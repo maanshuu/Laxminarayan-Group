@@ -1,93 +1,1412 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Laxminarayan Group — Admin CRM</title><meta http-equiv="Cache-Control" content="no-store"><meta http-equiv="Pragma" content="no-cache">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Laxminarayan Group — Executive Admin CRM</title>
+<meta http-equiv="Cache-Control" content="no-store">
+<meta http-equiv="Pragma" content="no-cache">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-:root{--ink:#171715;--gold:#b58a43;--paper:#f5f2eb;--line:#ddd8ce;--green:#2f6b45;--red:#a33b32;--blue:#315f87}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px Arial,sans-serif}.top{background:var(--ink);color:#fff;padding:16px 4%;display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:10}.top button,.btn{padding:9px 13px;border:1px solid #aaa;background:#fff;color:var(--ink);cursor:pointer;border-radius:4px}.top button{background:transparent;color:#fff;border-color:#666}.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.btn.gold{background:var(--gold);color:#fff;border-color:var(--gold)}.btn.danger{color:var(--red);border-color:#d7b5b0}.btn.smallbtn{padding:6px 9px;font-size:12px}.wrap{width:min(1500px,94%);margin:28px auto}.headrow{display:flex;justify-content:space-between;gap:14px;align-items:end;flex-wrap:wrap}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{border:1px solid var(--line);background:#fff;padding:10px 15px;cursor:pointer;border-radius:4px}.tab.active{background:var(--ink);color:#fff}.view{display:none}.view.active{display:block}.stats{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}.stat,.panel{background:#fff;border:1px solid var(--line);padding:18px;border-radius:5px}.stat strong{display:block;font:30px Georgia;color:var(--gold)}.panel{margin-top:16px;overflow:auto}h1,h2,h3{font-family:Georgia,serif}.toolbar{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}.toolbar .left,.toolbar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}table{width:100%;border-collapse:collapse;min-width:980px}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top;font-size:12px}th{background:#faf9f6;position:sticky;top:0}input,select,textarea{padding:9px;border:1px solid #ccc;background:#fff;width:100%;font:inherit;border-radius:4px}textarea{min-height:70px;resize:vertical}.formgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.span2{grid-column:span 2}.span4{grid-column:1/-1}.actions{display:flex;gap:6px;flex-wrap:wrap}.muted{color:#777}.small{font-size:11px}.pill{display:inline-block;padding:4px 7px;border:1px solid #ccc;font-size:11px;border-radius:999px}.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px}.bar{display:flex;align-items:center;gap:8px;margin:8px 0}.bar i{display:block;height:12px;background:var(--gold);border-radius:3px}.toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:#fff;padding:12px 16px;display:none;max-width:420px;z-index:50;border-radius:5px}.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:40}.modal.open{display:flex}.modal-card{background:#fff;width:min(900px,100%);max-height:90vh;overflow:auto;padding:22px;border-radius:6px}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.history{display:grid;grid-template-columns:1fr 1fr;gap:12px}.history .box{border:1px solid var(--line);padding:12px;border-radius:4px}.empty{padding:18px;text-align:center;color:#777}.danger-text{color:var(--red)}.success-text{color:var(--green)}.notice{padding:10px 12px;background:#faf9f6;border-left:3px solid var(--gold);margin:10px 0}.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}.media-card{border:1px solid var(--line);padding:8px}.media-card img,.media-card video{width:100%;height:130px;object-fit:cover;background:#eee}.filter{max-width:190px}.nowrap{white-space:nowrap}@media(max-width:1100px){.stats{grid-template-columns:repeat(4,1fr)}.formgrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.wrap{width:calc(100% - 20px);margin:18px auto}.stats{grid-template-columns:1fr 1fr}.formgrid{grid-template-columns:1fr}.span2,.span4{grid-column:1}.charts,.history{grid-template-columns:1fr}.top{align-items:flex-start;flex-wrap:wrap}.tab{flex:1 0 auto}}
-</style>
-<style id="crm-polish">
-:root{--ink:#171715;--gold:#b58a43;--gold-soft:#f5ead7;--paper:#f3f0e8;--white:#fff;--line:#ded8cd;--muted:#6f6b63;--green:#2f6b45;--red:#a33b32;--blue:#315f87;--shadow:0 8px 24px rgba(23,23,21,.06)}
-body{background:linear-gradient(180deg,#f7f4ed 0,#f1eee6 100%);color:var(--ink)}
-.top{padding:14px 4%;box-shadow:0 2px 12px rgba(0,0,0,.12)}
-.top b{letter-spacing:.06em;font-size:13px}.top button{transition:.18s}.top button:hover{background:#fff;color:var(--ink);border-color:#fff}
-.wrap{margin:26px auto 40px}.headrow{background:transparent;margin-bottom:8px}.headrow h1{font-size:32px;letter-spacing:-.02em}.headrow .muted{font-size:13px}
-.stats{gap:12px;margin:16px 0 20px}.stat{position:relative;box-shadow:var(--shadow);border-color:#e3ddd2;min-height:92px;padding:15px 16px;font-size:12px;color:var(--muted);overflow:hidden}.stat:after{content:"";position:absolute;right:-18px;top:-18px;width:58px;height:58px;border-radius:50%;background:var(--gold-soft);opacity:.75}.stat strong{font-size:28px;line-height:1.15;position:relative;z-index:1;margin-bottom:5px}
-.tabs{gap:7px;margin:14px 0 18px;padding:5px;background:#e9e5dc;border:1px solid #ddd7cc;border-radius:9px;box-shadow:inset 0 1px #fff}.tab{border-color:transparent;background:transparent;padding:9px 13px;border-radius:6px;font-weight:600;color:#555;transition:.18s}.tab:hover{background:#fff;color:var(--ink)}.tab.active{background:var(--ink);color:#fff;box-shadow:0 2px 7px rgba(0,0,0,.14)}
-.panel{border-color:#e0dbd1;border-radius:9px;box-shadow:var(--shadow);padding:20px;margin-top:14px}.panel+.panel{margin-top:14px}.toolbar{margin-bottom:14px}.toolbar h2{font-size:20px;letter-spacing:-.01em}.toolbar p{font-size:12px;line-height:1.5}
-.btn{border-radius:6px;padding:9px 13px;transition:.16s;font-weight:600}.btn:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.08)}.btn.primary{box-shadow:0 2px 6px rgba(0,0,0,.12)}.btn.gold{font-weight:700}.btn.danger{background:#fff8f7}.btn.danger:hover{background:#fff0ee}.btn.smallbtn{font-weight:600}
-.formgrid{gap:12px}.formgrid>input,.formgrid>select,.formgrid>textarea{min-height:40px}.formgrid textarea{min-height:86px}input,select,textarea{border-color:#d3cec4;border-radius:6px;transition:border-color .15s,box-shadow .15s;background:#fff}input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(181,138,67,.13)}
-.actions{gap:7px}.notice{border-radius:6px;background:#fbf8f1}.pill{background:#faf9f6;font-weight:600}
-table{border-collapse:separate;border-spacing:0;min-width:980px}th{background:#f7f5f0;color:#4d4a44;text-transform:uppercase;letter-spacing:.045em;font-size:10px;padding:11px 10px;border-bottom:1px solid #ded8ce}td{padding:11px 10px;border-bottom:1px solid #eee9e1;line-height:1.45}tbody tr:hover td{background:#fcfbf8}tbody tr:last-child td{border-bottom:0}.panel>table{margin-top:4px}
-.empty{padding:30px 18px}.toast{border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.2);font-weight:600}.modal-card{border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.charts{gap:14px}.charts .panel{margin-top:0}.history .box{border-radius:7px;background:#fcfbf8}.media-card{border-radius:8px;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.05);overflow:hidden}.media-card img,.media-card video{border-radius:5px}
-.filter{border-radius:6px}
-.section-kicker{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-weight:700;margin-bottom:4px}
-@media(max-width:1100px){.stats{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:650px){.headrow h1{font-size:27px}.panel{padding:15px}.tabs{overflow-x:auto;flex-wrap:nowrap}.tab{white-space:nowrap}.stats{gap:8px}.stat{min-height:80px;padding:12px}.stat strong{font-size:24px}.toolbar .right,.toolbar .left{width:100%}.toolbar .actions{width:100%}.toolbar .actions .btn{flex:1}.formgrid{gap:10px}}
-</style>
-
-<style id="crm-visual-premium">
-:root{
-  --ink:#171715;--gold:#b58a43;--gold-light:#d5b476;--paper:#f5f1e8;--white:#fff;
-  --line:#e1dbd0;--muted:#6f6a61;--green:#2f6b45;--red:#a33b32;
-  --shadow-sm:0 4px 14px rgba(25,22,17,.06);--shadow-md:0 12px 30px rgba(25,22,17,.09);
+:root {
+  --ink: #080b0f;
+  --ink-secondary: #475569;
+  --ink-muted: #64748b;
+  --ink-subtle: #94a3b8;
+  
+  --sky: #0284c7;
+  --sky-deep: #0369a1;
+  --sky-light: #e0f2fe;
+  --sky-subtle: #f0f9ff;
+  --sky-glow: rgba(2, 132, 199, 0.16);
+  
+  --bg-canvas: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  
+  --line: rgba(8, 11, 15, 0.08);
+  --line-strong: rgba(8, 11, 15, 0.15);
+  --line-sky: rgba(2, 132, 199, 0.25);
+  
+  --green: #059669;
+  --green-soft: #ecfdf5;
+  --red: #e11d48;
+  --red-soft: #fff1f2;
+  --amber: #d97706;
+  --amber-soft: #fffbeb;
+  
+  --shadow-sm: 0 1px 3px rgba(8, 11, 15, 0.04);
+  --shadow-card: 0 4px 20px -2px rgba(8, 11, 15, 0.05), 0 2px 6px -1px rgba(8, 11, 15, 0.02);
+  --shadow-hover: 0 16px 36px -8px rgba(8, 11, 15, 0.08);
+  --shadow-float: 0 25px 60px -15px rgba(8, 11, 15, 0.18);
+  
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 9999px;
+  
+  --gold: #0284c7;
+  --gold-soft: #e0f2fe;
+  --gold-light: #38bdf8;
+  --paper: #f8fafc;
+  --white: #ffffff;
 }
-html{scroll-behavior:smooth}
-body{background:radial-gradient(circle at 10% 0%,rgba(181,138,67,.09),transparent 26%),linear-gradient(180deg,#faf8f3 0,#f0ece3 100%);}
-.top{background:linear-gradient(110deg,#121210 0%,#24221d 58%,#171715 100%);border-bottom:1px solid rgba(213,180,118,.3);padding:16px 4%;box-shadow:0 5px 24px rgba(0,0,0,.16)}
-.top b{font-size:13px;letter-spacing:.14em;display:flex;align-items:center;gap:10px}.top b:before{content:"LG";display:inline-grid;place-items:center;width:31px;height:31px;border:1px solid rgba(213,180,118,.7);border-radius:50%;color:var(--gold-light);font:700 10px Georgia,serif;letter-spacing:.04em;box-shadow:inset 0 0 0 3px rgba(181,138,67,.08)}
-.top button{border-color:rgba(255,255,255,.28);border-radius:7px;font-weight:700;padding:9px 14px}.top button:hover{box-shadow:0 5px 16px rgba(0,0,0,.18);transform:translateY(-1px)}
-.wrap{width:min(1540px,94%);margin:30px auto 52px}.headrow{padding:4px 2px 6px}.headrow h1{font-size:34px;margin-bottom:6px;letter-spacing:-.035em}.headrow h1:after{content:"";display:block;width:48px;height:3px;margin-top:10px;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light))}.headrow .muted{max-width:760px;line-height:1.6}
-.stats{gap:14px;margin:20px 0 22px}.stat{border:1px solid #e2dbcf;border-radius:12px;background:linear-gradient(145deg,#fff 0,#fbf8f1 100%);box-shadow:var(--shadow-sm);min-height:104px;padding:17px 18px;transition:transform .18s,box-shadow .18s,border-color .18s}.stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-color:#d4c29f}.stat:after{width:78px;height:78px;right:-26px;top:-26px;background:radial-gradient(circle,var(--gold-soft) 0,rgba(245,234,215,.35) 58%,transparent 60%)}.stat strong{font-size:31px;color:#a77b35;margin-bottom:7px}.stat:before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--gold-light),var(--gold));opacity:.85}
-.tabs{gap:5px;margin:15px 0 20px;padding:6px;background:rgba(231,226,216,.9);border:1px solid #dcd5c8;border-radius:12px;box-shadow:0 3px 12px rgba(25,22,17,.05);position:sticky;top:64px;z-index:8;backdrop-filter:blur(10px)}.tab{position:relative;border:0;padding:10px 14px;border-radius:8px;font-size:13px;color:#5d584f}.tab.active{background:linear-gradient(135deg,#1b1a17,#302c24);box-shadow:0 4px 12px rgba(0,0,0,.16)}.tab.active:after{content:"";position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:18px;height:2px;border-radius:2px;background:var(--gold-light)}
-.panel{border:1px solid #e1dbd0;border-radius:12px;box-shadow:var(--shadow-sm);padding:21px;background:rgba(255,255,255,.96)}.panel:hover{border-color:#dbd2c3}.toolbar h2{font-size:21px}.toolbar h2:before{content:"";display:inline-block;width:4px;height:18px;margin:0 8px 0 0;vertical-align:-2px;border-radius:3px;background:var(--gold)}
-.btn{border-radius:7px;box-shadow:0 1px 0 rgba(0,0,0,.03)}.btn.primary{background:linear-gradient(135deg,#171715,#302c24)}.btn.gold{background:linear-gradient(135deg,#a87831,#c49b57)}.btn.primary:hover,.btn.gold:hover{filter:brightness(1.06)}
-.formgrid{background:linear-gradient(180deg,#fff,#fcfaf6);padding:2px;border-radius:9px}.formgrid>input,.formgrid>select,.formgrid>textarea{box-shadow:inset 0 1px 2px rgba(0,0,0,.025)}
-input,select,textarea{min-height:41px}textarea{line-height:1.5}
-table{border-spacing:0 3px;border-collapse:separate}.panel>table{margin-left:-3px;width:calc(100% + 6px)}th{background:#f2eee6;border-top:1px solid #e0d9cc;border-bottom:1px solid #e0d9cc;color:#514b42;padding:12px 11px}th:first-child{border-radius:8px 0 0 8px}th:last-child{border-radius:0 8px 8px 0}td{border-bottom:1px solid #eee9e1;padding:12px 11px}tbody tr td{background:rgba(255,255,255,.7)}tbody tr:hover td{background:#fffaf1}tbody tr:first-child td:first-child,tbody tr td:first-child{border-left:1px solid transparent}
-.pill{background:#f7f3eb;border-color:#ddd3c2;color:#5a4b34}.empty{background:#fbf9f5;border-radius:8px;margin:5px 0}
-.notice{border-left:4px solid var(--gold);box-shadow:var(--shadow-sm);background:linear-gradient(90deg,#fbf7ee,#fff)}.toast{background:linear-gradient(135deg,#171715,#302c24);border:1px solid rgba(213,180,118,.35)}
-.modal{background:rgba(13,12,10,.62);backdrop-filter:blur(4px)}.modal-card{border:1px solid #e0d8cb;box-shadow:0 24px 80px rgba(0,0,0,.28)}
-.charts .panel h3,.history .box h3{margin-top:2px}.history .box{background:linear-gradient(180deg,#fff,#faf7f0);box-shadow:var(--shadow-sm)}
-.media-card{border-color:#ded6c9;box-shadow:var(--shadow-sm)}.media-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.filter{background:#fff}
-@media(max-width:1100px){.tabs{top:58px}.stat{min-height:96px}}
-@media(max-width:650px){.top{padding:12px 14px}.top b{font-size:11px}.top b:before{width:28px;height:28px}.wrap{width:calc(100% - 16px);margin:20px auto 34px}.headrow h1{font-size:28px}.tabs{position:static;padding:5px;margin-bottom:14px}.tab{padding:9px 12px}.panel{padding:14px;border-radius:10px}.stat{min-height:86px;padding:13px}.stat strong{font-size:25px}.panel>table{margin-left:0;width:100%}}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background-color: var(--bg-canvas);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+button, input, select, textarea { font-family: inherit; }
+
+/* ─── TOP EXECUTIVE APP BAR ─── */
+.top {
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 4%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+.top-brand-flex {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.top-monogram {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+}
+.top-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+.top b {
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #fff;
+}
+.top-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+.top-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  color: #38bdf8;
+  margin-left: 8px;
+}
+.top-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.top-actions-flex {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.top-link {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #cbd5e1;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  transition: all .2s ease;
+}
+.top-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+.top button {
+  padding: 8px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  transition: all .2s ease;
+}
+.top button:hover {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+/* ─── MAIN WRAPPER ─── */
+.wrap {
+  width: min(1520px, 94%);
+  margin: 32px auto 60px;
+}
+.headrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.headrow h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.8px;
+  line-height: 1.15;
+}
+.headrow .muted {
+  font-size: 13.5px;
+  color: var(--ink-muted);
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all .2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--ink);
+  transform: translateY(-1px);
+}
+.btn.primary {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+  box-shadow: 0 2px 8px rgba(8, 11, 15, 0.15);
+}
+.btn.primary:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(8, 11, 15, 0.25);
+}
+.btn.gold {
+  background: var(--sky);
+  color: #fff;
+  border-color: var(--sky);
+  box-shadow: 0 2px 8px var(--sky-glow);
+}
+.btn.gold:hover {
+  background: var(--sky-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px var(--sky-glow);
+}
+.btn.danger {
+  background: var(--red-soft);
+  color: var(--red);
+  border-color: #fecdd3;
+}
+.btn.danger:hover {
+  background: #ffe4e6;
+  border-color: var(--red);
+  transform: translateY(-1px);
+}
+.btn.smallbtn {
+  padding: 5px 11px;
+  font-size: 11.5px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── STATS KPI GRID ─── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  padding: 20px 18px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: all .25s ease;
+  position: relative;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.stat:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--line-sky);
+}
+.stat strong {
+  display: block;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.stat::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.stat:hover::after {
+  opacity: 1;
+}
+
+/* ─── COMMAND CENTER HERO ─── */
+.dashboard-hero {
+  display: grid;
+  grid-template-columns: 1.45fr 0.75fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  color: #fff;
+  background: linear-gradient(135deg, #080b0f 0%, #1e293b 60%, #0f172a 100%);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hero-card::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+  right: -50px;
+  top: -60px;
+  pointer-events: none;
+}
+.section-kicker {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+.hero-card h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.hero-card p {
+  color: #94a3b8;
+  font-size: 13.5px;
+  line-height: 1.6;
+  max-width: 540px;
+}
+.attendance-mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+.attendance-mini div {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-size: 11.5px;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+.attendance-mini strong {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-card {
+  border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.quick-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.quick-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-secondary);
+  font-weight: 500;
+}
+.quick-stat:last-of-type {
+  border-bottom: none;
+}
+.quick-stat strong {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--sky);
+}
+.quick-card .actions {
+  margin-top: 14px;
+}
+
+/* ─── SEGMENTED CONTROL TABS ─── */
+.tabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  position: sticky;
+  top: 74px;
+  z-index: 50;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab {
+  border: none;
+  background: transparent;
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all .2s ease;
+  white-space: nowrap;
+}
+.tab:hover {
+  color: var(--ink);
+  background: var(--bg-subtle);
+}
+.tab.active {
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(8, 11, 15, 0.18);
+}
+
+/* ─── PANELS & SECTIONS ─── */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 26px 28px;
+  box-shadow: var(--shadow-card);
+  margin-top: 18px;
+  overflow-x: auto;
+}
+.panel + .panel {
+  margin-top: 18px;
+}
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.toolbar h2 {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+.toolbar p {
+  font-size: 13px;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
+/* ─── MODERN DATA TABLES ─── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+  font-size: 13px;
+}
+th {
+  background: var(--bg-subtle);
+  color: var(--ink-secondary);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+th:first-child { border-top-left-radius: var(--radius-sm); border-bottom-left-radius: var(--radius-sm); }
+th:last-child { border-top-right-radius: var(--radius-sm); border-bottom-right-radius: var(--radius-sm); }
+td {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  color: var(--ink);
+  line-height: 1.5;
+}
+tbody tr {
+  transition: background-color .15s ease;
+}
+tbody tr:hover td {
+  background: #f8fafc;
+}
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ─── STATUS PILLS ─── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid rgba(8, 11, 15, 0.08);
+  white-space: nowrap;
+}
+
+/* ─── FORM GRIDS & CONTROLS ─── */
+.formgrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.span2 { grid-column: span 2; }
+.span4 { grid-column: 1 / -1; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  transition: all .2s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--sky);
+  box-shadow: 0 0 0 3px var(--sky-glow);
+}
+textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.muted { color: var(--ink-muted); }
+.small { font-size: 11.5px; color: var(--ink-muted); }
+.filter { max-width: 200px; }
+
+/* ─── RECENT ACTIVITY & SNAPSHOT ─── */
+.recent-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.activity-list {
+  display: grid;
+  gap: 8px;
+}
+.activity-item {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  font-size: 13px;
+}
+.activity-item b {
+  color: var(--ink);
+  font-size: 13px;
+}
+.activity-item small {
+  display: block;
+  color: var(--ink-muted);
+  margin-top: 4px;
+  font-size: 11.5px;
+}
+.notice {
+  padding: 14px 18px;
+  background: var(--sky-subtle);
+  border-left: 4px solid var(--sky);
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+/* ─── MEDIA GRID ─── */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.media-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: all .2s ease;
+}
+.media-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.media-card img, .media-card video {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+}
+
+/* ─── CHARTS ─── */
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 13px;
+}
+.bar i {
+  display: block;
+  height: 14px;
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+  border-radius: var(--radius-pill);
+  transition: width .4s ease;
+}
+
+/* ─── MODALS & TOAST ─── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 11, 15, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
+}
+.modal.open { display: flex; animation: modalIn .2s ease; }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+.modal-card {
+  background: #fff;
+  width: min(840px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-float);
+  border: 1px solid var(--line);
+}
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.modal-head h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.history {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 18px;
+}
+.history .box {
+  border: 1px solid var(--line);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  font-size: 13px;
+}
+.history .box h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: var(--radius-pill);
+  display: none;
+  max-width: 440px;
+  z-index: 500;
+  box-shadow: var(--shadow-float);
+  font-weight: 600;
+  font-size: 13.5px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: toastSlide .25s ease;
+}
+@keyframes toastSlide { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1200px) {
+  .stats { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 850px) {
+  .dashboard-hero { grid-template-columns: 1fr; }
+  .recent-panel { grid-template-columns: 1fr; }
+  .history { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .formgrid { grid-template-columns: 1fr; }
+  .span2, .span4 { grid-column: 1; }
+  .charts { grid-template-columns: 1fr; }
+  .top { flex-direction: column; align-items: flex-start; }
+  .tabs { border-radius: var(--radius-md); }
+}
 </style>
-<style id="attendance-premium">
-.dashboard-hero{display:grid;grid-template-columns:1.45fr .75fr;gap:14px;margin:10px 0 18px}.hero-card{position:relative;overflow:hidden;border-radius:16px;padding:24px;color:#fff;background:linear-gradient(125deg,#151512,#302b22 58%,#8f6b35);box-shadow:0 16px 36px rgba(23,23,21,.16)}.hero-card:after{content:"";position:absolute;width:180px;height:180px;border:1px solid rgba(255,255,255,.15);border-radius:50%;right:-60px;top:-65px}.hero-card h2{font-size:26px;margin:0 0 7px}.hero-card p{margin:0;color:rgba(255,255,255,.72);line-height:1.55}.quick-card{border-radius:16px;padding:18px;background:linear-gradient(145deg,#fff,#f8f3e8);border:1px solid #e2dacd;box-shadow:var(--shadow-sm)}.quick-card .actions{margin-top:12px}.quick-stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #ebe5da}.quick-stat:last-child{border-bottom:0}.quick-stat strong{font:24px Georgia;color:var(--gold)}.recent-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px}.activity-list{display:grid;gap:8px}.activity-item{padding:11px 12px;border:1px solid #eee8dd;border-radius:8px;background:#fcfbf8}.activity-item b{font-size:12px}.activity-item small{display:block;color:var(--muted);margin-top:4px}.attendance-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.attendance-mini div{padding:9px;border-radius:8px;background:#faf8f3;text-align:center}.attendance-mini strong{display:block;font:20px Georgia;color:var(--gold)}
-@media(max-width:850px){.dashboard-hero,.recent-panel{grid-template-columns:1fr}}
-@media(max-width:650px){.attendance-mini{grid-template-columns:1fr 1fr}}
-</style>
-</head><body>
-<div class="top"><b>LAXMINARAYAN GROUP · ADMIN CRM</b><button onclick="location.href='/api/auth/logout'">LOG OUT</button></div>
+</head>
+<body>
+
+<!-- EXECUTIVE TOP NAVIGATION -->
+<div class="top">
+  <div class="top-brand-flex">
+    <div class="top-monogram">LG</div>
+    <div class="top-title-wrap">
+      <b>LAXMINARAYAN GROUP</b>
+      <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
+    </div>
+    <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
+  </div>
+  <div class="top-actions-flex">
+    <a href="index.html" class="top-link" target="_blank">View Website ↗</a>
+    <button onclick="location.href='/api/auth/logout'">LOG OUT</button>
+  </div>
+</div>
+
 <main class="wrap">
-<div class="headrow"><div><h1 style="margin-bottom:5px">Business Dashboard</h1><p class="muted" style="margin-top:0">Manage enquiries, leads, site visits, team, customers, projects and reporting from one place.</p></div><div class="actions"><button class="btn" onclick="refreshAll()">Refresh</button></div></div>
-<div class="stats"><div class="stat"><strong id="users">0</strong>Customers</div><div class="stat"><strong id="enq">0</strong>Enquiries</div><div class="stat"><strong id="leads">0</strong>Leads</div><div class="stat"><strong id="openLeads">0</strong>Open leads</div><div class="stat"><strong id="visits">0</strong>Site visits</div><div class="stat"><strong id="employees">0</strong>Team</div><div class="stat"><strong id="projects">0</strong>Active projects</div><div class="stat"><strong id="new">0</strong>New enquiries</div></div>
-<div class="dashboard-hero"><div class="hero-card"><span class="section-kicker" style="color:#d5b476">Laxminarayan Group · Command center</span><h2>Everything important, at a glance.</h2><p>Track customers, leads, projects, site visits and team attendance without leaving the dashboard.</p><div class="attendance-mini"><div><strong id="attPresent">0</strong>Present</div><div><strong id="attAbsent">0</strong>Absent</div><div><strong id="attLeave">0</strong>Leave</div><div><strong id="attHalf">0</strong>Half day</div></div></div><div class="quick-card"><span class="section-kicker">Today</span><h3 style="margin:3px 0 6px">Quick actions</h3><div class="quick-stat"><span>Open leads</span><strong id="heroOpenLeads">0</strong></div><div class="quick-stat"><span>New enquiries</span><strong id="heroNewEnquiries">0</strong></div><div class="actions"><button class="btn gold" onclick="showView('attendanceView')">Mark attendance</button><button class="btn" onclick="showView('leadsView')">Open leads</button></div></div></div>
-<div class="tabs"><button class="tab active" data-view="overview">Overview</button><button class="tab" data-view="leadsView">Leads</button><button class="tab" data-view="visitsView">Site visits</button><button class="tab" data-view="projectsView">Projects</button><button class="tab" data-view="teamView">Team</button><button class="tab" data-view="attendanceView">Attendance</button><button class="tab" data-view="customersView">Customers</button><button class="tab" data-view="reportsView">Reports</button><button class="tab" data-view="auditView">Audit log</button></div>
+  <!-- HEAD ROW -->
+  <div class="headrow">
+    <div>
+      <h1 style="margin-bottom:5px">Business Dashboard</h1>
+      <p class="muted" style="margin-top:0">Manage enquiries, leads, site visits, team, customers, projects and reporting from one place.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="refreshAll()">Refresh</button>
+    </div>
+  </div>
 
-<section id="overview" class="view active"><div class="panel"><div class="toolbar"><div><h2 style="margin:0" id="enquiryFormTitle">Add enquiry</h2><p class="muted" style="margin-bottom:0">Create an enquiry received from the website, phone or walk-in, or edit a saved enquiry.</p></div><div class="actions"><button class="btn" type="button" onclick="resetEnquiryForm()">+ New enquiry</button><button class="btn" type="button" onclick="refreshEnquiries()">Refresh saved enquiries</button></div></div><form id="enquiryFormInline" class="formgrid" style="margin-top:14px"><input id="enquiryIdInline" type="hidden"><select id="enquiryUserInline"><option value="">No linked customer account</option></select><input id="enquiryNameInline" required placeholder="Customer name"><input id="enquiryPhoneInline" required placeholder="Phone"><input id="enquiryEmailInline" type="email" placeholder="Email"><select id="enquiryProjectInline"><option value="">No project / General</option></select><select id="enquiryStatusInline"><option>new</option><option>contacted</option><option>closed</option></select><textarea id="enquiryMessageInline" class="span2" placeholder="Enquiry message"></textarea><textarea id="enquiryResponseInline" class="span2" placeholder="Team response"></textarea><div class="span4 actions"><button class="btn primary" type="submit" id="enquirySubmit">Save enquiry</button><button class="btn" type="button" onclick="resetEnquiryForm()">Clear</button><span id="enquiryFormMsg" class="muted"></span></div></form></div><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Saved enquiries</h2><p class="muted" style="margin-bottom:0">Saved records stay here after Save and Refresh. Use Edit to load a record into the form above.</p></div></div><table><thead><tr><th>Ref</th><th>Date</th><th>Customer</th><th>Contact</th><th>Message</th><th>Project</th><th>Status</th><th>Team response</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table></div><div class="recent-panel"><div class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="margin:0">Recent activity</h2><p class="muted" style="margin-bottom:0">Latest CRM actions across the system.</p></div></div><div id="recentActivity" class="activity-list"></div></div><div class="panel" style="margin-top:16px"><div class="toolbar"><div><h2 style="margin:0">Today’s team snapshot</h2><p class="muted" style="margin-bottom:0">Attendance can be updated from the Attendance tab.</p></div></div><div class="notice"><b id="teamSnapshotText">Loading attendance…</b><br><span class="muted">Use the dashboard quick action to mark today's attendance.</span></div></div></div></section>
+  <!-- STATS KPI STRIP -->
+  <div class="stats">
+    <div class="stat"><strong id="users">0</strong>Customers</div>
+    <div class="stat"><strong id="enq">0</strong>Enquiries</div>
+    <div class="stat"><strong id="leads">0</strong>Leads</div>
+    <div class="stat"><strong id="openLeads">0</strong>Open leads</div>
+    <div class="stat"><strong id="visits">0</strong>Site visits</div>
+    <div class="stat"><strong id="employees">0</strong>Team</div>
+    <div class="stat"><strong id="projects">0</strong>Active projects</div>
+    <div class="stat"><strong id="new">0</strong>New enquiries</div>
+  </div>
 
-<section id="leadsView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0" id="leadFormTitleInline">Add lead</h2><p class="muted" style="margin-bottom:0">Create a lead manually or edit a website-generated lead. Saved leads appear in the table below.</p></div><div class="actions"><button class="btn" type="button" onclick="resetLeadFormInline()">+ New lead</button><button class="btn" type="button" onclick="refreshLeads()">Refresh saved leads</button></div></div><form id="leadFormInline" class="formgrid" style="margin-top:14px"><input id="leadIdInline" type="hidden"><select id="leadUserInline"><option value="">No linked customer account</option></select><input id="leadNameInline" required placeholder="Lead/customer name"><input id="leadPhoneInline" placeholder="Phone"><input id="leadEmailInline" type="email" placeholder="Email"><input id="leadSourceInline" placeholder="Source (website, phone, walk-in...)" value="admin"><select id="leadProjectInline"><option value="">No project / General</option></select><select id="leadStatusInline"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select><select id="leadEmployeeInline"><option value="">Unassigned</option></select><input id="leadFollowInline" type="datetime-local"><textarea id="leadNotesInline" class="span2" placeholder="Notes"></textarea><textarea id="leadLostInline" class="span2" placeholder="Lost reason (optional)"></textarea><div class="span4 actions"><button class="btn primary" type="submit" id="leadSubmitInline">Save lead</button><button class="btn" type="button" onclick="resetLeadFormInline()">Clear</button><span id="leadFormMsgInline" class="muted"></span></div></form></div><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Saved leads</h2><p class="muted" style="margin-bottom:0">Saved records are read-only here. Use Edit to load a lead into the form above.</p></div></div><table><thead><tr><th>Lead</th><th>Customer</th><th>Project</th><th>Status</th><th>Assigned</th><th>Follow-up</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="leadRows"></tbody></table></div></section>
+  <!-- COMMAND CENTER HERO -->
+  <div class="dashboard-hero">
+    <div class="hero-card">
+      <span class="section-kicker">Command Center</span>
+      <h2>Everything important, at a glance.</h2>
+      <p>Track customers, leads, projects, site visits and team attendance without leaving the dashboard.</p>
+      <div class="attendance-mini">
+        <div><strong id="attPresent">0</strong>Present</div>
+        <div><strong id="attAbsent">0</strong>Absent</div>
+        <div><strong id="attLeave">0</strong>Leave</div>
+        <div><strong id="attHalf">0</strong>Half day</div>
+      </div>
+    </div>
+    <div class="quick-card">
+      <span class="section-kicker">Today</span>
+      <h3 style="margin:3px 0 6px">Quick actions</h3>
+      <div class="quick-stat"><span>Open leads</span><strong id="heroOpenLeads">0</strong></div>
+      <div class="quick-stat"><span>New enquiries</span><strong id="heroNewEnquiries">0</strong></div>
+      <div class="actions">
+        <button class="btn gold" onclick="showView('attendanceView')">Mark attendance</button>
+        <button class="btn" onclick="showView('leadsView')">Open leads</button>
+      </div>
+    </div>
+  </div>
 
-<section id="visitsView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0" id="visitFormTitle">Add site visit</h2><p class="muted" style="margin-bottom:0">Create a visit from a phone/walk-in request, or edit an existing visit.</p></div><div class="actions"><button class="btn" type="button" onclick="resetVisitForm()">+ New site visit</button><button class="btn" type="button" onclick="refreshVisits()">Refresh saved visits</button></div></div><form id="visitFormInline" class="formgrid" style="margin-top:14px"><input id="visitIdInline" type="hidden"><select id="visitUserInline"><option value="">No linked customer account</option></select><input id="visitNameInline" required placeholder="Customer name"><input id="visitPhoneInline" placeholder="Phone"><input id="visitEmailInline" type="email" placeholder="Email"><select id="visitProjectInline"><option value="">No project / General</option></select><input id="visitPreferredInline" required type="datetime-local"><select id="visitStatusInline"><option>requested</option><option>confirmed</option><option>completed</option><option>cancelled</option></select><textarea id="visitNotesInline" class="span2" placeholder="Customer notes"></textarea><textarea id="visitAdminInline" class="span2" placeholder="Admin notes"></textarea><div class="span4 actions"><button class="btn primary" type="submit" id="visitSubmit">Save site visit</button><button class="btn" type="button" onclick="resetVisitForm()">Clear</button><span id="visitFormMsg" class="muted"></span></div></form></div><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Saved site visits</h2><p class="muted" style="margin-bottom:0">Saved records stay here after Save and Refresh. Use Edit to load a record into the form above.</p></div></div><table><thead><tr><th>Date/time</th><th>Customer</th><th>Project</th><th>Contact</th><th>Status</th><th>Admin notes</th><th>Actions</th></tr></thead><tbody id="visitRows"></tbody></table></div></section>
+  <!-- SEGMENTED CONTROL TABS -->
+  <div class="tabs">
+    <button class="tab active" data-view="overview">Overview</button>
+    <button class="tab" data-view="leadsView">Leads</button>
+    <button class="tab" data-view="visitsView">Site visits</button>
+    <button class="tab" data-view="projectsView">Projects</button>
+    <button class="tab" data-view="teamView">Team</button>
+    <button class="tab" data-view="attendanceView">Attendance</button>
+    <button class="tab" data-view="customersView">Customers</button>
+    <button class="tab" data-view="reportsView">Reports</button>
+    <button class="tab" data-view="auditView">Audit log</button>
+  </div>
 
-<section id="attendanceView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Employee attendance</h2><p class="muted" style="margin-bottom:0">Record one attendance entry per employee per day. Save updates the same daily record instead of creating duplicates.</p></div><div class="actions"><label class="small">Date <input class="filter" id="attendanceDate" type="date"></label><button class="btn" onclick="refreshAttendance()">Refresh</button></div></div><form id="attendanceForm" class="formgrid" style="margin-top:14px"><select id="attendanceEmployee" required><option value="">Select employee</option></select><select id="attendanceStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="leave">Leave</option><option value="half_day">Half day</option></select><input id="attendanceIn" type="time"><input id="attendanceOut" type="time"><input id="attendanceNotes" class="span2" placeholder="Attendance notes (optional)"><div class="span4 actions"><button class="btn primary" type="submit">Save attendance</button><button class="btn" type="button" onclick="resetAttendanceForm()">Clear</button><span id="attendanceMsg" class="muted"></span></div></form></div><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Saved attendance</h2><p class="muted" style="margin-bottom:0">Daily records for the selected date.</p></div><div class="actions"><span class="pill" id="attendanceSummary">0 recorded</span></div></div><table><thead><tr><th>Employee</th><th>Code</th><th>Department</th><th>Status</th><th>Check in</th><th>Check out</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="attendanceRows"></tbody></table></div></section>
+  <!-- OVERVIEW VIEW -->
+  <section id="overview" class="view active">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0" id="enquiryFormTitle">Add enquiry</h2>
+          <p class="muted" style="margin-bottom:0">Create an enquiry received from the website, phone or walk-in, or edit a saved enquiry.</p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" onclick="resetEnquiryForm()">+ New enquiry</button>
+          <button class="btn" type="button" onclick="refreshEnquiries()">Refresh saved enquiries</button>
+        </div>
+      </div>
+      <form id="enquiryFormInline" class="formgrid" style="margin-top:14px">
+        <input id="enquiryIdInline" type="hidden">
+        <select id="enquiryUserInline"><option value="">No linked customer account</option></select>
+        <input id="enquiryNameInline" required placeholder="Customer name">
+        <input id="enquiryPhoneInline" required placeholder="Phone">
+        <input id="enquiryEmailInline" type="email" placeholder="Email">
+        <select id="enquiryProjectInline"><option value="">No project / General</option></select>
+        <select id="enquiryStatusInline"><option>new</option><option>contacted</option><option>closed</option></select>
+        <textarea id="enquiryMessageInline" class="span2" placeholder="Enquiry message"></textarea>
+        <textarea id="enquiryResponseInline" class="span2" placeholder="Team response"></textarea>
+        <div class="span4 actions">
+          <button class="btn primary" type="submit" id="enquirySubmit">Save enquiry</button>
+          <button class="btn" type="button" onclick="resetEnquiryForm()">Clear</button>
+          <span id="enquiryFormMsg" class="muted"></span>
+        </div>
+      </form>
+    </div>
 
-<section id="projectsView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Project management</h2><p class="muted" style="margin-bottom:0">Create, edit, activate/deactivate and manage project media.</p></div><div class="actions"><button class="btn primary" onclick="resetProjectForm();window.scrollTo({top:0,behavior:'smooth'})">+ New project</button><button class="btn" onclick="refreshProjects()">Refresh saved projects</button></div></div><form id="projectForm" class="formgrid"><input id="pId" type="hidden"><input id="pName" required placeholder="Project name"><select id="pCategory" required><option value="">Category</option><option>RESIDENTIAL</option><option>COMMERCIAL</option><option>DEVELOPMENT</option><option>INDUSTRIAL</option></select><select id="pStatus"><option>active</option><option>inactive</option></select><input id="pLocation" placeholder="Location / area"><input id="pPrice" placeholder="Price / price range"><input id="pAmenities" class="span2" placeholder="Amenities (comma separated)"><input id="pImage" placeholder="Legacy image path (optional)"><input id="pImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif,image/tiff"><textarea id="pDescription" class="span2" placeholder="Description"></textarea><div class="span4 actions"><button class="btn primary" type="submit">Save project</button><button class="btn" type="button" onclick="resetProjectForm()">Clear</button><span id="projectMsg" class="muted"></span></div></form><div id="mediaManager" style="display:none;margin-top:18px;border:1px solid var(--line);padding:15px;background:#faf9f6"><div class="actions"><h3 id="mediaTitle" style="margin:0;flex:1">Project media</h3><button class="btn" id="closeMedia">Close</button></div><input id="mediaFiles" type="file" multiple accept="image/*,video/mp4,video/webm,video/quicktime,video/x-m4v,video/ogg,video/x-msvideo" style="margin-top:12px"><button class="btn" id="uploadMedia" style="margin-top:8px">Upload selected media</button><p id="mediaMsg" class="muted small"></p><div id="mediaGrid" class="media-grid"></div></div><table style="margin-top:18px"><thead><tr><th>Project</th><th>Category</th><th>Status</th><th>Media</th><th>Actions</th></tr></thead><tbody id="projectRows"></tbody></table></div></section>
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Saved enquiries</h2>
+          <p class="muted" style="margin-bottom:0">Saved records stay here after Save and Refresh. Use Edit to load a record into the form above.</p>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Ref</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Contact</th>
+            <th>Message</th>
+            <th>Project</th>
+            <th>Status</th>
+            <th>Team response</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
 
-<section id="teamView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Team members</h2><p class="muted" style="margin-bottom:0">Create staff accounts, edit details, reset passwords and activate/deactivate access.</p></div><div class="actions"><button class="btn primary" onclick="resetTeamForm();document.getElementById('teamForm').scrollIntoView({behavior:'smooth'})">+ New team member</button><button class="btn" onclick="refreshTeam()">Refresh saved team</button></div></div><form id="teamForm" class="formgrid"><input id="tId" type="hidden"><input id="tName" required placeholder="Full name"><input id="tEmail" required type="email" placeholder="Email"><input id="tPhone" placeholder="Phone"><input id="tDepartment" placeholder="Department"><input id="tDesignation" placeholder="Designation"><input id="tPassword" type="password" minlength="8" placeholder="Password (new account / optional on edit)"><div class="span2 actions"><button class="btn primary" type="submit" id="teamSubmit">Create team account</button><button class="btn" type="button" onclick="resetTeamForm()">Clear</button><span id="teamMsg" class="muted"></span></div></form></div><div class="panel"><table><thead><tr><th>Name</th><th>Contact</th><th>Department</th><th>Designation</th><th>Code</th><th>Status</th><th>Actions</th></tr></thead><tbody id="teamRows"></tbody></table></div></section>
+    <div class="recent-panel">
+      <div class="panel" style="margin-top:16px">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0">Recent activity</h2>
+            <p class="muted" style="margin-bottom:0">Latest CRM actions across the system.</p>
+          </div>
+        </div>
+        <div id="recentActivity" class="activity-list"></div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0">Today’s team snapshot</h2>
+            <p class="muted" style="margin-bottom:0">Attendance can be updated from the Attendance tab.</p>
+          </div>
+        </div>
+        <div class="notice">
+          <b id="teamSnapshotText">Loading attendance…</b><br>
+          <span class="muted">Use the dashboard quick action to mark today's attendance.</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section id="customersView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Customers</h2><p class="muted" style="margin-bottom:0">Edit profiles, activate/suspend accounts, or open the customer's complete CRM history.</p></div><button class="btn" onclick="refreshCustomers()">Refresh saved customers</button></div><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="urows"></tbody></table></div></section>
+  <!-- LEADS VIEW -->
+  <section id="leadsView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0" id="leadFormTitleInline">Add lead</h2>
+          <p class="muted" style="margin-bottom:0">Create a lead manually or edit a website-generated lead. Saved leads appear in the table below.</p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" onclick="resetLeadFormInline()">+ New lead</button>
+          <button class="btn" type="button" onclick="refreshLeads()">Refresh saved leads</button>
+        </div>
+      </div>
+      <form id="leadFormInline" class="formgrid" style="margin-top:14px">
+        <input id="leadIdInline" type="hidden">
+        <select id="leadUserInline"><option value="">No linked customer account</option></select>
+        <input id="leadNameInline" required placeholder="Lead/customer name">
+        <input id="leadPhoneInline" placeholder="Phone">
+        <input id="leadEmailInline" type="email" placeholder="Email">
+        <input id="leadSourceInline" placeholder="Source (website, phone, walk-in...)" value="admin">
+        <select id="leadProjectInline"><option value="">No project / General</option></select>
+        <select id="leadStatusInline"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select>
+        <select id="leadEmployeeInline"><option value="">Unassigned</option></select>
+        <input id="leadFollowInline" type="datetime-local">
+        <textarea id="leadNotesInline" class="span2" placeholder="Notes"></textarea>
+        <textarea id="leadLostInline" class="span2" placeholder="Lost reason (optional)"></textarea>
+        <div class="span4 actions">
+          <button class="btn primary" type="submit" id="leadSubmitInline">Save lead</button>
+          <button class="btn" type="button" onclick="resetLeadFormInline()">Clear</button>
+          <span id="leadFormMsgInline" class="muted"></span>
+        </div>
+      </form>
+    </div>
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Saved leads</h2>
+          <p class="muted" style="margin-bottom:0">Saved records are read-only here. Use Edit to load a lead into the form above.</p>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Customer</th>
+            <th>Project</th>
+            <th>Status</th>
+            <th>Assigned</th>
+            <th>Follow-up</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leadRows"></tbody>
+      </table>
+    </div>
+  </section>
 
-<section id="reportsView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Reports</h2><p class="muted" style="margin-bottom:0">Read-only business metrics calculated from your live CRM data.</p></div><div class="actions"><label class="small">From <input class="filter" id="reportStart" type="date"></label><label class="small">To <input class="filter" id="reportEnd" type="date"></label><button class="btn primary" onclick="loadReports()">Apply filters</button><button class="btn" onclick="clearReportFilters()">Clear filters</button><button class="btn" onclick="refreshReports()">Refresh</button><a class="btn" href="/api/admin/reports.csv">Export leads CSV</a></div></div><div class="charts"><div class="panel"><h3>Lead status</h3><div id="statusChart"></div></div><div class="panel"><h3>Leads by project</h3><div id="projectChart"></div></div></div><div class="panel"><h3>Monthly leads</h3><div id="monthlyChart"></div><p id="conversion" style="font:22px Georgia"></p></div><div class="panel"><h3>Site visits</h3><div id="visitChart"></div></div></section>
+  <!-- VISITS VIEW -->
+  <section id="visitsView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0" id="visitFormTitle">Add site visit</h2>
+          <p class="muted" style="margin-bottom:0">Create a visit from a phone/walk-in request, or edit an existing visit.</p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" onclick="resetVisitForm()">+ New site visit</button>
+          <button class="btn" type="button" onclick="refreshVisits()">Refresh saved visits</button>
+        </div>
+      </div>
+      <form id="visitFormInline" class="formgrid" style="margin-top:14px">
+        <input id="visitIdInline" type="hidden">
+        <select id="visitUserInline"><option value="">No linked customer account</option></select>
+        <input id="visitNameInline" required placeholder="Customer name">
+        <input id="visitPhoneInline" placeholder="Phone">
+        <input id="visitEmailInline" type="email" placeholder="Email">
+        <select id="visitProjectInline"><option value="">No project / General</option></select>
+        <input id="visitPreferredInline" required type="datetime-local">
+        <select id="visitStatusInline"><option>requested</option><option>confirmed</option><option>completed</option><option>cancelled</option></select>
+        <textarea id="visitNotesInline" class="span2" placeholder="Customer notes"></textarea>
+        <textarea id="visitAdminInline" class="span2" placeholder="Admin notes"></textarea>
+        <div class="span4 actions">
+          <button class="btn primary" type="submit" id="visitSubmit">Save site visit</button>
+          <button class="btn" type="button" onclick="resetVisitForm()">Clear</button>
+          <span id="visitFormMsg" class="muted"></span>
+        </div>
+      </form>
+    </div>
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Saved site visits</h2>
+          <p class="muted" style="margin-bottom:0">Saved records stay here after Save and Refresh. Use Edit to load a record into the form above.</p>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date/time</th>
+            <th>Customer</th>
+            <th>Project</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Admin notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="visitRows"></tbody>
+      </table>
+    </div>
+  </section>
 
-<section id="auditView" class="view"><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Audit log</h2><p class="muted" style="margin-bottom:0">Security/history record. Audit entries are intentionally not editable or deletable.</p></div><div class="actions"><input class="filter" id="auditSearch" placeholder="Search action / details / user"><select class="filter" id="auditEntity"><option value="">All entities</option><option>lead</option><option>enquiry</option><option>site_visit</option><option>employee</option><option>customer</option><option>project</option><option>project_media</option><option>attendance</option></select><button class="btn primary" onclick="loadAudit()">Apply filter</button><button class="btn" onclick="clearAuditFilters()">Clear filters</button><button class="btn" onclick="refreshAudit()">Refresh</button></div></div><table><thead><tr><th>Date</th><th>User</th><th>Action</th><th>Entity</th><th>ID</th><th>Details</th><th>IP</th></tr></thead><tbody id="auditRows"></tbody></table></div></section>
+  <!-- ATTENDANCE VIEW -->
+  <section id="attendanceView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Employee attendance</h2>
+          <p class="muted" style="margin-bottom:0">Record one attendance entry per employee per day. Save updates the same daily record instead of creating duplicates.</p>
+        </div>
+        <div class="actions">
+          <label class="small">Date <input class="filter" id="attendanceDate" type="date"></label>
+          <button class="btn" onclick="refreshAttendance()">Refresh</button>
+        </div>
+      </div>
+      <form id="attendanceForm" class="formgrid" style="margin-top:14px">
+        <select id="attendanceEmployee" required><option value="">Select employee</option></select>
+        <select id="attendanceStatus"><option value="present">Present</option><option value="absent">Absent</option><option value="leave">Leave</option><option value="half_day">Half day</option></select>
+        <input id="attendanceIn" type="time">
+        <input id="attendanceOut" type="time">
+        <input id="attendanceNotes" class="span2" placeholder="Attendance notes (optional)">
+        <div class="span4 actions">
+          <button class="btn primary" type="submit">Save attendance</button>
+          <button class="btn" type="button" onclick="resetAttendanceForm()">Clear</button>
+          <span id="attendanceMsg" class="muted"></span>
+        </div>
+      </form>
+    </div>
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Saved attendance</h2>
+          <p class="muted" style="margin-bottom:0">Daily records for the selected date.</p>
+        </div>
+        <div class="actions">
+          <span class="pill" id="attendanceSummary">0 recorded</span>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Code</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Check in</th>
+            <th>Check out</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PROJECTS VIEW -->
+  <section id="projectsView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Project management</h2>
+          <p class="muted" style="margin-bottom:0">Create, edit, activate/deactivate and manage project media.</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" onclick="resetProjectForm();window.scrollTo({top:0,behavior:'smooth'})">+ New project</button>
+          <button class="btn" onclick="refreshProjects()">Refresh saved projects</button>
+        </div>
+      </div>
+      <form id="projectForm" class="formgrid">
+        <input id="pId" type="hidden">
+        <input id="pName" required placeholder="Project name">
+        <select id="pCategory" required>
+          <option value="">Category</option>
+          <option>RESIDENTIAL</option>
+          <option>COMMERCIAL</option>
+          <option>DEVELOPMENT</option>
+          <option>INDUSTRIAL</option>
+        </select>
+        <select id="pStatus"><option>active</option><option>inactive</option></select>
+        <input id="pLocation" placeholder="Location / area">
+        <input id="pPrice" placeholder="Price / price range">
+        <input id="pAmenities" class="span2" placeholder="Amenities (comma separated)">
+        <input id="pImage" placeholder="Legacy image path (optional)">
+        <input id="pImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif,image/tiff">
+        <textarea id="pDescription" class="span2" placeholder="Description"></textarea>
+        <div class="span4 actions">
+          <button class="btn primary" type="submit">Save project</button>
+          <button class="btn" type="button" onclick="resetProjectForm()">Clear</button>
+          <span id="projectMsg" class="muted"></span>
+        </div>
+      </form>
+      <div id="mediaManager" style="display:none;margin-top:18px;border:1px solid var(--line);padding:18px;background:var(--bg-subtle);border-radius:var(--radius-md);">
+        <div class="actions">
+          <h3 id="mediaTitle" style="margin:0;flex:1">Project media</h3>
+          <button class="btn" id="closeMedia">Close</button>
+        </div>
+        <input id="mediaFiles" type="file" multiple accept="image/*,video/mp4,video/webm,video/quicktime,video/x-m4v,video/ogg,video/x-msvideo" style="margin-top:12px">
+        <button class="btn gold" id="uploadMedia" style="margin-top:8px">Upload selected media</button>
+        <p id="mediaMsg" class="muted small"></p>
+        <div id="mediaGrid" class="media-grid"></div>
+      </div>
+      <table style="margin-top:18px">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Media</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="projectRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TEAM VIEW -->
+  <section id="teamView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Team members</h2>
+          <p class="muted" style="margin-bottom:0">Create staff accounts, edit details, reset passwords and activate/deactivate access.</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" onclick="resetTeamForm();document.getElementById('teamForm').scrollIntoView({behavior:'smooth'})">+ New team member</button>
+          <button class="btn" onclick="refreshTeam()">Refresh saved team</button>
+        </div>
+      </div>
+      <form id="teamForm" class="formgrid">
+        <input id="tId" type="hidden">
+        <input id="tName" required placeholder="Full name">
+        <input id="tEmail" required type="email" placeholder="Email">
+        <input id="tPhone" placeholder="Phone">
+        <input id="tDepartment" placeholder="Department">
+        <input id="tDesignation" placeholder="Designation">
+        <input id="tPassword" type="password" minlength="8" placeholder="Password (new account / optional on edit)">
+        <div class="span2 actions">
+          <button class="btn primary" type="submit" id="teamSubmit">Create team account</button>
+          <button class="btn" type="button" onclick="resetTeamForm()">Clear</button>
+          <span id="teamMsg" class="muted"></span>
+        </div>
+      </form>
+    </div>
+    <div class="panel">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Code</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="teamRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CUSTOMERS VIEW -->
+  <section id="customersView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Customers</h2>
+          <p class="muted" style="margin-bottom:0">Edit profiles, activate/suspend accounts, or open the customer's complete CRM history.</p>
+        </div>
+        <button class="btn" onclick="refreshCustomers()">Refresh saved customers</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="urows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- REPORTS VIEW -->
+  <section id="reportsView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Reports</h2>
+          <p class="muted" style="margin-bottom:0">Read-only business metrics calculated from your live CRM data.</p>
+        </div>
+        <div class="actions">
+          <label class="small">From <input class="filter" id="reportStart" type="date"></label>
+          <label class="small">To <input class="filter" id="reportEnd" type="date"></label>
+          <button class="btn primary" onclick="loadReports()">Apply filters</button>
+          <button class="btn" onclick="clearReportFilters()">Clear filters</button>
+          <button class="btn" onclick="refreshReports()">Refresh</button>
+          <a class="btn" href="/api/admin/reports.csv">Export leads CSV</a>
+        </div>
+      </div>
+      <div class="charts">
+        <div class="panel"><h3>Lead status</h3><div id="statusChart"></div></div>
+        <div class="panel"><h3>Leads by project</h3><div id="projectChart"></div></div>
+      </div>
+      <div class="panel" style="margin-top:16px;">
+        <h3>Monthly leads</h3>
+        <div id="monthlyChart"></div>
+        <p id="conversion" style="font-size:18px; font-weight:700; color:var(--sky); margin-top:12px;"></p>
+      </div>
+      <div class="panel" style="margin-top:16px;">
+        <h3>Site visits</h3>
+        <div id="visitChart"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIT VIEW -->
+  <section id="auditView" class="view">
+    <div class="panel">
+      <div class="toolbar">
+        <div>
+          <h2 style="margin:0">Audit log</h2>
+          <p class="muted" style="margin-bottom:0">Security/history record. Audit entries are intentionally not editable or deletable.</p>
+        </div>
+        <div class="actions">
+          <input class="filter" id="auditSearch" placeholder="Search action / details / user">
+          <select class="filter" id="auditEntity">
+            <option value="">All entities</option>
+            <option>lead</option>
+            <option>enquiry</option>
+            <option>site_visit</option>
+            <option>employee</option>
+            <option>customer</option>
+            <option>project</option>
+            <option>project_media</option>
+            <option>attendance</option>
+          </select>
+          <button class="btn primary" onclick="loadAudit()">Apply filter</button>
+          <button class="btn" onclick="clearAuditFilters()">Clear filters</button>
+          <button class="btn" onclick="refreshAudit()">Refresh</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Entity</th>
+            <th>ID</th>
+            <th>Details</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody id="auditRows"></tbody>
+      </table>
+    </div>
+  </section>
 </main>
 
-<div id="enquiryModal" class="modal"><div class="modal-card"><div class="modal-head"><h2>Add enquiry</h2><button class="btn" onclick="closeModal('enquiryModal')">Close</button></div><form id="enquiryForm" class="formgrid"><input id="enquiryName" required placeholder="Customer name"><input id="enquiryPhone" required placeholder="Phone"><input id="enquiryEmail" type="email" placeholder="Email"><select id="enquiryProject"><option value="">No project / General</option></select><select id="enquiryUser"><option value="">No linked customer account</option></select><select id="enquiryStatus"><option>new</option><option>contacted</option><option>closed</option></select><textarea id="enquiryMessage" class="span2" placeholder="Enquiry message"></textarea><div class="span4 actions"><button class="btn primary" type="submit">Save enquiry</button><button class="btn" type="button" onclick="closeModal('enquiryModal')">Cancel</button></div></form></div></div><div id="leadModal" class="modal"><div class="modal-card"><div class="modal-head"><h2 id="leadModalTitle">Add lead</h2><button class="btn" onclick="closeModal('leadModal')">Close</button></div><form id="leadForm" class="formgrid"><input id="leadId" type="hidden"><input id="leadName" required placeholder="Lead/customer name"><input id="leadPhone" placeholder="Phone"><input id="leadEmail" type="email" placeholder="Email"><input id="leadSource" placeholder="Source (website, phone, walk-in...)" value="admin"><select id="leadProject"><option value="">No project / General</option></select><select id="leadUser"><option value="">No linked customer account</option></select><select id="leadStatus"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select><select id="leadEmployee"><option value="">Unassigned</option></select><input id="leadFollow" type="datetime-local" placeholder="Follow-up"><textarea id="leadNotes" class="span2" placeholder="Notes"></textarea><textarea id="leadLost" class="span2" placeholder="Lost reason (optional)"></textarea><div class="span4 actions"><button class="btn primary" type="submit">Save lead</button><button class="btn" type="button" onclick="closeModal('leadModal')">Cancel</button></div></form></div></div>
+<!-- MODALS -->
+<div id="enquiryModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Add enquiry</h2>
+      <button class="btn" onclick="closeModal('enquiryModal')">Close</button>
+    </div>
+    <form id="enquiryForm" class="formgrid">
+      <input id="enquiryName" required placeholder="Customer name">
+      <input id="enquiryPhone" required placeholder="Phone">
+      <input id="enquiryEmail" type="email" placeholder="Email">
+      <select id="enquiryProject"><option value="">No project / General</option></select>
+      <select id="enquiryUser"><option value="">No linked customer account</option></select>
+      <select id="enquiryStatus"><option>new</option><option>contacted</option><option>closed</option></select>
+      <textarea id="enquiryMessage" class="span2" placeholder="Enquiry message"></textarea>
+      <div class="span4 actions">
+        <button class="btn primary" type="submit">Save enquiry</button>
+        <button class="btn" type="button" onclick="closeModal('enquiryModal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-<div id="customerModal" class="modal"><div class="modal-card"><div class="modal-head"><h2>Customer profile</h2><button class="btn" onclick="closeModal('customerModal')">Close</button></div><div id="customerContent"></div></div></div>
-<div id="passwordModal" class="modal"><div class="modal-card"><div class="modal-head"><h2>Reset team password</h2><button class="btn" onclick="closeModal('passwordModal')">Close</button></div><form id="passwordForm"><input id="passwordEmployeeId" type="hidden"><label>New password<input id="newTeamPassword" required type="password" minlength="8" maxlength="128" autocomplete="new-password"></label><div class="actions" style="margin-top:12px"><button class="btn primary" type="submit">Reset password</button></div></form></div></div>
+<div id="leadModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="leadModalTitle">Add lead</h2>
+      <button class="btn" onclick="closeModal('leadModal')">Close</button>
+    </div>
+    <form id="leadForm" class="formgrid">
+      <input id="leadId" type="hidden">
+      <input id="leadName" required placeholder="Lead/customer name">
+      <input id="leadPhone" placeholder="Phone">
+      <input id="leadEmail" type="email" placeholder="Email">
+      <input id="leadSource" placeholder="Source (website, phone, walk-in...)" value="admin">
+      <select id="leadProject"><option value="">No project / General</option></select>
+      <select id="leadUser"><option value="">No linked customer account</option></select>
+      <select id="leadStatus"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select>
+      <select id="leadEmployee"><option value="">Unassigned</option></select>
+      <input id="leadFollow" type="datetime-local" placeholder="Follow-up">
+      <textarea id="leadNotes" class="span2" placeholder="Notes"></textarea>
+      <textarea id="leadLost" class="span2" placeholder="Lost reason (optional)"></textarea>
+      <div class="span4 actions">
+        <button class="btn primary" type="submit">Save lead</button>
+        <button class="btn" type="button" onclick="closeModal('leadModal')">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="customerModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Customer profile</h2>
+      <button class="btn" onclick="closeModal('customerModal')">Close</button>
+    </div>
+    <div id="customerContent"></div>
+  </div>
+</div>
+
+<div id="passwordModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Reset team password</h2>
+      <button class="btn" onclick="closeModal('passwordModal')">Close</button>
+    </div>
+    <form id="passwordForm">
+      <input id="passwordEmployeeId" type="hidden">
+      <label style="display:block; margin-bottom:14px; font-weight:600;">
+        New password
+        <input id="newTeamPassword" required type="password" minlength="8" maxlength="128" autocomplete="new-password" style="margin-top:6px;">
+      </label>
+      <div class="actions">
+        <button class="btn primary" type="submit">Reset password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
+
+<!-- CRM CLIENT SCRIPTS (100% PRESERVED LOGIC) -->
 <script>
 const $=id=>document.getElementById(id);const state={employees:[],projects:[],customers:[]};
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -115,48 +1434,58 @@ async function editLead(id){try{const d=await get('/api/admin/leads');const x=d.
 function openLeadModal(x=null){fillProjectSelect('leadProject');fillUserSelect('leadUser');fillEmployeeSelect('leadEmployee');$('leadForm').reset();$('leadId').value='';$('leadSource').value='admin';if(x){$('leadModalTitle').textContent='Edit lead';$('leadId').value=x.id;$('leadName').value=x.name||'';$('leadPhone').value=x.phone||'';$('leadEmail').value=x.email||'';$('leadSource').value=x.source||'admin';$('leadProject').value=x.project_id||'';$('leadUser').value=x.user_id||'';$('leadStatus').value=x.status||'new';$('leadEmployee').value=x.assigned_employee_id||'';$('leadFollow').value=x.follow_up_at?new Date(x.follow_up_at).toISOString().slice(0,16):'';$('leadNotes').value=x.notes||'';$('leadLost').value=x.lost_reason||''}else $('leadModalTitle').textContent='Add lead';openModal('leadModal')}
 $('leadForm').onsubmit=async e=>{e.preventDefault();const id=$('leadId').value;const body={name:$('leadName').value,phone:$('leadPhone').value,email:$('leadEmail').value,source:$('leadSource').value,status:$('leadStatus').value,project_id:$('leadProject').value||null,user_id:$('leadUser').value||null,assigned_employee_id:$('leadEmployee').value||null,follow_up_at:$('leadFollow').value||null,notes:$('leadNotes').value,lost_reason:$('leadLost').value};try{if(id)await send('/api/admin/leads/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});else await send('/api/admin/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});closeModal('leadModal');toast(id?'Lead updated':'Lead created');await loadLeads()}catch(err){toast(err.message)}};
 async function deleteLead(id){if(!confirm('Delete this lead? This cannot be undone.'))return;try{await send('/api/admin/leads/'+id,{method:'DELETE'});toast('Lead deleted');loadLeads()}catch(e){toast(e.message)}}
-async function loadVisits(){try{const d=await get('/api/admin/site-visits');$('visitRows').innerHTML=d.data.length?d.data.map(x=>`<tr><td>${localDate(x.preferred_at)}</td><td>${esc(x.name)}</td><td>${esc(x.project_name||'General')}</td><td>${esc(x.phone)}<br>${esc(x.email)}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.admin_notes||'—')}</td><td class="actions"><button class="btn smallbtn" onclick="editVisit(${x.id})">Edit</button><button class="btn smallbtn danger" onclick="deleteVisit(${x.id})">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No saved site visits yet. Use the form above or let customers request one on the website.</td></tr>'}catch(e){toast(e.message)}}
-function resetVisitForm(){const f=$('visitFormInline');f.reset();$('visitIdInline').value='';$('visitFormTitle').textContent='Add site visit';$('visitSubmit').textContent='Save site visit';$('visitFormMsg').textContent='';fillProjectSelect('visitProjectInline');fillUserSelect('visitUserInline')}
+
 function editVisit(id){get('/api/admin/site-visits').then(d=>{const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;fillProjectSelect('visitProjectInline');fillUserSelect('visitUserInline');$('visitIdInline').value=x.id;$('visitUserInline').value=x.user_id||'';$('visitNameInline').value=x.name||'';$('visitPhoneInline').value=x.phone||'';$('visitEmailInline').value=x.email||'';$('visitProjectInline').value=x.project_id||'';$('visitPreferredInline').value=x.preferred_at?new Date(x.preferred_at).toISOString().slice(0,16):'';$('visitStatusInline').value=x.status||'requested';$('visitNotesInline').value=x.notes||'';$('visitAdminInline').value=x.admin_notes||'';$('visitFormTitle').textContent='Edit site visit';$('visitSubmit').textContent='Save changes';$('visitFormMsg').textContent='Editing visit #'+x.id;document.getElementById('visitsView').scrollIntoView({behavior:'smooth',block:'start'});$('visitNameInline').focus()}).catch(e=>toast(e.message))}
 $('visitFormInline').onsubmit=async e=>{e.preventDefault();const id=$('visitIdInline').value;const body={name:$('visitNameInline').value,phone:$('visitPhoneInline').value,email:$('visitEmailInline').value,project_id:$('visitProjectInline').value||null,user_id:$('visitUserInline').value||null,status:$('visitStatusInline').value,preferred_at:$('visitPreferredInline').value,notes:$('visitNotesInline').value,admin_notes:$('visitAdminInline').value};try{const d=id?await send('/api/admin/site-visits/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}):await send('/api/admin/site-visits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});resetVisitForm();await loadVisits();toast(id?'Site visit updated successfully':'Site visit created successfully')}catch(err){$('visitFormMsg').textContent=err.message;toast(err.message)}};
 $('visitUserInline').onchange=()=>{const id=$('visitUserInline').value;if(!id)return;const u=state.customers.find(x=>Number(x.id)===Number(id));if(!u)return;$('visitNameInline').value=u.name||'';$('visitPhoneInline').value=u.phone||'';$('visitEmailInline').value=u.email||''};
 async function deleteVisit(id){if(!confirm('Delete this site visit?'))return;try{await send('/api/admin/site-visits/'+id,{method:'DELETE'});toast('Site visit deleted');loadVisits()}catch(e){toast(e.message)}}
+
 async function loadProjects(){try{const d=await get('/api/admin/projects');state.projects=d.data;$('projectRows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.description)}</span></td><td>${esc(x.category)}</td><td><span class="pill">${esc(x.status)}</span></td><td>${x.media_count||0} file(s)</td><td class="actions"><button class="btn smallbtn" onclick="editProject(${x.id})">Edit</button><button class="btn smallbtn" onclick="openMedia(${x.id})">Media</button><button class="btn smallbtn" onclick="toggleProject(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Deactivate':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteProject(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('')}catch(e){toast(e.message)}}
 function resetProjectForm(){$('pId').value='';$('pName').value='';$('pCategory').value='';$('pStatus').value='active';$('pLocation').value='';$('pPrice').value='';$('pAmenities').value='';$('pImage').value='';$('pDescription').value='';$('pImageFile').value='';$('projectMsg').textContent=''}
 function editProject(id){const x=state.projects.find(p=>Number(p.id)===Number(id));if(!x)return;showView('projectsView');$('pId').value=x.id;$('pName').value=x.name;$('pCategory').value=x.category;$('pStatus').value=x.status;$('pLocation').value=x.location||'';$('pPrice').value=x.price||'';$('pAmenities').value=x.amenities||'';$('pImage').value=x.image||'';$('pDescription').value=x.description||'';window.scrollTo({top:0,behavior:'smooth'})}
 $('projectForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData();[['pName','name'],['pCategory','category'],['pStatus','status'],['pLocation','location'],['pPrice','price'],['pAmenities','amenities'],['pImage','image'],['pDescription','description']].forEach(([id,k])=>fd.append(k,$(id).value));if($('pImageFile').files[0])fd.append('image_file',$('pImageFile').files[0]);const id=$('pId').value;try{await send(id?'/api/admin/projects/'+id:'/api/admin/projects',{method:id?'PUT':'POST',body:fd});toast(id?'Project updated':'Project created');resetProjectForm();loadProjects()}catch(err){toast(err.message)}};
 async function toggleProject(id,status){try{await send('/api/admin/projects/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:status==='active'?'inactive':'active'})});toast('Project status updated');loadProjects()}catch(e){toast(e.message)}}
 async function deleteProject(id,name){if(!confirm(`Permanently delete ${name}?`))return;if(!confirm('This also removes its media and cannot be undone. Continue?'))return;try{await send('/api/admin/projects/'+id,{method:'DELETE'});toast('Project deleted');loadProjects()}catch(e){toast(e.message)}}
-let mediaProject=null;async function openMedia(id){mediaProject=id;const p=state.projects.find(x=>Number(x.id)===Number(id));$('mediaManager').style.display='block';$('mediaTitle').textContent='Media — '+(p?.name||'Project');await loadMedia();$('mediaManager').scrollIntoView({behavior:'smooth'})}$('closeMedia').onclick=()=>{$('mediaManager').style.display='none';mediaProject=null;$('mediaGrid').innerHTML=''};
-async function loadMedia(){try{const d=await get('/api/admin/projects/'+mediaProject+'/media');$('mediaGrid').innerHTML=d.data.map(x=>`<div class="media-card">${x.is_cover?'<b>Cover image</b>':''}${x.media_type==='video'?`<video controls src="${escAttr(x.file_path)}"></video>`:`<img src="${escAttr(x.file_path)}" loading="lazy">`}<div class="small">${esc(x.original_name)} · ${Math.round(x.file_size/1024/1024*10)/10} MB</div><div class="actions">${x.media_type==='image'&&!x.is_cover?`<button class="btn smallbtn" onclick="setCover(${x.id})">Set cover</button>`:''}<button class="btn smallbtn danger" onclick="deleteMedia(${x.id})">Delete</button></div></div>`).join('')||'<p class="muted">No media.</p>'}catch(e){toast(e.message)}}
+
+let mediaProject=null;
+async function openMedia(id){mediaProject=id;const p=state.projects.find(x=>Number(x.id)===Number(id));$('mediaManager').style.display='block';$('mediaTitle').textContent='Media — '+(p?.name||'Project');await loadMedia();$('mediaManager').scrollIntoView({behavior:'smooth'})}
+$('closeMedia').onclick=()=>{$('mediaManager').style.display='none';mediaProject=null;$('mediaGrid').innerHTML=''};
+async function loadMedia(){try{const d=await get('/api/admin/projects/'+mediaProject+'/media');$('mediaGrid').innerHTML=d.data.map(x=>`<div class="media-card">${x.is_cover?'<b style="display:block;margin-bottom:4px;color:var(--sky);">Cover image</b>':''}${x.media_type==='video'?`<video controls src="${escAttr(x.file_path)}"></video>`:`<img src="${escAttr(x.file_path)}" loading="lazy">`}<div class="small" style="margin-top:6px;">${esc(x.original_name)} · ${Math.round(x.file_size/1024/1024*10)/10} MB</div><div class="actions" style="margin-top:8px;">${x.media_type==='image'&&!x.is_cover?`<button class="btn smallbtn" onclick="setCover(${x.id})">Set cover</button>`:''}<button class="btn smallbtn danger" onclick="deleteMedia(${x.id})">Delete</button></div></div>`).join('')||'<p class="muted">No media.</p>'}catch(e){toast(e.message)}}
 $('uploadMedia').onclick=async()=>{const files=[...$('mediaFiles').files];if(!mediaProject||!files.length)return toast('Choose media first');const fd=new FormData();files.forEach(f=>fd.append('media',f));$('uploadMedia').disabled=true;try{await send('/api/admin/projects/'+mediaProject+'/media',{method:'POST',body:fd});$('mediaFiles').value='';toast('Media uploaded');await loadMedia();loadProjects()}catch(e){toast(e.message)}finally{$('uploadMedia').disabled=false}};
-async function setCover(id){try{await send(`/api/admin/projects/${mediaProject}/media/${id}/cover`,{method:'PATCH'});toast('Cover updated');loadMedia();loadProjects()}catch(e){toast(e.message)}}async function deleteMedia(id){if(!confirm('Delete this media?'))return;try{await send(`/api/admin/projects/${mediaProject}/media/${id}`,{method:'DELETE'});toast('Media deleted');loadMedia();loadProjects()}catch(e){toast(e.message)}}
+async function setCover(id){try{await send(`/api/admin/projects/${mediaProject}/media/${id}/cover`,{method:'PATCH'});toast('Cover updated');loadMedia();loadProjects()}catch(e){toast(e.message)}}
+async function deleteMedia(id){if(!confirm('Delete this media?'))return;try{await send(`/api/admin/projects/${mediaProject}/media/${id}`,{method:'DELETE'});toast('Media deleted');loadMedia();loadProjects()}catch(e){toast(e.message)}}
+
 function resetTeamForm(){$('tId').value='';$('tName').value='';$('tEmail').value='';$('tPhone').value='';$('tDepartment').value='';$('tDesignation').value='';$('tPassword').value='';$('teamSubmit').textContent='Create team account';$('teamMsg').textContent=''}
 $('teamForm').onsubmit=async e=>{e.preventDefault();const id=$('tId').value;const body={name:$('tName').value,email:$('tEmail').value,phone:$('tPhone').value,department:$('tDepartment').value,designation:$('tDesignation').value};try{if(id){await send('/api/admin/employees/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('Team member updated')}else{body.password=$('tPassword').value;await send('/api/admin/employees',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('Team account created')}resetTeamForm();loadTeam();loadLeads()}catch(err){$('teamMsg').textContent=err.message;toast(err.message)}};
-async function loadTeam(){try{const d=await get('/api/admin/employees');state.employees=d.data;$('teamRows').innerHTML=d.data.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}</td><td>${esc(x.employee_code)}</td><td>${esc(x.status)}</td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Deactivate':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No team members yet.</td></tr>'}catch(e){toast(e.message)}}
+async function loadTeam(){try{const d=await get('/api/admin/employees');state.employees=d.data;$('teamRows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Deactivate':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No team members yet.</td></tr>'}catch(e){toast(e.message)}}
 async function editTeam(id){const d=await get('/api/admin/employees');const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;$('tId').value=x.id;$('tName').value=x.name||'';$('tEmail').value=x.email||'';$('tPhone').value=x.phone||'';$('tDepartment').value=x.department||'';$('tDesignation').value=x.designation||'';$('tPassword').value='';$('teamSubmit').textContent='Save team member';$('teamMsg').textContent='Editing '+x.name;showView('teamView');window.scrollTo({top:0,behavior:'smooth'})}
 async function toggleEmployee(id,status){try{await send('/api/admin/employees/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:status==='active'?'inactive':'active'})});toast('Team status updated');loadTeam();loadLeads()}catch(e){toast(e.message)}}
 async function deleteEmployee(id,name){if(!confirm(`Delete ${name}?`))return;try{await send('/api/admin/employees/'+id,{method:'DELETE'});toast('Team member deleted');loadTeam();loadLeads()}catch(e){toast(e.message)}}
-function openPassword(id){$('passwordEmployeeId').value=id;$('newTeamPassword').value='';openModal('passwordModal')}$('passwordForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/employees/'+$('passwordEmployeeId').value+'/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('newTeamPassword').value})});closeModal('passwordModal');toast('Password reset successfully')}catch(err){toast(err.message)}};
-async function loadCustomers(){try{const d=await get('/api/admin/users');state.customers=d.data;$('urows').innerHTML=d.data.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.email)}</td><td>${esc(x.phone)}</td><td>${esc(x.role)}</td><td>${esc(x.status)}</td><td>${localDate(x.created_at)}</td><td class="actions">${x.role==='customer'?`<button class="btn smallbtn" onclick="openCustomer(${x.id})">View</button><button class="btn smallbtn" onclick="editCustomer(${x.id})">Edit</button><button class="btn smallbtn" onclick="toggleUser(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Suspend':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteCustomer(${x.id},'${escAttr(x.name)}')">Delete</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">No customers yet.</td></tr>'}catch(e){toast(e.message)}}
+
+function openPassword(id){$('passwordEmployeeId').value=id;$('newTeamPassword').value='';openModal('passwordModal')}
+$('passwordForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/employees/'+$('passwordEmployeeId').value+'/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('newTeamPassword').value})});closeModal('passwordModal');toast('Password reset successfully')}catch(err){toast(err.message)}};
+
+async function loadCustomers(){try{const d=await get('/api/admin/users');state.customers=d.data;$('urows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}</td><td>${esc(x.phone)}</td><td><span class="pill">${esc(x.role)}</span></td><td><span class="pill">${esc(x.status)}</span></td><td>${localDate(x.created_at)}</td><td class="actions">${x.role==='customer'?`<button class="btn smallbtn" onclick="openCustomer(${x.id})">View</button><button class="btn smallbtn" onclick="editCustomer(${x.id})">Edit</button><button class="btn smallbtn" onclick="toggleUser(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Suspend':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteCustomer(${x.id},'${escAttr(x.name)}')">Delete</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">No customers yet.</td></tr>'}catch(e){toast(e.message)}}
 function editCustomer(id){const x=state.customers.find(v=>Number(v.id)===Number(id));if(!x)return;const content=`<form id="customerEditForm" class="formgrid"><input type="hidden" id="ceId" value="${x.id}"><input id="ceName" required value="${escAttr(x.name)}" placeholder="Name"><input id="ceEmail" type="email" value="${escAttr(x.email)}" placeholder="Email"><input id="cePhone" value="${escAttr(x.phone)}" placeholder="Phone"><div class="span4 actions"><button class="btn primary" type="submit">Save customer</button><button class="btn" type="button" onclick="closeModal('customerModal')">Cancel</button></div></form>`;$('customerContent').innerHTML=content;openModal('customerModal');$('customerEditForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/users/'+x.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('ceName').value,email:$('ceEmail').value,phone:$('cePhone').value})});closeModal('customerModal');toast('Customer updated');loadCustomers()}catch(err){toast(err.message)}}}
 async function openCustomer(id){try{const d=await get('/api/admin/users/'+id),u=d.data.user;$('customerContent').innerHTML=`<div class="notice"><b>${esc(u.name)}</b><br>${esc(u.email)} · ${esc(u.phone)}<br>Status: ${esc(u.status)} · Joined: ${localDate(u.created_at)}</div><div class="history"><div class="box"><h3>Enquiries (${d.data.enquiries.length})</h3>${d.data.enquiries.map(x=>`<p><b>${esc(x.enquiry_reference||'')}</b> · ${esc(x.status)}<br>${esc(x.project_name||'General')}<br>${esc(x.message)}</p>`).join('')||'<p class="muted">None</p>'}</div><div class="box"><h3>Leads (${d.data.leads.length})</h3>${d.data.leads.map(x=>`<p><b>#${x.id}</b> · ${esc(x.status)}<br>${esc(x.project_name||'General')} · ${esc(x.employee_name||'Unassigned')}</p>`).join('')||'<p class="muted">None</p>'}</div><div class="box"><h3>Site visits (${d.data.visits.length})</h3>${d.data.visits.map(x=>`<p>${localDate(x.preferred_at)} · ${esc(x.status)}<br>${esc(x.project_name||'General')}</p>`).join('')||'<p class="muted">None</p>'}</div></div>`;openModal('customerModal')}catch(e){toast(e.message)}}
 async function toggleUser(id,status){if(!confirm(status==='active'?'Suspend this account?':'Activate this account?'))return;try{await send('/api/admin/users/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:status==='active'?'suspended':'active'})});toast('Account updated');loadCustomers()}catch(e){toast(e.message)}}
 async function deleteCustomer(id,name){if(!confirm(`Permanently delete customer ${name}?`))return;if(!confirm('Their historical enquiries/leads/site visits will remain but become unlinked. Continue?'))return;try{await send('/api/admin/users/'+id,{method:'DELETE'});toast('Customer deleted');loadCustomers()}catch(e){toast(e.message)}}
-function bars(el,items,labelKey='status'){const max=Math.max(1,...items.map(x=>Number(x.count)));$(el).innerHTML=items.map(x=>`<div class="bar"><span style="width:130px">${esc(x[labelKey])}</span><i style="width:${Math.max(3,Number(x.count)/max*60)}%"></i><b>${x.count}</b></div>`).join('')||'<span class="muted">No data yet.</span>'}
+
+function bars(el,items,labelKey='status'){const max=Math.max(1,...items.map(x=>Number(x.count)));$(el).innerHTML=items.map(x=>`<div class="bar"><span style="width:140px; font-weight:600;">${esc(x[labelKey])}</span><i style="width:${Math.max(3,Number(x.count)/max*60)}%"></i><b>${x.count}</b></div>`).join('')||'<span class="muted">No data yet.</span>'}
 function renderRecentActivity(items){const el=$('recentActivity');if(!el)return;el.innerHTML=(items||[]).map(x=>`<div class="activity-item"><b>${esc((x.action||'activity').replaceAll('_',' '))} · ${esc(x.entity_type||'')}</b><small>${esc(x.details||'')} · ${localDate(x.created_at)} · ${esc(x.user_name||'System')}</small></div>`).join('')||'<div class="empty">No recent activity yet.</div>'}
 function todayLocal(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
 function fillAttendanceEmployeeSelect(){$('attendanceEmployee').innerHTML='<option value="">Select employee</option>'+state.employees.filter(x=>x.status==='active').map(e=>`<option value="${e.id}">${esc(e.name)} · ${esc(e.employee_code)}</option>`).join('')}
 function resetAttendanceForm(){if(!$('attendanceForm'))return;$('attendanceForm').reset();$('attendanceMsg').textContent='';fillAttendanceEmployeeSelect()}
-async function loadAttendance(){try{if(!$('attendanceDate').value)$('attendanceDate').value=todayLocal();const d=await get('/api/admin/attendance?date='+encodeURIComponent($('attendanceDate').value));$('attendanceRows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.email||'')}</span></td><td>${esc(x.employee_code)}</td><td>${esc(x.department||'')}</td><td><span class="pill">${esc(x.attendance_status||'not recorded')}</span></td><td>${esc(x.check_in||'—')}</td><td>${esc(x.check_out||'—')}</td><td>${esc(x.notes||'—')}</td><td class="actions">${x.attendance_id?`<button class="btn smallbtn" onclick="editAttendance(${x.id},'${escAttr(x.attendance_status||'present')}','${escAttr(x.check_in||'')}','${escAttr(x.check_out||'')}','${escAttr(x.notes||'')}')">Edit</button><button class="btn smallbtn danger" onclick="deleteAttendance(${x.attendance_id})">Delete</button>`:'<span class="muted">Not recorded</span>'}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No employees yet.</td></tr>';const total=d.data.filter(x=>x.employee_status==='active').length,recorded=d.data.filter(x=>x.attendance_id).length;$('attendanceSummary').textContent=`${recorded}/${total} active employees recorded`;fillAttendanceEmployeeSelect()}catch(e){toast(e.message)}}
-$('attendanceDate').onchange=loadAttendance;$('attendanceForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/attendance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:Number($('attendanceEmployee').value),attendance_date:$('attendanceDate').value,status:$('attendanceStatus').value,check_in:$('attendanceIn').value,check_out:$('attendanceOut').value,notes:$('attendanceNotes').value})});resetAttendanceForm();await loadAttendance();await load();toast('Attendance saved successfully')}catch(err){$('attendanceMsg').textContent=err.message;toast(err.message)}};
+async function loadAttendance(){try{if(!$('attendanceDate').value)$('attendanceDate').value=todayLocal();const d=await get('/api/admin/attendance?date='+encodeURIComponent($('attendanceDate').value));$('attendanceRows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.email||'')}</span></td><td><code>${esc(x.employee_code)}</code></td><td>${esc(x.department||'')}</td><td><span class="pill">${esc(x.attendance_status||'not recorded')}</span></td><td>${esc(x.check_in||'—')}</td><td>${esc(x.check_out||'—')}</td><td>${esc(x.notes||'—')}</td><td class="actions">${x.attendance_id?`<button class="btn smallbtn" onclick="editAttendance(${x.id},'${escAttr(x.attendance_status||'present')}','${escAttr(x.check_in||'')}','${escAttr(x.check_out||'')}','${escAttr(x.notes||'')}')">Edit</button><button class="btn smallbtn danger" onclick="deleteAttendance(${x.attendance_id})">Delete</button>`:'<span class="muted">Not recorded</span>'}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No employees yet.</td></tr>';const total=d.data.filter(x=>x.employee_status==='active').length,recorded=d.data.filter(x=>x.attendance_id).length;$('attendanceSummary').textContent=`${recorded}/${total} active employees recorded`;fillAttendanceEmployeeSelect()}catch(e){toast(e.message)}}
+$('attendanceDate').onchange=loadAttendance;
+$('attendanceForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/attendance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:Number($('attendanceEmployee').value),attendance_date:$('attendanceDate').value,status:$('attendanceStatus').value,check_in:$('attendanceIn').value,check_out:$('attendanceOut').value,notes:$('attendanceNotes').value})});resetAttendanceForm();await loadAttendance();await load();toast('Attendance saved successfully')}catch(err){$('attendanceMsg').textContent=err.message;toast(err.message)}};
 function editAttendance(id,status,cin,cout,notes){$('attendanceEmployee').value=id;$('attendanceStatus').value=status;$('attendanceIn').value=cin;$('attendanceOut').value=cout;$('attendanceNotes').value=notes;showView('attendanceView');window.scrollTo({top:0,behavior:'smooth'});$('attendanceMsg').textContent='Editing attendance for '+(state.employees.find(x=>Number(x.id)===Number(id))?.name||'employee')}
 async function deleteAttendance(id){if(!confirm('Delete this attendance record?'))return;try{await send('/api/admin/attendance/'+id,{method:'DELETE'});await loadAttendance();await load();toast('Attendance record deleted')}catch(e){toast(e.message)}}
 async function refreshAttendance(){resetAttendanceForm();await loadAttendance();toast('Attendance refreshed; form cleared')}
 
 async function loadReports(){try{const q=new URLSearchParams();if($('reportStart').value)q.set('start',$('reportStart').value);if($('reportEnd').value)q.set('end',$('reportEnd').value);if($('reportStart').value&&$('reportEnd').value&&$('reportStart').value>$('reportEnd').value)return toast('Report start date cannot be after end date');const d=await get('/api/admin/report'+(q.toString()?'?'+q:''));bars('statusChart',d.data.byStatus);bars('projectChart',d.data.byProject,'project_name');bars('monthlyChart',d.data.monthly,'month');bars('visitChart',d.data.visits,'status');$('conversion').textContent=`Won conversion rate: ${d.data.conversionRate}% · Total leads: ${d.data.totalLeads} · Won: ${d.data.won}${d.data.start?' · '+d.data.start+' to '+d.data.end:''}`}catch(e){toast(e.message)}}
-async function loadAudit(){try{const q=new URLSearchParams();if($('auditSearch').value)q.set('search',$('auditSearch').value);if($('auditEntity').value)q.set('entity',$('auditEntity').value);const d=await get('/api/admin/audit-logs'+(q.toString()?'?'+q:''));$('auditRows').innerHTML=d.data.map(x=>`<tr><td>${localDate(x.created_at)}</td><td>${esc(x.user_name||'System')}<br>${esc(x.user_email||'')}</td><td>${esc(x.action)}</td><td>${esc(x.entity_type)}</td><td>${esc(x.entity_id)}</td><td>${esc(x.details)}</td><td>${esc(x.ip_address)}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">No audit entries match your filter.</td></tr>'}catch(e){toast(e.message)}}
-/* Consistent CRM form-first controls: Refresh reloads saved records and resets the active form. */
+async function loadAudit(){try{const q=new URLSearchParams();if($('auditSearch').value)q.set('search',$('auditSearch').value);if($('auditEntity').value)q.set('entity',$('auditEntity').value);const d=await get('/api/admin/audit-logs'+(q.toString()?'?'+q:''));$('auditRows').innerHTML=d.data.map(x=>`<tr><td>${localDate(x.created_at)}</td><td>${esc(x.user_name||'System')}<br>${esc(x.user_email||'')}</td><td><b>${esc(x.action)}</b></td><td><span class="pill">${esc(x.entity_type)}</span></td><td>#${esc(x.entity_id)}</td><td>${esc(x.details)}</td><td><code>${esc(x.ip_address)}</code></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No audit entries match your filter.</td></tr>'}catch(e){toast(e.message)}}
+
 function resetEnquiryForm(){const f=$('enquiryFormInline');if(!f)return;f.reset();$('enquiryIdInline').value='';$('enquiryFormTitle').textContent='Add enquiry';$('enquirySubmit').textContent='Save enquiry';$('enquiryFormMsg').textContent='';fillProjectSelect('enquiryProjectInline');fillUserSelect('enquiryUserInline')}
 function editEnquiry(id){get('/api/admin/enquiries').then(d=>{const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;fillProjectSelect('enquiryProjectInline');fillUserSelect('enquiryUserInline');$('enquiryIdInline').value=x.id;$('enquiryUserInline').value=x.user_id||'';$('enquiryNameInline').value=x.name||'';$('enquiryPhoneInline').value=x.phone||'';$('enquiryEmailInline').value=x.email||'';$('enquiryProjectInline').value=x.project_id||'';$('enquiryStatusInline').value=x.status||'new';$('enquiryMessageInline').value=x.message||'';$('enquiryResponseInline').value=x.admin_response||'';$('enquiryFormTitle').textContent='Edit enquiry';$('enquirySubmit').textContent='Save changes';$('enquiryFormMsg').textContent='Editing '+(x.enquiry_reference||('ENQ-'+x.id));showView('overview');window.scrollTo({top:0,behavior:'smooth'});$('enquiryNameInline').focus()}).catch(e=>toast(e.message))}
 $('enquiryUserInline').onchange=()=>{const id=$('enquiryUserInline').value;if(!id)return;const u=state.customers.find(x=>Number(x.id)===Number(id));if(!u)return;$('enquiryNameInline').value=u.name||'';$('enquiryPhoneInline').value=u.phone||'';$('enquiryEmailInline').value=u.email||''}
@@ -180,5 +1509,9 @@ async function refreshReports(){clearReportFilters();toast('Reports refreshed; f
 function clearAuditFilters(){$('auditSearch').value='';$('auditEntity').value='';loadAudit()}
 async function refreshAudit(){clearAuditFilters();toast('Audit log refreshed; filters cleared')}
 async function refreshAll(){resetEnquiryForm();resetLeadFormInline();resetVisitForm();resetTeamForm();resetAttendanceForm();resetProjectForm();if($('mediaManager')){$('mediaManager').style.display='none';mediaProject=null;$('mediaGrid').innerHTML=''};try{await load();toast('Dashboard refreshed; forms cleared')}catch(e){toast(e.message)}}
-load().catch(e=>toast(e.message));setInterval(()=>{if(document.querySelector('.view.active')?.id==='overview'&&!document.activeElement.matches('textarea,select,input'))load().catch(()=>{})},15000);
-</script></body></html>
+
+load().catch(e=>toast(e.message));
+setInterval(()=>{if(document.querySelector('.view.active')?.id==='overview'&&!document.activeElement.matches('textarea,select,input'))load().catch(()=>{})},15000);
+</script>
+</body>
+</html>
