@@ -2,65 +2,71 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Laxminarayan Group — Project Details</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0b0b0e;
-  --surface: #141418;
-  --surface-glass: rgba(20, 20, 26, 0.75);
-  --surface-card: #191920;
-  --surface-hover: #22222c;
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.16);
-  --gold: #d4af37;
-  --gold-glow: rgba(212, 175, 55, 0.35);
-  --gold-soft: rgba(212, 175, 55, 0.12);
-  --gold-gradient: linear-gradient(135deg, #f3d789 0%, #d4af37 60%, #aa8420 100%);
-  --ink: #ffffff;
-  --muted: #9c9ca8;
-  --subtle: #6a6a78;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-pill: 999px;
-  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 35px var(--gold-glow);
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-sky-tint: #f0f9ff;
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  
+  --sky-primary: #0284c7;
+  --sky-deep: #0369a1;
+  --sky-light: #e0f2fe;
+  --sky-glow: rgba(2, 132, 199, 0.2);
+  --sky-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  
+  --ink-heading: #0f172a;
+  --ink-body: #334155;
+  --ink-muted: #64748b;
+  --ink-subtle: #94a3b8;
+  
+  --line: rgba(15, 23, 42, 0.08);
+  --line-strong: rgba(15, 23, 42, 0.15);
+  --line-sky: rgba(2, 132, 199, 0.25);
+  
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --shadow-hover: 0 20px 40px -15px rgba(2, 132, 199, 0.14), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
+  --shadow-float: 0 20px 50px -10px rgba(15, 23, 42, 0.09);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 9999px;
+  
+  --font-serif: "Playfair Display", Georgia, serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
 body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.6;
-  overflow-x: hidden;
-  background-image: 
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 45%),
-    radial-gradient(circle at 85% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 40%);
-  background-attachment: fixed;
+  background: var(--bg-main);
+  color: var(--ink-body);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
 }
 
 a { text-decoration: none; color: inherit; transition: all .25s ease; }
-.container { width: min(1160px, 92%); margin: auto; }
+.container { width: min(1140px, 92%); margin: auto; }
 
 /* ─── HEADER ─── */
 header {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 16px 0;
-  background: rgba(11, 11, 14, 0.85);
+  padding: 14px 0;
+  background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--line);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 35px;
 }
 .nav {
   display: flex;
@@ -72,118 +78,101 @@ header {
   flex-direction: column;
   font-weight: 800;
   letter-spacing: 2px;
-  font-size: 18px;
-  color: #fff;
+  font-size: 16px;
+  color: var(--ink-heading);
 }
 .logo span {
-  font-size: 8px;
-  letter-spacing: 3.5px;
-  color: var(--gold);
-  font-weight: 600;
-  margin-top: 2px;
-  text-transform: uppercase;
+  font-size: 8.5px;
+  letter-spacing: 2px;
+  color: var(--sky-primary);
+  font-weight: 700;
+  margin-top: 1px;
 }
 .back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sky-deep);
+  background: var(--sky-light);
+  border: 1px solid var(--line-sky);
   padding: 8px 18px;
   border-radius: var(--radius-pill);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--line);
+  transition: all .2s ease;
 }
 .back-btn:hover {
+  background: var(--sky-primary);
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
-/* ─── PROJECT HERO ─── */
+/* ─── HERO CARD ─── */
 .hero {
-  position: relative;
-  min-height: 440px;
   border-radius: var(--radius-lg);
-  overflow: hidden;
-  margin: 30px 0 35px;
+  min-height: 420px;
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: flex-end;
-  padding: 50px 40px;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  padding: 50px 45px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-float);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-lg);
-}
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(11, 11, 14, 0.2) 0%, rgba(11, 11, 14, 0.95) 90%);
-  z-index: 1;
-}
-.hero > div {
   position: relative;
-  z-index: 2;
-  max-width: 800px;
+  overflow: hidden;
 }
 #cat {
   display: inline-block;
-  padding: 6px 14px;
+  padding: 5px 14px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line-sky);
   border-radius: var(--radius-pill);
-  background: rgba(212, 175, 55, 0.15);
-  border: 1px solid rgba(212, 175, 55, 0.35);
-  color: var(--gold);
+  color: var(--sky-deep);
   font-size: 11px;
-  font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 14px;
-  backdrop-filter: blur(8px);
+  font-weight: 800;
+  margin-bottom: 16px;
 }
 .hero h1 {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 4.5vw, 54px);
   font-weight: 600;
-  font-size: clamp(38px, 5.5vw, 64px);
   line-height: 1.1;
   color: #fff;
   margin-bottom: 12px;
-  letter-spacing: -1.5px;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 .hero p {
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 16px;
   line-height: 1.7;
+  max-width: 650px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* ─── PANELS & BENTO ─── */
+/* ─── PANELS ─── */
 .panel {
-  background: var(--surface);
+  background: var(--bg-surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 36px 40px;
   margin-bottom: 30px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
 }
 .panel h2 {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 28px;
-  color: #fff;
-  margin-bottom: 20px;
+  font-size: 26px;
+  color: var(--ink-heading);
+  margin-bottom: 18px;
   letter-spacing: -0.5px;
 }
 .panel p {
-  color: var(--muted);
+  color: var(--ink-body);
   font-size: 15px;
   line-height: 1.8;
   margin-bottom: 14px;
-}
-.panel p b {
-  color: #fff;
-  font-weight: 600;
 }
 
 .specs-grid {
@@ -193,9 +182,9 @@ header {
   margin: 25px 0 30px;
 }
 .spec-box {
-  padding: 20px;
-  background: var(--surface-glass);
-  border: 1px solid var(--line);
+  padding: 22px;
+  background: var(--bg-sky-tint);
+  border: 1px solid var(--line-sky);
   border-radius: var(--radius-md);
 }
 .spec-box span {
@@ -203,14 +192,14 @@ header {
   font-size: 11px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--subtle);
-  font-weight: 700;
+  color: var(--sky-deep);
+  font-weight: 800;
   margin-bottom: 6px;
 }
 .spec-box strong {
   font-size: 16px;
-  color: #fff;
-  font-weight: 600;
+  color: var(--ink-heading);
+  font-weight: 700;
 }
 
 .btn {
@@ -221,17 +210,17 @@ header {
   padding: 14px 28px;
   border-radius: var(--radius-pill);
   border: 0;
-  background: var(--gold-gradient);
-  color: #0b0b0e;
+  background: var(--sky-gradient);
+  color: #fff;
   font-weight: 700;
   font-size: 13px;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all .25s ease;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+  box-shadow: 0 4px 16px var(--sky-glow);
 }
 .btn:hover {
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.35);
   transform: translateY(-2px);
 }
 .btn:disabled {
@@ -241,57 +230,53 @@ header {
 }
 
 .muted {
-  color: var(--muted);
-  font-size: 13px;
+  color: var(--ink-muted);
+  font-size: 13.5px;
 }
 #interestMsg, #visitMsg {
   margin-left: 14px;
-  font-weight: 500;
-  color: #4ade80;
+  font-weight: 600;
+  color: var(--sky-deep);
 }
 
 /* ─── GALLERY ─── */
 .gallery {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 15px;
 }
 .gallery img, .gallery video {
   width: 100%;
-  height: 250px;
+  height: 220px;
   object-fit: cover;
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  background: #191920;
-  transition: transform .4s ease;
-}
-.gallery img:hover, .gallery video:hover {
-  transform: scale(1.03);
+  box-shadow: var(--shadow-sm);
 }
 
-/* ─── SITE VISIT FORM ─── */
+/* ─── FORM ─── */
 .form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-top: 20px;
+  gap: 16px;
+  margin-top: 24px;
 }
 .form input, .form textarea {
-  width: 100%;
-  padding: 15px 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  color: #fff;
-  font-family: inherit;
+  padding: 14px 18px;
+  background: var(--bg-main);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-heading);
+  border-radius: var(--radius-md);
   font-size: 14px;
-  outline: none;
+  font-family: inherit;
   transition: all .2s ease;
 }
 .form input:focus, .form textarea:focus {
-  border-color: var(--gold);
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+  outline: none;
+  border-color: var(--sky-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--sky-glow);
 }
 .form textarea {
   grid-column: 1 / -1;
@@ -301,9 +286,8 @@ header {
 
 /* ─── FOOTER ─── */
 footer {
-  background: #070709;
-  border-top: 1px solid var(--line);
-  color: var(--subtle);
+  background: var(--ink-heading);
+  color: #fff;
   padding: 30px 0;
   font-size: 12px;
   margin-top: 60px;
@@ -316,7 +300,6 @@ footer {
   flex-wrap: wrap;
 }
 
-/* ─── RESPONSIVE ─── */
 @media (max-width: 800px) {
   .hero { min-height: 320px; padding: 30px 20px; }
   .specs-grid { grid-template-columns: 1fr; }
@@ -385,8 +368,8 @@ footer {
     <h2>Schedule a Private Site Visit</h2>
     <p class="muted">Select your preferred date and time. An advisory manager will confirm your private walkthrough.</p>
     <form id="visitForm" class="form">
-      <input id="visitAt" type="datetime-local" required>
-      <textarea id="visitNotes" placeholder="Any specific requirements or questions for our development team?"></textarea>
+      <input id="visitAt" type="datetime-local" required aria-label="Preferred date and time">
+      <textarea id="visitNotes" placeholder="Any specific requirements or questions for our development team?" aria-label="Notes"></textarea>
       <div style="grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
         <button class="btn" type="submit">REQUEST SITE VISIT →</button>
         <span id="visitMsg" class="muted"></span>
@@ -432,7 +415,7 @@ async function load() {
   $('location').textContent = p.location || 'Contact our advisory team';
   $('price').textContent = p.price || 'Contact our advisory team';
   $('amenities').textContent = p.amenities || 'Contact our advisory team';
-  $('hero').style.backgroundImage = `linear-gradient(180deg,rgba(11,11,14,.2) 0%,rgba(11,11,14,.95) 90%),url('${String(p.image || '').replace(/'/g, '%27')}')`;
+  $('hero').style.backgroundImage = `linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%), url('${String(p.image || '').replace(/'/g, '%27')}')`;
   
   $('gallery').innerHTML = (d.media || []).map(x => x.media_type === 'video' ? `<video controls preload="metadata" src="${esc(x.file_path)}"></video>` : `<img loading="lazy" src="${esc(x.file_path)}" alt="${esc(p.name)}">`).join('') || '<p class="muted">Project gallery coming soon.</p>';
   

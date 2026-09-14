@@ -3,62 +3,67 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Laxminarayan Group — Log In</title>
+<title>Laxminarayan Group — Client Log In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0b0b0e;
-  --surface: #141418;
-  --surface-glass: rgba(20, 20, 26, 0.85);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.18);
-  --gold: #d4af37;
-  --gold-glow: rgba(212, 175, 55, 0.35);
-  --gold-soft: rgba(212, 175, 55, 0.12);
-  --gold-gradient: linear-gradient(135deg, #f3d789 0%, #d4af37 60%, #aa8420 100%);
-  --ink: #ffffff;
-  --muted: #9c9ca8;
-  --subtle: #6a6a78;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-pill: 999px;
-  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.7);
-  --shadow-glow: 0 0 35px var(--gold-glow);
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-sky-tint: #f0f9ff;
+  
+  --sky-primary: #0284c7;
+  --sky-deep: #0369a1;
+  --sky-light: #e0f2fe;
+  --sky-glow: rgba(2, 132, 199, 0.2);
+  --sky-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  
+  --ink-heading: #0f172a;
+  --ink-body: #334155;
+  --ink-muted: #64748b;
+  --ink-subtle: #94a3b8;
+  
+  --line: rgba(15, 23, 42, 0.08);
+  --line-strong: rgba(15, 23, 42, 0.15);
+  --line-sky: rgba(2, 132, 199, 0.25);
+  
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  --shadow-float: 0 20px 50px -10px rgba(15, 23, 42, 0.09);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 9999px;
+  
+  --font-serif: "Playfair Display", Georgia, serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-main);
+  color: var(--ink-body);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 40%);
-  background-attachment: fixed;
-  min-height: 100vh;
-}
-
-.wrap {
+    radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.05) 0%, transparent 40%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 30px 20px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .box {
   width: min(440px, 100%);
-  background: var(--surface-glass);
+  background: var(--bg-surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 44px 38px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-float);
   position: relative;
   overflow: hidden;
 }
@@ -69,33 +74,33 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  height: 3px;
+  background: var(--sky-gradient);
 }
 
 .logo {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 2.5px;
-  color: #fff;
+  color: var(--ink-heading);
   display: flex;
   align-items: center;
   gap: 8px;
   text-transform: uppercase;
 }
-.gold { color: var(--gold); }
+.sky-dot { color: var(--sky-primary); }
 
 h1 {
-  font-family: "Playfair Display", serif;
-  font-size: 36px;
+  font-family: var(--font-serif);
+  font-size: 34px;
   font-weight: 600;
-  color: #fff;
-  margin: 20px 0 8px;
+  color: var(--ink-heading);
+  margin: 18px 0 8px;
   letter-spacing: -0.5px;
 }
 
 p {
-  color: var(--muted);
+  color: var(--ink-muted);
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 24px;
@@ -106,46 +111,46 @@ label {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.5px;
-  color: var(--subtle);
+  color: var(--ink-muted);
   text-transform: uppercase;
-  margin: 18px 0 8px;
+  margin: 18px 0 6px;
 }
 
 input {
   width: 100%;
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--line);
+  padding: 13px 16px;
+  background: var(--bg-main);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  color: #fff;
+  color: var(--ink-heading);
   font-family: inherit;
   font-size: 14px;
   outline: none;
   transition: all .2s ease;
 }
 input:focus {
-  border-color: var(--gold);
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+  border-color: var(--sky-primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--sky-glow);
 }
 
 button {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   margin-top: 24px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--gold-gradient);
-  color: #0b0b0e;
+  background: var(--sky-gradient);
+  color: #fff;
   font-weight: 700;
   font-size: 13px;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all .25s ease;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+  box-shadow: 0 4px 16px var(--sky-glow);
 }
 button:hover {
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.35);
   transform: translateY(-2px);
 }
 button:disabled {
@@ -156,10 +161,10 @@ button:disabled {
 
 .msg {
   padding: 14px 16px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   border-radius: var(--radius-sm);
-  color: #f87171;
+  color: #dc2626;
   margin-top: 18px;
   font-size: 13px;
   line-height: 1.5;
@@ -169,42 +174,40 @@ button:disabled {
   margin-top: 24px;
   text-align: center;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--ink-muted);
 }
 .links a {
-  color: var(--gold);
+  color: var(--sky-deep);
   text-decoration: none;
   font-weight: 600;
   transition: color .2s;
 }
 .links a:hover {
   text-decoration: underline;
-  color: #fff;
+  color: var(--sky-primary);
 }
 
 @media (max-width: 480px) {
   .box { padding: 32px 24px; }
-  h1 { font-size: 30px; }
+  h1 { font-size: 28px; }
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="box">
-    <div class="logo">LAXMINARAYAN GROUP <span class="gold">•</span></div>
-    <h1>Welcome back.</h1>
-    <p id="intro">Log in using your registered email or phone number.</p>
-    <form id="form">
-      <label>EMAIL OR PHONE</label>
-      <input id="identifier" autocomplete="username" placeholder="e.g. name@example.com or 9876543210" required>
-      <label>PASSWORD</label>
-      <input id="password" type="password" minlength="8" autocomplete="current-password" placeholder="••••••••" required>
-      <button id="submit">LOG IN →</button>
-    </form>
-    <div id="msg" class="msg" style="display:none"></div>
-    <div class="links">
-      Don't have an account? <a href="signup.html">Sign up</a> · <a href="index.html">Back to Website</a>
-    </div>
+<div class="box">
+  <div class="logo">LAXMINARAYAN GROUP <span class="sky-dot">•</span></div>
+  <h1>Welcome back.</h1>
+  <p id="intro">Log in using your registered email or phone number.</p>
+  <form id="form">
+    <label>EMAIL OR PHONE</label>
+    <input id="identifier" autocomplete="username" placeholder="e.g. name@example.com or 9876543210" required aria-label="Email or Phone">
+    <label>PASSWORD</label>
+    <input id="password" type="password" minlength="8" autocomplete="current-password" placeholder="••••••••" required aria-label="Password">
+    <button id="submit">LOG IN →</button>
+  </form>
+  <div id="msg" class="msg" style="display:none"></div>
+  <div class="links">
+    Don't have an account? <a href="signup.html">Sign up</a> · <a href="index.html">Back to Website</a>
   </div>
 </div>
 
