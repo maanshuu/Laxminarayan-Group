@@ -1,0 +1,45 @@
+{
+  "company": {
+    "name": "Laxminarayan Group",
+    "phone": "6352000017",
+    "email": "msinfraprojects2021@gmail.com",
+    "tagline": "CONSTRUCTION \u2022 DEVELOPMENT \u2022 TRUST"
+  },
+  "founders": [
+    {
+      "name": "Roshan Sabhaya",
+      "designation": "FOUNDER & DIRECTOR",
+      "initials": "RS"
+    },
+    {
+      "name": "Mehul Mistry",
+      "designation": "FOUNDER & DIRECTOR",
+      "initials": "MM"
+    },
+    {
+      "name": "Swaraj Jikadara",
+      "designation": "FOUNDER & DIRECTOR",
+      "initials": "SJ"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Signature Homes",
+      "category": "RESIDENTIAL",
+      "description": "Thoughtfully planned homes for contemporary families.",
+      "image": "/assets/project-1.jpg"
+    },
+    {
+      "name": "Prime Spaces",
+      "category": "COMMERCIAL",
+      "description": "Strategic commercial spaces built for opportunity.",
+      "image": "/assets/project-2.jpg"
+    },
+    {
+      "name": "Future Landmarks",
+      "category": "DEVELOPMENT",
+      "description": "Planned developments with a long-term perspective.",
+      "image": "/assets/project-3.jpg"
+    }
+  ]
+}

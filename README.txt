@@ -34,7 +34,7 @@ These are intentionally separate so future modules can be added without replacin
 
 ## Setup
 
-Requirements: Node.js 22.5+ and npm.
+Requirements: Node.js 20+ and npm.
 
 1. Copy `.env.example` to `.env`.
 2. Generate a long random `JWT_SECRET` (at least 32 characters).
@@ -118,24 +118,8 @@ PROJECT PORTFOLIO UPDATE
 - Project-category details require an authenticated account. Unauthenticated clicks are sent to login and returned to the requested category after successful customer login.
 - New project imagery is bundled locally under assets/.
 
-## Project interest flow
 
-Logged-in customers can now register interest directly from any project category page. Each project card has an **I'm Interested** button. The server authenticates the customer, reads their name/email/phone from the account, links the interest to the selected project, and creates an enquiry record automatically. No contact form is required for this flow.
-
-Admins see the selected project in **Customer enquiries → Interested project**, alongside the customer's contact details and enquiry status. Customers see the selected project in **My enquiries**.
-
-Repeated clicks on the same project while an earlier request is still `new` or `contacted` do not create duplicate active requests; the existing request is returned instead. Once an enquiry is `closed`, the customer may register interest again.
-
-
-DYNAMIC CONTENT UPDATE
-- Admin Dashboard now includes project management (create, edit, activate/deactivate projects).
-- Homepage project cards are loaded from the projects database.
-- Project category pages load active projects from the database and use database images/content.
-- Project category API accepts categories present in the database and remains authentication-protected.
-
-
-## Project image upload
-Admin project management now supports choosing an image directly from the device. JPG, PNG, WEBP and GIF files up to 8 MB are stored under `uploads/projects/` and served by the website. A path/URL can still be used instead.
+PROJECT IMAGES: In Admin > Manage projects, use the new file picker to choose a JPG, PNG, WEBP, or GIF from your device (max 8 MB). You can still enter an image path/URL instead.
 
 
 IMPORTANT — DATA PERSISTENCE
@@ -145,3 +129,26 @@ Project media is stored in %APPDATA%\LaxminarayanGroup\uploads\projects.
 On first run, the server automatically imports the existing database from this project or the newest sibling Laxminarayan project folder when available. After initialization, future ZIP updates use the same permanent database and media store. Do NOT delete %APPDATA%\LaxminarayanGroup.
 
 Future updates can be extracted into new folders without manually copying the database.
+
+PRODUCTION CRM UPGRADE
+======================
+This build keeps the Persistent Master storage architecture. Business data remains in:
+%APPDATA%\LaxminarayanGroup\data\laxminarayan.db
+Media remains in:
+%APPDATA%\LaxminarayanGroup\uploads\projects
+Backups remain in:
+%APPDATA%\LaxminarayanGroup\backups
+
+Added modules:
+- CRM lead pipeline with status, assignment, notes and follow-up dates
+- Automatic lead creation from website enquiries
+- Site-visit request workflow for signed-in customers
+- Admin site-visit confirmation/completion/cancellation workflow
+- Team member account creation and activation/deactivation
+- Project detail pages with gallery, location, price and amenities
+- Admin reporting dashboard and conversion metrics
+- Admin audit log
+- Basic public endpoint rate limiting
+- Production-oriented robots.txt and sitemap.xml
+
+IMPORTANT: Do not copy a data folder between ZIP versions. The database and uploaded media are intentionally stored outside the project folder so future updates keep the same business data.

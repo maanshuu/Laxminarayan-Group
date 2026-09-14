@@ -1,0 +1,10 @@
+ADMIN API
+=========
+Authentication is via the secure HttpOnly session cookie created by /api/auth/login.
+Do not send passwords to admin endpoints.
+
+GET  /api/admin/dashboard
+GET  /api/admin/users
+PATCH /api/admin/users/:id/status
+GET  /api/admin/enquiries
+PATCH /api/admin/enquiries/:id

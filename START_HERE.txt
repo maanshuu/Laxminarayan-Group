@@ -1,0 +1,56 @@
+LAXMINARAYAN GROUP — SIMPLE SETUP
+
+You now have:
+- Main website
+- Customer Sign Up
+- Customer Login
+- Customer Account page
+- Customer enquiry database
+- Admin Login
+- Admin Dashboard
+- Registered users list
+- Enquiry list
+- New / Contacted / Closed status
+- Project data
+- Founder data
+
+TO TEST ON YOUR COMPUTER:
+1. Install Node.js 22.5 or newer from the official Node.js website.
+2. Open this folder.
+3. Copy .env.example and rename the copy to .env
+4. Open .env and change ADMIN_EMAIL and ADMIN_PASSWORD.
+5. Double-click START_BACKEND.bat.
+6. Open your browser and go to http://localhost:5000
+7. Click Login / Sign Up.
+8. For another device on the same Wi-Fi, use http://YOUR-PC-IP:5000 (the server accepts LAN connections).
+
+ADMIN:
+Use the ADMIN_EMAIL and ADMIN_PASSWORD you put in .env.
+Do NOT share the admin password.
+
+CUSTOMERS:
+Customers can create their own account using Sign Up.
+After login they can see their account and enquiries.
+
+IMPORTANT FOR LIVE WEBSITE:
+This is ready for a Node.js-capable hosting/server. Do not upload the .env file publicly or put passwords inside frontend code.
+PROJECT PORTFOLIO UPDATE
+- The homepage now has four clickable project categories: Signature Homes, Prime Spaces, Future Landmarks and Industrial Properties.
+- Each category opens project-category.html and shows only projects from that category.
+- Project-category details require an authenticated account. Unauthenticated clicks are sent to login and returned to the requested category after successful customer login.
+- New project imagery is bundled locally under assets/.
+
+ADMIN PASSWORD RESET:
+If the admin password does not work, stop Node.js and run RESET_ADMIN_PASSWORD.bat. It is a one-time utility that updates the existing admin password safely using bcrypt and invalidates existing admin sessions.
+
+
+PROJECT IMAGES: In Admin > Manage projects, use the new file picker to choose a JPG, PNG, WEBP, or GIF from your device (max 8 MB). You can still enter an image path/URL instead.
+
+
+IMPORTANT — DATA PERSISTENCE
+This version uses a permanent Windows storage location outside the extracted project folder:
+%APPDATA%\LaxminarayanGroup\data\laxminarayan.db
+Project media is stored in %APPDATA%\LaxminarayanGroup\uploads\projects.
+On first run, the server automatically imports the existing database from this project or the newest sibling Laxminarayan project folder when available. After initialization, future ZIP updates use the same permanent database and media store. Do NOT delete %APPDATA%\LaxminarayanGroup.
+
+Future updates can be extracted into new folders without manually copying the database.

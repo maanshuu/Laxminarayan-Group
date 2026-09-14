@@ -1,0 +1,83 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laxminarayan Group — Sign Up</title><style>
+body{margin:0;background:#f5f2eb;color:#171715;font-family:Arial,sans-serif}.wrap{min-height:100vh;display:grid;place-items:center;padding:25px}.box{width:min(430px,100%);background:#fff;padding:38px;border:1px solid #ddd8ce;box-shadow:0 18px 60px #0001}.logo{font-weight:800;letter-spacing:2px}.gold{color:#b58a43}h1{font-family:Georgia,serif;font-size:40px;margin:25px 0 8px}p{color:#777;line-height:1.6}label{display:block;font-size:12px;font-weight:700;margin:18px 0 7px}input{width:100%;padding:14px;border:1px solid #d7d1c5;box-sizing:border-box;font:inherit}button{width:100%;padding:15px;margin-top:20px;border:0;background:#b58a43;color:#171715;font-weight:800;cursor:pointer}.msg{padding:11px;background:#f1ece3;margin-top:15px;font-size:13px}.links{margin-top:20px;text-align:center;font-size:13px}.links a{color:#9b7131;text-decoration:none;font-weight:700}
+
+@media (max-width:600px){
+  .wrap{padding:16px;align-items:start;padding-top:30px}
+  .box{padding:25px 20px;width:100%;max-width:430px}
+  h1{font-size:34px;line-height:1.08}
+  input{font-size:16px}
+  button{min-height:48px}
+}
+@media (max-width:360px){
+  .wrap{padding:10px}
+  .box{padding:20px 16px}
+  h1{font-size:30px}
+}
+
+</style></head><body><div class="wrap"><div class="box"><div class="logo">LAXMINARAYAN GROUP <span class="gold">•</span></div><h1>Create your account.</h1><p>Use an email, phone number, or both. Your password is securely hashed before it is stored.</p><form id="form"><label>FULL NAME</label><input id="name" autocomplete="name" required><label>EMAIL <small>(optional if phone is provided)</small></label><input id="email" type="email" autocomplete="email"><label>PHONE <small>(optional if email is provided)</small></label><input id="phone" type="tel" autocomplete="tel"><label>PASSWORD</label><input id="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required><button id="submit">CREATE ACCOUNT</button></form><div id="msg" class="msg" style="display:none"></div><div class="links">Already have an account? <a href="login.html">Log in</a> · <a href="index.html">Website</a></div></div></div><script>
+const params=new URLSearchParams(location.search);const returnTo=params.get("return_to");const safeReturnTo=v=>v&&v.startsWith("/")&&!v.startsWith("//")&&!v.includes("\\")?v:null;const safeTarget=safeReturnTo(returnTo);
+const form=document.getElementById("form");
+const msg=document.getElementById("msg");
+const nameInput=document.getElementById("name");
+const emailInput=document.getElementById("email");
+const phoneInput=document.getElementById("phone");
+const passwordInput=document.getElementById("password");
+const submitBtn=document.getElementById("submit");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  msg.style.display = "none";
+
+  const nameValue = nameInput.value.trim();
+  const emailValue = emailInput.value.trim();
+  const phoneValue = phoneInput.value.trim();
+  const passwordValue = passwordInput.value;
+
+  if (nameValue.length < 2) {
+    msg.textContent = "Enter your full name";
+    msg.style.display = "block";
+    nameInput.focus();
+    return;
+  }
+  if (!emailValue && !phoneValue) {
+    msg.textContent = "Enter an email or phone number";
+    msg.style.display = "block";
+    emailInput.focus();
+    return;
+  }
+  if (passwordValue.length < 8) {
+    msg.textContent = "Password must be 8–128 characters";
+    msg.style.display = "block";
+    passwordInput.focus();
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "CREATING ACCOUNT...";
+
+  try {
+    const r = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      credentials: "same-origin",
+      body: JSON.stringify({
+        name: nameValue,
+        email: emailValue,
+        phone: phoneValue,
+        password: passwordValue
+      })
+    });
+
+    const d = await r.json();
+    if (!r.ok || !d.success) throw new Error(d.error || "Could not create account");
+
+    window.location.replace(safeTarget||"index.html#projects");
+  } catch (err) {
+    msg.textContent = err.message || "Could not create account";
+    msg.style.display = "block";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "CREATE ACCOUNT";
+  }
+});
+</script></body></html>

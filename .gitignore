@@ -1,0 +1,10 @@
+node_modules/
+.env
+data/*.db
+data/*.db-shm
+data/*.db-wal
+uploads/
+*.db
+*.db-shm
+*.db-wal
+.admin-password-reset-used
