@@ -1,28 +1,242 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Laxminarayan Group — Sign Up</title><style>
-body{margin:0;background:#f5f2eb;color:#171715;font-family:Arial,sans-serif}.wrap{min-height:100vh;display:grid;place-items:center;padding:25px}.box{width:min(430px,100%);background:#fff;padding:38px;border:1px solid #ddd8ce;box-shadow:0 18px 60px #0001}.logo{font-weight:800;letter-spacing:2px}.gold{color:#b58a43}h1{font-family:Georgia,serif;font-size:40px;margin:25px 0 8px}p{color:#777;line-height:1.6}label{display:block;font-size:12px;font-weight:700;margin:18px 0 7px}input{width:100%;padding:14px;border:1px solid #d7d1c5;box-sizing:border-box;font:inherit}button{width:100%;padding:15px;margin-top:20px;border:0;background:#b58a43;color:#171715;font-weight:800;cursor:pointer}.msg{padding:11px;background:#f1ece3;margin-top:15px;font-size:13px}.links{margin-top:20px;text-align:center;font-size:13px}.links a{color:#9b7131;text-decoration:none;font-weight:700}
-
-@media (max-width:600px){
-  .wrap{padding:16px;align-items:start;padding-top:30px}
-  .box{padding:25px 20px;width:100%;max-width:430px}
-  h1{font-size:34px;line-height:1.08}
-  input{font-size:16px}
-  button{min-height:48px}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laxminarayan Group — Sign Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b0e;
+  --surface: #141418;
+  --surface-glass: rgba(20, 20, 26, 0.85);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --gold: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-gradient: linear-gradient(135deg, #f3d789 0%, #d4af37 60%, #aa8420 100%);
+  --ink: #ffffff;
+  --muted: #9c9ca8;
+  --subtle: #6a6a78;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 35px var(--gold-glow);
 }
-@media (max-width:360px){
-  .wrap{padding:10px}
-  .box{padding:20px 16px}
-  h1{font-size:30px}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 40%);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
 
-</style></head><body><div class="wrap"><div class="box"><div class="logo">LAXMINARAYAN GROUP <span class="gold">•</span></div><h1>Create your account.</h1><p>Use an email, phone number, or both. Your password is securely hashed before it is stored.</p><form id="form"><label>FULL NAME</label><input id="name" autocomplete="name" required><label>EMAIL <small>(optional if phone is provided)</small></label><input id="email" type="email" autocomplete="email"><label>PHONE <small>(optional if email is provided)</small></label><input id="phone" type="tel" autocomplete="tel"><label>PASSWORD</label><input id="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" required><button id="submit">CREATE ACCOUNT</button></form><div id="msg" class="msg" style="display:none"></div><div class="links">Already have an account? <a href="login.html">Log in</a> · <a href="index.html">Website</a></div></div></div><script>
-const params=new URLSearchParams(location.search);const returnTo=params.get("return_to");const safeReturnTo=v=>v&&v.startsWith("/")&&!v.startsWith("//")&&!v.includes("\\")?v:null;const safeTarget=safeReturnTo(returnTo);
-const form=document.getElementById("form");
-const msg=document.getElementById("msg");
-const nameInput=document.getElementById("name");
-const emailInput=document.getElementById("email");
-const phoneInput=document.getElementById("phone");
-const passwordInput=document.getElementById("password");
-const submitBtn=document.getElementById("submit");
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+}
+
+.box {
+  width: min(460px, 100%);
+  background: var(--surface-glass);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 44px 38px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.logo {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+}
+.gold { color: var(--gold); }
+
+h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 34px;
+  font-weight: 600;
+  color: #fff;
+  margin: 20px 0 8px;
+  letter-spacing: -0.5px;
+}
+
+p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--subtle);
+  text-transform: uppercase;
+  margin: 16px 0 6px;
+}
+label small {
+  color: var(--subtle);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+input {
+  width: 100%;
+  padding: 13px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all .2s ease;
+}
+input:focus {
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--gold-gradient);
+  color: #0b0b0e;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+}
+button:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.msg {
+  padding: 14px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  color: #f87171;
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.links {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.links a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color .2s;
+}
+.links a:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .box { padding: 32px 24px; }
+  h1 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="box">
+    <div class="logo">LAXMINARAYAN GROUP <span class="gold">•</span></div>
+    <h1>Create your account.</h1>
+    <p>Use an email, phone number, or both. Your password is securely encrypted.</p>
+    
+    <form id="form">
+      <label>FULL NAME</label>
+      <input id="name" autocomplete="name" placeholder="Himanshu Kanani" required>
+      
+      <label>EMAIL <small>(optional if phone is provided)</small></label>
+      <input id="email" type="email" autocomplete="email" placeholder="name@example.com">
+      
+      <label>PHONE <small>(optional if email is provided)</small></label>
+      <input id="phone" type="tel" autocomplete="tel" placeholder="+91 9876543210">
+      
+      <label>PASSWORD</label>
+      <input id="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters" required>
+      
+      <button id="submit">CREATE ACCOUNT →</button>
+    </form>
+    
+    <div id="msg" class="msg" style="display:none"></div>
+    <div class="links">
+      Already have an account? <a href="login.html">Log in</a> · <a href="index.html">Back to Website</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const returnTo = params.get("return_to");
+const safeReturnTo = v => v && v.startsWith("/") && !v.startsWith("//") && !v.includes("\\") ? v : null;
+const safeTarget = safeReturnTo(returnTo);
+
+const form = document.getElementById("form");
+const msg = document.getElementById("msg");
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+const passwordInput = document.getElementById("password");
+const submitBtn = document.getElementById("submit");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -58,7 +272,7 @@ form.addEventListener("submit", async (e) => {
   try {
     const r = await fetch("/api/auth/signup", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
       body: JSON.stringify({
         name: nameValue,
@@ -71,13 +285,15 @@ form.addEventListener("submit", async (e) => {
     const d = await r.json();
     if (!r.ok || !d.success) throw new Error(d.error || "Could not create account");
 
-    window.location.replace(safeTarget||"index.html#projects");
+    window.location.replace(safeTarget || "index.html#projects");
   } catch (err) {
     msg.textContent = err.message || "Could not create account";
     msg.style.display = "block";
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = "CREATE ACCOUNT";
+    submitBtn.textContent = "CREATE ACCOUNT →";
   }
 });
-</script></body></html>
+</script>
+</body>
+</html>

@@ -1,85 +1,593 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Explore Laxminarayan Group projects.">
 <title>Laxminarayan Group — Projects</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#171715;--paper:#f5f2eb;--muted:#77736a;--gold:#b58a43;--line:#ded8ca;--white:#fff;--dark:#1c1b18}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:"DM Sans",sans-serif}a{text-decoration:none;color:inherit}.container{width:min(1160px,92%);margin:auto}
-header{position:sticky;top:0;z-index:20;background:rgba(23,23,21,.97);backdrop-filter:blur(12px);padding:15px 0}.nav{display:flex;align-items:center;justify-content:space-between;color:#fff}.logo{font-weight:700;letter-spacing:2px;font-size:19px}.logo span{display:block;font-size:9px;letter-spacing:4px;color:#d8b66d;margin-top:3px}nav{display:flex;gap:28px;font-size:13px}nav a:hover{color:#d8b66d}.account{border:1px solid #75613e;padding:9px 13px}
-.hero{min-height:360px;display:grid;align-items:end;color:#fff;background:linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.22)),url("assets/signature-homes.jpg") center/cover no-repeat}.hero-inner{padding:80px 0 55px}.eyebrow{color:#d8b66d;letter-spacing:4px;font-size:11px;font-weight:700;text-transform:uppercase}.hero h1{font:600 clamp(45px,7vw,78px)/.95 "Playfair Display",serif;margin:15px 0}.hero p{max-width:650px;color:#eee;line-height:1.75;margin:0;font-size:16px}
-main{padding:75px 0 105px}.crumb{font-size:12px;color:var(--muted);margin-bottom:30px}.crumb a{color:var(--gold)}.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:35px}.section-head h2{font:600 42px "Playfair Display",serif;margin:0}.section-head p{max-width:480px;color:var(--muted);line-height:1.7;margin:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.project{background:#fff;border:1px solid var(--line);overflow:hidden;transition:.25s}.project:hover{transform:translateY(-4px);box-shadow:0 15px 35px rgba(23,23,21,.10)}.project-pic{height:250px;background:center/cover no-repeat}.project-body{padding:25px}.project-body .tag{color:var(--gold);font-size:10px;font-weight:700;letter-spacing:2px}.project-body h3{font:500 28px "Playfair Display",serif;margin:8px 0 10px}.project-body p{color:var(--muted);font-size:13px;line-height:1.7;min-height:66px}.details{display:inline-flex;align-items:center;gap:8px;margin-top:8px;color:#9b7131;font-size:12px;font-weight:700;letter-spacing:.5px;border:1px solid var(--gold);background:#fff;padding:10px 14px;cursor:pointer}.details:hover{background:#b58a43;color:#fff}.details:disabled{opacity:.65;cursor:default}.interest-note{margin-top:10px;font-size:11px;color:#4d7a4d;min-height:16px}.notice{margin-top:45px;padding:24px 28px;background:#ebe6dc;border:1px solid var(--line);display:flex;justify-content:space-between;gap:25px;align-items:center}.notice strong{font-family:"Playfair Display",serif;font-size:22px}.notice p{color:var(--muted);margin:5px 0 0;font-size:13px}.btn{display:inline-flex;padding:13px 21px;background:var(--gold);font-weight:700;font-size:12px;white-space:nowrap}.empty{padding:50px;background:#fff;border:1px solid var(--line);color:var(--muted)}
-footer{background:#111;color:#888;padding:25px 0;font-size:11px}.foot{display:flex;justify-content:space-between}
-@media(max-width:800px){nav{gap:12px;font-size:11px}.account{padding:8px}.grid{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:14px}.notice{display:block}.notice .btn{margin-top:18px}.foot{display:block;line-height:2}.project-pic{height:220px}}
-
-.menu{display:none;background:none;border:0;color:#fff;font-size:25px;width:44px;height:44px}
-@media (max-width:1100px) and (min-width:801px){
-  .container{width:min(94%,1000px)}
-  nav{gap:18px;font-size:12px}
-}
-@media (max-width:800px){
-  header{padding:11px 0}
-  .container{width:min(92%,680px)}
-  .logo{font-size:16px;line-height:1.2}
-  .logo span{font-size:7px;letter-spacing:3px}
-  .menu{display:block}
-  header nav{display:none;position:absolute;top:100%;left:4%;right:4%;flex-direction:column;gap:0;background:rgba(23,23,21,.98);padding:8px 0;border:1px solid rgba(255,255,255,.12)}
-  header nav.open{display:flex}
-  header nav a{padding:14px 18px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08)}
-  header nav a:last-child{border-bottom:0}
-  .hero{min-height:300px}
-  .hero-inner{padding:70px 0 36px}
-  .grid{grid-template-columns:1fr}
-  .project-pic{height:240px}
-}
-@media (max-width:480px){
-  .container{width:calc(100% - 32px)}
-  .hero{min-height:270px}
-  .project-pic{height:210px}
-  .section-head h2{font-size:38px}
-  .notice{padding:18px}
+:root {
+  --bg: #0b0b0e;
+  --surface: #141418;
+  --surface-glass: rgba(20, 20, 26, 0.75);
+  --surface-card: #191920;
+  --surface-hover: #22222c;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --gold: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-gradient: linear-gradient(135deg, #f3d789 0%, #d4af37 60%, #aa8420 100%);
+  --ink: #ffffff;
+  --muted: #9c9ca8;
+  --subtle: #6a6a78;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 35px var(--gold-glow);
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 90% 40%, rgba(212, 175, 55, 0.04) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+a { text-decoration: none; color: inherit; transition: all .25s ease; }
+.container { width: min(1200px, 92%); margin: auto; }
+
+/* ─── HEADER ─── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 16px 0;
+  background: rgba(11, 11, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 18px;
+  color: #fff;
+}
+.logo span {
+  font-size: 8px;
+  letter-spacing: 3.5px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 6px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+}
+nav a {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  border-radius: var(--radius-pill);
+  transition: all .2s ease;
+}
+nav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+.account {
+  background: var(--gold-soft);
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  font-weight: 600;
+}
+.account:hover {
+  background: var(--gold-gradient);
+  color: #111;
+  border-color: var(--gold);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.menu {
+  display: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: #fff;
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  place-items: center;
+}
+
+/* ─── CATEGORY HERO ─── */
+.hero {
+  min-height: 400px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  color: #fff;
+  background: 
+    linear-gradient(180deg, rgba(11, 11, 14, 0.7) 0%, rgba(11, 11, 14, 0.96) 100%),
+    url("assets/signature-homes.jpg") center/cover no-repeat;
+  padding: 80px 0 55px;
+  border-bottom: 1px solid var(--line);
+}
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  color: #e5c07b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  backdrop-filter: blur(10px);
+}
+.hero h1 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: clamp(40px, 6vw, 70px);
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  margin-bottom: 14px;
+  color: #fff;
+}
+.hero p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.75;
+  max-width: 640px;
+}
+
+/* ─── MAIN CONTENT & GRID ─── */
+main {
+  padding: 60px 0 110px;
+}
+.crumb {
+  font-size: 13px;
+  color: var(--subtle);
+  margin-bottom: 35px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+.crumb a { color: var(--gold); }
+.crumb a:hover { text-decoration: underline; }
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+.section-head h2 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: 38px;
+  letter-spacing: -1px;
+  color: #fff;
+}
+.section-head p {
+  max-width: 480px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+.project {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all .35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+}
+.project:hover {
+  transform: translateY(-8px);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.12);
+}
+.project-pic {
+  height: 260px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: transform .7s ease;
+}
+.project:hover .project-pic {
+  transform: scale(1.05);
+}
+.project-body {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.project-body .tag {
+  align-self: flex-start;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.project-body h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  color: #fff;
+  margin-bottom: 10px;
+  line-height: 1.25;
+}
+.project-body p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  min-height: 65px;
+  margin-bottom: 20px;
+}
+.details {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+.details:hover {
+  background: var(--gold-gradient);
+  color: #0b0b0e;
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+}
+.details:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+.interest-note {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #4ade80;
+  min-height: 18px;
+}
+
+/* ─── NOTICE BENTO ─── */
+.notice {
+  margin-top: 60px;
+  padding: 36px 40px;
+  background: var(--surface-glass);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  backdrop-filter: blur(12px);
+}
+.notice strong {
+  display: block;
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.notice p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 26px;
+  border-radius: var(--radius-pill);
+  background: var(--gold-gradient);
+  color: #0b0b0e;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+}
+.btn:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.empty {
+  padding: 60px 40px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--muted);
+  text-align: center;
+  font-size: 16px;
+  grid-column: 1 / -1;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  background: #070709;
+  border-top: 1px solid var(--line);
+  color: var(--subtle);
+  padding: 30px 0;
+  font-size: 12px;
+}
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 800px) {
+  .menu { display: grid; }
+  header nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 4%;
+    right: 4%;
+    flex-direction: column;
+    padding: 16px;
+    background: rgba(14, 14, 18, 0.98);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    gap: 4px;
+  }
+  header nav.open { display: flex; }
+  header nav a { width: 100%; text-align: center; padding: 12px; font-size: 14px; }
+  .hero { min-height: 320px; padding: 70px 0 40px; }
+  .hero h1 { font-size: 38px; }
+  .grid { grid-template-columns: 1fr; }
+  .section-head { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .notice { flex-direction: column; align-items: flex-start; padding: 28px 24px; }
+  .foot { flex-direction: column; text-align: center; }
+}
 </style>
 </head>
 <body>
-<header><div class="container nav"><a class="logo" href="index.html">LAXMINARAYAN GROUP<span>CONSTRUCTION • DEVELOPMENT</span></a><nav><a href="index.html#about">About</a><a href="index.html#projects">Projects</a><a href="index.html#leadership">Leadership</a><a href="index.html#contact">Contact</a><a class="account" href="dashboard.html" id="accountLink">My Account</a></nav><button class="menu" type="button" aria-label="Open menu" aria-expanded="false" onclick="const n=document.querySelector('header nav'); const b=this; n.classList.toggle('open'); b.setAttribute('aria-expanded',n.classList.contains('open'))">☰</button></div></header>
-<section class="hero"><div class="container hero-inner"><div class="eyebrow" id="heroKicker">PROJECT PORTFOLIO</div><h1 id="heroTitle">Projects</h1><p id="heroDesc">Explore our projects.</p></div></section>
-<main><div class="container"><div class="crumb"><a href="index.html">Home</a> &nbsp;→&nbsp; <a href="index.html#projects">Projects</a> &nbsp;→&nbsp; <span id="crumbTitle">Projects</span></div>
-<div class="section-head"><div><div class="eyebrow" style="color:var(--gold)">SELECTED PROJECTS</div><h2 id="sectionTitle">Projects</h2></div><p id="sectionDesc">A focused collection from this Laxminarayan Group portfolio.</p></div>
-<div class="grid" id="grid"></div>
-<div class="notice"><div><strong>Looking for something specific?</strong><p>Send us an enquiry and our team can help with availability, specifications and project information.</p></div><a class="btn" href="index.html#contact">SEND AN ENQUIRY →</a></div>
-</div></main>
-<footer><div class="container foot"><span>© 2026 Laxminarayan Group. All rights reserved.</span><span>CONSTRUCTION • DEVELOPMENT • TRUST</span></div></footer>
+<header>
+  <div class="container nav">
+    <a class="logo" href="index.html">
+      LAXMINARAYAN GROUP
+      <span>CONSTRUCTION • DEVELOPMENT</span>
+    </a>
+    <nav>
+      <a href="index.html#about">About</a>
+      <a href="index.html#projects">Projects</a>
+      <a href="index.html#leadership">Leadership</a>
+      <a href="index.html#contact">Contact</a>
+      <a class="account" href="dashboard.html" id="accountLink">My Account</a>
+    </nav>
+    <button class="menu" type="button" aria-label="Open menu" aria-expanded="false" onclick="const n=document.querySelector('header nav'); const b=this; n.classList.toggle('open'); b.setAttribute('aria-expanded',n.classList.contains('open'))">☰</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="eyebrow" id="heroKicker">PROJECT PORTFOLIO</div>
+    <h1 id="heroTitle">Projects</h1>
+    <p id="heroDesc">Explore our projects.</p>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+    <div class="crumb">
+      <a href="index.html">Home</a> &nbsp;→&nbsp; 
+      <a href="index.html#projects">Projects</a> &nbsp;→&nbsp; 
+      <span id="crumbTitle">Projects</span>
+    </div>
+    
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">SELECTED PROJECTS</div>
+        <h2 id="sectionTitle">Projects</h2>
+      </div>
+      <p id="sectionDesc">A focused collection from this Laxminarayan Group portfolio.</p>
+    </div>
+    
+    <div class="grid" id="grid"></div>
+    
+    <div class="notice">
+      <div>
+        <strong>Looking for something specific?</strong>
+        <p>Send us an enquiry and our team can help with availability, detailed architectural specifications and upcoming inventory.</p>
+      </div>
+      <a class="btn" href="index.html#contact">SEND AN ENQUIRY →</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container foot">
+    <span>© 2026 Laxminarayan Group. All rights reserved.</span>
+    <span>CONSTRUCTION • DEVELOPMENT • TRUST</span>
+  </div>
+</footer>
+
 <script>
-const API="/api";
-const meta={RESIDENTIAL:{title:"Signature Homes",desc:"Thoughtfully planned residential projects created around modern family living.",kicker:"RESIDENTIAL PORTFOLIO",hero:"assets/signature-homes.jpg"},COMMERCIAL:{title:"Prime Spaces",desc:"Strategic commercial spaces designed for visibility, convenience and business growth.",kicker:"COMMERCIAL PORTFOLIO",hero:"assets/commercial-properties.jpg"},DEVELOPMENT:{title:"Future Landmarks",desc:"Long-term development projects planned with quality infrastructure, connectivity and value in mind.",kicker:"DEVELOPMENT PORTFOLIO",hero:"assets/residential-properties.jpg"},INDUSTRIAL:{title:"Industrial Properties",desc:"Purpose-built industrial spaces for manufacturing, logistics, warehousing and expansion.",kicker:"INDUSTRIAL PORTFOLIO",hero:"assets/industrial-properties.jpg"}};
-const cat=(new URLSearchParams(location.search).get("category")||"").toUpperCase();
-const fallback=meta[cat]||{title:cat.replace(/_/g," "),desc:"Explore projects in this portfolio.",kicker:cat+" PORTFOLIO",hero:"assets/project-2.jpg"};
-if(!cat){location.replace("index.html#projects");}
-else{load();}
-async function load(){
- try{
-  const me=await fetch(API+"/auth/me",{credentials:"same-origin",cache:"no-store"});
-  if(!me.ok){const returnTo=location.pathname+location.search;location.replace("login.html?return_to="+encodeURIComponent(returnTo));return}
-  const md=await me.json();
-  if(md.success&&md.user){const a=document.getElementById("accountLink");a.textContent=md.user.role==="admin"?"Admin Dashboard":"My Account";a.href=md.user.role==="admin"?"admin.html":"dashboard.html"}
-  const r=await fetch(API+"/projects/category/"+encodeURIComponent(cat),{credentials:"same-origin",cache:"no-store"});const d=await r.json();if(!r.ok||!d.success)throw Error(d.error||"Unable to load projects");
-  const items=d.data||[];
-  const m={...fallback};
-  if(items[0]){m.title=meta[cat]?.title||items[0].category.replace(/_/g," ");m.hero=items[0].image||m.hero;m.desc=meta[cat]?.desc||items[0].description||m.desc;m.kicker=(meta[cat]?.kicker)||((items[0].category||cat)+" PORTFOLIO");}
-  document.title="Laxminarayan Group — "+m.title;document.getElementById("heroKicker").textContent=m.kicker;document.getElementById("heroTitle").textContent=m.title;document.getElementById("heroDesc").textContent=m.desc;document.getElementById("crumbTitle").textContent=m.title;document.getElementById("sectionTitle").textContent=m.title;document.getElementById("sectionDesc").textContent=m.desc;document.querySelector(".hero").style.backgroundImage=`linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.22)),url("${escAttr(m.hero)}")`;
-  document.getElementById("grid").innerHTML=items.length?items.map(x=>`<article class="project"><div class="project-pic" style="background-image:url('${escAttr(x.image||m.hero)}')"></div><div class="project-body"><div class="tag">${esc(x.category)}</div><h3>${esc(x.name)}</h3><p>${esc(x.description)}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="details" href="project-detail.html?id=${x.id}">View details →</a><button class="details" type="button" data-project-id="${x.id}" onclick="registerInterest(${x.id},this)">I’m Interested →</button></div><div class="interest-note" data-interest-note="${x.id}"></div></div></article>`).join(""):"<div class='empty'>No active projects are listed in this category yet.</div>";
- }catch(e){document.getElementById("grid").innerHTML="<div class='empty'>We could not load these projects right now. Please return to the website and try again.</div>";console.error(e)}
+const API = "/api";
+const meta = {
+  RESIDENTIAL: { title: "Signature Homes", desc: "Thoughtfully planned residential projects created around modern family living.", kicker: "RESIDENTIAL PORTFOLIO", hero: "assets/signature-homes.jpg" },
+  COMMERCIAL: { title: "Prime Spaces", desc: "Strategic commercial spaces designed for visibility, convenience and business growth.", kicker: "COMMERCIAL PORTFOLIO", hero: "assets/commercial-properties.jpg" },
+  DEVELOPMENT: { title: "Future Landmarks", desc: "Long-term development projects planned with quality infrastructure, connectivity and value in mind.", kicker: "DEVELOPMENT PORTFOLIO", hero: "assets/residential-properties.jpg" },
+  INDUSTRIAL: { title: "Industrial Properties", desc: "Purpose-built industrial spaces for manufacturing, logistics, warehousing and expansion.", kicker: "INDUSTRIAL PORTFOLIO", hero: "assets/industrial-properties.jpg" }
+};
+const cat = (new URLSearchParams(location.search).get("category") || "").toUpperCase();
+const fallback = meta[cat] || { title: cat.replace(/_/g, " "), desc: "Explore projects in this portfolio.", kicker: cat + " PORTFOLIO", hero: "assets/project-2.jpg" };
+
+if (!cat) {
+  location.replace("index.html#projects");
+} else {
+  load();
 }
-async function registerInterest(projectId,button){
- if(button.disabled)return;const note=document.querySelector(`[data-interest-note="${projectId}"]`);button.disabled=true;button.textContent="Sending…";
- try{const r=await fetch("/api/projects/"+encodeURIComponent(projectId)+"/interest",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json","Accept":"application/json"},body:"{}"});let d={};try{d=await r.json()}catch(e){}if(r.status===401){const returnTo=location.pathname+location.search;location.href="login.html?return_to="+encodeURIComponent(returnTo);return}if(!r.ok||!d.success)throw Error(d.error||"Could not register your interest");button.textContent=d.already_registered?"Interest Already Registered ✓":"Interest Registered ✓";if(note)note.textContent=d.already_registered?"Our team already has this project request.":"Our team has received your interest and can now follow up using your account details."}catch(e){button.disabled=false;button.textContent="I’m Interested →";if(note)note.textContent=e.message||"Could not register your interest";alert(e.message||"Could not register your interest");}
+
+async function load() {
+  try {
+    const me = await fetch(API + "/auth/me", { credentials: "same-origin", cache: "no-store" });
+    if (!me.ok) {
+      const returnTo = location.pathname + location.search;
+      location.replace("login.html?return_to=" + encodeURIComponent(returnTo));
+      return;
+    }
+    const md = await me.json();
+    if (md.success && md.user) {
+      const a = document.getElementById("accountLink");
+      a.textContent = md.user.role === "admin" ? "Admin Dashboard" : "My Account";
+      a.href = md.user.role === "admin" ? "admin.html" : "dashboard.html";
+    }
+    const r = await fetch(API + "/projects/category/" + encodeURIComponent(cat), { credentials: "same-origin", cache: "no-store" });
+    const d = await r.json();
+    if (!r.ok || !d.success) throw Error(d.error || "Unable to load projects");
+    const items = d.data || [];
+    const m = { ...fallback };
+    if (items[0]) {
+      m.title = meta[cat]?.title || items[0].category.replace(/_/g, " ");
+      m.hero = items[0].image || m.hero;
+      m.desc = meta[cat]?.desc || items[0].description || m.desc;
+      m.kicker = (meta[cat]?.kicker) || ((items[0].category || cat) + " PORTFOLIO");
+    }
+    document.title = "Laxminarayan Group — " + m.title;
+    document.getElementById("heroKicker").textContent = m.kicker;
+    document.getElementById("heroTitle").textContent = m.title;
+    document.getElementById("heroDesc").textContent = m.desc;
+    document.getElementById("crumbTitle").textContent = m.title;
+    document.getElementById("sectionTitle").textContent = m.title;
+    document.getElementById("sectionDesc").textContent = m.desc;
+    document.querySelector(".hero").style.backgroundImage = `linear-gradient(180deg,rgba(11,11,14,.7) 0%,rgba(11,11,14,.96) 100%),url("${escAttr(m.hero)}")`;
+    
+    document.getElementById("grid").innerHTML = items.length ? items.map(x => `
+      <article class="project">
+        <div class="project-pic" style="background-image:url('${escAttr(x.image || m.hero)}')"></div>
+        <div class="project-body">
+          <div class="tag">${esc(x.category)}</div>
+          <h3>${esc(x.name)}</h3>
+          <p>${esc(x.description)}</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a class="details" href="project-detail.html?id=${x.id}">View details →</a>
+            <button class="details" type="button" data-project-id="${x.id}" onclick="registerInterest(${x.id},this)">I’m Interested →</button>
+          </div>
+          <div class="interest-note" data-interest-note="${x.id}"></div>
+        </div>
+      </article>
+    `).join("") : "<div class='empty'>No active projects are listed in this category yet.</div>";
+  } catch (e) {
+    document.getElementById("grid").innerHTML = "<div class='empty'>We could not load these projects right now. Please return to the website and try again.</div>";
+    console.error(e);
+  }
 }
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function escAttr(s){return String(s??"").replace(/[^a-zA-Z0-9_./:?#=&%-]/g,"")}
+
+async function registerInterest(projectId, button) {
+  if (button.disabled) return;
+  const note = document.querySelector(`[data-interest-note="${projectId}"]`);
+  button.disabled = true;
+  button.textContent = "Sending…";
+  try {
+    const r = await fetch("/api/projects/" + encodeURIComponent(projectId) + "/interest", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: "{}"
+    });
+    let d = {};
+    try { d = await r.json(); } catch (e) {}
+    if (r.status === 401) {
+      const returnTo = location.pathname + location.search;
+      location.href = "login.html?return_to=" + encodeURIComponent(returnTo);
+      return;
+    }
+    if (!r.ok || !d.success) throw Error(d.error || "Could not register your interest");
+    button.textContent = d.already_registered ? "Interest Already Registered ✓" : "Interest Registered ✓";
+    if (note) note.textContent = d.already_registered ? "Our team already has this project request." : "Our team has received your interest and will follow up shortly.";
+  } catch (e) {
+    button.disabled = false;
+    button.textContent = "I’m Interested →";
+    if (note) note.textContent = e.message || "Could not register your interest";
+    alert(e.message || "Could not register your interest");
+  }
+}
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
+}
+function escAttr(s) {
+  return String(s ?? "").replace(/'/g, "%27").replace(/"/g, "%22");
+}
 </script>
-</body></html>
+</body>
+</html>

@@ -1,8 +1,496 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Laxminarayan Group — Project</title><style>
-body{margin:0;background:#f5f2eb;color:#171715;font:14px Arial,sans-serif}header{background:#171715;color:#fff;padding:16px 5%}header a{color:#fff;text-decoration:none;letter-spacing:2px;font-weight:700}.wrap{width:min(1100px,92%);margin:30px auto}.hero{background:#111;color:#fff;min-height:360px;display:flex;align-items:end;padding:35px;box-sizing:border-box;background-size:cover;background-position:center}.hero h1{font:52px Georgia;margin:0 0 8px}.hero p{max-width:700px;line-height:1.7}.panel{background:#fff;border:1px solid #ddd8ce;padding:24px;margin-top:18px}.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.gallery img,.gallery video{width:100%;height:230px;object-fit:cover;background:#eee}.btn{border:0;background:#b58a43;color:#fff;padding:12px 16px;font-weight:700;cursor:pointer}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form input,.form textarea{padding:11px;border:1px solid #ccc;font:inherit}.form textarea{grid-column:1/-1;min-height:80px}.muted{color:#666}@media(max-width:700px){.hero{min-height:300px;padding:22px}.hero h1{font-size:38px}.gallery{grid-template-columns:1fr}.gallery img,.gallery video{height:220px}.form{grid-template-columns:1fr}.form textarea{grid-column:1}}
-</style></head><body><header><a href="index.html">LAXMINARAYAN GROUP</a></header><main class="wrap"><div id="hero" class="hero"><div><div id="cat" class="muted"></div><h1 id="title">Loading…</h1><p id="desc"></p></div></div><div class="panel"><h2>Project information</h2><p id="description"></p><p><b>Location:</b> <span id="location">—</span></p><p><b>Price:</b> <span id="price">—</span></p><p><b>Amenities:</b> <span id="amenities">—</span></p><div><button class="btn" id="interest">I’m Interested →</button> <span id="interestMsg" class="muted"></span></div></div><div class="panel"><h2>Project gallery</h2><div id="gallery" class="gallery"></div></div><div class="panel"><h2>Request a site visit</h2><p class="muted">Choose a preferred date and time. Our team will confirm it with you.</p><form id="visitForm" class="form"><input id="visitAt" type="datetime-local" required><textarea id="visitNotes" placeholder="Anything you would like us to know?"></textarea><div><button class="btn">REQUEST SITE VISIT →</button></div><span id="visitMsg" class="muted"></span></form></div></main><script>
-const id=Number(new URLSearchParams(location.search).get('id'));const $=x=>document.getElementById(x);const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-async function load(){if(!Number.isInteger(id)||id<1){location.replace('index.html#projects');return}const me=await fetch('/api/auth/me',{credentials:'same-origin',cache:'no-store'});if(!me.ok){location.replace('login.html?return_to='+encodeURIComponent(location.pathname+location.search));return}const r=await fetch('/api/projects/'+id,{credentials:'same-origin',cache:'no-store'});const d=await r.json();if(!r.ok||!d.success){document.body.innerHTML='<main class="wrap"><div class="panel"><h2>Project not found</h2><a href="index.html#projects">Return to website</a></div></main>';return}const p=d.data;document.title='Laxminarayan Group — '+p.name;$('title').textContent=p.name;$('cat').textContent=p.category;$('desc').textContent=p.description;$('description').textContent=p.description;$('location').textContent=p.location||'Contact our team';$('price').textContent=p.price||'Contact our team';$('amenities').textContent=p.amenities||'Contact our team';$('hero').style.backgroundImage=`linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.2)),url('${String(p.image||'').replace(/'/g,'%27')}')`;$('gallery').innerHTML=(d.media||[]).map(x=>x.media_type==='video'?`<video controls preload="metadata" src="${esc(x.file_path)}"></video>`:`<img loading="lazy" src="${esc(x.file_path)}" alt="${esc(p.name)}">`).join('')||'<p class="muted">Project gallery coming soon.</p>';$('interest').onclick=async()=>{const b=$('interest');b.disabled=true;try{const rr=await fetch('/api/projects/'+id+'/interest',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'}});const dd=await rr.json();if(rr.status===401){location.href='login.html?return_to='+encodeURIComponent(location.pathname+location.search);return}if(!rr.ok||!dd.success)throw Error(dd.error||'Could not register interest');$('interestMsg').textContent=dd.already_registered?'Our team already has this request.':'Interest registered. Our team will contact you.';$('interest').textContent='Interest Registered ✓'}catch(e){b.disabled=false;$('interestMsg').textContent=e.message}};
-$('visitForm').onsubmit=async e=>{e.preventDefault();const btn=e.target.querySelector('button');btn.disabled=true;try{const rr=await fetch('/api/site-visits',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_id:id,preferred_at:$('visitAt').value,notes:$('visitNotes').value})});const dd=await rr.json();if(rr.status===401){location.href='login.html?return_to='+encodeURIComponent(location.pathname+location.search);return}if(!rr.ok||!dd.success)throw Error(dd.error||'Could not request site visit');$('visitMsg').textContent='Site visit request received. You can track it from My Account.';e.target.reset()}catch(e){$('visitMsg').textContent=e.message}finally{btn.disabled=false}}}
-load().catch(e=>console.error(e));
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Laxminarayan Group — Project Details</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b0e;
+  --surface: #141418;
+  --surface-glass: rgba(20, 20, 26, 0.75);
+  --surface-card: #191920;
+  --surface-hover: #22222c;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --gold: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-gradient: linear-gradient(135deg, #f3d789 0%, #d4af37 60%, #aa8420 100%);
+  --ink: #ffffff;
+  --muted: #9c9ca8;
+  --subtle: #6a6a78;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 35px var(--gold-glow);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 85% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+a { text-decoration: none; color: inherit; transition: all .25s ease; }
+.container { width: min(1160px, 92%); margin: auto; }
+
+/* ─── HEADER ─── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 16px 0;
+  background: rgba(11, 11, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 18px;
+  color: #fff;
+}
+.logo span {
+  font-size: 8px;
+  letter-spacing: 3.5px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+}
+.back-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ─── PROJECT HERO ─── */
+.hero {
+  position: relative;
+  min-height: 440px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 30px 0 35px;
+  display: flex;
+  align-items: flex-end;
+  padding: 50px 40px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 11, 14, 0.2) 0%, rgba(11, 11, 14, 0.95) 90%);
+  z-index: 1;
+}
+.hero > div {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+#cat {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  backdrop-filter: blur(8px);
+}
+.hero h1 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: clamp(38px, 5.5vw, 64px);
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 12px;
+  letter-spacing: -1.5px;
+}
+.hero p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ─── PANELS & BENTO ─── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 36px 40px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-sm);
+}
+.panel h2 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: #fff;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+.panel p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 14px;
+}
+.panel p b {
+  color: #fff;
+  font-weight: 600;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 25px 0 30px;
+}
+.spec-box {
+  padding: 20px;
+  background: var(--surface-glass);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.spec-box span {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--subtle);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.spec-box strong {
+  font-size: 16px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: var(--gold-gradient);
+  color: #0b0b0e;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+}
+.btn:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+#interestMsg, #visitMsg {
+  margin-left: 14px;
+  font-weight: 500;
+  color: #4ade80;
+}
+
+/* ─── GALLERY ─── */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.gallery img, .gallery video {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: #191920;
+  transition: transform .4s ease;
+}
+.gallery img:hover, .gallery video:hover {
+  transform: scale(1.03);
+}
+
+/* ─── SITE VISIT FORM ─── */
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 20px;
+}
+.form input, .form textarea {
+  width: 100%;
+  padding: 15px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all .2s ease;
+}
+.form input:focus, .form textarea:focus {
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+.form textarea {
+  grid-column: 1 / -1;
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  background: #070709;
+  border-top: 1px solid var(--line);
+  color: var(--subtle);
+  padding: 30px 0;
+  font-size: 12px;
+  margin-top: 60px;
+}
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 800px) {
+  .hero { min-height: 320px; padding: 30px 20px; }
+  .specs-grid { grid-template-columns: 1fr; }
+  .gallery { grid-template-columns: 1fr; }
+  .form { grid-template-columns: 1fr; }
+  .panel { padding: 24px 20px; }
+  .foot { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a class="logo" href="index.html">
+      LAXMINARAYAN GROUP
+      <span>CONSTRUCTION • DEVELOPMENT</span>
+    </a>
+    <a class="back-btn" href="index.html#projects">← Back to Portfolio</a>
+  </div>
+</header>
+
+<main class="container">
+  <!-- PROJECT HERO -->
+  <div id="hero" class="hero">
+    <div>
+      <div id="cat">PROJECT</div>
+      <h1 id="title">Loading…</h1>
+      <p id="desc"></p>
+    </div>
+  </div>
+
+  <!-- PROJECT INFORMATION BENTO -->
+  <div class="panel">
+    <h2>Project Overview & Specifications</h2>
+    <p id="description"></p>
+    
+    <div class="specs-grid">
+      <div class="spec-box">
+        <span>Location</span>
+        <strong id="location">—</strong>
+      </div>
+      <div class="spec-box">
+        <span>Pricing / Configuration</span>
+        <strong id="price">—</strong>
+      </div>
+      <div class="spec-box">
+        <span>Key Amenities</span>
+        <strong id="amenities">—</strong>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
+      <button class="btn" id="interest">I’m Interested →</button>
+      <span id="interestMsg" class="muted"></span>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="panel">
+    <h2>Project Gallery & Media</h2>
+    <div id="gallery" class="gallery"></div>
+  </div>
+
+  <!-- SITE VISIT REQUEST -->
+  <div class="panel">
+    <h2>Schedule a Private Site Visit</h2>
+    <p class="muted">Select your preferred date and time. An advisory manager will confirm your private walkthrough.</p>
+    <form id="visitForm" class="form">
+      <input id="visitAt" type="datetime-local" required>
+      <textarea id="visitNotes" placeholder="Any specific requirements or questions for our development team?"></textarea>
+      <div style="grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <button class="btn" type="submit">REQUEST SITE VISIT →</button>
+        <span id="visitMsg" class="muted"></span>
+      </div>
+    </form>
+  </div>
+</main>
+
+<footer>
+  <div class="container foot">
+    <span>© 2026 Laxminarayan Group. All rights reserved.</span>
+    <span>CONSTRUCTION • DEVELOPMENT • TRUST</span>
+  </div>
+</footer>
+
+<script>
+const id = Number(new URLSearchParams(location.search).get('id'));
+const $ = x => document.getElementById(x);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+
+async function load() {
+  if (!Number.isInteger(id) || id < 1) {
+    location.replace('index.html#projects');
+    return;
+  }
+  const me = await fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' });
+  if (!me.ok) {
+    location.replace('login.html?return_to=' + encodeURIComponent(location.pathname + location.search));
+    return;
+  }
+  const r = await fetch('/api/projects/' + id, { credentials: 'same-origin', cache: 'no-store' });
+  const d = await r.json();
+  if (!r.ok || !d.success) {
+    document.querySelector('main').innerHTML = '<div class="panel"><h2>Project not found</h2><p class="muted">The requested project could not be located.</p><a class="btn" href="index.html#projects">Return to website</a></div>';
+    return;
+  }
+  const p = d.data;
+  document.title = 'Laxminarayan Group — ' + p.name;
+  $('title').textContent = p.name;
+  $('cat').textContent = p.category;
+  $('desc').textContent = p.description;
+  $('description').textContent = p.description;
+  $('location').textContent = p.location || 'Contact our advisory team';
+  $('price').textContent = p.price || 'Contact our advisory team';
+  $('amenities').textContent = p.amenities || 'Contact our advisory team';
+  $('hero').style.backgroundImage = `linear-gradient(180deg,rgba(11,11,14,.2) 0%,rgba(11,11,14,.95) 90%),url('${String(p.image || '').replace(/'/g, '%27')}')`;
+  
+  $('gallery').innerHTML = (d.media || []).map(x => x.media_type === 'video' ? `<video controls preload="metadata" src="${esc(x.file_path)}"></video>` : `<img loading="lazy" src="${esc(x.file_path)}" alt="${esc(p.name)}">`).join('') || '<p class="muted">Project gallery coming soon.</p>';
+  
+  $('interest').onclick = async () => {
+    const b = $('interest');
+    b.disabled = true;
+    try {
+      const rr = await fetch('/api/projects/' + id + '/interest', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const dd = await rr.json();
+      if (rr.status === 401) {
+        location.href = 'login.html?return_to=' + encodeURIComponent(location.pathname + location.search);
+        return;
+      }
+      if (!rr.ok || !dd.success) throw Error(dd.error || 'Could not register interest');
+      $('interestMsg').textContent = dd.already_registered ? 'Our team already has this request.' : 'Interest registered. Our advisory team will contact you.';
+      $('interest').textContent = 'Interest Registered ✓';
+    } catch (e) {
+      b.disabled = false;
+      $('interestMsg').textContent = e.message;
+    }
+  };
+
+  $('visitForm').onsubmit = async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true;
+    try {
+      const rr = await fetch('/api/site-visits', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: id,
+          preferred_at: $('visitAt').value,
+          notes: $('visitNotes').value
+        })
+      });
+      const dd = await rr.json();
+      if (rr.status === 401) {
+        location.href = 'login.html?return_to=' + encodeURIComponent(location.pathname + location.search);
+        return;
+      }
+      if (!rr.ok || !dd.success) throw Error(dd.error || 'Could not request site visit');
+      $('visitMsg').textContent = 'Site visit request received. You can track it from My Account.';
+      e.target.reset();
+    } catch (e) {
+      $('visitMsg').textContent = e.message;
+    } finally {
+      btn.disabled = false;
+    }
+  };
+}
+
+load().catch(e => console.error(e));
+</script>
+</body>
+</html>

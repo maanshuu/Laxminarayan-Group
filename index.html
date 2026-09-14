@@ -3,212 +3,1175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Laxminarayan Group — premium construction and real estate development.">
+<meta name="description" content="Laxminarayan Group — luxury architectural development, residential landmarks and commercial real estate.">
 <title>Laxminarayan Group | Building Trust. Creating Landmarks.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#171715;--paper:#f5f2eb;--muted:#77736a;--gold:#b58a43;--line:#ded8ca;--white:#fff}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:"DM Sans",sans-serif}
-a{text-decoration:none;color:inherit}.container{width:min(1160px,92%);margin:auto}
-header{position:fixed;top:0;left:0;right:0;z-index:20;transition:.3s;padding:20px 0}
-header.scrolled{background:rgba(23,23,21,.94);backdrop-filter:blur(12px);padding:13px 0}
-.nav{display:flex;align-items:center;justify-content:space-between;color:#fff}
-.logo{font-weight:700;letter-spacing:2px;font-size:19px}.logo span{display:block;font-size:9px;letter-spacing:4px;color:#d8b66d;margin-top:3px}
-nav{display:flex;gap:30px;font-size:13px}nav a{opacity:.9}nav a:hover{color:#d8b66d}
-.menu{display:none;background:none;border:0;color:#fff;font-size:25px}
-.hero{min-height:100vh;display:grid;place-items:center;color:#fff;position:relative;overflow:hidden;background:
-linear-gradient(90deg,rgba(0,0,0,.78),rgba(0,0,0,.28)),url("assets/hero.jpg") center/cover no-repeat,#292824}
-.hero-content{padding-top:90px;max-width:800px}.eyebrow{color:#d8b66d;letter-spacing:4px;font-size:12px;font-weight:700;text-transform:uppercase}
-h1{font:600 clamp(52px,8vw,104px)/.95 "Playfair Display",serif;margin:18px 0 25px;letter-spacing:-3px}
-.hero p{max-width:590px;font-size:18px;line-height:1.7;color:#eee;margin-bottom:34px}.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 23px;border:1px solid #fff;color:#fff;font-size:13px;font-weight:700;margin-right:10px;transition:.25s}.btn.primary{background:var(--gold);border-color:var(--gold);color:#171715}.btn:hover{transform:translateY(-2px)}
-.scroll{position:absolute;bottom:28px;left:4%;font-size:10px;letter-spacing:3px;opacity:.7}
-section{padding:105px 0}.section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:48px}.kicker{color:var(--gold);font-size:11px;letter-spacing:3px;font-weight:700;text-transform:uppercase}h2{font:600 clamp(36px,5vw,62px)/1 "Playfair Display",serif;margin:10px 0 0;letter-spacing:-1px}.lead{max-width:470px;color:var(--muted);line-height:1.8}
-.about{display:grid;grid-template-columns:1.1fr .9fr;gap:75px;align-items:center}.about-photo{min-height:550px;background:url("assets/about.jpg") center/cover no-repeat;position:relative}.about-photo:after{content:"LAXMINARAYAN";position:absolute;bottom:25px;left:25px;color:#fff;font-size:11px;letter-spacing:5px}.about-copy p{color:var(--muted);line-height:1.9}.signature{margin-top:30px;color:var(--gold);font:italic 24px "Playfair Display",serif}
-.projects{background:#1c1b18;color:#fff}.projects .lead{color:#aaa}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.card{min-height:430px;position:relative;overflow:hidden;background:#2c2a25}.card .pic{position:absolute;inset:0;background:center/cover no-repeat;transition:.6s}.card:nth-child(1) .pic{background-image:url("assets/project-1.jpg")}.card:nth-child(2) .pic{background-image:url("assets/project-2.jpg")}.card:nth-child(3) .pic{background-image:url("assets/project-3.jpg")}.card:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.9))}.card:hover .pic{transform:scale(1.06)}.project-link{display:block;color:inherit}.project-arrow{display:inline-block;margin-top:14px;color:#e1bd72;font-size:11px;letter-spacing:1px;font-weight:700}.project-link:focus-visible{outline:2px solid #e1bd72;outline-offset:4px}.card-info{position:absolute;z-index:2;left:25px;right:25px;bottom:25px}.tag{font-size:10px;letter-spacing:2px;color:#e1bd72}.card h3{font:500 29px "Playfair Display",serif;margin:7px 0}.card p{font-size:12px;color:#ddd;margin:0}
-.values{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.value{padding:35px 25px;border-right:1px solid var(--line)}.value:last-child{border-right:0}.number{font:600 42px "Playfair Display",serif;color:var(--gold)}.value h3{font-size:14px;margin:12px 0 8px}.value p{font-size:12px;color:var(--muted);line-height:1.6}
-.leaders{background:#ebe6dc}.leader-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.leader{background:#f8f5ef;padding:28px;border:1px solid var(--line)}.leader .avatar{height:260px;background:linear-gradient(135deg,#cfc7b8,#817a6e);display:grid;place-items:center;color:#fff;font:50px "Playfair Display",serif;margin-bottom:22px}.leader h3{font:25px "Playfair Display",serif;margin:0 0 5px}.leader p{color:var(--muted);font-size:12px}
-.contact{background:#171715;color:#fff}.contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:80px}.contact .lead{color:#aaa}.contact-details{margin-top:30px}.detail{padding:18px 0;border-bottom:1px solid #35332e;display:flex;justify-content:space-between;gap:20px}.detail span:first-child{color:#aaa;font-size:11px;letter-spacing:2px;text-transform:uppercase}.detail span:last-child{font-weight:600}.form{display:grid;gap:12px}.form input,.form textarea{width:100%;padding:16px;background:#23221f;border:1px solid #3a3832;color:#fff;font:inherit;outline:none}.form textarea{min-height:130px;resize:vertical}.form button{padding:16px;border:0;background:var(--gold);font-weight:700;cursor:pointer}
-footer{background:#111;color:#888;padding:30px 0;font-size:11px}.foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}.social{display:flex;align-items:center;gap:10px}.social-label{color:#ddd;font-weight:700;letter-spacing:.08em;margin-right:4px}.social a{display:inline-flex;align-items:center;justify-content:center}.social a svg{width:20px;height:20px}.social-name{font-size:12px;opacity:.9;margin-left:2px}
-display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid #555;border-radius:50%;color:#fff;text-decoration:none;font-size:12px;font-weight:700;transition:.2s}.social a:hover{background:#c9a227;border-color:#c9a227;color:#111}.social a:focus-visible{outline:2px solid #c9a227;outline-offset:3px}
-@media(max-width:800px){nav{display:none}.menu{display:block}.about,.contact-wrap{grid-template-columns:1fr}.about-photo{min-height:380px}.grid,.leader-grid{grid-template-columns:1fr}.values{grid-template-columns:1fr 1fr}.value:nth-child(2){border-right:0}.value{border-bottom:1px solid var(--line)}section{padding:75px 0}.section-head{display:block}.section-head .lead{margin-top:20px}.hero p{font-size:16px}.foot{display:block;line-height:2}}
-
-/* Responsive refinement: desktop, tablet and mobile */
-.container{max-width:1160px}
-img,video{max-width:100%}
-@media (max-width:1100px) and (min-width:801px){
-  .container{width:min(94%,1000px)}
-  nav{gap:20px}
-  .hero-content{max-width:760px}
-  .about{gap:40px}
-  .leader-grid{gap:16px}
+:root {
+  --bg: #0b0b0e;
+  --surface: #141418;
+  --surface-glass: rgba(20, 20, 26, 0.75);
+  --surface-card: #191920;
+  --surface-hover: #22222c;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --gold: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-gradient: linear-gradient(135deg, #f3d789 0%, #d4af37 60%, #aa8420 100%);
+  --ink: #ffffff;
+  --muted: #9c9ca8;
+  --subtle: #6a6a78;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 35px var(--gold-glow);
 }
-@media (max-width:800px){
-  header{padding:14px 0}
-  header.scrolled{padding:11px 0}
-  .container{width:min(92%,680px)}
-  .logo{font-size:16px;letter-spacing:1.6px;line-height:1.2}
-  .logo span{font-size:7px;letter-spacing:3px}
-  .menu{display:block;position:relative;z-index:31;width:44px;height:44px}
-  header nav{
-    display:none;position:absolute;top:100%;left:4%;right:4%;flex-direction:column;
-    gap:0;padding:8px 0;background:rgba(23,23,21,.98);border:1px solid rgba(255,255,255,.12);
-    box-shadow:0 15px 35px rgba(0,0,0,.25)
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 90% 40%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 10% 80%, rgba(212, 175, 55, 0.06) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+a { text-decoration: none; color: inherit; transition: all .25s ease; }
+.container { width: min(1200px, 92%); margin: auto; }
+
+/* ─── FLOATING PILL NAVIGATION ─── */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 24px 0;
+  transition: all .35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+header.scrolled {
+  padding: 14px 0;
+  background: rgba(11, 11, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 18px;
+  color: #fff;
+}
+.logo span {
+  font-size: 8px;
+  letter-spacing: 3.5px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 6px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+}
+nav a {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  border-radius: var(--radius-pill);
+  transition: all .2s ease;
+}
+nav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+#accountLink {
+  background: var(--gold-soft);
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  font-weight: 600;
+}
+#accountLink:hover {
+  background: var(--gold-gradient);
+  color: #111;
+  border-color: var(--gold);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+.menu {
+  display: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: #fff;
+  font-size: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  place-items: center;
+  transition: all .2s;
+}
+.menu:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* ─── HERO SECTION ─── */
+.hero {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 140px 0 100px;
+  background: 
+    linear-gradient(180deg, rgba(11, 11, 14, 0.75) 0%, rgba(11, 11, 14, 0.95) 100%),
+    url("assets/hero.jpg") center/cover no-repeat;
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(212, 175, 55, 0.15), transparent 60%);
+  pointer-events: none;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 860px;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  color: #e5c07b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+}
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+}
+
+h1 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: clamp(48px, 7.5vw, 92px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin-bottom: 26px;
+  color: #fff;
+}
+h1 span.gold-text {
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.hero p {
+  font-size: 19px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 620px;
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  transition: all .3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+.btn:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.btn.primary {
+  background: var(--gold-gradient);
+  color: #0b0b0e;
+  border-color: var(--gold);
+  font-weight: 700;
+  box-shadow: 0 4px 25px rgba(212, 175, 55, 0.25);
+}
+.btn.primary:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-3px);
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-top: 65px;
+  padding-top: 35px;
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.hero-stat-item strong {
+  display: block;
+  font-family: "Playfair Display", serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.1;
+}
+.hero-stat-item span {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.scroll {
+  position: absolute;
+  bottom: 30px;
+  left: 4%;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--subtle);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.scroll::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: var(--subtle);
+}
+
+/* ─── SECTION COMMON ─── */
+section {
+  padding: 130px 0;
+  position: relative;
+}
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  margin-bottom: 60px;
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+h2 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.15;
+  letter-spacing: -1.2px;
+  color: #fff;
+}
+.lead {
+  max-width: 480px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ─── ABOUT BENTO ─── */
+.about {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 60px;
+  align-items: center;
+}
+.about-photo-wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+}
+.about-photo {
+  min-height: 540px;
+  background: url("assets/about.jpg") center/cover no-repeat;
+  transition: transform .7s ease;
+}
+.about-photo-wrap:hover .about-photo {
+  transform: scale(1.04);
+}
+.about-photo-badge {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  padding: 18px 24px;
+  border-radius: var(--radius-md);
+  background: rgba(14, 14, 18, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.about-photo-badge b {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.about-photo-badge span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.about-copy p {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.85;
+  margin-bottom: 20px;
+}
+.signature-card {
+  margin-top: 36px;
+  padding: 24px 28px;
+  border-radius: var(--radius-md);
+  background: var(--surface-glass);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.signature {
+  color: var(--gold);
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 24px;
+}
+.signature-sub {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--subtle);
+  text-transform: uppercase;
+}
+
+/* ─── PROJECTS SECTION (FRAMER CARDS) ─── */
+.projects {
+  background: #0e0e12;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.card {
+  position: relative;
+  min-height: 480px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: all .4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-shadow: var(--shadow-sm);
+}
+.card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.15);
+}
+.card .pic {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: transform .8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card:hover .pic {
+  transform: scale(1.08);
+}
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 14, 18, 0.1) 0%, rgba(11, 11, 14, 0.95) 85%);
+  z-index: 1;
+}
+.card-info {
+  position: relative;
+  z-index: 2;
+  padding: 30px 24px;
+}
+.tag {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(14, 14, 18, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.card h3 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: 26px;
+  color: #fff;
+  margin: 6px 0 10px;
+  line-height: 1.2;
+}
+.card p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+.project-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  transition: all .25s ease;
+}
+.card:hover .project-arrow {
+  background: var(--gold-gradient);
+  color: #111;
+  border-color: var(--gold);
+  transform: translateX(4px);
+}
+.project-link {
+  display: block;
+  color: inherit;
+}
+.project-link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+/* ─── VALUES BENTO ─── */
+.values {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.value {
+  padding: 40px 30px;
+  background: var(--surface-glass);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(12px);
+  transition: all .3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.value::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.value:hover {
+  transform: translateY(-5px);
+  border-color: var(--line-strong);
+  background: var(--surface-card);
+}
+.value:hover::before { opacity: 1; }
+.number {
+  font-family: "Playfair Display", serif;
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 20px;
+}
+.value h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.value p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ─── LEADERSHIP ─── */
+.leaders {
+  background: #0e0e12;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.leader-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.leader {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 36px 30px;
+  transition: all .3s ease;
+}
+.leader:hover {
+  transform: translateY(-6px);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: var(--shadow-sm);
+}
+.leader .avatar {
+  width: 100%;
+  height: 260px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #242430 0%, #15151c 100%);
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  font-family: "Playfair Display", serif;
+  font-size: 56px;
+  margin-bottom: 24px;
+  border: 1px solid var(--line);
+  letter-spacing: 2px;
+}
+.leader h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.leader p {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* ─── CONTACT & ENQUIRY FORM ─── */
+.contact-wrap {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 70px;
+  align-items: start;
+}
+.contact-details {
+  margin-top: 40px;
+  display: grid;
+  gap: 16px;
+}
+.detail {
+  padding: 20px 24px;
+  background: var(--surface-glass);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+.detail span:first-child {
+  color: var(--subtle);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.detail a, .detail span:last-child {
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+}
+.detail a:hover { color: var(--gold); }
+
+.form {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  gap: 16px;
+}
+.form input, .form textarea {
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all .2s ease;
+}
+.form input:focus, .form textarea:focus {
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+.form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+.form button[type="submit"] {
+  padding: 16px 24px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--gold-gradient);
+  color: #0b0b0e;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+}
+.form button[type="submit"]:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.whatsapp-btn {
+  padding: 15px 24px;
+  border: 1px solid #2f6b45;
+  border-radius: var(--radius-pill);
+  background: rgba(47, 107, 69, 0.15);
+  color: #4ade80;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+.whatsapp-btn:hover {
+  background: #2f6b45;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ─── FOOTER ─── */
+footer {
+  background: #070709;
+  border-top: 1px solid var(--line);
+  color: var(--subtle);
+  padding: 40px 0;
+  font-size: 12px;
+}
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.social {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.social-label {
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+  margin-right: 4px;
+}
+.social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: #fff;
+  transition: all .25s ease;
+}
+.social a:hover {
+  background: var(--gold);
+  color: #0b0b0e;
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+.social a svg { width: 16px; height: 16px; }
+.social-name {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+/* ─── RESPONSIVE REFINEMENTS ─── */
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .values { grid-template-columns: repeat(2, 1fr); }
+  .leader-grid { grid-template-columns: repeat(2, 1fr); }
+  .about, .contact-wrap { grid-template-columns: 1fr; gap: 45px; }
+}
+
+@media (max-width: 800px) {
+  header { padding: 16px 0; }
+  .menu { display: grid; }
+  nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 4%;
+    right: 4%;
+    flex-direction: column;
+    padding: 16px;
+    background: rgba(14, 14, 18, 0.98);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    gap: 4px;
   }
-  header nav.open{display:flex}
-  header nav a{padding:14px 18px;font-size:14px;border-bottom:1px solid rgba(255,255,255,.08)}
-  header nav a:last-child{border-bottom:0}
-  .hero{min-height:88vh}
-  .hero-content{padding-top:120px}
-  .hero h1{font-size:clamp(42px,11vw,66px);line-height:.98}
-  .hero p{max-width:100%;line-height:1.65}
-  .btn{display:inline-flex;margin:6px 6px 0 0}
-  .about{grid-template-columns:1fr;gap:32px}
-  .about-photo{min-height:320px}
-  .project-grid,.grid,.leader-grid{grid-template-columns:1fr}
-  .values{grid-template-columns:1fr}
-  .value{border-right:0!important}
-  .section-head{display:block}
-  .section-head .lead{max-width:100%}
-  .contact-wrap{grid-template-columns:1fr;gap:35px}
-  .foot{display:flex;flex-direction:column;gap:12px}
+  nav.open { display: flex; }
+  nav a { width: 100%; text-align: center; padding: 12px; font-size: 14px; }
+  .grid { grid-template-columns: 1fr; }
+  .values { grid-template-columns: 1fr; }
+  .leader-grid { grid-template-columns: 1fr; }
+  .section-head { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 40px; }
+  .hero { min-height: auto; padding: 120px 0 80px; }
+  h1 { font-size: clamp(40px, 11vw, 56px); }
+  .hero-stats { gap: 24px; margin-top: 40px; }
+  .form { padding: 24px 20px; }
+  .foot { flex-direction: column; align-items: center; text-align: center; gap: 16px; }
 }
-@media (max-width:480px){
-  .container{width:calc(100% - 32px)}
-  .hero-content{padding-top:105px}
-  .hero h1{font-size:42px}
-  .hero .btn{width:100%;justify-content:center}
-  .about-photo{min-height:250px}
-  section{padding:58px 0}
-  .kicker{font-size:11px;letter-spacing:3px}
-  h2{font-size:clamp(34px,10vw,48px)}
-  .foot{font-size:12px}
-}
-
-.whatsapp-btn{padding:16px;border:1px solid #4f8b5f;background:#fff;color:#2f6b45;font-weight:700;cursor:pointer}.whatsapp-btn:hover{background:#f1f8f3}</style>
+</style>
 </head>
 <body>
-<header id="header"><div class="container nav">
-<a class="logo" href="#">LAXMINARAYAN GROUP<span>CONSTRUCTION • DEVELOPMENT</span></a>
-<nav><a href="#about">About</a><a href="#projects">Projects</a><a href="#leadership">Leadership</a><a href="#contact">Contact</a><a href="login.html" id="accountLink">Login</a></nav>
-<button class="menu" onclick="document.querySelector('nav').style.display=document.querySelector('nav').style.display==='flex'?'none':'flex'">☰</button>
-</div></header>
+<header id="header">
+  <div class="container nav">
+    <a class="logo" href="#">
+      LAXMINARAYAN GROUP
+      <span>CONSTRUCTION • DEVELOPMENT</span>
+    </a>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#leadership">Leadership</a>
+      <a href="#contact">Contact</a>
+      <a href="login.html" id="accountLink">Log in</a>
+    </nav>
+    <button class="menu" type="button" aria-label="Toggle navigation menu" onclick="const n=document.querySelector('nav');n.classList.toggle('open');">☰</button>
+  </div>
+</header>
 
 <main>
-<section class="hero"><div class="container hero-content">
-<div class="eyebrow">Construction • Development • Trust</div>
-<h1>Building Trust.<br>Creating Landmarks.</h1>
-<p>Laxminarayan Group creates thoughtfully planned spaces with a focus on quality, transparency and long-term value.</p>
-<a class="btn primary" href="#projects">Explore Projects ↗</a><a class="btn" href="#contact">Talk to Us</a>
-</div><div class="scroll">SCROLL TO DISCOVER ↓</div></section>
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="eyebrow">Luxury Real Estate • Architectural Excellence</div>
+      <h1>Building Trust.<br><span class="gold-text">Creating Landmarks.</span></h1>
+      <p>Laxminarayan Group creates thoughtfully planned residential and commercial spaces with an uncompromised focus on quality, transparency and enduring value.</p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#projects">Explore Projects ↗</a>
+        <a class="btn" href="#contact">Talk to Us</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat-item">
+          <strong>25+</strong>
+          <span>Years Experience</span>
+        </div>
+        <div class="hero-stat-item">
+          <strong>100+</strong>
+          <span>Delivered Landmarks</span>
+        </div>
+        <div class="hero-stat-item">
+          <strong>100%</strong>
+          <span>Customer Trust</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll">SCROLL TO DISCOVER ↓</div>
+  </section>
 
-<section id="about"><div class="container about">
-<div class="about-photo"></div><div class="about-copy"><div class="kicker">About the Group</div><h2>Built with purpose.<br>Delivered with pride.</h2>
-<p>Laxminarayan Group is a construction and real estate development company focused on creating dependable spaces for modern living and business. From planning to execution, every detail is approached with care, discipline and a commitment to customer value.</p>
-<p>Our philosophy is simple: build responsibly, communicate honestly and create properties that continue to add value long after handover.</p>
-<div class="signature">Laxminarayan Group</div></div>
-</div></section>
+  <!-- ABOUT SECTION -->
+  <section id="about">
+    <div class="container about">
+      <div class="about-photo-wrap">
+        <div class="about-photo"></div>
+        <div class="about-photo-badge">
+          <b>LAXMINARAYAN GROUP</b>
+          <span>EST. 2001 • CRAFTING LEGACIES</span>
+        </div>
+      </div>
+      <div class="about-copy">
+        <div class="kicker">About the Group</div>
+        <h2>Built with purpose.<br>Delivered with pride.</h2>
+        <p>Laxminarayan Group is a premier construction and real estate development company dedicated to creating dependable spaces for modern living and thriving businesses. From planning to execution, every detail is approached with care, discipline and an enduring commitment to customer value.</p>
+        <p>Our philosophy is straightforward: build responsibly, communicate with absolute honesty and construct properties that continue to add value long after handover.</p>
+        <div class="signature-card">
+          <div class="signature">Laxminarayan Group</div>
+          <div class="signature-sub">FOUNDING VISION</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section id="projects" class="projects"><div class="container">
-<div class="section-head"><div><div class="kicker">Selected Work</div><h2>Our Projects</h2></div><p class="lead">Explore a growing portfolio of residential, commercial and development projects designed around real customer needs.</p></div>
-<div class="grid project-grid" id="projectGrid"></div></div></section>
+  <!-- PROJECTS SECTION -->
+  <section id="projects" class="projects">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Selected Work</div>
+          <h2>Our Projects</h2>
+        </div>
+        <p class="lead">Explore a distinguished portfolio of residential, commercial and development projects engineered around contemporary customer aspirations.</p>
+      </div>
+      <div class="grid project-grid" id="projectGrid"></div>
+    </div>
+  </section>
 
-<section><div class="container">
-<div class="section-head"><div><div class="kicker">Our Promise</div><h2>Why Laxminarayan</h2></div><p class="lead">A professional approach from the first conversation to the final handover.</p></div>
-<div class="values">
-<div class="value"><div class="number">01</div><h3>Quality First</h3><p>Careful planning, materials and execution at every stage.</p></div>
-<div class="value"><div class="number">02</div><h3>Transparent</h3><p>Clear communication and straightforward customer dealings.</p></div>
-<div class="value"><div class="number">03</div><h3>Prime Locations</h3><p>Projects selected with accessibility and future value in mind.</p></div>
-<div class="value"><div class="number">04</div><h3>Customer Focus</h3><p>Spaces and services shaped around the people who use them.</p></div>
-</div></div></section>
+  <!-- VALUES / PROMISE SECTION -->
+  <section>
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Our Promise</div>
+          <h2>Why Laxminarayan</h2>
+        </div>
+        <p class="lead">A professional, transparent approach from the first conceptual conversation to final handover.</p>
+      </div>
+      <div class="values">
+        <div class="value">
+          <div class="number">01</div>
+          <h3>Quality First</h3>
+          <p>Meticulous architectural planning, premium structural materials and precision execution at every milestone.</p>
+        </div>
+        <div class="value">
+          <div class="number">02</div>
+          <h3>Transparent</h3>
+          <p>Complete clarity, straightforward legal dealings and verified progress reporting without hidden terms.</p>
+        </div>
+        <div class="value">
+          <div class="number">03</div>
+          <h3>Prime Locations</h3>
+          <p>Projects strategically selected with direct highway accessibility, future expansion corridors and high appreciation potential.</p>
+        </div>
+        <div class="value">
+          <div class="number">04</div>
+          <h3>Customer Focus</h3>
+          <p>Elegantly crafted spaces and personalized after-sales support shaped around the people who inhabit them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section id="leadership" class="leaders"><div class="container">
-<div class="section-head"><div><div class="kicker">Leadership</div><h2>The People Behind<br>the Vision</h2></div><p class="lead">A leadership team committed to building a stronger, more trusted development business.</p></div>
-<div class="leader-grid">
-<div class="leader"><div class="avatar">RS</div><h3>Roshan Sabhaya</h3><p>FOUNDER & DIRECTOR</p></div>
-<div class="leader"><div class="avatar">MM</div><h3>Mehul Mistry</h3><p>FOUNDER & DIRECTOR</p></div>
-<div class="leader"><div class="avatar">SJ</div><h3>Swaraj Jikadara</h3><p>FOUNDER & DIRECTOR</p></div>
-</div></div></section>
+  <!-- LEADERSHIP SECTION -->
+  <section id="leadership" class="leaders">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Leadership</div>
+          <h2>The People Behind<br>the Vision</h2>
+        </div>
+        <p class="lead">A visionary leadership team committed to building a stronger, more trusted development business across Gujarat.</p>
+      </div>
+      <div class="leader-grid">
+        <div class="leader">
+          <div class="avatar">RS</div>
+          <h3>Roshan Sabhaya</h3>
+          <p>FOUNDER & DIRECTOR</p>
+        </div>
+        <div class="leader">
+          <div class="avatar">MM</div>
+          <h3>Mehul Mistry</h3>
+          <p>FOUNDER & DIRECTOR</p>
+        </div>
+        <div class="leader">
+          <div class="avatar">SJ</div>
+          <h3>Swaraj Jikadara</h3>
+          <p>FOUNDER & DIRECTOR</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section id="contact" class="contact"><div class="container contact-wrap">
-<div><div class="kicker">Start a Conversation</div><h2>Let's build<br>something lasting.</h2><p class="lead">Have a property enquiry, project requirement or partnership opportunity? Reach out to our team.</p>
-<div class="contact-details">
-<div class="detail"><span>Phone</span><a href="tel:+916352000017">6352000017</a></div><div class="detail"><span>WhatsApp</span><a href="https://wa.me/916352000017" target="_blank" rel="noopener noreferrer">Chat with our team →</a></div>
-<div class="detail"><span>Email</span><span>msinfraprojects2021@gmail.com</span></div>
-</div></div>
-<form class="form" onsubmit="submitEnquiry(event)" id="enquiryForm">
-<input required placeholder="Your name"><input required type="tel" placeholder="Phone number"><input type="email" placeholder="Email address"><textarea placeholder="Tell us what you are looking for"></textarea><button type="submit">SEND ENQUIRY →</button><button type="button" class="whatsapp-btn" onclick="openWhatsAppEnquiry()">WHATSAPP ENQUIRY ↗</button>
-</form>
-</div></section>
+  <!-- CONTACT & ENQUIRY SECTION -->
+  <section id="contact" class="contact">
+    <div class="container contact-wrap">
+      <div>
+        <div class="kicker">Start a Conversation</div>
+        <h2>Let's build<br>something lasting.</h2>
+        <p class="lead">Have a property enquiry, project requirement or partnership opportunity? Reach out to our dedicated advisory team.</p>
+        <div class="contact-details">
+          <div class="detail">
+            <span>Direct Phone</span>
+            <a href="tel:+916352000017">+91 6352000017</a>
+          </div>
+          <div class="detail">
+            <span>WhatsApp Connect</span>
+            <a href="https://wa.me/916352000017" target="_blank" rel="noopener noreferrer">Chat with our advisory team →</a>
+          </div>
+          <div class="detail">
+            <span>Email</span>
+            <span>msinfraprojects2021@gmail.com</span>
+          </div>
+        </div>
+      </div>
+
+      <form class="form" onsubmit="submitEnquiry(event)" id="enquiryForm">
+        <input required placeholder="Your full name">
+        <input required type="tel" placeholder="Phone number (e.g. +91 ...)">
+        <input type="email" placeholder="Email address">
+        <textarea placeholder="Tell us what you are looking for (Residential, Commercial, Plots)..."></textarea>
+        <button type="submit">SEND ENQUIRY →</button>
+        <button type="button" class="whatsapp-btn" onclick="openWhatsAppEnquiry()">WHATSAPP ENQUIRY ↗</button>
+      </form>
+    </div>
+  </section>
 </main>
 
-<footer><div class="container foot"><span>© 2026 Laxminarayan Group. All rights reserved.</span><div class="social" aria-label="Connect with Laxminarayan Group"><span class="social-label">CONNECT WITH US</span><a href="https://instagram.com/laxminarayan__group" target="_blank" rel="noopener noreferrer" aria-label="Instagram — @laxminarayan__group" title="Instagram — @laxminarayan__group"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.7" r="1.2" fill="currentColor"/></svg></a><a href="https://www.facebook.com/profile.php?id=61593855638357" target="_blank" rel="noopener noreferrer" aria-label="Facebook — Laxminarayan Consulatant" title="Facebook — Laxminarayan Consulatant"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 8h3V4h-3c-3.31 0-5 1.69-5 5v3H6v4h3v4h4v-4h3.2l.8-4H13V9c0-.66.34-1 1-1Z" fill="currentColor"/></svg></a><span class="social-name">Laxminarayan Consulatant</span></div><span>CONSTRUCTION • DEVELOPMENT • TRUST</span></div></footer>
-<script>
-const header=document.getElementById('header');
-window.addEventListener('scroll',()=>header.classList.toggle('scrolled',scrollY>30));
-</script>
-<script>
-const API="/api";
-async function submitEnquiry(e){
- e.preventDefault();const f=e.target;const btn=f.querySelector("button");btn.disabled=true;btn.textContent="SENDING...";
- const inputs=f.querySelectorAll("input,textarea");const body={name:inputs[0].value,phone:inputs[1].value,email:inputs[2].value,message:inputs[3].value};
- try{const r=await fetch(API+"/enquiries",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify(body)});const d=await r.json();if(!d.success)throw Error(d.error);alert("Thank you. Your enquiry has been submitted successfully.");f.reset()}catch(err){alert(err.message||"Unable to submit enquiry.")}finally{btn.disabled=false;btn.textContent="SEND ENQUIRY →"}
-}
-async function openWhatsAppEnquiry(){
- const form=document.querySelector('.form');
- const inputs=form?form.querySelectorAll('input,textarea'):[];
- const name=inputs[0]?.value.trim()||'';const phone=inputs[1]?.value.trim()||'';const email=inputs[2]?.value.trim()||'';const message=inputs[3]?.value.trim()||'';
- if(!name||!phone){alert('Please enter your name and phone number first.');return;}
- try{const r=await fetch(API+'/whatsapp-enquiry',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({name,phone,email,message})});const d=await r.json();if(!r.ok||!d.success)throw Error(d.error||'Unable to prepare WhatsApp enquiry');const text=`Hello Laxminarayan Group,\n\nI would like to enquire about your projects.\nName: ${name}\nPhone: ${phone}${email?'\nEmail: '+email:''}${message?'\nMessage: '+message:''}\n\nEnquiry Ref: ${d.reference||''}`;const w=window.open('about:blank','_blank');if(w)w.location.href='https://wa.me/916352000017?text='+encodeURIComponent(text);else window.location.href='https://wa.me/916352000017?text='+encodeURIComponent(text);}catch(e){alert(e.message||'Unable to open WhatsApp enquiry.')}}
+<footer>
+  <div class="container foot">
+    <span>© 2026 Laxminarayan Group. All rights reserved.</span>
+    <div class="social" aria-label="Connect with Laxminarayan Group">
+      <span class="social-label">CONNECT WITH US</span>
+      <a href="https://instagram.com/laxminarayan__group" target="_blank" rel="noopener noreferrer" aria-label="Instagram — @laxminarayan__group" title="Instagram — @laxminarayan__group">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.7" r="1.2" fill="currentColor"/></svg>
+      </a>
+      <a href="https://www.facebook.com/profile.php?id=61593855638357" target="_blank" rel="noopener noreferrer" aria-label="Facebook — Laxminarayan Consulatant" title="Facebook — Laxminarayan Consulatant">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14 8h3V4h-3c-3.31 0-5 1.69-5 5v3H6v4h3v4h4v-4h3.2l.8-4H13V9c0-.66.34-1 1-1Z" fill="currentColor"/></svg>
+      </a>
+      <span class="social-name">Laxminarayan Consultant</span>
+    </div>
+    <span>CONSTRUCTION • DEVELOPMENT • TRUST</span>
+  </div>
+</footer>
 
-const accountLink=document.getElementById("accountLink");
-async function updateAccountLink(){
- try{const r=await fetch(API+"/auth/me",{credentials:"same-origin",cache:"no-store"});if(!r.ok)throw Error();const d=await r.json();
-  if(d.success){accountLink.textContent=d.user.role==="admin"?"Admin Dashboard":"My Account";accountLink.href=d.user.role==="admin"?"admin.html":"dashboard.html";return;}
- }catch(e){}
- accountLink.textContent="Log in";accountLink.href="login.html";
+<script>
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 30));
+</script>
+
+<script>
+const API = "/api";
+
+async function submitEnquiry(e) {
+  e.preventDefault();
+  const f = e.target;
+  const btn = f.querySelector("button[type='submit']");
+  btn.disabled = true;
+  btn.textContent = "SENDING...";
+  const inputs = f.querySelectorAll("input,textarea");
+  const body = {
+    name: inputs[0].value,
+    phone: inputs[1].value,
+    email: inputs[2].value,
+    message: inputs[3].value
+  };
+  try {
+    const r = await fetch(API + "/enquiries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (!d.success) throw Error(d.error);
+    alert("Thank you. Your enquiry has been submitted successfully.");
+    f.reset();
+  } catch (err) {
+    alert(err.message || "Unable to submit enquiry.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "SEND ENQUIRY →";
+  }
+}
+
+async function openWhatsAppEnquiry() {
+  const form = document.querySelector('.form');
+  const inputs = form ? form.querySelectorAll('input,textarea') : [];
+  const name = inputs[0]?.value.trim() || '';
+  const phone = inputs[1]?.value.trim() || '';
+  const email = inputs[2]?.value.trim() || '';
+  const message = inputs[3]?.value.trim() || '';
+  if (!name || !phone) {
+    alert('Please enter your name and phone number first.');
+    return;
+  }
+  try {
+    const r = await fetch(API + '/whatsapp-enquiry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ name, phone, email, message })
+    });
+    const d = await r.json();
+    if (!r.ok || !d.success) throw Error(d.error || 'Unable to prepare WhatsApp enquiry');
+    const text = `Hello Laxminarayan Group,\n\nI would like to enquire about your projects.\nName: ${name}\nPhone: ${phone}${email ? '\nEmail: ' + email : ''}${message ? '\nMessage: ' + message : ''}\n\nEnquiry Ref: ${d.reference || ''}`;
+    const w = window.open('about:blank', '_blank');
+    if (w) w.location.href = 'https://wa.me/916352000017?text=' + encodeURIComponent(text);
+    else window.location.href = 'https://wa.me/916352000017?text=' + encodeURIComponent(text);
+  } catch (e) {
+    alert(e.message || 'Unable to open WhatsApp enquiry.');
+  }
+}
+
+const accountLink = document.getElementById("accountLink");
+async function updateAccountLink() {
+  try {
+    const r = await fetch(API + "/auth/me", { credentials: "same-origin", cache: "no-store" });
+    if (!r.ok) throw Error();
+    const d = await r.json();
+    if (d.success) {
+      accountLink.textContent = d.user.role === "admin" ? "Admin Dashboard" : "My Account";
+      accountLink.href = d.user.role === "admin" ? "admin.html" : "dashboard.html";
+      return;
+    }
+  } catch (e) {}
+  accountLink.textContent = "Log in";
+  accountLink.href = "login.html";
 }
 updateAccountLink();
 
-const categoryMeta={
- RESIDENTIAL:{title:"Signature Homes",description:"Thoughtfully planned homes for contemporary families.",fallback:"assets/signature-homes.jpg"},
- COMMERCIAL:{title:"Prime Spaces",description:"Strategic commercial spaces built for opportunity.",fallback:"assets/commercial-properties.jpg"},
- DEVELOPMENT:{title:"Future Landmarks",description:"Planned developments with a long-term perspective.",fallback:"assets/residential-properties.jpg"},
- INDUSTRIAL:{title:"Industrial Properties",description:"Purpose-built spaces for manufacturing, logistics and expansion.",fallback:"assets/industrial-properties.jpg"}
+const categoryMeta = {
+  RESIDENTIAL: { title: "Signature Homes", description: "Thoughtfully planned homes for contemporary families.", fallback: "assets/signature-homes.jpg" },
+  COMMERCIAL: { title: "Prime Spaces", description: "Strategic commercial spaces built for opportunity.", fallback: "assets/commercial-properties.jpg" },
+  DEVELOPMENT: { title: "Future Landmarks", description: "Planned developments with a long-term perspective.", fallback: "assets/residential-properties.jpg" },
+  INDUSTRIAL: { title: "Industrial Properties", description: "Purpose-built spaces for manufacturing, logistics and expansion.", fallback: "assets/industrial-properties.jpg" }
 };
-function projectCard(category,first){
- const m=categoryMeta[category]||{title:category.charAt(0)+category.slice(1).toLowerCase(),description:"Explore our latest projects.",fallback:"assets/project-2.jpg"};
- const image=first?.image||m.fallback;
- const title=first?m.title||category:m.title;
- return `<a class="card project-link" href="project-category.html?category=${encodeURIComponent(category)}" data-category="${esc(category)}">
-   <div class="pic" style="background-image:url('${String(image).replace(/'/g,"%27")}')"></div>
-   <div class="card-info"><div class="tag">${esc(category)}</div><h3>${esc(title)}</h3><p>${esc(m.description)}</p><span class="project-arrow">View projects ↗</span></div>
- </a>`;
+
+function projectCard(category, first) {
+  const m = categoryMeta[category] || { title: category.charAt(0) + category.slice(1).toLowerCase(), description: "Explore our latest projects.", fallback: "assets/project-2.jpg" };
+  const image = first?.image || m.fallback;
+  const title = first ? m.title || category : m.title;
+  return `<a class="card project-link" href="project-category.html?category=${encodeURIComponent(category)}" data-category="${esc(category)}">
+    <div class="pic" style="background-image:url('${String(image).replace(/'/g, "%27")}')"></div>
+    <div class="card-info">
+      <div class="tag">${esc(category)}</div>
+      <h3>${esc(title)}</h3>
+      <p>${esc(m.description)}</p>
+      <span class="project-arrow">Explore Portfolio ↗</span>
+    </div>
+  </a>`;
 }
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function bindProjectLinks(){
- document.querySelectorAll(".project-link").forEach(a=>a.addEventListener("click",async function(e){
-  e.preventDefault();const target=this.href;
-  try{const r=await fetch(API+"/auth/me",{credentials:"same-origin",cache:"no-store"});if(r.ok){location.href=target;return}}catch(err){}
-  const u=new URL(target,location.href);location.href="login.html?return_to="+encodeURIComponent(u.pathname+u.search);
- }));
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
 }
-async function loadSiteData(){
- try{
-  const p=await fetch(API+"/projects",{cache:"no-store"}).then(r=>r.json());
-  const groups={};(p.data||[]).forEach(x=>{if(!groups[x.category])groups[x.category]=[];groups[x.category].push(x)});
-  const categories=Object.keys(groups);
-  const order=["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL"];
-  categories.sort((a,b)=>(order.indexOf(a)<0?99:order.indexOf(a))-(order.indexOf(b)<0?99:order.indexOf(b)));
-  const grid=document.getElementById("projectGrid");
-  grid.innerHTML=categories.map(c=>projectCard(c,groups[c][0])).join("");
-  bindProjectLinks();
-  const l=await fetch(API+"/leaders",{cache:"no-store"}).then(r=>r.json());
-  const leaders=document.querySelectorAll(".leader");
-  (l.data||[]).slice(0,3).forEach((x,i)=>{if(!leaders[i])return;leaders[i].querySelector(".avatar").textContent=x.initials;leaders[i].querySelector("h3").textContent=x.name;leaders[i].querySelector("p").textContent=x.designation});
- }catch(e){console.error("Could not load site data",e)}
+
+function bindProjectLinks() {
+  document.querySelectorAll(".project-link").forEach(a => a.addEventListener("click", async function (e) {
+    e.preventDefault();
+    const target = this.href;
+    try {
+      const r = await fetch(API + "/auth/me", { credentials: "same-origin", cache: "no-store" });
+      if (r.ok) { location.href = target; return; }
+    } catch (err) {}
+    const u = new URL(target, location.href);
+    location.href = "login.html?return_to=" + encodeURIComponent(u.pathname + u.search);
+  }));
+}
+
+async function loadSiteData() {
+  try {
+    const p = await fetch(API + "/projects", { cache: "no-store" }).then(r => r.json());
+    const groups = {};
+    (p.data || []).forEach(x => {
+      if (!groups[x.category]) groups[x.category] = [];
+      groups[x.category].push(x);
+    });
+    const categories = Object.keys(groups);
+    const order = ["RESIDENTIAL", "COMMERCIAL", "DEVELOPMENT", "INDUSTRIAL"];
+    categories.sort((a, b) => (order.indexOf(a) < 0 ? 99 : order.indexOf(a)) - (order.indexOf(b) < 0 ? 99 : order.indexOf(b)));
+    const grid = document.getElementById("projectGrid");
+    grid.innerHTML = categories.map(c => projectCard(c, groups[c][0])).join("");
+    bindProjectLinks();
+    
+    const l = await fetch(API + "/leaders", { cache: "no-store" }).then(r => r.json());
+    const leaders = document.querySelectorAll(".leader");
+    (l.data || []).slice(0, 3).forEach((x, i) => {
+      if (!leaders[i]) return;
+      leaders[i].querySelector(".avatar").textContent = x.initials;
+      leaders[i].querySelector("h3").textContent = x.name;
+      leaders[i].querySelector("p").textContent = x.designation;
+    });
+  } catch (e) {
+    console.error("Could not load site data", e);
+  }
 }
 loadSiteData();
-</script></body>
+</script>
+</body>
 </html>

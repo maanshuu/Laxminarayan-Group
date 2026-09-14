@@ -1,2 +1,450 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Laxminarayan Group — My Account</title><style>body{margin:0;background:#f5f2eb;color:#171715;font:14px Arial,sans-serif}.top{background:#171715;color:#fff;padding:18px 5%;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.top button{background:none;color:#fff;border:1px solid #777;padding:9px 14px}.wrap{width:min(1100px,92%);margin:35px auto}h1{font:48px Georgia}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card,.table{background:#fff;border:1px solid #ddd8ce;padding:20px;margin-top:18px}.table{overflow:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:13px}.gold{color:#b58a43}.visit-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.visit-form select,.visit-form input,.visit-form textarea{padding:10px;border:1px solid #ccc}.visit-form textarea{grid-column:1/-1;min-height:70px}.btn{background:#b58a43;color:#fff;border:0;padding:11px 15px;font-weight:700}@media(max-width:700px){h1{font-size:38px}.cards{grid-template-columns:1fr}.visit-form{grid-template-columns:1fr}.visit-form textarea{grid-column:1}}
-</style><meta http-equiv="Cache-Control" content="no-store"></head><body><div class="top"><b>LAXMINARAYAN GROUP</b><div><span id="user"></span> <button onclick="location.href='/api/auth/logout'">LOG OUT</button></div></div><main class="wrap"><div class="gold">CUSTOMER ACCOUNT</div><h1>My account</h1><p>Welcome, <strong id="name"></strong>. Track enquiries and site visits from one place.</p><div class="cards"><div class="card"><h3>Account</h3><p id="email"></p><p id="phone"></p></div><div class="card"><h3>Company</h3><p>6352000017</p><p>msinfraprojects2021@gmail.com</p></div><div class="card"><h3>Website</h3><p><a href="index.html">← Back to main website</a></p></div></div><div class="table"><h2>My enquiries</h2><table><thead><tr><th>Enquiry #</th><th>Submitted</th><th>Project</th><th>Message</th><th>Status</th><th>Team response</th></tr></thead><tbody id="rows"></tbody></table></div><div class="card"><h2>Request a site visit</h2><form id="visitForm" class="visit-form"><select id="project" required><option value="">Select project</option></select><input id="at" type="datetime-local" required><textarea id="notes" placeholder="Notes for our team"></textarea><div><button class="btn">REQUEST SITE VISIT</button></div><span id="visitMsg"></span></form></div><div class="table"><h2>My site visits</h2><table><thead><tr><th>Requested</th><th>Project</th><th>Preferred time</th><th>Status</th><th>Team notes</th></tr></thead><tbody id="visitRows"></tbody></table></div></main><script>const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));const ld=v=>new Date(/Z$|[+-]\d\d:\d\d$/.test(v)?v:v+'Z').toLocaleString('en-IN',{timeZone:'Asia/Kolkata'});async function get(u){const r=await fetch(u,{credentials:'same-origin',cache:'no-store'});let d={};try{d=await r.json()}catch{}return [r,d]}async function load(){const [mr,me]=await get('/api/auth/me');if(!mr.ok||!me.success){location.replace('login.html');return}const u=me.user;$('name').textContent=u.name;$('user').textContent=u.name;$('email').textContent=u.email;$('phone').textContent=u.phone||'';const [er,e]=await get('/api/my/enquiries');$('rows').innerHTML=er.ok&&e.data?.length?e.data.map(x=>`<tr><td><b>${esc(x.enquiry_reference)}</b></td><td>${ld(x.created_at)}</td><td>${esc(x.project_name||'General enquiry')}</td><td>${esc(x.message)}</td><td>${esc(x.status)}</td><td>${esc(x.admin_response||'Our team will update you here.')}</td></tr>`).join(''):'<tr><td colspan="6">No enquiries yet.</td></tr>';const [pr,p]=await get('/api/projects');$('project').innerHTML='<option value="">Select project</option>'+(p.data||[]).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');loadVisits()}async function loadVisits(){const [r,d]=await get('/api/my/site-visits');$('visitRows').innerHTML=r.ok&&d.data?.length?d.data.map(x=>`<tr><td>${ld(x.created_at)}</td><td>${esc(x.project_name||'')}</td><td>${ld(x.preferred_at)}</td><td>${esc(x.status)}</td><td>${esc(x.admin_notes||'Waiting for confirmation.')}</td></tr>`).join(''):'<tr><td colspan="5">No site visits yet.</td></tr>'}$('visitForm').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;try{const r=await fetch('/api/site-visits',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_id:Number($('project').value),preferred_at:$('at').value,notes:$('notes').value})});const d=await r.json();if(!r.ok||!d.success)throw Error(d.error||'Could not request site visit');$('visitMsg').textContent='Request received.';e.target.reset();loadVisits()}catch(x){$('visitMsg').textContent=x.message}finally{b.disabled=false}};load();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Laxminarayan Group — My Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b0e;
+  --surface: #141418;
+  --surface-glass: rgba(20, 20, 26, 0.85);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --gold: #d4af37;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-gradient: linear-gradient(135deg, #f3d789 0%, #d4af37 60%, #aa8420 100%);
+  --ink: #ffffff;
+  --muted: #9c9ca8;
+  --subtle: #6a6a78;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 35px var(--gold-glow);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 45%),
+    radial-gradient(circle at 85% 50%, rgba(212, 175, 55, 0.04) 0%, transparent 40%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+a { text-decoration: none; color: inherit; transition: all .2s; }
+
+/* ─── TOP BAR ─── */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(11, 11, 14, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+  padding: 16px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.top b {
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-transform: uppercase;
+}
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+#user {
+  font-weight: 600;
+  color: var(--gold);
+  font-size: 14px;
+}
+.top button {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  border: 1px solid var(--line);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.top button:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+/* ─── MAIN WRAP ─── */
+.wrap {
+  width: min(1160px, 92%);
+  margin: 40px auto 80px;
+}
+.gold {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+h1 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: -1px;
+}
+.welcome-p {
+  color: var(--muted);
+  font-size: 16px;
+  margin-bottom: 35px;
+}
+
+/* ─── CARDS ─── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 35px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .25s ease;
+}
+.card:hover { transform: translateY(-3px); border-color: rgba(255, 255, 255, 0.15); }
+.card h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+.card h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 18px;
+}
+.card p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.card p a {
+  color: var(--gold);
+  font-weight: 600;
+}
+.card p a:hover { text-decoration: underline; }
+
+/* ─── TABLES ─── */
+.table {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 35px;
+  overflow: auto;
+  box-shadow: var(--shadow-sm);
+}
+.table h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 20px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+th {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--subtle);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+td {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--muted);
+}
+td b { color: #fff; }
+tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ─── VISIT FORM ─── */
+.visit-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.visit-form select, .visit-form input, .visit-form textarea {
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: all .2s;
+}
+.visit-form select option {
+  background: #141418;
+  color: #fff;
+}
+.visit-form select:focus, .visit-form input:focus, .visit-form textarea:focus {
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+.visit-form textarea {
+  grid-column: 1 / -1;
+  min-height: 90px;
+  resize: vertical;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: var(--gold-gradient);
+  color: #0b0b0e;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+}
+.btn:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+}
+#visitMsg {
+  margin-left: 14px;
+  color: #4ade80;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+@media (max-width: 800px) {
+  .cards { grid-template-columns: 1fr; }
+  .visit-form { grid-template-columns: 1fr; }
+  .top { padding: 14px 20px; }
+  .wrap { margin: 25px auto 50px; }
+}
+</style>
+<meta http-equiv="Cache-Control" content="no-store">
+</head>
+<body>
+<div class="top">
+  <b>LAXMINARAYAN GROUP</b>
+  <div class="top-actions">
+    <span id="user"></span>
+    <button onclick="location.href='/api/auth/logout'">LOG OUT</button>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="gold">CUSTOMER ACCOUNT PORTAL</div>
+  <h1>My Account</h1>
+  <p class="welcome-p">Welcome, <strong id="name" style="color:#fff;"></strong>. Track enquiries and site visits from your centralized dashboard.</p>
+  
+  <div class="cards">
+    <div class="card">
+      <h3>Account Details</h3>
+      <p id="email"></p>
+      <p id="phone"></p>
+    </div>
+    <div class="card">
+      <h3>Direct Support</h3>
+      <p>Phone: +91 6352000017</p>
+      <p>Email: msinfraprojects2021@gmail.com</p>
+    </div>
+    <div class="card">
+      <h3>Quick Links</h3>
+      <p><a href="index.html">← Return to Main Website</a></p>
+      <p><a href="index.html#projects">Explore All Projects →</a></p>
+    </div>
+  </div>
+
+  <div class="table">
+    <h2>My Enquiries</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Enquiry #</th>
+          <th>Submitted</th>
+          <th>Project</th>
+          <th>Message</th>
+          <th>Status</th>
+          <th>Team Response</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-bottom: 35px;">
+    <h2>Request a Site Visit</h2>
+    <form id="visitForm" class="visit-form">
+      <select id="project" required>
+        <option value="">Select project</option>
+      </select>
+      <input id="at" type="datetime-local" required>
+      <textarea id="notes" placeholder="Notes or specific timing preferences for our development team..."></textarea>
+      <div style="grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <button class="btn" type="submit">REQUEST SITE VISIT →</button>
+        <span id="visitMsg"></span>
+      </div>
+    </form>
+  </div>
+
+  <div class="table">
+    <h2>My Site Visits</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Requested</th>
+          <th>Project</th>
+          <th>Preferred Time</th>
+          <th>Status</th>
+          <th>Team Notes</th>
+        </tr>
+      </thead>
+      <tbody id="visitRows"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
+const ld = v => new Date(/Z$|[+-]\d\d:\d\d$/.test(v) ? v : v + 'Z').toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+async function get(u) {
+  const r = await fetch(u, { credentials: 'same-origin', cache: 'no-store' });
+  let d = {};
+  try { d = await r.json(); } catch {}
+  return [r, d];
+}
+
+async function load() {
+  const [mr, me] = await get('/api/auth/me');
+  if (!mr.ok || !me.success) {
+    location.replace('login.html');
+    return;
+  }
+  const u = me.user;
+  $('name').textContent = u.name;
+  $('user').textContent = u.name;
+  $('email').textContent = u.email;
+  $('phone').textContent = u.phone || '';
+  
+  const [er, e] = await get('/api/my/enquiries');
+  $('rows').innerHTML = er.ok && e.data?.length ? e.data.map(x => `
+    <tr>
+      <td><b>${esc(x.enquiry_reference)}</b></td>
+      <td>${ld(x.created_at)}</td>
+      <td>${esc(x.project_name || 'General enquiry')}</td>
+      <td>${esc(x.message)}</td>
+      <td><span style="color:var(--gold);font-weight:600;">${esc(x.status)}</span></td>
+      <td>${esc(x.admin_response || 'Our team will update you here.')}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="6">No enquiries recorded yet.</td></tr>';
+
+  const [pr, p] = await get('/api/projects');
+  $('project').innerHTML = '<option value="">Select project</option>' + (p.data || []).map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  loadVisits();
+}
+
+async function loadVisits() {
+  const [r, d] = await get('/api/my/site-visits');
+  $('visitRows').innerHTML = r.ok && d.data?.length ? d.data.map(x => `
+    <tr>
+      <td>${ld(x.created_at)}</td>
+      <td><b>${esc(x.project_name || '')}</b></td>
+      <td>${ld(x.preferred_at)}</td>
+      <td><span style="color:var(--gold);font-weight:600;">${esc(x.status)}</span></td>
+      <td>${esc(x.admin_notes || 'Waiting for confirmation.')}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="5">No site visits booked yet.</td></tr>';
+}
+
+$('visitForm').onsubmit = async e => {
+  e.preventDefault();
+  const b = e.target.querySelector('button');
+  b.disabled = true;
+  b.textContent = 'SUBMITTING...';
+  try {
+    const r = await fetch('/api/site-visits', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_id: Number($('project').value),
+        preferred_at: $('at').value,
+        notes: $('notes').value
+      })
+    });
+    const d = await r.json();
+    if (!r.ok || !d.success) throw Error(d.error || 'Could not request site visit');
+    $('visitMsg').textContent = 'Request received successfully.';
+    e.target.reset();
+    loadVisits();
+  } catch (x) {
+    $('visitMsg').textContent = x.message;
+  } finally {
+    b.disabled = false;
+    b.textContent = 'REQUEST SITE VISIT →';
+  }
+};
+
+load();
+</script>
+</body>
+</html>
