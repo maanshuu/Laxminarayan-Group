@@ -265,8 +265,76 @@ function migrateProductionSchema(){
   if(!c.has("details")) db.exec("ALTER TABLE audit_logs ADD COLUMN details TEXT NOT NULL DEFAULT ''");
   if(!c.has("ip_address")) db.exec("ALTER TABLE audit_logs ADD COLUMN ip_address TEXT NOT NULL DEFAULT ''");
   if(!c.has("created_at")) db.exec("ALTER TABLE audit_logs ADD COLUMN created_at TEXT NOT NULL DEFAULT ''");
+
+  // Enterprise PropTech: Project Unit Inventory Matrix (Towers / Flats / Villas / Plots)
+  db.exec(`CREATE TABLE IF NOT EXISTS project_units (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL,
+    unit_number TEXT NOT NULL,
+    unit_type TEXT NOT NULL DEFAULT '3 BHK',
+    floor_number INTEGER DEFAULT 1,
+    area_sqft INTEGER NOT NULL DEFAULT 1200,
+    price TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'available' CHECK(status IN ('available','blocked','sold')),
+    buyer_name TEXT NOT NULL DEFAULT '',
+    buyer_phone TEXT NOT NULL DEFAULT '',
+    notes TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_units_project_id ON project_units(project_id);
+  CREATE INDEX IF NOT EXISTS idx_units_status ON project_units(status);`);
+
+  c=cols("leads");
+  if(!c.has("budget")) db.exec("ALTER TABLE leads ADD COLUMN budget TEXT NOT NULL DEFAULT ''");
+  if(!c.has("sentiment")) db.exec("ALTER TABLE leads ADD COLUMN sentiment TEXT NOT NULL DEFAULT 'warm'");
+  if(!c.has("unit_id")) db.exec("ALTER TABLE leads ADD COLUMN unit_id INTEGER");
+
+  c=cols("bookings");
+  if(!c.has("unit_id")) db.exec("ALTER TABLE bookings ADD COLUMN unit_id INTEGER");
+  if(!c.has("lead_id")) db.exec("ALTER TABLE bookings ADD COLUMN lead_id INTEGER");
+  if(!c.has("customer_name")) db.exec("ALTER TABLE bookings ADD COLUMN customer_name TEXT NOT NULL DEFAULT ''");
+  if(!c.has("customer_phone")) db.exec("ALTER TABLE bookings ADD COLUMN customer_phone TEXT NOT NULL DEFAULT ''");
+  if(!c.has("customer_email")) db.exec("ALTER TABLE bookings ADD COLUMN customer_email TEXT NOT NULL DEFAULT ''");
+  if(!c.has("allotted_unit")) db.exec("ALTER TABLE bookings ADD COLUMN allotted_unit TEXT NOT NULL DEFAULT ''");
+  if(!c.has("agreement_value")) db.exec("ALTER TABLE bookings ADD COLUMN agreement_value TEXT NOT NULL DEFAULT ''");
+  if(!c.has("token_amount")) db.exec("ALTER TABLE bookings ADD COLUMN token_amount TEXT NOT NULL DEFAULT ''");
+  if(!c.has("payment_status")) db.exec("ALTER TABLE bookings ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'token_received'");
 }
 migrateProductionSchema();
+
+function seedSampleProjectUnits(){
+  try{
+    const unitCount=db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
+    if(unitCount>0) return;
+    const projects=db.prepare("SELECT id,name,category FROM projects LIMIT 12").all();
+    if(!projects.length) return;
+    const insert=db.prepare(`INSERT INTO project_units(project_id,unit_number,unit_type,floor_number,area_sqft,price,status,buyer_name,buyer_phone,notes)
+      VALUES(?,?,?,?,?,?,?,?,?,?)`);
+    const tx=db.transaction(()=>{
+      for(const p of projects){
+        const cat=(p.category||'').toUpperCase();
+        if(cat==="RESIDENTIAL" || p.name.toLowerCase().includes("villa") || p.name.toLowerCase().includes("heights")){
+          insert.run(p.id,"Unit 101","3 BHK Luxury",1,1850,"₹85,00,000","available","","","Garden facing with private deck");
+          insert.run(p.id,"Unit 102","3 BHK Luxury",1,1850,"₹85,00,000","blocked","Rajesh Sharma","9876543210","Token advance paid, agreement in progress");
+          insert.run(p.id,"Unit 201","4 BHK Penthouse",2,2600,"₹1,35,00,000","available","","","Corner penthouse with expansive terrace");
+          insert.run(p.id,"Unit 202","2 BHK Premium",2,1250,"₹62,00,000","sold","Anita Desai","9823456789","Sold & booked, handover scheduled");
+        }else if(cat==="COMMERCIAL"){
+          insert.run(p.id,"Office 301","Executive Suite",3,980,"₹72,00,000","available","","","Road facing premium glass facade office");
+          insert.run(p.id,"Shop G-04","Retail Showroom",0,1450,"₹1,15,00,000","blocked","Vikas Patel","9898012345","Retail showroom token held");
+          insert.run(p.id,"Office 402","Corporate Workspace",4,1700,"₹1,10,00,000","available","","","Double height ceiling with parking slots");
+        }else{
+          insert.run(p.id,"Plot #12","Industrial Plot",1,5000,"₹95,00,000","available","","","Heavy power & water connection infrastructure");
+          insert.run(p.id,"Shed B-1","Industrial Warehouse",1,7500,"₹1,50,00,000","sold","Metro Logistics","9712345678","Long-term industrial facility lease/sale");
+        }
+      }
+    });
+    tx();
+    console.log("Seeded initial real estate project inventory units");
+  }catch(e){console.error("Unit seeding warning:",e.message);}
+}
+seedSampleProjectUnits();
 
 // Backfill one CRM lead for every existing enquiry that does not already have one.
 // This keeps older databases compatible with the production CRM upgrade.
@@ -459,7 +527,10 @@ app.post("/api/admin/leads",admin,(req,res)=>{
   if(projectId!==null && (!Number.isInteger(projectId)||!db.prepare("SELECT id FROM projects WHERE id=?").get(projectId)))return res.status(400).json({success:false,error:"Invalid project"});
   if(userId!==null && (!Number.isInteger(userId)||!db.prepare("SELECT id FROM users WHERE id=? AND role='customer'").get(userId)))return res.status(400).json({success:false,error:"Invalid customer"});
   if(employeeId!==null && (!Number.isInteger(employeeId)||!db.prepare("SELECT id FROM employees WHERE id=? AND status='active'").get(employeeId)))return res.status(400).json({success:false,error:"Invalid team member"});
-  const r=db.prepare(`INSERT INTO leads(user_id,name,phone,email,source,status,notes,project_id,assigned_employee_id,follow_up_at) VALUES(?,?,?,?,?,?,?,?,?,?)`).run(userId,name,phone,email,source,status,notes,projectId,employeeId,follow);
+  const budget=clean(req.body.budget,80);
+  const sentiment=clean(req.body.sentiment,20)||"warm";
+  const unitId=req.body.unit_id?Number(req.body.unit_id):null;
+  const r=db.prepare(`INSERT INTO leads(user_id,name,phone,email,source,status,notes,project_id,assigned_employee_id,follow_up_at,budget,sentiment,unit_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(userId,name,phone,email,source,status,notes,projectId,employeeId,follow,budget,sentiment,unitId);
   audit(req,"create","lead",r.lastInsertRowid,`${name} · ${source}`);
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(r.lastInsertRowid)});
 });
@@ -518,8 +589,11 @@ app.delete("/api/admin/site-visits/:id",admin,(req,res)=>{
 });
 
 app.get("/api/admin/leads",admin,(req,res)=>{
-  const rows=db.prepare(`SELECT l.*,p.name AS project_name,e.employee_code,eu.name AS employee_name
-    FROM leads l LEFT JOIN projects p ON p.id=l.project_id LEFT JOIN employees e ON e.id=l.assigned_employee_id
+  const rows=db.prepare(`SELECT l.*,p.name AS project_name,pu.unit_number,e.employee_code,eu.name AS employee_name
+    FROM leads l
+    LEFT JOIN projects p ON p.id=l.project_id
+    LEFT JOIN project_units pu ON pu.id=l.unit_id
+    LEFT JOIN employees e ON e.id=l.assigned_employee_id
     LEFT JOIN users eu ON eu.id=e.user_id ORDER BY l.id DESC`).all();
   res.json({success:true,data:rows});
 });
@@ -527,12 +601,193 @@ app.patch("/api/admin/leads/:id",admin,(req,res)=>{
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM leads WHERE id=?").get(id); if(!existing)return res.status(404).json({success:false,error:"Lead not found"});
   const allowed=["new","contacted","qualified","site_visit","negotiation","won","lost"];
   const status=clean(req.body.status,30)||existing.status; if(!allowed.includes(status))return res.status(400).json({success:false,error:"Invalid lead status"});
-  const employeeId=req.body.assigned_employee_id===null||req.body.assigned_employee_id===""?null:Number(req.body.assigned_employee_id);
+  const employeeId=Object.prototype.hasOwnProperty.call(req.body,"assigned_employee_id")?(req.body.assigned_employee_id===null||req.body.assigned_employee_id===""?null:Number(req.body.assigned_employee_id)):existing.assigned_employee_id;
   if(employeeId!==null && (!Number.isInteger(employeeId)||!db.prepare("SELECT id FROM employees WHERE id=? AND status='active'").get(employeeId)))return res.status(400).json({success:false,error:"Invalid team member"});
-  const follow=clean(req.body.follow_up_at,50); const notes=clean(req.body.notes,4000); const lost=Object.prototype.hasOwnProperty.call(req.body,"lost_reason")?clean(req.body.lost_reason,1000):(existing.lost_reason||"");
-  db.prepare("UPDATE leads SET status=?,assigned_employee_id=?,follow_up_at=?,notes=?,lost_reason=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(status,employeeId,follow||null,notes,lost,id);
-  audit(req,"update","lead",id,`Status ${status}`);
+  const follow=Object.prototype.hasOwnProperty.call(req.body,"follow_up_at")?(clean(req.body.follow_up_at,50)||null):existing.follow_up_at;
+  const notes=Object.prototype.hasOwnProperty.call(req.body,"notes")?clean(req.body.notes,4000):(existing.notes||"");
+  const lost=Object.prototype.hasOwnProperty.call(req.body,"lost_reason")?clean(req.body.lost_reason,1000):(existing.lost_reason||"");
+  const budget=Object.prototype.hasOwnProperty.call(req.body,"budget")?clean(req.body.budget,80):(existing.budget||"");
+  const sentiment=Object.prototype.hasOwnProperty.call(req.body,"sentiment")?clean(req.body.sentiment,20):(existing.sentiment||"warm");
+  const unitId=Object.prototype.hasOwnProperty.call(req.body,"unit_id")?(req.body.unit_id===null||req.body.unit_id===""?null:Number(req.body.unit_id)):existing.unit_id;
+  const name=clean(req.body.name,120)||existing.name;
+  const phone=clean(req.body.phone,30)||existing.phone;
+  const email=clean(req.body.email,160)||existing.email;
+  const projectId=Object.prototype.hasOwnProperty.call(req.body,"project_id")?(req.body.project_id===null||req.body.project_id===""?null:Number(req.body.project_id)):existing.project_id;
+  db.prepare("UPDATE leads SET status=?,assigned_employee_id=?,follow_up_at=?,notes=?,lost_reason=?,budget=?,sentiment=?,unit_id=?,name=?,phone=?,email=?,project_id=?,updated_at=CURRENT_TIMESTAMP WHERE id=?")
+    .run(status,employeeId,follow||null,notes,lost,budget,sentiment,unitId,name,phone,email,projectId,id);
+  audit(req,"update","lead",id,`Status ${status} · Sentiment: ${sentiment}`);
   res.json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(id)});
+});
+
+// Convert an enquiry directly to a qualified lead
+app.post("/api/admin/enquiries/:id/convert",admin,(req,res)=>{
+  const id=Number(req.params.id);
+  const enq=db.prepare("SELECT * FROM enquiries WHERE id=?").get(id);
+  if(!enq) return res.status(404).json({success:false,error:"Enquiry not found"});
+  let lead=db.prepare("SELECT * FROM leads WHERE enquiry_id=?").get(id);
+  if(!lead){
+    const r=db.prepare(`INSERT INTO leads(user_id,name,phone,email,source,status,notes,project_id,enquiry_id,created_at,updated_at)
+      VALUES(?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).run(enq.user_id,enq.name,enq.phone||'',enq.email||'','website enquiry','qualified',enq.message||'',enq.project_id||null,id);
+    lead=db.prepare("SELECT * FROM leads WHERE id=?").get(r.lastInsertRowid);
+  }else{
+    db.prepare("UPDATE leads SET status='qualified',updated_at=CURRENT_TIMESTAMP WHERE id=?").run(lead.id);
+    lead.status='qualified';
+  }
+  db.prepare("UPDATE enquiries SET status='contacted' WHERE id=?").run(id);
+  audit(req,"convert","enquiry",id,`Converted to qualified lead #${lead.id}`);
+  res.json({success:true,data:lead});
+});
+
+// ---------------- Enterprise PropTech: Project Unit Inventory ----------------
+app.get("/api/admin/units",admin,(req,res)=>{
+  const projectId=req.query.project_id?Number(req.query.project_id):null;
+  const status=clean(req.query.status,20);
+  const search=clean(req.query.search,100).toLowerCase();
+  let sql=`SELECT u.*,p.name AS project_name,p.category AS project_category FROM project_units u LEFT JOIN projects p ON p.id=u.project_id WHERE 1=1`;
+  const params=[];
+  if(projectId){ sql+=` AND u.project_id=?`; params.push(projectId); }
+  if(status){ sql+=` AND u.status=?`; params.push(status); }
+  if(search){ sql+=` AND (LOWER(u.unit_number) LIKE ? OR LOWER(u.buyer_name) LIKE ? OR LOWER(p.name) LIKE ?)`; params.push(`%${search}%`,`%${search}%`,`%${search}%`); }
+  sql+=` ORDER BY u.project_id ASC, u.floor_number ASC, u.unit_number ASC`;
+  const units=db.prepare(sql).all(...params);
+  res.json({success:true,data:units});
+});
+
+app.post("/api/admin/units",admin,(req,res)=>{
+  const projectId=Number(req.body.project_id);
+  const unitNumber=clean(req.body.unit_number,50);
+  const unitType=clean(req.body.unit_type,50)||"3 BHK";
+  const floorNumber=Number(req.body.floor_number)||1;
+  const areaSqft=Number(req.body.area_sqft)||1200;
+  const price=clean(req.body.price,100);
+  const status=clean(req.body.status,20)||"available";
+  const buyerName=clean(req.body.buyer_name,120);
+  const buyerPhone=clean(req.body.buyer_phone,30);
+  const notes=clean(req.body.notes,1000);
+  if(!unitNumber) return res.status(400).json({success:false,error:"Unit number is required"});
+  if(!projectId||!db.prepare("SELECT id FROM projects WHERE id=?").get(projectId)) return res.status(400).json({success:false,error:"Invalid project"});
+  if(!["available","blocked","sold"].includes(status)) return res.status(400).json({success:false,error:"Invalid status"});
+  const r=db.prepare(`INSERT INTO project_units(project_id,unit_number,unit_type,floor_number,area_sqft,price,status,buyer_name,buyer_phone,notes)
+    VALUES(?,?,?,?,?,?,?,?,?,?)`).run(projectId,unitNumber,unitType,floorNumber,areaSqft,price,status,buyerName,buyerPhone,notes);
+  audit(req,"create","unit",r.lastInsertRowid,`${unitNumber} · Status: ${status}`);
+  res.status(201).json({success:true,data:db.prepare("SELECT u.*,p.name AS project_name FROM project_units u LEFT JOIN projects p ON p.id=u.project_id WHERE u.id=?").get(r.lastInsertRowid)});
+});
+
+app.put("/api/admin/units/:id",admin,(req,res)=>{
+  const id=Number(req.params.id);
+  const existing=db.prepare("SELECT * FROM project_units WHERE id=?").get(id);
+  if(!existing) return res.status(404).json({success:false,error:"Unit not found"});
+  const unitNumber=clean(req.body.unit_number,50)||existing.unit_number;
+  const unitType=clean(req.body.unit_type,50)||existing.unit_type;
+  const floorNumber=Number(req.body.floor_number)||existing.floor_number;
+  const areaSqft=Number(req.body.area_sqft)||existing.area_sqft;
+  const price=clean(req.body.price,100)||existing.price;
+  const status=clean(req.body.status,20)||existing.status;
+  const buyerName=clean(req.body.buyer_name,120);
+  const buyerPhone=clean(req.body.buyer_phone,30);
+  const notes=clean(req.body.notes,1000);
+  if(!["available","blocked","sold"].includes(status)) return res.status(400).json({success:false,error:"Invalid status"});
+  db.prepare(`UPDATE project_units SET unit_number=?,unit_type=?,floor_number=?,area_sqft=?,price=?,status=?,buyer_name=?,buyer_phone=?,notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`)
+    .run(unitNumber,unitType,floorNumber,areaSqft,price,status,buyerName,buyerPhone,notes,id);
+  audit(req,"update","unit",id,`${unitNumber} · Status ${status}`);
+  res.json({success:true,data:db.prepare("SELECT u.*,p.name AS project_name FROM project_units u LEFT JOIN projects p ON p.id=u.project_id WHERE u.id=?").get(id)});
+});
+
+app.patch("/api/admin/units/:id/status",admin,(req,res)=>{
+  const id=Number(req.params.id);
+  const existing=db.prepare("SELECT * FROM project_units WHERE id=?").get(id);
+  if(!existing) return res.status(404).json({success:false,error:"Unit not found"});
+  const status=clean(req.body.status,20);
+  if(!["available","blocked","sold"].includes(status)) return res.status(400).json({success:false,error:"Invalid status"});
+  const buyerName=clean(req.body.buyer_name,120)||(status==='available'?'':existing.buyer_name);
+  const buyerPhone=clean(req.body.buyer_phone,30)||(status==='available'?'':existing.buyer_phone);
+  db.prepare(`UPDATE project_units SET status=?,buyer_name=?,buyer_phone=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`).run(status,buyerName,buyerPhone,id);
+  audit(req,"update","unit",id,`Status changed to ${status}`);
+  res.json({success:true,data:db.prepare("SELECT u.*,p.name AS project_name FROM project_units u LEFT JOIN projects p ON p.id=u.project_id WHERE u.id=?").get(id)});
+});
+
+app.delete("/api/admin/units/:id",admin,(req,res)=>{
+  const id=Number(req.params.id);
+  const existing=db.prepare("SELECT * FROM project_units WHERE id=?").get(id);
+  if(!existing) return res.status(404).json({success:false,error:"Unit not found"});
+  db.prepare("DELETE FROM project_units WHERE id=?").run(id);
+  audit(req,"delete","unit",id,`Deleted unit ${existing.unit_number}`);
+  res.json({success:true});
+});
+
+// ---------------- Enterprise PropTech: Bookings & Deal Closures ----------------
+app.get("/api/admin/bookings",admin,(req,res)=>{
+  const rows=db.prepare(`SELECT b.*,p.name AS project_name,pu.unit_number,pu.unit_type,u.name AS user_name,u.email AS user_email
+    FROM bookings b
+    LEFT JOIN projects p ON p.id=b.project_id
+    LEFT JOIN project_units pu ON pu.id=b.unit_id
+    LEFT JOIN users u ON u.id=b.user_id
+    ORDER BY b.id DESC`).all();
+  res.json({success:true,data:rows});
+});
+
+app.post("/api/admin/bookings",admin,(req,res)=>{
+  const projectId=Number(req.body.project_id);
+  const unitId=req.body.unit_id?Number(req.body.unit_id):null;
+  const leadId=req.body.lead_id?Number(req.body.lead_id):null;
+  const userId=req.body.user_id?Number(req.body.user_id):null;
+  const customerName=clean(req.body.customer_name,120);
+  const customerPhone=clean(req.body.customer_phone,30);
+  const customerEmail=clean(req.body.customer_email,160).toLowerCase();
+  const allottedUnit=clean(req.body.allotted_unit,100);
+  const agreementValue=clean(req.body.agreement_value,100);
+  const tokenAmount=clean(req.body.token_amount,100);
+  const paymentStatus=clean(req.body.payment_status,50)||"token_received";
+  const status=clean(req.body.status,30)||"confirmed";
+  const notes=clean(req.body.notes,2000);
+  if(!customerName) return res.status(400).json({success:false,error:"Customer name is required"});
+  if(!projectId||!db.prepare("SELECT id FROM projects WHERE id=?").get(projectId)) return res.status(400).json({success:false,error:"Select a valid project"});
+  const bookingRef='BKG-'+Date.now().toString().slice(-6)+'-'+Math.floor(100+Math.random()*900);
+  const tx=db.transaction(()=>{
+    const r=db.prepare(`INSERT INTO bookings(user_id,project_id,unit_id,lead_id,booking_reference,customer_name,customer_phone,customer_email,allotted_unit,agreement_value,token_amount,payment_status,status,notes)
+      VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(userId,projectId,unitId,leadId,bookingRef,customerName,customerPhone,customerEmail,allottedUnit,agreementValue,tokenAmount,paymentStatus,status,notes);
+    if(unitId){
+      db.prepare("UPDATE project_units SET status='sold',buyer_name=?,buyer_phone=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(customerName,customerPhone,unitId);
+    }
+    if(leadId){
+      db.prepare("UPDATE leads SET status='won',updated_at=CURRENT_TIMESTAMP WHERE id=?").run(leadId);
+    }
+    return r.lastInsertRowid;
+  });
+  const bookingId=tx();
+  audit(req,"create","booking",bookingId,`${bookingRef} · ${customerName} · ${allottedUnit}`);
+  res.status(201).json({success:true,data:db.prepare("SELECT b.*,p.name AS project_name FROM bookings b LEFT JOIN projects p ON p.id=b.project_id WHERE b.id=?").get(bookingId)});
+});
+
+app.put("/api/admin/bookings/:id",admin,(req,res)=>{
+  const id=Number(req.params.id);
+  const existing=db.prepare("SELECT * FROM bookings WHERE id=?").get(id);
+  if(!existing) return res.status(404).json({success:false,error:"Booking not found"});
+  const customerName=clean(req.body.customer_name,120)||existing.customer_name;
+  const customerPhone=clean(req.body.customer_phone,30)||existing.customer_phone;
+  const customerEmail=clean(req.body.customer_email,160)||existing.customer_email;
+  const allottedUnit=clean(req.body.allotted_unit,100)||existing.allotted_unit;
+  const agreementValue=clean(req.body.agreement_value,100)||existing.agreement_value;
+  const tokenAmount=clean(req.body.token_amount,100)||existing.token_amount;
+  const paymentStatus=clean(req.body.payment_status,50)||existing.payment_status;
+  const status=clean(req.body.status,30)||existing.status;
+  const notes=clean(req.body.notes,2000);
+  db.prepare(`UPDATE bookings SET customer_name=?,customer_phone=?,customer_email=?,allotted_unit=?,agreement_value=?,token_amount=?,payment_status=?,status=?,notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`)
+    .run(customerName,customerPhone,customerEmail,allottedUnit,agreementValue,tokenAmount,paymentStatus,status,notes,id);
+  audit(req,"update","booking",id,`${existing.booking_reference} updated`);
+  res.json({success:true,data:db.prepare("SELECT * FROM bookings WHERE id=?").get(id)});
+});
+
+app.delete("/api/admin/bookings/:id",admin,(req,res)=>{
+  const id=Number(req.params.id);
+  const existing=db.prepare("SELECT * FROM bookings WHERE id=?").get(id);
+  if(!existing) return res.status(404).json({success:false,error:"Booking not found"});
+  db.prepare("DELETE FROM bookings WHERE id=?").run(id);
+  if(existing.unit_id){
+    db.prepare("UPDATE project_units SET status='available',buyer_name='',buyer_phone='',updated_at=CURRENT_TIMESTAMP WHERE id=?").run(existing.unit_id);
+  }
+  audit(req,"delete","booking",id,`Cancelled booking ${existing.booking_reference}`);
+  res.json({success:true});
 });
 
 
@@ -794,6 +1049,12 @@ app.get("/api/admin/dashboard",admin,(req,res)=>{
  const att=db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(today);
  const amap=Object.fromEntries(att.map(x=>[x.status,Number(x.c)]));
  const recent=db.prepare(`SELECT a.action,a.entity_type,a.entity_id,a.details,a.created_at,u.name user_name FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 6`).all();
+ const unitStats=db.prepare("SELECT status,COUNT(*) c FROM project_units GROUP BY status").all();
+ const umap=Object.fromEntries(unitStats.map(x=>[x.status,Number(x.c)]));
+ const totalUnits=db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
+ const bookingCount=db.prepare("SELECT COUNT(*) c FROM bookings").get().c;
+ const followUpsToday=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=date('now') AND status NOT IN ('won','lost')").get().c;
+ const overdueLeads=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<date('now') AND status NOT IN ('won','lost')").get().c;
  res.json({success:true,stats:{
  users:db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c,
  enquiries:db.prepare("SELECT COUNT(*) c FROM enquiries").get().c,
@@ -804,6 +1065,10 @@ app.get("/api/admin/dashboard",admin,(req,res)=>{
  visits:db.prepare("SELECT COUNT(*) c FROM site_visits").get().c,
  employees:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
  attendance:{total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
+ units:{total:totalUnits,available:umap.available||0,blocked:umap.blocked||0,sold:umap.sold||0},
+ bookings:bookingCount,
+ followUpsToday,
+ overdueLeads,
  recent
 }});
 });

@@ -767,6 +767,353 @@ textarea {
 }
 @keyframes toastSlide { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+/* ─── ENTERPRISE PROPTECH & KANBAN PIPELINE ─── */
+.speed-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #080b0f 0%, #1e293b 100%);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  gap: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(8, 11, 15, 0.12);
+}
+.speed-alert-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.speed-badge {
+  background: #f43f5e;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+#speedAlertText {
+  color: #0f172a;
+}
+
+.view-switcher-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  background: #ffffff;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(8, 11, 15, 0.03);
+}
+.view-switch-btns {
+  display: inline-flex;
+  background: #e2e8f0;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  gap: 2px;
+}
+.view-switch-btn {
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.view-switch-btn.active {
+  background: #080b0f;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(8, 11, 15, 0.2);
+}
+
+.kanban-wrapper {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 18px;
+  scrollbar-width: thin;
+}
+.kanban-col {
+  flex: 0 0 310px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 520px;
+}
+.kanban-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e2e8f0;
+}
+.kanban-col-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kanban-count-badge {
+  background: #e2e8f0;
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.kanban-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(8, 11, 15, 0.04);
+  cursor: pointer;
+  transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.kanban-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(8, 11, 15, 0.09);
+  border-color: rgba(8, 11, 15, 0.18);
+}
+.kanban-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.kanban-card-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.kanban-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+.lead-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: .02em;
+}
+.lead-tag.hot { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.lead-tag.warm { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.lead-tag.cold { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+.lead-tag.project { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+.lead-tag.budget { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; font-family: monospace; font-size: 11.5px; }
+
+.kanban-contact-info {
+  font-size: 12px;
+  color: var(--ink-light);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+.kanban-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+.btn-wa {
+  background: #25d366 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  padding: 5px 10px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  text-decoration: none !important;
+}
+.btn-call {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  padding: 5px 10px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  text-decoration: none !important;
+}
+
+/* ─── LEAD 360° SLIDE-OVER DRAWER ─── */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 11, 15, 0.45);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  display: none;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.drawer-backdrop.open {
+  display: block;
+  opacity: 1;
+}
+.lead-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(520px, 100vw);
+  background: #ffffff;
+  z-index: 1000;
+  box-shadow: -12px 0 40px rgba(8, 11, 15, 0.16);
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+.lead-drawer.open {
+  transform: translateX(0);
+}
+.drawer-header {
+  padding: 22px 28px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+}
+.drawer-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  flex: 1;
+}
+.drawer-footer {
+  padding: 18px 28px;
+  border-top: 1px solid var(--line);
+  background: #f8fafc;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.stage-stepper {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 10px;
+  padding: 4px;
+  gap: 2px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+.stepper-step {
+  flex: 1;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 7px 4px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: #64748b;
+  white-space: nowrap;
+  transition: all .15s ease;
+}
+.stepper-step.active {
+  background: #080b0f;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(8, 11, 15, 0.2);
+}
+.stepper-step.passed {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* ─── UNIT INVENTORY MATRIX ─── */
+.unit-matrix {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+.unit-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(8, 11, 15, 0.04);
+  transition: all .2s ease;
+  position: relative;
+}
+.unit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(8, 11, 15, 0.08);
+}
+.unit-card.available { border-top: 4px solid #10b981; }
+.unit-card.blocked { border-top: 4px solid #f59e0b; background: #fffdf7; }
+.unit-card.sold { border-top: 4px solid #64748b; background: #f8fafc; }
+
+.unit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.unit-num {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.unit-type-pill {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.unit-price {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--sky);
+  margin: 6px 0;
+  font-family: monospace;
+}
+.unit-meta {
+  font-size: 12.5px;
+  color: var(--ink-light);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 1200px) {
   .stats { grid-template-columns: repeat(4, 1fr); }
@@ -821,42 +1168,34 @@ textarea {
     <div class="stat"><strong id="users">0</strong>Customers</div>
     <div class="stat"><strong id="enq">0</strong>Enquiries</div>
     <div class="stat"><strong id="leads">0</strong>Leads</div>
-    <div class="stat"><strong id="openLeads">0</strong>Open leads</div>
+    <div class="stat"><strong id="openLeads">0</strong>Open pipeline</div>
     <div class="stat"><strong id="visits">0</strong>Site visits</div>
-    <div class="stat"><strong id="employees">0</strong>Team</div>
+    <div class="stat"><strong id="statUnits">38</strong>Total units</div>
+    <div class="stat"><strong id="statAvailable">21</strong>Available units</div>
+    <div class="stat"><strong id="statSold">8</strong>Sold / Booked</div>
+    <div class="stat"><strong id="statBookings">1</strong>Bookings</div>
+    <div class="stat"><strong id="employees">0</strong>Team active</div>
     <div class="stat"><strong id="projects">0</strong>Active projects</div>
-    <div class="stat"><strong id="new">0</strong>New enquiries</div>
+    <div class="stat"><strong id="new">0</strong>New today</div>
   </div>
 
-  <!-- COMMAND CENTER HERO -->
-  <div class="dashboard-hero">
-    <div class="hero-card">
-      <span class="section-kicker">Command Center</span>
-      <h2>Everything important, at a glance.</h2>
-      <p>Track customers, leads, projects, site visits and team attendance without leaving the dashboard.</p>
-      <div class="attendance-mini">
-        <div><strong id="attPresent">0</strong>Present</div>
-        <div><strong id="attAbsent">0</strong>Absent</div>
-        <div><strong id="attLeave">0</strong>Leave</div>
-        <div><strong id="attHalf">0</strong>Half day</div>
-      </div>
+  <!-- SPEED-TO-LEAD ACTION PULSE BANNER -->
+  <div id="speedAlertBanner" class="speed-alert-banner">
+    <div class="speed-alert-content">
+      <span class="speed-badge">ACTION PULSE</span>
+      <span id="speedAlertText" style="font-weight:600; font-size:13.5px;">All leads and follow-ups are synchronized with database.</span>
     </div>
-    <div class="quick-card">
-      <span class="section-kicker">Today</span>
-      <h3 style="margin:3px 0 6px">Quick actions</h3>
-      <div class="quick-stat"><span>Open leads</span><strong id="heroOpenLeads">0</strong></div>
-      <div class="quick-stat"><span>New enquiries</span><strong id="heroNewEnquiries">0</strong></div>
-      <div class="actions">
-        <button class="btn gold" onclick="showView('attendanceView')">Mark attendance</button>
-        <button class="btn" onclick="showView('leadsView')">Open leads</button>
-      </div>
+    <div class="actions">
+      <button class="btn gold" style="font-size:12px; padding:6px 14px;" onclick="showView('leadsView')">Open Pipeline Board →</button>
     </div>
   </div>
 
   <!-- SEGMENTED CONTROL TABS -->
   <div class="tabs">
     <button class="tab active" data-view="overview">Overview</button>
-    <button class="tab" data-view="leadsView">Leads</button>
+    <button class="tab" data-view="leadsView">Lead Pipeline</button>
+    <button class="tab" data-view="unitsView">Unit Inventory</button>
+    <button class="tab" data-view="bookingsView">Bookings & Deals</button>
     <button class="tab" data-view="visitsView">Site visits</button>
     <button class="tab" data-view="projectsView">Projects</button>
     <button class="tab" data-view="teamView">Team</button>
@@ -868,6 +1207,30 @@ textarea {
 
   <!-- OVERVIEW VIEW -->
   <section id="overview" class="view active">
+    <!-- COMMAND CENTER HERO -->
+    <div class="dashboard-hero">
+      <div class="hero-card">
+        <span class="section-kicker">Command Center</span>
+        <h2>Enterprise Real Estate Command Center</h2>
+        <p>Manage prospective buyers, schedule site visits, allocate project units, and record bookings without leaving the dashboard.</p>
+        <div class="attendance-mini">
+          <div><strong id="attPresent">0</strong>Present</div>
+          <div><strong id="attAbsent">0</strong>Absent</div>
+          <div><strong id="attLeave">0</strong>Leave</div>
+          <div><strong id="attHalf">0</strong>Half day</div>
+        </div>
+      </div>
+      <div class="quick-card">
+        <span class="section-kicker">Today</span>
+        <h3 style="margin:3px 0 6px">Quick actions</h3>
+        <div class="quick-stat"><span>Open pipeline leads</span><strong id="heroOpenLeads">0</strong></div>
+        <div class="quick-stat"><span>New enquiries today</span><strong id="heroNewEnquiries">0</strong></div>
+        <div class="actions">
+          <button class="btn gold" onclick="openLeadModal()">+ Register Lead</button>
+          <button class="btn" onclick="showView('unitsView')">Unit Inventory</button>
+        </div>
+      </div>
+    </div>
     <div class="panel">
       <div class="toolbar">
         <div>
@@ -947,60 +1310,213 @@ textarea {
     </div>
   </section>
 
-  <!-- LEADS VIEW -->
+  <!-- LEADS & PIPELINE VIEW -->
   <section id="leadsView" class="view">
+    <!-- View Switcher Toolbar -->
+    <div class="view-switcher-bar">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="view-switch-btns">
+          <button id="viewBtnKanban" class="view-switch-btn active" onclick="switchLeadView('kanban')">⊞ Pipeline Kanban</button>
+          <button id="viewBtnTable" class="view-switch-btn" onclick="switchLeadView('table')">☰ Data Table</button>
+        </div>
+        <select id="leadFilterProject" onchange="renderKanban();" style="max-width:200px; padding:6px 12px; font-size:12.5px;">
+          <option value="">All Projects</option>
+        </select>
+        <select id="leadFilterPriority" onchange="renderKanban();" style="max-width:160px; padding:6px 12px; font-size:12.5px;">
+          <option value="">All Priorities</option>
+          <option value="hot">🔥 Hot Leads</option>
+          <option value="warm">⚡ Warm Leads</option>
+          <option value="cold">❄️ Cold Leads</option>
+        </select>
+        <input id="leadFilterSearch" oninput="renderKanban();" placeholder="Search name, phone, email..." style="max-width:210px; padding:6px 12px; font-size:12.5px;">
+      </div>
+      <div class="actions">
+        <button class="btn primary" onclick="openLeadModal()">+ Register Lead</button>
+        <button class="btn" onclick="refreshLeads()">Refresh Pipeline</button>
+      </div>
+    </div>
+
+    <!-- KANBAN BOARD CONTAINER -->
+    <div id="leadKanbanContainer" class="kanban-wrapper">
+      <!-- 7 Stages: new, contacted, qualified, site_visit, negotiation, won, lost -->
+      <div class="kanban-col" data-stage="new">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title" style="color:#0284c7;"><span style="width:8px; height:8px; border-radius:50%; background:#0284c7; display:inline-block;"></span> New Inquiries</div>
+          <span class="kanban-count-badge" id="badge-new">0</span>
+        </div>
+        <div class="kanban-cards" id="col-new"></div>
+      </div>
+
+      <div class="kanban-col" data-stage="contacted">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title" style="color:#6366f1;"><span style="width:8px; height:8px; border-radius:50%; background:#6366f1; display:inline-block;"></span> Contacted</div>
+          <span class="kanban-count-badge" id="badge-contacted">0</span>
+        </div>
+        <div class="kanban-cards" id="col-contacted"></div>
+      </div>
+
+      <div class="kanban-col" data-stage="qualified">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title" style="color:#8b5cf6;"><span style="width:8px; height:8px; border-radius:50%; background:#8b5cf6; display:inline-block;"></span> Qualified</div>
+          <span class="kanban-count-badge" id="badge-qualified">0</span>
+        </div>
+        <div class="kanban-cards" id="col-qualified"></div>
+      </div>
+
+      <div class="kanban-col" data-stage="site_visit">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title" style="color:#d97706;"><span style="width:8px; height:8px; border-radius:50%; background:#d97706; display:inline-block;"></span> Site Visit</div>
+          <span class="kanban-count-badge" id="badge-site_visit">0</span>
+        </div>
+        <div class="kanban-cards" id="col-site_visit"></div>
+      </div>
+
+      <div class="kanban-col" data-stage="negotiation">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title" style="color:#ea580c;"><span style="width:8px; height:8px; border-radius:50%; background:#ea580c; display:inline-block;"></span> Negotiation</div>
+          <span class="kanban-count-badge" id="badge-negotiation">0</span>
+        </div>
+        <div class="kanban-cards" id="col-negotiation"></div>
+      </div>
+
+      <div class="kanban-col" data-stage="won">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title" style="color:#059669;"><span style="width:8px; height:8px; border-radius:50%; background:#059669; display:inline-block;"></span> Won / Booked</div>
+          <span class="kanban-count-badge" id="badge-won">0</span>
+        </div>
+        <div class="kanban-cards" id="col-won"></div>
+      </div>
+
+      <div class="kanban-col" data-stage="lost">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title" style="color:#64748b;"><span style="width:8px; height:8px; border-radius:50%; background:#64748b; display:inline-block;"></span> Lost</div>
+          <span class="kanban-count-badge" id="badge-lost">0</span>
+        </div>
+        <div class="kanban-cards" id="col-lost"></div>
+      </div>
+    </div>
+
+    <!-- DATA TABLE CONTAINER (TOGGLEABLE) -->
+    <div id="leadTableContainer" style="display:none;">
+      <div class="panel">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0" id="leadFormTitleInline">Add lead</h2>
+            <p class="muted" style="margin-bottom:0">Create a lead manually or edit a website-generated lead. Saved leads appear in the table below.</p>
+          </div>
+          <div class="actions">
+            <button class="btn" type="button" onclick="resetLeadFormInline()">+ New lead</button>
+            <button class="btn" type="button" onclick="refreshLeads()">Refresh saved leads</button>
+          </div>
+        </div>
+        <form id="leadFormInline" class="formgrid" style="margin-top:14px">
+          <input id="leadIdInline" type="hidden">
+          <select id="leadUserInline"><option value="">No linked customer account</option></select>
+          <input id="leadNameInline" required placeholder="Lead/customer name">
+          <input id="leadPhoneInline" placeholder="Phone">
+          <input id="leadEmailInline" type="email" placeholder="Email">
+          <input id="leadSourceInline" placeholder="Source (website, phone, walk-in...)" value="admin">
+          <select id="leadProjectInline"><option value="">No project / General</option></select>
+          <select id="leadStatusInline"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select>
+          <select id="leadEmployeeInline"><option value="">Unassigned</option></select>
+          <input id="leadFollowInline" type="datetime-local">
+          <textarea id="leadNotesInline" class="span2" placeholder="Notes"></textarea>
+          <textarea id="leadLostInline" class="span2" placeholder="Lost reason (optional)"></textarea>
+          <div class="span4 actions">
+            <button class="btn primary" type="submit" id="leadSubmitInline">Save lead</button>
+            <button class="btn" type="button" onclick="resetLeadFormInline()">Clear</button>
+            <span id="leadFormMsgInline" class="muted"></span>
+          </div>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <div>
+            <h2 style="margin:0">Saved leads</h2>
+            <p class="muted" style="margin-bottom:0">Saved records are read-only here. Use Edit to load a lead into the form above, or click on any row in the Kanban pipeline to open the 360° Drawer.</p>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Lead</th>
+              <th>Customer</th>
+              <th>Project</th>
+              <th>Status</th>
+              <th>Assigned</th>
+              <th>Follow-up</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leadRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- UNIT INVENTORY VIEW -->
+  <section id="unitsView" class="view">
     <div class="panel">
       <div class="toolbar">
         <div>
-          <h2 style="margin:0" id="leadFormTitleInline">Add lead</h2>
-          <p class="muted" style="margin-bottom:0">Create a lead manually or edit a website-generated lead. Saved leads appear in the table below.</p>
+          <h2 style="margin:0">Unit Inventory Matrix</h2>
+          <p class="muted" style="margin-bottom:0">Real-time asset availability across all developer projects. Track units available, held on token, or sold.</p>
         </div>
         <div class="actions">
-          <button class="btn" type="button" onclick="resetLeadFormInline()">+ New lead</button>
-          <button class="btn" type="button" onclick="refreshLeads()">Refresh saved leads</button>
+          <button class="btn primary" onclick="openUnitModal()">+ Add New Unit</button>
+          <button class="btn" onclick="loadUnits()">Refresh Inventory</button>
         </div>
       </div>
-      <form id="leadFormInline" class="formgrid" style="margin-top:14px">
-        <input id="leadIdInline" type="hidden">
-        <select id="leadUserInline"><option value="">No linked customer account</option></select>
-        <input id="leadNameInline" required placeholder="Lead/customer name">
-        <input id="leadPhoneInline" placeholder="Phone">
-        <input id="leadEmailInline" type="email" placeholder="Email">
-        <input id="leadSourceInline" placeholder="Source (website, phone, walk-in...)" value="admin">
-        <select id="leadProjectInline"><option value="">No project / General</option></select>
-        <select id="leadStatusInline"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select>
-        <select id="leadEmployeeInline"><option value="">Unassigned</option></select>
-        <input id="leadFollowInline" type="datetime-local">
-        <textarea id="leadNotesInline" class="span2" placeholder="Notes"></textarea>
-        <textarea id="leadLostInline" class="span2" placeholder="Lost reason (optional)"></textarea>
-        <div class="span4 actions">
-          <button class="btn primary" type="submit" id="leadSubmitInline">Save lead</button>
-          <button class="btn" type="button" onclick="resetLeadFormInline()">Clear</button>
-          <span id="leadFormMsgInline" class="muted"></span>
+      <div class="toolbar" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <select id="unitFilterProject" onchange="renderUnits()" style="max-width:240px;"><option value="">All Projects</option></select>
+          <select id="unitFilterStatus" onchange="renderUnits()" style="max-width:180px;">
+            <option value="">All Statuses</option>
+            <option value="available">Available (Open for sale)</option>
+            <option value="blocked">Blocked (Token Held)</option>
+            <option value="sold">Sold (Booked)</option>
+          </select>
+          <input id="unitFilterSearch" oninput="renderUnits()" placeholder="Search unit #, type or buyer..." style="max-width:240px;">
         </div>
-      </form>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span class="pill" id="unitsSummaryTotal">38 Units</span>
+          <span class="pill" id="unitsSummaryAvail" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;">21 Available</span>
+          <span class="pill" id="unitsSummaryBlocked" style="background:#fffbeb; color:#d97706; border:1px solid #fde68a;">9 Blocked</span>
+          <span class="pill" id="unitsSummarySold" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;">8 Sold</span>
+        </div>
+      </div>
+      <div id="unitGrid" class="unit-matrix"></div>
     </div>
+  </section>
+
+  <!-- BOOKINGS & SALES VIEW -->
+  <section id="bookingsView" class="view">
     <div class="panel">
       <div class="toolbar">
         <div>
-          <h2 style="margin:0">Saved leads</h2>
-          <p class="muted" style="margin-bottom:0">Saved records are read-only here. Use Edit to load a lead into the form above.</p>
+          <h2 style="margin:0">Bookings & Sales Closures</h2>
+          <p class="muted" style="margin-bottom:0">Official real estate allotment records, booking tokens, agreement values and payment milestones.</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" onclick="openBookingModal()">+ New Booking</button>
+          <button class="btn" onclick="loadBookings()">Refresh Bookings</button>
         </div>
       </div>
       <table>
         <thead>
           <tr>
-            <th>Lead</th>
+            <th>Booking Ref</th>
             <th>Customer</th>
-            <th>Project</th>
-            <th>Status</th>
-            <th>Assigned</th>
-            <th>Follow-up</th>
-            <th>Notes</th>
+            <th>Project & Unit</th>
+            <th>Agreement Value</th>
+            <th>Token Received</th>
+            <th>Payment Status</th>
+            <th>Deal Status</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="leadRows"></tbody>
+        <tbody id="bookingRows"></tbody>
       </table>
     </div>
   </section>
@@ -1404,114 +1920,1825 @@ textarea {
   </div>
 </div>
 
+<!-- UNIT INVENTORY MODAL -->
+<div id="unitModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="unitModalTitle">Add Project Unit</h2>
+      <button class="btn" onclick="closeModal('unitModal')">Close</button>
+    </div>
+    <form id="unitForm" class="formgrid">
+      <input id="unitId" type="hidden">
+      <label class="span2"><b>Project</b>
+        <select id="unitProject" required style="margin-top:4px;"></select>
+      </label>
+      <label><b>Unit Number / Flat / Villa #</b>
+        <input id="unitNumber" required placeholder="e.g. Villa 104, Flat A-302" style="margin-top:4px;">
+      </label>
+      <label><b>Configuration / Type</b>
+        <input id="unitType" placeholder="e.g. 3 BHK Luxury, 4 BHK Villa, Commercial" value="3 BHK Luxury" style="margin-top:4px;">
+      </label>
+      <label><b>Floor Number</b>
+        <input id="unitFloor" type="number" value="1" style="margin-top:4px;">
+      </label>
+      <label><b>Area (Super Built-up sq.ft.)</b>
+        <input id="unitArea" type="number" value="1850" style="margin-top:4px;">
+      </label>
+      <label class="span2"><b>Price / Agreement Base</b>
+        <input id="unitPrice" placeholder="e.g. ₹85,00,000" style="margin-top:4px;">
+      </label>
+      <label class="span2"><b>Inventory Status</b>
+        <select id="unitStatus" style="margin-top:4px;">
+          <option value="available">🟢 Available (Open for Sale)</option>
+          <option value="blocked">🟡 Blocked (Token Advance Held)</option>
+          <option value="sold">🔴 Sold (Booked / Registered)</option>
+        </select>
+      </label>
+      <label><b>Buyer Name (if held/sold)</b>
+        <input id="unitBuyerName" placeholder="Customer name" style="margin-top:4px;">
+      </label>
+      <label><b>Buyer Phone</b>
+        <input id="unitBuyerPhone" placeholder="Customer phone" style="margin-top:4px;">
+      </label>
+      <label class="span4"><b>Unit Notes / Specifications</b>
+        <textarea id="unitNotes" placeholder="Facing, balcony view, parking allotment..." style="margin-top:4px;"></textarea>
+      </label>
+      <div class="span4 actions">
+        <button class="btn primary" type="submit" id="unitSubmit">Save Unit</button>
+        <button class="btn" type="button" onclick="closeModal('unitModal')">Cancel</button>
+        <span id="unitMsg" class="muted"></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- BOOKINGS MODAL -->
+<div id="bookingModal" class="modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="bookingModalTitle">Create Official Real Estate Booking</h2>
+      <button class="btn" onclick="closeModal('bookingModal')">Close</button>
+    </div>
+    <form id="bookingForm" class="formgrid">
+      <input id="bookingId" type="hidden">
+      <input id="bookingLeadId" type="hidden">
+      <label class="span2"><b>Project</b>
+        <select id="bookingProject" required style="margin-top:4px;"></select>
+      </label>
+      <label class="span2"><b>Allotted Unit / Villa</b>
+        <select id="bookingUnitSelect" style="margin-top:4px;"><option value="">Select available unit</option></select>
+      </label>
+      <label class="span2"><b>Customer Full Name</b>
+        <input id="bookingCustName" required placeholder="Full legal name" style="margin-top:4px;">
+      </label>
+      <label><b>Customer Phone</b>
+        <input id="bookingCustPhone" required placeholder="Phone number" style="margin-top:4px;">
+      </label>
+      <label><b>Customer Email</b>
+        <input id="bookingCustEmail" type="email" placeholder="Email address" style="margin-top:4px;">
+      </label>
+      <label><b>Total Agreement Value</b>
+        <input id="bookingAgreementVal" placeholder="e.g. ₹85,00,000" style="margin-top:4px;">
+      </label>
+      <label><b>Token Amount Received</b>
+        <input id="bookingTokenAmt" placeholder="e.g. ₹5,00,000" style="margin-top:4px;">
+      </label>
+      <label><b>Payment Milestone Status</b>
+        <select id="bookingPaymentStatus" style="margin-top:4px;">
+          <option value="token_received">Token Received</option>
+          <option value="agreement_signed">Agreement Signed (20% Paid)</option>
+          <option value="plinth_slab_paid">Plinth / Slab Milestone Paid</option>
+          <option value="completed">100% Fully Paid (Ready for Possession)</option>
+        </select>
+      </label>
+      <label><b>Deal Status</b>
+        <select id="bookingStatus" style="margin-top:4px;">
+          <option value="confirmed">Confirmed Deal</option>
+          <option value="pending">Pending Document Verification</option>
+          <option value="cancelled">Cancelled Deal</option>
+        </select>
+      </label>
+      <label class="span4"><b>Booking Terms & Bank Financing Notes</b>
+        <textarea id="bookingNotes" placeholder="Cheque #, Bank loan approval, registration dates..." style="margin-top:4px;"></textarea>
+      </label>
+      <div class="span4 actions">
+        <button class="btn primary" type="submit" id="bookingSubmit">Confirm & Save Booking</button>
+        <button class="btn" type="button" onclick="closeModal('bookingModal')">Cancel</button>
+        <span id="bookingMsg" class="muted"></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- LEAD 360° SLIDE-OVER DRAWER -->
+<div id="drawerBackdrop" class="drawer-backdrop" onclick="closeLeadDrawer()"></div>
+<div id="leadDrawer" class="lead-drawer">
+  <div class="drawer-header">
+    <div>
+      <span class="section-kicker" id="drawerLeadSource">WEBSITE LEAD</span>
+      <h2 id="drawerLeadName" style="margin:2px 0 0; font-size:20px; color:var(--ink);">Lead Details</h2>
+    </div>
+    <button class="btn smallbtn" onclick="closeLeadDrawer()" style="font-size:16px;">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div style="font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#475569; margin-bottom:6px;">SALES PIPELINE PROGRESS</div>
+    <div class="stage-stepper" id="drawerStageStepper"></div>
+
+    <div style="display:flex; gap:8px; margin:16px 0; flex-wrap:wrap;">
+      <a id="drawerWaBtn" href="#" target="_blank" class="btn btn-wa">💬 WhatsApp Lead</a>
+      <a id="drawerCallBtn" href="#" class="btn btn-call">📞 Call Directly</a>
+      <button class="btn smallbtn" onclick="openVisitFromDrawer()">📅 Schedule Visit</button>
+    </div>
+
+    <form id="drawerForm" class="formgrid" style="margin-top:16px;">
+      <input type="hidden" id="drawerLeadId">
+      <label class="span2"><b>Customer Name</b>
+        <input id="drawerName" required style="margin-top:4px;">
+      </label>
+      <label><b>Phone</b>
+        <input id="drawerPhone" style="margin-top:4px;">
+      </label>
+      <label><b>Email</b>
+        <input id="drawerEmail" type="email" style="margin-top:4px;">
+      </label>
+      <label><b>Project Interest</b>
+        <select id="drawerProject" style="margin-top:4px;"></select>
+      </label>
+      <label><b>Buyer Budget</b>
+        <input id="drawerBudget" placeholder="e.g. ₹85 Lakhs" style="margin-top:4px;">
+      </label>
+      <label><b>Priority / Sentiment</b>
+        <select id="drawerSentiment" style="margin-top:4px;">
+          <option value="hot">🔥 Hot (High Purchase Intent)</option>
+          <option value="warm">⚡ Warm (Engaged & Responsive)</option>
+          <option value="cold">❄️ Cold (Nurturing / Long-term)</option>
+        </select>
+      </label>
+      <label><b>Assigned Executive</b>
+        <select id="drawerEmployee" style="margin-top:4px;"></select>
+      </label>
+      <label class="span2"><b>Next Follow-Up Date & Time</b>
+        <input id="drawerFollowUp" type="datetime-local" style="margin-top:4px;">
+      </label>
+      <label class="span4"><b>Lead Interaction Notes</b>
+        <textarea id="drawerNotes" style="min-height:90px; margin-top:4px;"></textarea>
+      </label>
+      <label class="span4"><b>Lost Reason (if disqualified)</b>
+        <input id="drawerLostReason" placeholder="e.g. Budget mismatch, bought in another project" style="margin-top:4px;">
+      </label>
+    </form>
+  <div class="drawer-footer">
+    <button class="btn primary" onclick="saveLeadFromDrawer()">Save Changes</button>
+    <button class="btn gold" onclick="createBookingFromDrawer()">Convert to Booking →</button>
+    <button class="btn" onclick="closeLeadDrawer()">Close</button>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
-<!-- CRM CLIENT SCRIPTS (100% PRESERVED LOGIC) -->
+<!-- CRM CLIENT SCRIPTS -->
 <script>
-const $=id=>document.getElementById(id);const state={employees:[],projects:[],customers:[]};
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function escAttr(s){return esc(s)}
-function localDate(v){if(!v)return '—';try{return new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(v))}catch{return esc(v)}}
-function toast(msg){$('toast').textContent=msg;$('toast').style.display='block';clearTimeout(window._toast);window._toast=setTimeout(()=>$('toast').style.display='none',3200)}
-async function get(url){const r=await fetch(url,{credentials:'include',cache:'no-store'});const d=await r.json().catch(()=>({success:false,error:'Invalid server response'}));if(!r.ok||d.success===false)throw new Error(d.error||'Request failed');return d}
-async function send(url,opt={}){const r=await fetch(url,{credentials:'include',...opt});const d=await r.json().catch(()=>({success:false,error:'Invalid server response'}));if(!r.ok||d.success===false)throw new Error(d.error||'Request failed');return d}
-function showView(id){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.view===id));const view=$(id);view.classList.add('active');const tabs=document.querySelector('.tabs');if(id!=='overview'){requestAnimationFrame(()=>tabs.scrollIntoView({behavior:'smooth',block:'start'}));}}
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{showView(b.dataset.view);if(b.dataset.view==='reportsView')loadReports();if(b.dataset.view==='auditView')loadAudit();if(b.dataset.view==='customersView')loadCustomers();if(b.dataset.view==='leadsView')loadLeads();if(b.dataset.view==='visitsView')loadVisits();if(b.dataset.view==='teamView')loadTeam();if(b.dataset.view==='attendanceView')loadAttendance();if(b.dataset.view==='projectsView')loadProjects()});
-function closeModal(id){$(id).classList.remove('open')}
-function openModal(id){$(id).classList.add('open')}
-async function load(){const d=await get('/api/admin/dashboard');$('users').textContent=d.stats.users;$('enq').textContent=d.stats.enquiries;$('new').textContent=d.stats.newEnquiries;$('leads').textContent=d.stats.leads;$('openLeads').textContent=d.stats.openLeads;$('visits').textContent=d.stats.visits;$('employees').textContent=d.stats.employees;$('projects').textContent=d.stats.projects;$('heroOpenLeads').textContent=d.stats.openLeads;$('heroNewEnquiries').textContent=d.stats.newEnquiries;$('attPresent').textContent=d.stats.attendance.present;$('attAbsent').textContent=d.stats.attendance.absent;$('attLeave').textContent=d.stats.attendance.leave;$('attHalf').textContent=d.stats.attendance.half_day;renderRecentActivity(d.stats.recent);if($('teamSnapshotText'))$('teamSnapshotText').textContent=`${d.stats.attendance.present} present · ${d.stats.attendance.absent} absent · ${d.stats.attendance.leave} on leave · ${d.stats.attendance.half_day} half day`;try{const [t]=await Promise.all([get('/api/admin/employees')]);state.employees=t.data;fillAttendanceEmployeeSelect();}catch(e){}await Promise.all([loadEnquiries(),loadTeam(),loadCustomers(),loadProjects()]);await loadLeads();await loadVisits()}
-async function refreshAll(){try{await load();toast('Dashboard refreshed')}catch(e){toast(e.message)}}
-function openEnquiryModal(){fillProjectSelect('enquiryProject');fillUserSelect('enquiryUser');$('enquiryForm').reset();openModal('enquiryModal')}
-$('enquiryForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/enquiries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('enquiryName').value,phone:$('enquiryPhone').value,email:$('enquiryEmail').value,project_id:$('enquiryProject').value||null,user_id:$('enquiryUser').value||null,status:$('enquiryStatus').value,message:$('enquiryMessage').value})});closeModal('enquiryModal');toast('Enquiry created');await loadEnquiries();await loadLeads()}catch(err){toast(err.message)}};
-async function loadEnquiries(){try{const d=await get('/api/admin/enquiries');$('rows').innerHTML=d.data.length?d.data.map(x=>`<tr><td><b>${esc(x.enquiry_reference||('ENQ-'+x.id))}</b></td><td>${localDate(x.created_at)}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}<br>${esc(x.email)}</td><td>${esc(x.message)}</td><td>${esc(x.project_name||'General')}</td><td><select data-enq-status="${x.id}"><option ${x.status==='new'?'selected':''}>new</option><option ${x.status==='contacted'?'selected':''}>contacted</option><option ${x.status==='closed'?'selected':''}>closed</option></select></td><td><textarea data-enq-response="${x.id}">${esc(x.admin_response||'')}</textarea><button class="btn smallbtn" onclick="saveEnquiry(${x.id})">Save</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No enquiries yet.</td></tr>'}catch(e){toast(e.message)}}
-async function saveEnquiry(id){try{await send('/api/admin/enquiries/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:document.querySelector(`[data-enq-status="${id}"]`).value,admin_response:document.querySelector(`[data-enq-response="${id}"]`).value})});toast('Enquiry saved');loadEnquiries();loadLeads()}catch(e){toast(e.message)}}
-function fillProjectSelect(id,includeGeneral=true){const el=$(id);el.innerHTML=(includeGeneral?'<option value="">No project / General</option>':'<option value="">Select project</option>')+state.projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}
-function fillUserSelect(id){$(id).innerHTML='<option value="">No linked customer account</option>'+state.customers.filter(x=>x.role==='customer').map(u=>`<option value="${u.id}">${esc(u.name)} · ${esc(u.email||u.phone)}</option>`).join('')}
-function fillEmployeeSelect(id){$(id).innerHTML='<option value="">Unassigned</option>'+state.employees.filter(x=>x.status==='active').map(e=>`<option value="${e.id}">${esc(e.name)} · ${esc(e.employee_code)}</option>`).join('')}
-async function loadLeads(){try{const d=await get('/api/admin/leads');$('leadRows').innerHTML=d.data.length?d.data.map(x=>`<tr><td><b>#${x.id}</b><br><span class="small">${localDate(x.created_at)}<br>${esc(x.source||'')}</span></td><td>${esc(x.name)}<br>${esc(x.phone)}<br>${esc(x.email)}</td><td>${esc(x.project_name||'General')}</td><td><select id="ls${x.id}">${['new','contacted','qualified','site_visit','negotiation','won','lost'].map(v=>`<option ${x.status===v?'selected':''}>${v}</option>`).join('')}</select></td><td><select id="le${x.id}"><option value="">Unassigned</option>${state.employees.filter(e=>e.status==='active').map(e=>`<option value="${e.id}" ${Number(x.assigned_employee_id)===Number(e.id)?'selected':''}>${esc(e.name)} · ${esc(e.employee_code)}</option>`).join('')}</select></td><td><input id="lf${x.id}" type="datetime-local" value="${x.follow_up_at?new Date(x.follow_up_at).toISOString().slice(0,16):''}"></td><td><textarea id="ln${x.id}">${esc(x.notes||'')}</textarea></td><td class="actions"><button class="btn smallbtn" onclick="saveLead(${x.id})">Save</button><button class="btn smallbtn" onclick="editLead(${x.id})">Edit</button><button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No leads yet. Use + Add lead to create one manually, or submit an enquiry from the website.</td></tr>'}catch(e){toast(e.message)}}
-async function saveLead(id){try{await send('/api/admin/leads/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:$('ls'+id).value,assigned_employee_id:$('le'+id).value||null,follow_up_at:$('lf'+id).value||null,notes:$('ln'+id).value,lost_reason:''})});toast('Lead updated');loadLeads()}catch(e){toast(e.message)}}
-async function editLead(id){try{const d=await get('/api/admin/leads');const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;openLeadModal(x)}catch(e){toast(e.message)}}
-function openLeadModal(x=null){fillProjectSelect('leadProject');fillUserSelect('leadUser');fillEmployeeSelect('leadEmployee');$('leadForm').reset();$('leadId').value='';$('leadSource').value='admin';if(x){$('leadModalTitle').textContent='Edit lead';$('leadId').value=x.id;$('leadName').value=x.name||'';$('leadPhone').value=x.phone||'';$('leadEmail').value=x.email||'';$('leadSource').value=x.source||'admin';$('leadProject').value=x.project_id||'';$('leadUser').value=x.user_id||'';$('leadStatus').value=x.status||'new';$('leadEmployee').value=x.assigned_employee_id||'';$('leadFollow').value=x.follow_up_at?new Date(x.follow_up_at).toISOString().slice(0,16):'';$('leadNotes').value=x.notes||'';$('leadLost').value=x.lost_reason||''}else $('leadModalTitle').textContent='Add lead';openModal('leadModal')}
-$('leadForm').onsubmit=async e=>{e.preventDefault();const id=$('leadId').value;const body={name:$('leadName').value,phone:$('leadPhone').value,email:$('leadEmail').value,source:$('leadSource').value,status:$('leadStatus').value,project_id:$('leadProject').value||null,user_id:$('leadUser').value||null,assigned_employee_id:$('leadEmployee').value||null,follow_up_at:$('leadFollow').value||null,notes:$('leadNotes').value,lost_reason:$('leadLost').value};try{if(id)await send('/api/admin/leads/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});else await send('/api/admin/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});closeModal('leadModal');toast(id?'Lead updated':'Lead created');await loadLeads()}catch(err){toast(err.message)}};
-async function deleteLead(id){if(!confirm('Delete this lead? This cannot be undone.'))return;try{await send('/api/admin/leads/'+id,{method:'DELETE'});toast('Lead deleted');loadLeads()}catch(e){toast(e.message)}}
+const $ = id => document.getElementById(id);
+const state = {
+  employees: [],
+  projects: [],
+  customers: [],
+  leads: [],
+  units: [],
+  bookings: [],
+  currentDrawerLead: null,
+  leadViewMode: 'kanban'
+};
 
-function editVisit(id){get('/api/admin/site-visits').then(d=>{const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;fillProjectSelect('visitProjectInline');fillUserSelect('visitUserInline');$('visitIdInline').value=x.id;$('visitUserInline').value=x.user_id||'';$('visitNameInline').value=x.name||'';$('visitPhoneInline').value=x.phone||'';$('visitEmailInline').value=x.email||'';$('visitProjectInline').value=x.project_id||'';$('visitPreferredInline').value=x.preferred_at?new Date(x.preferred_at).toISOString().slice(0,16):'';$('visitStatusInline').value=x.status||'requested';$('visitNotesInline').value=x.notes||'';$('visitAdminInline').value=x.admin_notes||'';$('visitFormTitle').textContent='Edit site visit';$('visitSubmit').textContent='Save changes';$('visitFormMsg').textContent='Editing visit #'+x.id;document.getElementById('visitsView').scrollIntoView({behavior:'smooth',block:'start'});$('visitNameInline').focus()}).catch(e=>toast(e.message))}
-$('visitFormInline').onsubmit=async e=>{e.preventDefault();const id=$('visitIdInline').value;const body={name:$('visitNameInline').value,phone:$('visitPhoneInline').value,email:$('visitEmailInline').value,project_id:$('visitProjectInline').value||null,user_id:$('visitUserInline').value||null,status:$('visitStatusInline').value,preferred_at:$('visitPreferredInline').value,notes:$('visitNotesInline').value,admin_notes:$('visitAdminInline').value};try{const d=id?await send('/api/admin/site-visits/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}):await send('/api/admin/site-visits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});resetVisitForm();await loadVisits();toast(id?'Site visit updated successfully':'Site visit created successfully')}catch(err){$('visitFormMsg').textContent=err.message;toast(err.message)}};
-$('visitUserInline').onchange=()=>{const id=$('visitUserInline').value;if(!id)return;const u=state.customers.find(x=>Number(x.id)===Number(id));if(!u)return;$('visitNameInline').value=u.name||'';$('visitPhoneInline').value=u.phone||'';$('visitEmailInline').value=u.email||''};
-async function deleteVisit(id){if(!confirm('Delete this site visit?'))return;try{await send('/api/admin/site-visits/'+id,{method:'DELETE'});toast('Site visit deleted');loadVisits()}catch(e){toast(e.message)}}
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, m => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[m]));
+}
 
-async function loadProjects(){try{const d=await get('/api/admin/projects');state.projects=d.data;$('projectRows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.description)}</span></td><td>${esc(x.category)}</td><td><span class="pill">${esc(x.status)}</span></td><td>${x.media_count||0} file(s)</td><td class="actions"><button class="btn smallbtn" onclick="editProject(${x.id})">Edit</button><button class="btn smallbtn" onclick="openMedia(${x.id})">Media</button><button class="btn smallbtn" onclick="toggleProject(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Deactivate':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteProject(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('')}catch(e){toast(e.message)}}
-function resetProjectForm(){$('pId').value='';$('pName').value='';$('pCategory').value='';$('pStatus').value='active';$('pLocation').value='';$('pPrice').value='';$('pAmenities').value='';$('pImage').value='';$('pDescription').value='';$('pImageFile').value='';$('projectMsg').textContent=''}
-function editProject(id){const x=state.projects.find(p=>Number(p.id)===Number(id));if(!x)return;showView('projectsView');$('pId').value=x.id;$('pName').value=x.name;$('pCategory').value=x.category;$('pStatus').value=x.status;$('pLocation').value=x.location||'';$('pPrice').value=x.price||'';$('pAmenities').value=x.amenities||'';$('pImage').value=x.image||'';$('pDescription').value=x.description||'';window.scrollTo({top:0,behavior:'smooth'})}
-$('projectForm').onsubmit=async e=>{e.preventDefault();const fd=new FormData();[['pName','name'],['pCategory','category'],['pStatus','status'],['pLocation','location'],['pPrice','price'],['pAmenities','amenities'],['pImage','image'],['pDescription','description']].forEach(([id,k])=>fd.append(k,$(id).value));if($('pImageFile').files[0])fd.append('image_file',$('pImageFile').files[0]);const id=$('pId').value;try{await send(id?'/api/admin/projects/'+id:'/api/admin/projects',{method:id?'PUT':'POST',body:fd});toast(id?'Project updated':'Project created');resetProjectForm();loadProjects()}catch(err){toast(err.message)}};
-async function toggleProject(id,status){try{await send('/api/admin/projects/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:status==='active'?'inactive':'active'})});toast('Project status updated');loadProjects()}catch(e){toast(e.message)}}
-async function deleteProject(id,name){if(!confirm(`Permanently delete ${name}?`))return;if(!confirm('This also removes its media and cannot be undone. Continue?'))return;try{await send('/api/admin/projects/'+id,{method:'DELETE'});toast('Project deleted');loadProjects()}catch(e){toast(e.message)}}
+function escAttr(s) {
+  return esc(s);
+}
 
-let mediaProject=null;
-async function openMedia(id){mediaProject=id;const p=state.projects.find(x=>Number(x.id)===Number(id));$('mediaManager').style.display='block';$('mediaTitle').textContent='Media — '+(p?.name||'Project');await loadMedia();$('mediaManager').scrollIntoView({behavior:'smooth'})}
-$('closeMedia').onclick=()=>{$('mediaManager').style.display='none';mediaProject=null;$('mediaGrid').innerHTML=''};
-async function loadMedia(){try{const d=await get('/api/admin/projects/'+mediaProject+'/media');$('mediaGrid').innerHTML=d.data.map(x=>`<div class="media-card">${x.is_cover?'<b style="display:block;margin-bottom:4px;color:var(--sky);">Cover image</b>':''}${x.media_type==='video'?`<video controls src="${escAttr(x.file_path)}"></video>`:`<img src="${escAttr(x.file_path)}" loading="lazy">`}<div class="small" style="margin-top:6px;">${esc(x.original_name)} · ${Math.round(x.file_size/1024/1024*10)/10} MB</div><div class="actions" style="margin-top:8px;">${x.media_type==='image'&&!x.is_cover?`<button class="btn smallbtn" onclick="setCover(${x.id})">Set cover</button>`:''}<button class="btn smallbtn danger" onclick="deleteMedia(${x.id})">Delete</button></div></div>`).join('')||'<p class="muted">No media.</p>'}catch(e){toast(e.message)}}
-$('uploadMedia').onclick=async()=>{const files=[...$('mediaFiles').files];if(!mediaProject||!files.length)return toast('Choose media first');const fd=new FormData();files.forEach(f=>fd.append('media',f));$('uploadMedia').disabled=true;try{await send('/api/admin/projects/'+mediaProject+'/media',{method:'POST',body:fd});$('mediaFiles').value='';toast('Media uploaded');await loadMedia();loadProjects()}catch(e){toast(e.message)}finally{$('uploadMedia').disabled=false}};
-async function setCover(id){try{await send(`/api/admin/projects/${mediaProject}/media/${id}/cover`,{method:'PATCH'});toast('Cover updated');loadMedia();loadProjects()}catch(e){toast(e.message)}}
-async function deleteMedia(id){if(!confirm('Delete this media?'))return;try{await send(`/api/admin/projects/${mediaProject}/media/${id}`,{method:'DELETE'});toast('Media deleted');loadMedia();loadProjects()}catch(e){toast(e.message)}}
+function localDate(v) {
+  if (!v) return '—';
+  try {
+    return new Intl.DateTimeFormat('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      timeZone: 'Asia/Kolkata'
+    }).format(new Date(v));
+  } catch {
+    return esc(v);
+  }
+}
 
-function resetTeamForm(){$('tId').value='';$('tName').value='';$('tEmail').value='';$('tPhone').value='';$('tDepartment').value='';$('tDesignation').value='';$('tPassword').value='';$('teamSubmit').textContent='Create team account';$('teamMsg').textContent=''}
-$('teamForm').onsubmit=async e=>{e.preventDefault();const id=$('tId').value;const body={name:$('tName').value,email:$('tEmail').value,phone:$('tPhone').value,department:$('tDepartment').value,designation:$('tDesignation').value};try{if(id){await send('/api/admin/employees/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('Team member updated')}else{body.password=$('tPassword').value;await send('/api/admin/employees',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});toast('Team account created')}resetTeamForm();loadTeam();loadLeads()}catch(err){$('teamMsg').textContent=err.message;toast(err.message)}};
-async function loadTeam(){try{const d=await get('/api/admin/employees');state.employees=d.data;$('teamRows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Deactivate':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No team members yet.</td></tr>'}catch(e){toast(e.message)}}
-async function editTeam(id){const d=await get('/api/admin/employees');const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;$('tId').value=x.id;$('tName').value=x.name||'';$('tEmail').value=x.email||'';$('tPhone').value=x.phone||'';$('tDepartment').value=x.department||'';$('tDesignation').value=x.designation||'';$('tPassword').value='';$('teamSubmit').textContent='Save team member';$('teamMsg').textContent='Editing '+x.name;showView('teamView');window.scrollTo({top:0,behavior:'smooth'})}
-async function toggleEmployee(id,status){try{await send('/api/admin/employees/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:status==='active'?'inactive':'active'})});toast('Team status updated');loadTeam();loadLeads()}catch(e){toast(e.message)}}
-async function deleteEmployee(id,name){if(!confirm(`Delete ${name}?`))return;try{await send('/api/admin/employees/'+id,{method:'DELETE'});toast('Team member deleted');loadTeam();loadLeads()}catch(e){toast(e.message)}}
+function toast(msg) {
+  const el = $('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(window._toast);
+  window._toast = setTimeout(() => el.style.display = 'none', 3200);
+}
 
-function openPassword(id){$('passwordEmployeeId').value=id;$('newTeamPassword').value='';openModal('passwordModal')}
-$('passwordForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/employees/'+$('passwordEmployeeId').value+'/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('newTeamPassword').value})});closeModal('passwordModal');toast('Password reset successfully')}catch(err){toast(err.message)}};
+async function get(url) {
+  const r = await fetch(url, { credentials: 'include', cache: 'no-store' });
+  const d = await r.json().catch(() => ({ success: false, error: 'Invalid server response' }));
+  if (!r.ok || d.success === false) throw new Error(d.error || 'Request failed');
+  return d;
+}
 
-async function loadCustomers(){try{const d=await get('/api/admin/users');state.customers=d.data;$('urows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}</td><td>${esc(x.phone)}</td><td><span class="pill">${esc(x.role)}</span></td><td><span class="pill">${esc(x.status)}</span></td><td>${localDate(x.created_at)}</td><td class="actions">${x.role==='customer'?`<button class="btn smallbtn" onclick="openCustomer(${x.id})">View</button><button class="btn smallbtn" onclick="editCustomer(${x.id})">Edit</button><button class="btn smallbtn" onclick="toggleUser(${x.id},'${escAttr(x.status)}')">${x.status==='active'?'Suspend':'Activate'}</button><button class="btn smallbtn danger" onclick="deleteCustomer(${x.id},'${escAttr(x.name)}')">Delete</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">No customers yet.</td></tr>'}catch(e){toast(e.message)}}
-function editCustomer(id){const x=state.customers.find(v=>Number(v.id)===Number(id));if(!x)return;const content=`<form id="customerEditForm" class="formgrid"><input type="hidden" id="ceId" value="${x.id}"><input id="ceName" required value="${escAttr(x.name)}" placeholder="Name"><input id="ceEmail" type="email" value="${escAttr(x.email)}" placeholder="Email"><input id="cePhone" value="${escAttr(x.phone)}" placeholder="Phone"><div class="span4 actions"><button class="btn primary" type="submit">Save customer</button><button class="btn" type="button" onclick="closeModal('customerModal')">Cancel</button></div></form>`;$('customerContent').innerHTML=content;openModal('customerModal');$('customerEditForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/users/'+x.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:$('ceName').value,email:$('ceEmail').value,phone:$('cePhone').value})});closeModal('customerModal');toast('Customer updated');loadCustomers()}catch(err){toast(err.message)}}}
-async function openCustomer(id){try{const d=await get('/api/admin/users/'+id),u=d.data.user;$('customerContent').innerHTML=`<div class="notice"><b>${esc(u.name)}</b><br>${esc(u.email)} · ${esc(u.phone)}<br>Status: ${esc(u.status)} · Joined: ${localDate(u.created_at)}</div><div class="history"><div class="box"><h3>Enquiries (${d.data.enquiries.length})</h3>${d.data.enquiries.map(x=>`<p><b>${esc(x.enquiry_reference||'')}</b> · ${esc(x.status)}<br>${esc(x.project_name||'General')}<br>${esc(x.message)}</p>`).join('')||'<p class="muted">None</p>'}</div><div class="box"><h3>Leads (${d.data.leads.length})</h3>${d.data.leads.map(x=>`<p><b>#${x.id}</b> · ${esc(x.status)}<br>${esc(x.project_name||'General')} · ${esc(x.employee_name||'Unassigned')}</p>`).join('')||'<p class="muted">None</p>'}</div><div class="box"><h3>Site visits (${d.data.visits.length})</h3>${d.data.visits.map(x=>`<p>${localDate(x.preferred_at)} · ${esc(x.status)}<br>${esc(x.project_name||'General')}</p>`).join('')||'<p class="muted">None</p>'}</div></div>`;openModal('customerModal')}catch(e){toast(e.message)}}
-async function toggleUser(id,status){if(!confirm(status==='active'?'Suspend this account?':'Activate this account?'))return;try{await send('/api/admin/users/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:status==='active'?'suspended':'active'})});toast('Account updated');loadCustomers()}catch(e){toast(e.message)}}
-async function deleteCustomer(id,name){if(!confirm(`Permanently delete customer ${name}?`))return;if(!confirm('Their historical enquiries/leads/site visits will remain but become unlinked. Continue?'))return;try{await send('/api/admin/users/'+id,{method:'DELETE'});toast('Customer deleted');loadCustomers()}catch(e){toast(e.message)}}
+async function send(url, opt = {}) {
+  const r = await fetch(url, { credentials: 'include', ...opt });
+  const d = await r.json().catch(() => ({ success: false, error: 'Invalid server response' }));
+  if (!r.ok || d.success === false) throw new Error(d.error || 'Request failed');
+  return d;
+}
 
-function bars(el,items,labelKey='status'){const max=Math.max(1,...items.map(x=>Number(x.count)));$(el).innerHTML=items.map(x=>`<div class="bar"><span style="width:140px; font-weight:600;">${esc(x[labelKey])}</span><i style="width:${Math.max(3,Number(x.count)/max*60)}%"></i><b>${x.count}</b></div>`).join('')||'<span class="muted">No data yet.</span>'}
-function renderRecentActivity(items){const el=$('recentActivity');if(!el)return;el.innerHTML=(items||[]).map(x=>`<div class="activity-item"><b>${esc((x.action||'activity').replaceAll('_',' '))} · ${esc(x.entity_type||'')}</b><small>${esc(x.details||'')} · ${localDate(x.created_at)} · ${esc(x.user_name||'System')}</small></div>`).join('')||'<div class="empty">No recent activity yet.</div>'}
-function todayLocal(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
-function fillAttendanceEmployeeSelect(){$('attendanceEmployee').innerHTML='<option value="">Select employee</option>'+state.employees.filter(x=>x.status==='active').map(e=>`<option value="${e.id}">${esc(e.name)} · ${esc(e.employee_code)}</option>`).join('')}
-function resetAttendanceForm(){if(!$('attendanceForm'))return;$('attendanceForm').reset();$('attendanceMsg').textContent='';fillAttendanceEmployeeSelect()}
-async function loadAttendance(){try{if(!$('attendanceDate').value)$('attendanceDate').value=todayLocal();const d=await get('/api/admin/attendance?date='+encodeURIComponent($('attendanceDate').value));$('attendanceRows').innerHTML=d.data.map(x=>`<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.email||'')}</span></td><td><code>${esc(x.employee_code)}</code></td><td>${esc(x.department||'')}</td><td><span class="pill">${esc(x.attendance_status||'not recorded')}</span></td><td>${esc(x.check_in||'—')}</td><td>${esc(x.check_out||'—')}</td><td>${esc(x.notes||'—')}</td><td class="actions">${x.attendance_id?`<button class="btn smallbtn" onclick="editAttendance(${x.id},'${escAttr(x.attendance_status||'present')}','${escAttr(x.check_in||'')}','${escAttr(x.check_out||'')}','${escAttr(x.notes||'')}')">Edit</button><button class="btn smallbtn danger" onclick="deleteAttendance(${x.attendance_id})">Delete</button>`:'<span class="muted">Not recorded</span>'}</td></tr>`).join('')||'<tr><td colspan="8" class="empty">No employees yet.</td></tr>';const total=d.data.filter(x=>x.employee_status==='active').length,recorded=d.data.filter(x=>x.attendance_id).length;$('attendanceSummary').textContent=`${recorded}/${total} active employees recorded`;fillAttendanceEmployeeSelect()}catch(e){toast(e.message)}}
-$('attendanceDate').onchange=loadAttendance;
-$('attendanceForm').onsubmit=async e=>{e.preventDefault();try{await send('/api/admin/attendance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:Number($('attendanceEmployee').value),attendance_date:$('attendanceDate').value,status:$('attendanceStatus').value,check_in:$('attendanceIn').value,check_out:$('attendanceOut').value,notes:$('attendanceNotes').value})});resetAttendanceForm();await loadAttendance();await load();toast('Attendance saved successfully')}catch(err){$('attendanceMsg').textContent=err.message;toast(err.message)}};
-function editAttendance(id,status,cin,cout,notes){$('attendanceEmployee').value=id;$('attendanceStatus').value=status;$('attendanceIn').value=cin;$('attendanceOut').value=cout;$('attendanceNotes').value=notes;showView('attendanceView');window.scrollTo({top:0,behavior:'smooth'});$('attendanceMsg').textContent='Editing attendance for '+(state.employees.find(x=>Number(x.id)===Number(id))?.name||'employee')}
-async function deleteAttendance(id){if(!confirm('Delete this attendance record?'))return;try{await send('/api/admin/attendance/'+id,{method:'DELETE'});await loadAttendance();await load();toast('Attendance record deleted')}catch(e){toast(e.message)}}
-async function refreshAttendance(){resetAttendanceForm();await loadAttendance();toast('Attendance refreshed; form cleared')}
+function showView(id) {
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === id));
+  const view = $(id);
+  if (view) view.classList.add('active');
+}
 
-async function loadReports(){try{const q=new URLSearchParams();if($('reportStart').value)q.set('start',$('reportStart').value);if($('reportEnd').value)q.set('end',$('reportEnd').value);if($('reportStart').value&&$('reportEnd').value&&$('reportStart').value>$('reportEnd').value)return toast('Report start date cannot be after end date');const d=await get('/api/admin/report'+(q.toString()?'?'+q:''));bars('statusChart',d.data.byStatus);bars('projectChart',d.data.byProject,'project_name');bars('monthlyChart',d.data.monthly,'month');bars('visitChart',d.data.visits,'status');$('conversion').textContent=`Won conversion rate: ${d.data.conversionRate}% · Total leads: ${d.data.totalLeads} · Won: ${d.data.won}${d.data.start?' · '+d.data.start+' to '+d.data.end:''}`}catch(e){toast(e.message)}}
-async function loadAudit(){try{const q=new URLSearchParams();if($('auditSearch').value)q.set('search',$('auditSearch').value);if($('auditEntity').value)q.set('entity',$('auditEntity').value);const d=await get('/api/admin/audit-logs'+(q.toString()?'?'+q:''));$('auditRows').innerHTML=d.data.map(x=>`<tr><td>${localDate(x.created_at)}</td><td>${esc(x.user_name||'System')}<br>${esc(x.user_email||'')}</td><td><b>${esc(x.action)}</b></td><td><span class="pill">${esc(x.entity_type)}</span></td><td>#${esc(x.entity_id)}</td><td>${esc(x.details)}</td><td><code>${esc(x.ip_address)}</code></td></tr>`).join('')||'<tr><td colspan="7" class="empty">No audit entries match your filter.</td></tr>'}catch(e){toast(e.message)}}
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  showView(b.dataset.view);
+  if (b.dataset.view === 'reportsView') loadReports();
+  if (b.dataset.view === 'auditView') loadAudit();
+  if (b.dataset.view === 'customersView') loadCustomers();
+  if (b.dataset.view === 'leadsView') loadLeads();
+  if (b.dataset.view === 'unitsView') loadUnits();
+  if (b.dataset.view === 'bookingsView') loadBookings();
+  if (b.dataset.view === 'visitsView') loadVisits();
+  if (b.dataset.view === 'teamView') loadTeam();
+  if (b.dataset.view === 'attendanceView') loadAttendance();
+  if (b.dataset.view === 'projectsView') loadProjects();
+});
 
-function resetEnquiryForm(){const f=$('enquiryFormInline');if(!f)return;f.reset();$('enquiryIdInline').value='';$('enquiryFormTitle').textContent='Add enquiry';$('enquirySubmit').textContent='Save enquiry';$('enquiryFormMsg').textContent='';fillProjectSelect('enquiryProjectInline');fillUserSelect('enquiryUserInline')}
-function editEnquiry(id){get('/api/admin/enquiries').then(d=>{const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;fillProjectSelect('enquiryProjectInline');fillUserSelect('enquiryUserInline');$('enquiryIdInline').value=x.id;$('enquiryUserInline').value=x.user_id||'';$('enquiryNameInline').value=x.name||'';$('enquiryPhoneInline').value=x.phone||'';$('enquiryEmailInline').value=x.email||'';$('enquiryProjectInline').value=x.project_id||'';$('enquiryStatusInline').value=x.status||'new';$('enquiryMessageInline').value=x.message||'';$('enquiryResponseInline').value=x.admin_response||'';$('enquiryFormTitle').textContent='Edit enquiry';$('enquirySubmit').textContent='Save changes';$('enquiryFormMsg').textContent='Editing '+(x.enquiry_reference||('ENQ-'+x.id));showView('overview');window.scrollTo({top:0,behavior:'smooth'});$('enquiryNameInline').focus()}).catch(e=>toast(e.message))}
-$('enquiryUserInline').onchange=()=>{const id=$('enquiryUserInline').value;if(!id)return;const u=state.customers.find(x=>Number(x.id)===Number(id));if(!u)return;$('enquiryNameInline').value=u.name||'';$('enquiryPhoneInline').value=u.phone||'';$('enquiryEmailInline').value=u.email||''}
-$('enquiryFormInline').onsubmit=async e=>{e.preventDefault();const id=$('enquiryIdInline').value;const body={name:$('enquiryNameInline').value,phone:$('enquiryPhoneInline').value,email:$('enquiryEmailInline').value,project_id:$('enquiryProjectInline').value||null,user_id:$('enquiryUserInline').value||null,status:$('enquiryStatusInline').value,message:$('enquiryMessageInline').value,admin_response:$('enquiryResponseInline').value};try{await send(id?'/api/admin/enquiries/'+id:'/api/admin/enquiries',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});resetEnquiryForm();await loadEnquiries();await loadLeads();toast(id?'Enquiry updated successfully':'Enquiry created successfully')}catch(err){$('enquiryFormMsg').textContent=err.message;toast(err.message)}}
-async function loadEnquiries(){try{const d=await get('/api/admin/enquiries');$('rows').innerHTML=d.data.length?d.data.map(x=>`<tr><td><b>${esc(x.enquiry_reference||('ENQ-'+x.id))}</b></td><td>${localDate(x.created_at)}</td><td>${esc(x.name)}</td><td>${esc(x.phone)}<br>${esc(x.email)}</td><td>${esc(x.message)}</td><td>${esc(x.project_name||'General')}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.admin_response||'—')}</td><td class="actions"><button class="btn smallbtn" onclick="editEnquiry(${x.id})">Edit</button></td></tr>`).join(''):'<tr><td colspan="9" class="empty">No saved enquiries yet. Use the form above or let customers submit one from the website.</td></tr>'}catch(e){toast(e.message)}}
-async function refreshEnquiries(){resetEnquiryForm();await loadEnquiries();toast('Saved enquiries refreshed; form cleared')}
+function closeModal(id) {
+  const el = $(id);
+  if (el) el.classList.remove('open');
+}
 
-function resetLeadFormInline(){const f=$('leadFormInline');if(!f)return;f.reset();$('leadIdInline').value='';$('leadFormTitleInline').textContent='Add lead';$('leadSubmitInline').textContent='Save lead';$('leadFormMsgInline').textContent='';$('leadSourceInline').value='admin';fillProjectSelect('leadProjectInline');fillUserSelect('leadUserInline');fillEmployeeSelect('leadEmployeeInline')}
-function editLeadInline(id){get('/api/admin/leads').then(d=>{const x=d.data.find(v=>Number(v.id)===Number(id));if(!x)return;fillProjectSelect('leadProjectInline');fillUserSelect('leadUserInline');fillEmployeeSelect('leadEmployeeInline');$('leadIdInline').value=x.id;$('leadUserInline').value=x.user_id||'';$('leadNameInline').value=x.name||'';$('leadPhoneInline').value=x.phone||'';$('leadEmailInline').value=x.email||'';$('leadSourceInline').value=x.source||'admin';$('leadProjectInline').value=x.project_id||'';$('leadStatusInline').value=x.status||'new';$('leadEmployeeInline').value=x.assigned_employee_id||'';$('leadFollowInline').value=x.follow_up_at?new Date(x.follow_up_at).toISOString().slice(0,16):'';$('leadNotesInline').value=x.notes||'';$('leadLostInline').value=x.lost_reason||'';$('leadFormTitleInline').textContent='Edit lead';$('leadSubmitInline').textContent='Save changes';$('leadFormMsgInline').textContent='Editing lead #'+x.id;showView('leadsView');window.scrollTo({top:0,behavior:'smooth'});$('leadNameInline').focus()}).catch(e=>toast(e.message))}
-$('leadUserInline').onchange=()=>{const id=$('leadUserInline').value;if(!id)return;const u=state.customers.find(x=>Number(x.id)===Number(id));if(!u)return;$('leadNameInline').value=u.name||'';$('leadPhoneInline').value=u.phone||'';$('leadEmailInline').value=u.email||''}
-$('leadFormInline').onsubmit=async e=>{e.preventDefault();const id=$('leadIdInline').value;const body={name:$('leadNameInline').value,phone:$('leadPhoneInline').value,email:$('leadEmailInline').value,source:$('leadSourceInline').value,status:$('leadStatusInline').value,project_id:$('leadProjectInline').value||null,user_id:$('leadUserInline').value||null,assigned_employee_id:$('leadEmployeeInline').value||null,follow_up_at:$('leadFollowInline').value||null,notes:$('leadNotesInline').value,lost_reason:$('leadLostInline').value};try{await send(id?'/api/admin/leads/'+id:'/api/admin/leads',{method:id?'PATCH':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});resetLeadFormInline();await loadLeads();toast(id?'Lead updated successfully':'Lead created successfully')}catch(err){$('leadFormMsgInline').textContent=err.message;toast(err.message)}}
-async function loadLeads(){try{const d=await get('/api/admin/leads');$('leadRows').innerHTML=d.data.length?d.data.map(x=>`<tr><td><b>#${x.id}</b><br><span class="small">${localDate(x.created_at)}<br>${esc(x.source||'')}</span></td><td>${esc(x.name)}<br>${esc(x.phone)}<br>${esc(x.email)}</td><td>${esc(x.project_name||'General')}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.employee_name||'Unassigned')}</td><td>${x.follow_up_at?localDate(x.follow_up_at):'—'}</td><td>${esc(x.notes||'—')}</td><td class="actions"><button class="btn smallbtn" onclick="editLeadInline(${x.id})">Edit</button><button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No saved leads yet. Use the form above or submit an enquiry from the website.</td></tr>'}catch(e){toast(e.message)}}
-async function refreshLeads(){resetLeadFormInline();await loadLeads();toast('Saved leads refreshed; form cleared')}
+function openModal(id) {
+  const el = $(id);
+  if (el) el.classList.add('open');
+}
 
-async function refreshVisits(){resetVisitForm();await loadVisits();toast('Saved site visits refreshed; form cleared')}
-async function refreshTeam(){resetTeamForm();await loadTeam();toast('Saved team refreshed; form cleared')}
-async function refreshProjects(){resetProjectForm();$('mediaManager').style.display='none';mediaProject=null;$('mediaGrid').innerHTML='';await loadProjects();toast('Saved projects refreshed; form cleared')}
-async function refreshCustomers(){await loadCustomers();if($('customerModal')?.classList.contains('open'))closeModal('customerModal');toast('Saved customers refreshed')}
-function clearReportFilters(){$('reportStart').value='';$('reportEnd').value='';loadReports()}
-async function refreshReports(){clearReportFilters();toast('Reports refreshed; filters cleared')}
-function clearAuditFilters(){$('auditSearch').value='';$('auditEntity').value='';loadAudit()}
-async function refreshAudit(){clearAuditFilters();toast('Audit log refreshed; filters cleared')}
-async function refreshAll(){resetEnquiryForm();resetLeadFormInline();resetVisitForm();resetTeamForm();resetAttendanceForm();resetProjectForm();if($('mediaManager')){$('mediaManager').style.display='none';mediaProject=null;$('mediaGrid').innerHTML=''};try{await load();toast('Dashboard refreshed; forms cleared')}catch(e){toast(e.message)}}
+async function load() {
+  const d = await get('/api/admin/dashboard');
+  if ($('users')) $('users').textContent = d.stats.users;
+  if ($('enq')) $('enq').textContent = d.stats.enquiries;
+  if ($('new')) $('new').textContent = d.stats.newEnquiries;
+  if ($('leads')) $('leads').textContent = d.stats.leads;
+  if ($('openLeads')) $('openLeads').textContent = d.stats.openLeads;
+  if ($('visits')) $('visits').textContent = d.stats.visits;
+  if ($('employees')) $('employees').textContent = d.stats.employees;
+  if ($('projects')) $('projects').textContent = d.stats.projects;
+  if ($('statUnits')) $('statUnits').textContent = d.stats.units ? d.stats.units.total : 38;
+  if ($('statAvailable')) $('statAvailable').textContent = d.stats.units ? d.stats.units.available : 21;
+  if ($('statSold')) $('statSold').textContent = d.stats.units ? d.stats.units.sold : 8;
+  if ($('statBookings')) $('statBookings').textContent = d.stats.bookings || 0;
+  if ($('heroOpenLeads')) $('heroOpenLeads').textContent = d.stats.openLeads;
+  if ($('heroNewEnquiries')) $('heroNewEnquiries').textContent = d.stats.newEnquiries;
+  if ($('attPresent')) $('attPresent').textContent = d.stats.attendance.present;
+  if ($('attAbsent')) $('attAbsent').textContent = d.stats.attendance.absent;
+  if ($('attLeave')) $('attLeave').textContent = d.stats.attendance.leave;
+  if ($('attHalf')) $('attHalf').textContent = d.stats.attendance.half_day;
 
-load().catch(e=>toast(e.message));
-setInterval(()=>{if(document.querySelector('.view.active')?.id==='overview'&&!document.activeElement.matches('textarea,select,input'))load().catch(()=>{})},15000);
+  // Speed-to-lead Action Pulse Banner
+  if ($('speedAlertBanner') && $('speedAlertText')) {
+    if (d.stats.overdueLeads > 0) {
+      $('speedAlertBanner').style.borderColor = '#f87171';
+      $('speedAlertBanner').style.background = '#fff1f2';
+      $('speedAlertText').innerHTML = `<b style="color:#e11d48;">Attention: ${d.stats.overdueLeads} lead follow-up(s) overdue!</b> · ${d.stats.followUpsToday} appointment(s) or site visit(s) scheduled for today.`;
+    } else if (d.stats.followUpsToday > 0) {
+      $('speedAlertBanner').style.borderColor = '#38bdf8';
+      $('speedAlertBanner').style.background = '#f0f9ff';
+      $('speedAlertText').innerHTML = `<b>${d.stats.followUpsToday} high-priority appointment(s) or site visit(s) scheduled today.</b> Speed to response is critical.`;
+    } else {
+      $('speedAlertBanner').style.borderColor = 'rgba(56,189,248,0.2)';
+      $('speedAlertBanner').style.background = '#f8fafc';
+      $('speedAlertText').textContent = 'All lead follow-ups and unit inventory allocations are up-to-date.';
+    }
+  }
+
+  renderRecentActivity(d.stats.recent);
+  if ($('teamSnapshotText')) {
+    $('teamSnapshotText').textContent = `${d.stats.attendance.present} present · ${d.stats.attendance.absent} absent · ${d.stats.attendance.leave} on leave · ${d.stats.attendance.half_day} half day`;
+  }
+
+  try {
+    const [t] = await Promise.all([get('/api/admin/employees')]);
+    state.employees = t.data;
+    fillAttendanceEmployeeSelect();
+  } catch (e) {}
+
+  await Promise.all([loadEnquiries(), loadTeam(), loadCustomers(), loadProjects()]);
+  await Promise.all([loadLeads(), loadVisits(), loadUnits(), loadBookings()]);
+}
+
+function fillProjectSelect(id, includeGeneral = true) {
+  const el = $(id);
+  if (!el) return;
+  el.innerHTML = (includeGeneral ? '<option value="">No project / General</option>' : '<option value="">Select project</option>') +
+    state.projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+}
+
+function fillUserSelect(id) {
+  const el = $(id);
+  if (!el) return;
+  el.innerHTML = '<option value="">No linked customer account</option>' +
+    state.customers.filter(x => x.role === 'customer').map(u => `<option value="${u.id}">${esc(u.name)} · ${esc(u.email || u.phone)}</option>`).join('');
+}
+
+function fillEmployeeSelect(id) {
+  const el = $(id);
+  if (!el) return;
+  el.innerHTML = '<option value="">Unassigned</option>' +
+    state.employees.filter(x => x.status === 'active').map(e => `<option value="${e.id}">${esc(e.name)} · ${esc(e.employee_code)}</option>`).join('');
+}
+
+// ─── ENQUIRIES ───
+function resetEnquiryForm() {
+  const f = $('enquiryFormInline');
+  if (!f) return;
+  f.reset();
+  $('enquiryIdInline').value = '';
+  $('enquiryFormTitle').textContent = 'Add enquiry';
+  $('enquirySubmit').textContent = 'Save enquiry';
+  $('enquiryFormMsg').textContent = '';
+  fillProjectSelect('enquiryProjectInline');
+  fillUserSelect('enquiryUserInline');
+}
+
+function editEnquiry(id) {
+  get('/api/admin/enquiries').then(d => {
+    const x = d.data.find(v => Number(v.id) === Number(id));
+    if (!x) return;
+    fillProjectSelect('enquiryProjectInline');
+    fillUserSelect('enquiryUserInline');
+    $('enquiryIdInline').value = x.id;
+    $('enquiryUserInline').value = x.user_id || '';
+    $('enquiryNameInline').value = x.name || '';
+    $('enquiryPhoneInline').value = x.phone || '';
+    $('enquiryEmailInline').value = x.email || '';
+    $('enquiryProjectInline').value = x.project_id || '';
+    $('enquiryStatusInline').value = x.status || 'new';
+    $('enquiryMessageInline').value = x.message || '';
+    $('enquiryResponseInline').value = x.admin_response || '';
+    $('enquiryFormTitle').textContent = 'Edit enquiry';
+    $('enquirySubmit').textContent = 'Save changes';
+    $('enquiryFormMsg').textContent = 'Editing ' + (x.enquiry_reference || ('ENQ-' + x.id));
+    showView('overview');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    $('enquiryNameInline').focus();
+  }).catch(e => toast(e.message));
+}
+
+if ($('enquiryUserInline')) {
+  $('enquiryUserInline').onchange = () => {
+    const id = $('enquiryUserInline').value;
+    if (!id) return;
+    const u = state.customers.find(x => Number(x.id) === Number(id));
+    if (!u) return;
+    $('enquiryNameInline').value = u.name || '';
+    $('enquiryPhoneInline').value = u.phone || '';
+    $('enquiryEmailInline').value = u.email || '';
+  };
+}
+
+if ($('enquiryFormInline')) {
+  $('enquiryFormInline').onsubmit = async e => {
+    e.preventDefault();
+    const id = $('enquiryIdInline').value;
+    const body = {
+      name: $('enquiryNameInline').value,
+      phone: $('enquiryPhoneInline').value,
+      email: $('enquiryEmailInline').value,
+      project_id: $('enquiryProjectInline').value || null,
+      user_id: $('enquiryUserInline').value || null,
+      status: $('enquiryStatusInline').value,
+      message: $('enquiryMessageInline').value,
+      admin_response: $('enquiryResponseInline').value
+    };
+    try {
+      await send(id ? '/api/admin/enquiries/' + id : '/api/admin/enquiries', {
+        method: id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      resetEnquiryForm();
+      await loadEnquiries();
+      await loadLeads();
+      toast(id ? 'Enquiry updated successfully' : 'Enquiry created successfully');
+    } catch (err) {
+      $('enquiryFormMsg').textContent = err.message;
+      toast(err.message);
+    }
+  };
+}
+
+async function loadEnquiries() {
+  try {
+    const d = await get('/api/admin/enquiries');
+    $('rows').innerHTML = d.data.length ? d.data.map(x => {
+      const p = (x.phone || '').replace(/[^0-9]/g, '');
+      return `
+        <tr>
+          <td><b>${esc(x.enquiry_reference || ('ENQ-' + x.id))}</b></td>
+          <td>${localDate(x.created_at)}</td>
+          <td><b>${esc(x.name)}</b></td>
+          <td>
+            ${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
+            <div style="display:flex; gap:6px; margin-top:4px;">
+              ${p ? `<a href="https://wa.me/91${p}?text=${encodeURIComponent('Hello ' + x.name + ', greeting from Laxminarayan Group.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp">💬</a>` : ''}
+              ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Call">📞</a>` : ''}
+            </div>
+          </td>
+          <td>${esc(x.message)}</td>
+          <td>${esc(x.project_name || 'General')}</td>
+          <td><span class="pill">${esc(x.status)}</span></td>
+          <td>${esc(x.admin_response || '—')}</td>
+          <td class="actions">
+            <button class="btn smallbtn" onclick="editEnquiry(${x.id})">Edit</button>
+            <button class="btn smallbtn gold" onclick="convertEnquiryToLead(${x.id})">Convert to Lead →</button>
+          </td>
+        </tr>
+      `;
+    }).join('') : '<tr><td colspan="9" class="empty">No saved enquiries yet. Use the form above or let customers submit one from the website.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function convertEnquiryToLead(id) {
+  try {
+    const res = await send(`/api/admin/enquiries/${id}/convert`, { method: 'POST' });
+    toast(res.message || 'Enquiry upgraded to Qualified Lead');
+    await loadEnquiries();
+    await loadLeads();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function refreshEnquiries() {
+  resetEnquiryForm();
+  await loadEnquiries();
+  toast('Saved enquiries refreshed; form cleared');
+}
+
+// ─── LEADS & PIPELINE (KANBAN + TABLE + DRAWER) ───
+function switchLeadView(mode) {
+  if (mode === 'kanban') {
+    if ($('viewBtnKanban')) $('viewBtnKanban').classList.add('active');
+    if ($('viewBtnTable')) $('viewBtnTable').classList.remove('active');
+    if ($('leadKanbanContainer')) $('leadKanbanContainer').style.display = 'flex';
+    if ($('leadTableContainer')) $('leadTableContainer').style.display = 'none';
+    state.leadViewMode = 'kanban';
+  } else {
+    if ($('viewBtnTable')) $('viewBtnTable').classList.add('active');
+    if ($('viewBtnKanban')) $('viewBtnKanban').classList.remove('active');
+    if ($('leadKanbanContainer')) $('leadKanbanContainer').style.display = 'none';
+    if ($('leadTableContainer')) $('leadTableContainer').style.display = 'block';
+    state.leadViewMode = 'table';
+  }
+}
+
+function renderKanban() {
+  const pid = $('leadFilterProject')?.value;
+  const pri = $('leadFilterPriority')?.value;
+  const q = ($('leadFilterSearch')?.value || '').toLowerCase().trim();
+
+  let list = state.leads || [];
+  if (pid) list = list.filter(l => Number(l.project_id) === Number(pid));
+  if (pri) list = list.filter(l => (l.sentiment || 'warm') === pri);
+  if (q) list = list.filter(l =>
+    (l.name && l.name.toLowerCase().includes(q)) ||
+    (l.phone && l.phone.toLowerCase().includes(q)) ||
+    (l.email && l.email.toLowerCase().includes(q)) ||
+    (l.notes && l.notes.toLowerCase().includes(q))
+  );
+
+  const stages = ['new', 'contacted', 'qualified', 'site_visit', 'negotiation', 'won', 'lost'];
+  const now = new Date();
+
+  stages.forEach(st => {
+    const stageCards = list.filter(l => (l.status || 'new') === st);
+    const badge = $('badge-' + st);
+    if (badge) badge.textContent = stageCards.length;
+
+    const col = $('col-' + st);
+    if (!col) return;
+
+    if (!stageCards.length) {
+      col.innerHTML = '<div style="text-align:center; padding:28px 10px; color:#94a3b8; font-size:12px; font-weight:500;">No leads here</div>';
+      return;
+    }
+
+    col.innerHTML = stageCards.map(x => {
+      const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
+      const isOverdue = x.follow_up_at && new Date(x.follow_up_at) < now && !['won', 'lost'].includes(x.status);
+      const sentiment = x.sentiment || 'warm';
+
+      return `
+        <div class="kanban-card priority-${sentiment}" onclick="openLeadDrawer(${x.id})">
+          <div class="card-top">
+            <span class="card-customer">${esc(x.name)}</span>
+            <span class="card-ref">#${x.id}</span>
+          </div>
+          <div class="card-project">📍 ${esc(x.project_name || 'General Inquiry')} ${x.unit_number ? ('· Unit ' + esc(x.unit_number)) : ''}</div>
+          ${x.budget ? `<div style="font-size:12px; font-weight:700; color:#0f766e; margin-bottom:4px;">💰 ${esc(x.budget)}</div>` : ''}
+          <div class="card-tags">
+            <span class="tag-priority tag-${sentiment}">${sentiment === 'hot' ? '🔥 Hot' : (sentiment === 'cold' ? '❄️ Cold' : '⚡ Warm')}</span>
+            ${isOverdue ? '<span class="tag-overdue">⚠️ Overdue</span>' : ''}
+            <span class="card-tag" style="background:#f1f5f9; color:#475569;">${esc(x.source || 'web')}</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-assignee">${x.employee_name ? ('👤 ' + esc(x.employee_name)) : '⚪ Unassigned'}</span>
+            <div class="card-actions" onclick="event.stopPropagation()">
+              ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greeting from Laxminarayan Group.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp">💬</a>` : ''}
+              ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Direct Call">📞</a>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+async function loadLeads() {
+  try {
+    const d = await get('/api/admin/leads');
+    state.leads = d.data;
+
+    // Populate project filter in lead toolbar
+    const leadPFilter = $('leadFilterProject');
+    if (leadPFilter && leadPFilter.options.length <= 1) {
+      leadPFilter.innerHTML = '<option value="">All Projects</option>' + state.projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    }
+
+    renderKanban();
+
+    // Data table rows (Preserved Table #leadRows)
+    $('leadRows').innerHTML = d.data.length ? d.data.map(x => `
+      <tr>
+        <td>
+          <b>#${x.id}</b><br>
+          <span class="small">${localDate(x.created_at)}<br>${esc(x.source || '')}</span>
+        </td>
+        <td>
+          <b>${esc(x.name)}</b><br>${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
+          ${x.budget ? `<br><span style="font-size:11.5px; color:#0f766e; font-weight:700;">💰 ${esc(x.budget)}</span>` : ''}
+        </td>
+        <td>
+          <b>${esc(x.project_name || 'General')}</b>
+          ${x.unit_number ? `<br><span class="pill" style="font-size:11px;">Unit ${esc(x.unit_number)}</span>` : ''}
+        </td>
+        <td><span class="pill">${esc(x.status)}</span></td>
+        <td>${esc(x.employee_name || 'Unassigned')}</td>
+        <td>${x.follow_up_at ? localDate(x.follow_up_at) : '—'}</td>
+        <td>${esc(x.notes || '—')}</td>
+        <td class="actions">
+          <button class="btn smallbtn" onclick="openLeadDrawer(${x.id})">360° Drawer</button>
+          <button class="btn smallbtn" onclick="editLeadInline(${x.id})">Edit</button>
+          <button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button>
+        </td>
+      </tr>
+    `).join('') : '<tr><td colspan="8" class="empty">No saved leads yet. Use + Register Lead to create one or submit an enquiry.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+// ─── LEAD 360° DRAWER ───
+const PIPELINE_STAGES = [
+  { id: 'new', label: '1. New' },
+  { id: 'contacted', label: '2. Contacted' },
+  { id: 'qualified', label: '3. Qualified' },
+  { id: 'site_visit', label: '4. Site Visit' },
+  { id: 'negotiation', label: '5. Negotiation' },
+  { id: 'won', label: '6. Won Deal' },
+  { id: 'lost', label: 'Lost' }
+];
+
+function renderDrawerStepper(currentStatus) {
+  const stepper = $('drawerStageStepper');
+  if (!stepper) return;
+  const currentIdx = PIPELINE_STAGES.findIndex(s => s.id === currentStatus);
+  stepper.innerHTML = PIPELINE_STAGES.map((s, idx) => {
+    let cls = 'stepper-step';
+    if (s.id === currentStatus) cls += ' active';
+    else if (currentIdx !== -1 && idx < currentIdx && currentStatus !== 'lost') cls += ' passed';
+    return `<button type="button" class="${cls}" onclick="changeDrawerStage('${s.id}')">${s.label}</button>`;
+  }).join('');
+}
+
+async function changeDrawerStage(newStage) {
+  if (!state.currentDrawerLead) return;
+  try {
+    await send('/api/admin/leads/' + state.currentDrawerLead.id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStage })
+    });
+    state.currentDrawerLead.status = newStage;
+    renderDrawerStepper(newStage);
+    toast(`Lead stage updated to ${newStage.replace('_', ' ').toUpperCase()}`);
+    await loadLeads();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function openLeadDrawer(id) {
+  const x = state.leads.find(l => Number(l.id) === Number(id));
+  if (!x) return;
+  state.currentDrawerLead = x;
+
+  fillProjectSelect('drawerProject');
+  fillEmployeeSelect('drawerEmployee');
+
+  $('drawerLeadSource').textContent = ((x.source || 'WEBSITE').toUpperCase()) + ' LEAD #' + x.id;
+  $('drawerLeadName').textContent = x.name || 'Lead Details';
+  $('drawerLeadId').value = x.id;
+  $('drawerName').value = x.name || '';
+  $('drawerPhone').value = x.phone || '';
+  $('drawerEmail').value = x.email || '';
+  $('drawerProject').value = x.project_id || '';
+  $('drawerBudget').value = x.budget || '';
+  $('drawerSentiment').value = x.sentiment || 'warm';
+  $('drawerEmployee').value = x.assigned_employee_id || '';
+  $('drawerFollowUp').value = x.follow_up_at ? new Date(x.follow_up_at).toISOString().slice(0, 16) : '';
+  $('drawerNotes').value = x.notes || '';
+  $('drawerLostReason').value = x.lost_reason || '';
+
+  const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
+  $('drawerCallBtn').href = x.phone ? ('tel:' + x.phone) : '#';
+  $('drawerWaBtn').href = cleanPhone ? (`https://wa.me/91${cleanPhone}?text=` + encodeURIComponent(`Hello ${x.name}, greeting from Laxminarayan Group.`)) : '#';
+
+  renderDrawerStepper(x.status || 'new');
+
+  $('drawerBackdrop').classList.add('open');
+  $('leadDrawer').classList.add('open');
+}
+
+function closeLeadDrawer() {
+  $('drawerBackdrop').classList.remove('open');
+  $('leadDrawer').classList.remove('open');
+  state.currentDrawerLead = null;
+}
+
+async function saveLeadFromDrawer() {
+  if (!state.currentDrawerLead) return;
+  const id = state.currentDrawerLead.id;
+  const body = {
+    name: $('drawerName').value,
+    phone: $('drawerPhone').value,
+    email: $('drawerEmail').value,
+    project_id: $('drawerProject').value || null,
+    budget: $('drawerBudget').value,
+    sentiment: $('drawerSentiment').value,
+    assigned_employee_id: $('drawerEmployee').value || null,
+    follow_up_at: $('drawerFollowUp').value || null,
+    notes: $('drawerNotes').value,
+    lost_reason: $('drawerLostReason').value
+  };
+  try {
+    await send('/api/admin/leads/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    closeLeadDrawer();
+    toast('Lead updated successfully');
+    await loadLeads();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function createBookingFromDrawer() {
+  if (!state.currentDrawerLead) return;
+  const lead = state.currentDrawerLead;
+  closeLeadDrawer();
+  openBookingModal({
+    lead_id: lead.id,
+    project_id: lead.project_id,
+    customer_name: lead.name,
+    customer_phone: lead.phone,
+    customer_email: lead.email
+  });
+}
+
+function openVisitFromDrawer() {
+  if (!state.currentDrawerLead) return;
+  const lead = state.currentDrawerLead;
+  closeLeadDrawer();
+  showView('visitsView');
+  resetVisitForm();
+  $('visitNameInline').value = lead.name || '';
+  $('visitPhoneInline').value = lead.phone || '';
+  $('visitEmailInline').value = lead.email || '';
+  $('visitProjectInline').value = lead.project_id || '';
+  $('visitNotesInline').value = 'Scheduled from Lead Pipeline #' + lead.id;
+  document.getElementById('visitsView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('visitPreferredInline').focus();
+}
+
+function openLeadModal(x = null) {
+  fillProjectSelect('leadProject');
+  fillUserSelect('leadUser');
+  fillEmployeeSelect('leadEmployee');
+  $('leadForm').reset();
+  $('leadId').value = '';
+  $('leadSource').value = 'admin';
+  if (x) {
+    $('leadModalTitle').textContent = 'Edit lead';
+    $('leadId').value = x.id;
+    $('leadName').value = x.name || '';
+    $('leadPhone').value = x.phone || '';
+    $('leadEmail').value = x.email || '';
+    $('leadSource').value = x.source || 'admin';
+    $('leadProject').value = x.project_id || '';
+    $('leadUser').value = x.user_id || '';
+    $('leadStatus').value = x.status || 'new';
+    $('leadEmployee').value = x.assigned_employee_id || '';
+    $('leadFollow').value = x.follow_up_at ? new Date(x.follow_up_at).toISOString().slice(0, 16) : '';
+    $('leadNotes').value = x.notes || '';
+    $('leadLost').value = x.lost_reason || '';
+  } else {
+    $('leadModalTitle').textContent = 'Register New Lead';
+  }
+  openModal('leadModal');
+}
+
+if ($('leadForm')) {
+  $('leadForm').onsubmit = async e => {
+    e.preventDefault();
+    const id = $('leadId').value;
+    const body = {
+      name: $('leadName').value,
+      phone: $('leadPhone').value,
+      email: $('leadEmail').value,
+      source: $('leadSource').value,
+      status: $('leadStatus').value,
+      project_id: $('leadProject').value || null,
+      user_id: $('leadUser').value || null,
+      assigned_employee_id: $('leadEmployee').value || null,
+      follow_up_at: $('leadFollow').value || null,
+      notes: $('leadNotes').value,
+      lost_reason: $('leadLost').value
+    };
+    try {
+      if (id) await send('/api/admin/leads/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      else await send('/api/admin/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      closeModal('leadModal');
+      toast(id ? 'Lead updated' : 'Lead registered');
+      await loadLeads();
+      await load();
+    } catch (err) {
+      toast(err.message);
+    }
+  };
+}
+
+function resetLeadFormInline() {
+  const f = $('leadFormInline');
+  if (!f) return;
+  f.reset();
+  $('leadIdInline').value = '';
+  $('leadFormTitleInline').textContent = 'Add lead';
+  $('leadSubmitInline').textContent = 'Save lead';
+  $('leadFormMsgInline').textContent = '';
+  $('leadSourceInline').value = 'admin';
+  fillProjectSelect('leadProjectInline');
+  fillUserSelect('leadUserInline');
+  fillEmployeeSelect('leadEmployeeInline');
+}
+
+function editLeadInline(id) {
+  const x = state.leads.find(v => Number(v.id) === Number(id));
+  if (!x) return;
+  fillProjectSelect('leadProjectInline');
+  fillUserSelect('leadUserInline');
+  fillEmployeeSelect('leadEmployeeInline');
+  $('leadIdInline').value = x.id;
+  $('leadUserInline').value = x.user_id || '';
+  $('leadNameInline').value = x.name || '';
+  $('leadPhoneInline').value = x.phone || '';
+  $('leadEmailInline').value = x.email || '';
+  $('leadSourceInline').value = x.source || 'admin';
+  $('leadProjectInline').value = x.project_id || '';
+  $('leadStatusInline').value = x.status || 'new';
+  $('leadEmployeeInline').value = x.assigned_employee_id || '';
+  $('leadFollowInline').value = x.follow_up_at ? new Date(x.follow_up_at).toISOString().slice(0, 16) : '';
+  $('leadNotesInline').value = x.notes || '';
+  $('leadLostInline').value = x.lost_reason || '';
+  $('leadFormTitleInline').textContent = 'Edit lead';
+  $('leadSubmitInline').textContent = 'Save changes';
+  $('leadFormMsgInline').textContent = 'Editing lead #' + x.id;
+  switchLeadView('table');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  $('leadNameInline').focus();
+}
+
+if ($('leadUserInline')) {
+  $('leadUserInline').onchange = () => {
+    const id = $('leadUserInline').value;
+    if (!id) return;
+    const u = state.customers.find(x => Number(x.id) === Number(id));
+    if (!u) return;
+    $('leadNameInline').value = u.name || '';
+    $('leadPhoneInline').value = u.phone || '';
+    $('leadEmailInline').value = u.email || '';
+  };
+}
+
+if ($('leadFormInline')) {
+  $('leadFormInline').onsubmit = async e => {
+    e.preventDefault();
+    const id = $('leadIdInline').value;
+    const body = {
+      name: $('leadNameInline').value,
+      phone: $('leadPhoneInline').value,
+      email: $('leadEmailInline').value,
+      source: $('leadSourceInline').value,
+      status: $('leadStatusInline').value,
+      project_id: $('leadProjectInline').value || null,
+      user_id: $('leadUserInline').value || null,
+      assigned_employee_id: $('leadEmployeeInline').value || null,
+      follow_up_at: $('leadFollowInline').value || null,
+      notes: $('leadNotesInline').value,
+      lost_reason: $('leadLostInline').value
+    };
+    try {
+      await send(id ? '/api/admin/leads/' + id : '/api/admin/leads', {
+        method: id ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      resetLeadFormInline();
+      await loadLeads();
+      await load();
+      toast(id ? 'Lead updated successfully' : 'Lead created successfully');
+    } catch (err) {
+      $('leadFormMsgInline').textContent = err.message;
+      toast(err.message);
+    }
+  };
+}
+
+async function deleteLead(id) {
+  if (!confirm('Delete this lead? This cannot be undone.')) return;
+  try {
+    await send('/api/admin/leads/' + id, { method: 'DELETE' });
+    toast('Lead deleted');
+    await loadLeads();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function refreshLeads() {
+  resetLeadFormInline();
+  await loadLeads();
+  toast('Pipeline refreshed');
+}
+
+// ─── UNIT INVENTORY MATRIX ───
+async function loadUnits() {
+  try {
+    const d = await get('/api/admin/units');
+    state.units = d.data;
+
+    const pFilter = $('unitFilterProject');
+    if (pFilter && pFilter.options.length <= 1) {
+      pFilter.innerHTML = '<option value="">All Projects</option>' + state.projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    }
+
+    const total = state.units.length;
+    const avail = state.units.filter(u => u.status === 'available').length;
+    const blocked = state.units.filter(u => u.status === 'blocked').length;
+    const sold = state.units.filter(u => u.status === 'sold').length;
+
+    if ($('unitsSummaryTotal')) $('unitsSummaryTotal').textContent = total + ' Units';
+    if ($('unitsSummaryAvail')) $('unitsSummaryAvail').textContent = avail + ' Available';
+    if ($('unitsSummaryBlocked')) $('unitsSummaryBlocked').textContent = blocked + ' Blocked';
+    if ($('unitsSummarySold')) $('unitsSummarySold').textContent = sold + ' Sold';
+
+    if ($('statUnits')) $('statUnits').textContent = total;
+    if ($('statAvailable')) $('statAvailable').textContent = avail;
+    if ($('statSold')) $('statSold').textContent = sold;
+
+    renderUnits();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function renderUnits() {
+  const pid = $('unitFilterProject')?.value;
+  const st = $('unitFilterStatus')?.value;
+  const q = ($('unitFilterSearch')?.value || '').toLowerCase().trim();
+
+  let list = state.units || [];
+  if (pid) list = list.filter(u => Number(u.project_id) === Number(pid));
+  if (st) list = list.filter(u => u.status === st);
+  if (q) list = list.filter(u =>
+    (u.unit_number && u.unit_number.toLowerCase().includes(q)) ||
+    (u.unit_type && u.unit_type.toLowerCase().includes(q)) ||
+    (u.buyer_name && u.buyer_name.toLowerCase().includes(q)) ||
+    (u.project_name && u.project_name.toLowerCase().includes(q))
+  );
+
+  const grid = $('unitGrid');
+  if (!grid) return;
+
+  if (!list.length) {
+    grid.innerHTML = '<div style="grid-column: 1/-1; padding:36px; text-align:center; color:var(--ink-light); background:#f8fafc; border-radius:12px; border:1px dashed var(--line);">No units match the selected filters.</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map(u => {
+    const statusClass = u.status === 'available' ? 'available' : (u.status === 'blocked' ? 'blocked' : 'sold');
+    const statusLabel = u.status === 'available' ? '🟢 Available' : (u.status === 'blocked' ? '🟡 Blocked' : '🔴 Sold');
+    return `
+      <div class="unit-card ${statusClass}">
+        <div class="unit-head">
+          <span class="unit-num">${esc(u.unit_number)}</span>
+          <span class="unit-type-pill">${esc(u.unit_type || 'Residential')}</span>
+        </div>
+        <div style="font-size:12px; color:#64748b; font-weight:600;">📍 ${esc(u.project_name || 'Project')} · Floor ${u.floor_number ?? 1}</div>
+        <div class="unit-price">${esc(u.price || 'Price on Request')}</div>
+        <div class="unit-meta">
+          <span>📐 <b>${u.area_sqft || 0}</b> sq.ft.</span><br>
+          <span>Status: <b>${statusLabel}</b></span>
+          ${u.buyer_name ? `<br><span style="color:#b45309; font-weight:600;">👤 ${esc(u.buyer_name)} ${u.buyer_phone ? ('(' + esc(u.buyer_phone) + ')') : ''}</span>` : ''}
+          ${u.notes ? `<br><span class="small" style="color:#64748b;">${esc(u.notes)}</span>` : ''}
+        </div>
+        <div class="actions" style="margin-top:10px; border-top:1px solid #f1f5f9; padding-top:10px; gap:6px;">
+          ${u.status === 'available' ? `
+            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'blocked')" style="background:#fef3c7; color:#92400e; border:none;">Hold / Block</button>
+            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'sold')" style="background:#fee2e2; color:#991b1b; border:none;">Mark Sold</button>
+          ` : (u.status === 'blocked' ? `
+            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'available')" style="background:#d1fae5; color:#065f46; border:none;">Release</button>
+            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'sold')" style="background:#fee2e2; color:#991b1b; border:none;">Mark Sold</button>
+          ` : `
+            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'available')" style="background:#d1fae5; color:#065f46; border:none;">Release</button>
+          `)}
+          <button class="btn smallbtn" onclick="editUnit(${u.id})">Edit</button>
+          <button class="btn smallbtn danger" onclick="deleteUnit(${u.id}, '${escAttr(u.unit_number)}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function promptUnitStatus(id, newStatus) {
+  let buyerName = '';
+  let buyerPhone = '';
+  if (newStatus === 'blocked' || newStatus === 'sold') {
+    buyerName = prompt(`Enter buyer/client name to mark this unit as ${newStatus.toUpperCase()}:`, '') || '';
+    if (!buyerName) return;
+    buyerPhone = prompt('Enter buyer contact number (optional):', '') || '';
+  }
+  try {
+    await send(`/api/admin/units/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus, buyer_name: buyerName, buyer_phone: buyerPhone })
+    });
+    toast(`Unit status updated to ${newStatus}`);
+    await loadUnits();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function openUnitModal(u = null) {
+  fillProjectSelect('unitProject', false);
+  $('unitForm').reset();
+  $('unitId').value = '';
+  $('unitMsg').textContent = '';
+  if (u) {
+    $('unitModalTitle').textContent = 'Edit Project Unit';
+    $('unitId').value = u.id;
+    $('unitProject').value = u.project_id || '';
+    $('unitNumber').value = u.unit_number || '';
+    $('unitType').value = u.unit_type || '3 BHK Luxury';
+    $('unitFloor').value = u.floor_number ?? 1;
+    $('unitArea').value = u.area_sqft || 1850;
+    $('unitPrice').value = u.price || '';
+    $('unitStatus').value = u.status || 'available';
+    $('unitBuyerName').value = u.buyer_name || '';
+    $('unitBuyerPhone').value = u.buyer_phone || '';
+    $('unitNotes').value = u.notes || '';
+    $('unitSubmit').textContent = 'Update Unit';
+  } else {
+    $('unitModalTitle').textContent = 'Add Project Unit';
+    $('unitSubmit').textContent = 'Save Unit';
+    if (state.projects.length) $('unitProject').value = state.projects[0].id;
+  }
+  openModal('unitModal');
+}
+
+function editUnit(id) {
+  const u = state.units.find(x => Number(x.id) === Number(id));
+  if (!u) return;
+  openUnitModal(u);
+}
+
+async function deleteUnit(id, unitNum) {
+  if (!confirm(`Delete unit ${unitNum || id}?`)) return;
+  try {
+    await send('/api/admin/units/' + id, { method: 'DELETE' });
+    toast('Unit deleted');
+    await loadUnits();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+if ($('unitForm')) {
+  $('unitForm').onsubmit = async e => {
+    e.preventDefault();
+    const id = $('unitId').value;
+    const body = {
+      project_id: $('unitProject').value,
+      unit_number: $('unitNumber').value,
+      unit_type: $('unitType').value,
+      floor_number: Number($('unitFloor').value) || 0,
+      area_sqft: Number($('unitArea').value) || 0,
+      price: $('unitPrice').value,
+      status: $('unitStatus').value,
+      buyer_name: $('unitBuyerName').value,
+      buyer_phone: $('unitBuyerPhone').value,
+      notes: $('unitNotes').value
+    };
+    try {
+      if (id) {
+        await send('/api/admin/units/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        toast('Unit updated successfully');
+      } else {
+        await send('/api/admin/units', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        toast('New unit added to inventory');
+      }
+      closeModal('unitModal');
+      await loadUnits();
+      await load();
+    } catch (err) {
+      $('unitMsg').textContent = err.message;
+      toast(err.message);
+    }
+  };
+}
+
+// ─── BOOKINGS & DEALS ───
+function onBookingProjectChange() {
+  const pid = $('bookingProject').value;
+  const availUnits = state.units.filter(u => (!pid || Number(u.project_id) === Number(pid)) && (u.status === 'available' || u.status === 'blocked'));
+  $('bookingUnitSelect').innerHTML = '<option value="">Select available unit</option>' + availUnits.map(u => `<option value="${u.id}">${esc(u.unit_number)} (${esc(u.unit_type)} - Floor ${u.floor_number ?? 1} - ${esc(u.price || 'Price on Req')})</option>`).join('');
+}
+
+if ($('bookingProject')) $('bookingProject').onchange = onBookingProjectChange;
+if ($('bookingUnitSelect')) {
+  $('bookingUnitSelect').onchange = () => {
+    const uid = $('bookingUnitSelect').value;
+    if (uid && !$('bookingAgreementVal').value) {
+      const u = state.units.find(x => Number(x.id) === Number(uid));
+      if (u && u.price) $('bookingAgreementVal').value = u.price;
+    }
+  };
+}
+
+async function loadBookings() {
+  try {
+    const d = await get('/api/admin/bookings');
+    state.bookings = d.data;
+    $('bookingRows').innerHTML = d.data.length ? d.data.map(x => `
+      <tr>
+        <td><b>${esc(x.booking_reference || ('BK-' + x.id))}</b><br><span class="small">${localDate(x.created_at)}</span></td>
+        <td><b>${esc(x.customer_name)}</b><br>${esc(x.customer_phone)}<br><span class="small">${esc(x.customer_email || '')}</span></td>
+        <td><b>${esc(x.project_name || 'General')}</b><br><span class="pill" style="margin-top:4px;">${x.unit_number ? ('Unit ' + esc(x.unit_number)) : (esc(x.allotted_unit || 'Custom Allotment'))}</span></td>
+        <td><b style="color:var(--ink); font-family:monospace; font-size:14px;">${esc(x.agreement_value || '—')}</b></td>
+        <td><span style="color:#059669; font-weight:700; font-family:monospace;">${esc(x.token_amount || '—')}</span></td>
+        <td><span class="pill" style="background:#ecfdf5; color:#065f46;">${esc(x.payment_status || 'token_received').replace(/_/g, ' ')}</span></td>
+        <td><span class="pill" style="background:${x.status === 'confirmed' ? '#ecfdf5' : '#fffbeb'}; color:${x.status === 'confirmed' ? '#065f46' : '#92400e'};">${esc(x.status)}</span></td>
+        <td class="actions">
+          <button class="btn smallbtn danger" onclick="deleteBooking(${x.id}, '${escAttr(x.booking_reference)}')">Delete</button>
+        </td>
+      </tr>
+    `).join('') : '<tr><td colspan="8" class="empty">No bookings recorded yet. Use + New Booking or convert directly from Won Lead.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function openBookingModal(prefill = null) {
+  fillProjectSelect('bookingProject', false);
+  $('bookingForm').reset();
+  $('bookingId').value = '';
+  $('bookingLeadId').value = '';
+  $('bookingMsg').textContent = '';
+  $('bookingModalTitle').textContent = 'Create Official Real Estate Booking';
+
+  if (prefill) {
+    if (prefill.lead_id) $('bookingLeadId').value = prefill.lead_id;
+    if (prefill.project_id) $('bookingProject').value = prefill.project_id;
+    if (prefill.customer_name) $('bookingCustName').value = prefill.customer_name;
+    if (prefill.customer_phone) $('bookingCustPhone').value = prefill.customer_phone;
+    if (prefill.customer_email) $('bookingCustEmail').value = prefill.customer_email;
+  } else if (state.projects.length) {
+    $('bookingProject').value = state.projects[0].id;
+  }
+  onBookingProjectChange();
+  if (prefill && prefill.unit_id) {
+    $('bookingUnitSelect').value = prefill.unit_id;
+  }
+  openModal('bookingModal');
+}
+
+if ($('bookingForm')) {
+  $('bookingForm').onsubmit = async e => {
+    e.preventDefault();
+    const id = $('bookingId').value;
+    const body = {
+      lead_id: $('bookingLeadId').value || null,
+      project_id: $('bookingProject').value,
+      unit_id: $('bookingUnitSelect').value || null,
+      customer_name: $('bookingCustName').value,
+      customer_phone: $('bookingCustPhone').value,
+      customer_email: $('bookingCustEmail').value,
+      agreement_value: $('bookingAgreementVal').value,
+      token_amount: $('bookingTokenAmt').value,
+      payment_status: $('bookingPaymentStatus').value,
+      status: $('bookingStatus').value,
+      notes: $('bookingNotes').value
+    };
+    try {
+      if (id) {
+        await send('/api/admin/bookings/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        toast('Booking updated');
+      } else {
+        await send('/api/admin/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        toast('Booking created! Unit marked as Sold and Lead marked as Won.');
+      }
+      closeModal('bookingModal');
+      await loadBookings();
+      await loadUnits();
+      await loadLeads();
+      await load();
+    } catch (err) {
+      $('bookingMsg').textContent = err.message;
+      toast(err.message);
+    }
+  };
+}
+
+async function deleteBooking(id, ref) {
+  if (!confirm(`Delete booking ${ref || ('#' + id)}?`)) return;
+  try {
+    await send('/api/admin/bookings/' + id, { method: 'DELETE' });
+    toast('Booking removed');
+    await loadBookings();
+    await loadUnits();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+// ─── SITE VISITS ───
+function resetVisitForm() {
+  const f = $('visitFormInline');
+  if (!f) return;
+  f.reset();
+  $('visitIdInline').value = '';
+  $('visitFormTitle').textContent = 'Add site visit';
+  $('visitSubmit').textContent = 'Save site visit';
+  $('visitFormMsg').textContent = '';
+  fillProjectSelect('visitProjectInline');
+  fillUserSelect('visitUserInline');
+}
+
+function editVisit(id) {
+  get('/api/admin/site-visits').then(d => {
+    const x = d.data.find(v => Number(v.id) === Number(id));
+    if (!x) return;
+    fillProjectSelect('visitProjectInline');
+    fillUserSelect('visitUserInline');
+    $('visitIdInline').value = x.id;
+    $('visitUserInline').value = x.user_id || '';
+    $('visitNameInline').value = x.name || '';
+    $('visitPhoneInline').value = x.phone || '';
+    $('visitEmailInline').value = x.email || '';
+    $('visitProjectInline').value = x.project_id || '';
+    $('visitPreferredInline').value = x.preferred_at ? new Date(x.preferred_at).toISOString().slice(0, 16) : '';
+    $('visitStatusInline').value = x.status || 'requested';
+    $('visitNotesInline').value = x.notes || '';
+    $('visitAdminInline').value = x.admin_notes || '';
+    $('visitFormTitle').textContent = 'Edit site visit';
+    $('visitSubmit').textContent = 'Save changes';
+    $('visitFormMsg').textContent = 'Editing visit #' + x.id;
+    document.getElementById('visitsView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('visitNameInline').focus();
+  }).catch(e => toast(e.message));
+}
+
+if ($('visitUserInline')) {
+  $('visitUserInline').onchange = () => {
+    const id = $('visitUserInline').value;
+    if (!id) return;
+    const u = state.customers.find(x => Number(x.id) === Number(id));
+    if (!u) return;
+    $('visitNameInline').value = u.name || '';
+    $('visitPhoneInline').value = u.phone || '';
+    $('visitEmailInline').value = u.email || '';
+  };
+}
+
+if ($('visitFormInline')) {
+  $('visitFormInline').onsubmit = async e => {
+    e.preventDefault();
+    const id = $('visitIdInline').value;
+    const body = {
+      name: $('visitNameInline').value,
+      phone: $('visitPhoneInline').value,
+      email: $('visitEmailInline').value,
+      project_id: $('visitProjectInline').value || null,
+      user_id: $('visitUserInline').value || null,
+      status: $('visitStatusInline').value,
+      preferred_at: $('visitPreferredInline').value,
+      notes: $('visitNotesInline').value,
+      admin_notes: $('visitAdminInline').value
+    };
+    try {
+      const d = id ? await send('/api/admin/site-visits/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) : await send('/api/admin/site-visits', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      resetVisitForm();
+      await loadVisits();
+      toast(id ? 'Site visit updated successfully' : 'Site visit created successfully');
+    } catch (err) {
+      $('visitFormMsg').textContent = err.message;
+      toast(err.message);
+    }
+  };
+}
+
+async function loadVisits() {
+  try {
+    const d = await get('/api/admin/site-visits');
+    $('visitRows').innerHTML = d.data.map(x => `<tr><td><b>#${x.id}</b></td><td>${localDate(x.preferred_at)}</td><td>${esc(x.name)}<br>${esc(x.phone)}<br>${esc(x.email)}</td><td>${esc(x.project_name || 'General')}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.notes || '—')}</td><td>${esc(x.admin_notes || '—')}</td><td class="actions"><button class="btn smallbtn" onclick="editVisit(${x.id})">Edit</button><button class="btn smallbtn danger" onclick="deleteVisit(${x.id})">Delete</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No saved site visits yet.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteVisit(id) {
+  if (!confirm('Delete this site visit?')) return;
+  try {
+    await send('/api/admin/site-visits/' + id, { method: 'DELETE' });
+    toast('Site visit deleted');
+    loadVisits();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function refreshVisits() {
+  resetVisitForm();
+  await loadVisits();
+  toast('Saved site visits refreshed; form cleared');
+}
+
+// ─── PROJECTS ───
+async function loadProjects() {
+  try {
+    const d = await get('/api/admin/projects');
+    state.projects = d.data;
+    $('projectRows').innerHTML = d.data.map(x => `<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.description)}</span></td><td>${esc(x.category)}</td><td><span class="pill">${esc(x.status)}</span></td><td>${x.media_count || 0} file(s)</td><td class="actions"><button class="btn smallbtn" onclick="editProject(${x.id})">Edit</button><button class="btn smallbtn" onclick="openMedia(${x.id})">Media</button><button class="btn smallbtn" onclick="toggleProject(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteProject(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('');
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function resetProjectForm() {
+  $('pId').value = '';
+  $('pName').value = '';
+  $('pCategory').value = '';
+  $('pStatus').value = 'active';
+  $('pLocation').value = '';
+  $('pPrice').value = '';
+  $('pAmenities').value = '';
+  $('pImage').value = '';
+  $('pDescription').value = '';
+  $('pImageFile').value = '';
+  $('projectMsg').textContent = '';
+}
+
+function editProject(id) {
+  const x = state.projects.find(p => Number(p.id) === Number(id));
+  if (!x) return;
+  showView('projectsView');
+  $('pId').value = x.id;
+  $('pName').value = x.name;
+  $('pCategory').value = x.category;
+  $('pStatus').value = x.status;
+  $('pLocation').value = x.location || '';
+  $('pPrice').value = x.price || '';
+  $('pAmenities').value = x.amenities || '';
+  $('pImage').value = x.image || '';
+  $('pDescription').value = x.description || '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+if ($('projectForm')) {
+  $('projectForm').onsubmit = async e => {
+    e.preventDefault();
+    const fd = new FormData();
+    [['pName', 'name'], ['pCategory', 'category'], ['pStatus', 'status'], ['pLocation', 'location'], ['pPrice', 'price'], ['pAmenities', 'amenities'], ['pImage', 'image'], ['pDescription', 'description']].forEach(([id, k]) => fd.append(k, $(id).value));
+    if ($('pImageFile').files[0]) fd.append('image_file', $('pImageFile').files[0]);
+    const id = $('pId').value;
+    try {
+      await send(id ? '/api/admin/projects/' + id : '/api/admin/projects', { method: id ? 'PUT' : 'POST', body: fd });
+      toast(id ? 'Project updated' : 'Project created');
+      resetProjectForm();
+      loadProjects();
+    } catch (err) {
+      toast(err.message);
+    }
+  };
+}
+
+async function toggleProject(id, status) {
+  try {
+    await send('/api/admin/projects/' + id + '/status', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: status === 'active' ? 'inactive' : 'active' }) });
+    toast('Project status updated');
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteProject(id, name) {
+  if (!confirm(`Permanently delete ${name}?`)) return;
+  if (!confirm('This also removes its media and cannot be undone. Continue?')) return;
+  try {
+    await send('/api/admin/projects/' + id, { method: 'DELETE' });
+    toast('Project deleted');
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+let mediaProject = null;
+async function openMedia(id) {
+  mediaProject = id;
+  const p = state.projects.find(x => Number(x.id) === Number(id));
+  $('mediaManager').style.display = 'block';
+  $('mediaTitle').textContent = 'Media — ' + (p?.name || 'Project');
+  await loadMedia();
+  $('mediaManager').scrollIntoView({ behavior: 'smooth' });
+}
+
+if ($('closeMedia')) {
+  $('closeMedia').onclick = () => {
+    $('mediaManager').style.display = 'none';
+    mediaProject = null;
+    $('mediaGrid').innerHTML = '';
+  };
+}
+
+async function loadMedia() {
+  try {
+    const d = await get('/api/admin/projects/' + mediaProject + '/media');
+    $('mediaGrid').innerHTML = d.data.map(x => `<div class="media-card">${x.is_cover ? '<b style="display:block;margin-bottom:4px;color:var(--sky);">Cover image</b>' : ''}${x.media_type === 'video' ? `<video controls src="${escAttr(x.file_path)}"></video>` : `<img src="${escAttr(x.file_path)}" loading="lazy">`}<div class="small" style="margin-top:6px;">${esc(x.original_name)} · ${Math.round(x.file_size / 1024 / 1024 * 10) / 10} MB</div><div class="actions" style="margin-top:8px;">${x.media_type === 'image' && !x.is_cover ? `<button class="btn smallbtn" onclick="setCover(${x.id})">Set cover</button>` : ''}<button class="btn smallbtn danger" onclick="deleteMedia(${x.id})">Delete</button></div></div>`).join('') || '<p class="muted">No media.</p>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+if ($('uploadMedia')) {
+  $('uploadMedia').onclick = async () => {
+    const files = [...$('mediaFiles').files];
+    if (!mediaProject || !files.length) return toast('Choose media first');
+    const fd = new FormData();
+    files.forEach(f => fd.append('media', f));
+    $('uploadMedia').disabled = true;
+    try {
+      await send('/api/admin/projects/' + mediaProject + '/media', { method: 'POST', body: fd });
+      $('mediaFiles').value = '';
+      toast('Media uploaded');
+      await loadMedia();
+      loadProjects();
+    } catch (e) {
+      toast(e.message);
+    } finally {
+      $('uploadMedia').disabled = false;
+    }
+  };
+}
+
+async function setCover(id) {
+  try {
+    await send(`/api/admin/projects/${mediaProject}/media/${id}/cover`, { method: 'PATCH' });
+    toast('Cover updated');
+    loadMedia();
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteMedia(id) {
+  if (!confirm('Delete this media?')) return;
+  try {
+    await send(`/api/admin/projects/${mediaProject}/media/${id}`, { method: 'DELETE' });
+    toast('Media deleted');
+    loadMedia();
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function refreshProjects() {
+  resetProjectForm();
+  if ($('mediaManager')) {
+    $('mediaManager').style.display = 'none';
+    mediaProject = null;
+    $('mediaGrid').innerHTML = '';
+  }
+  loadProjects();
+  toast('Saved projects refreshed; form cleared');
+}
+
+// ─── TEAM & EMPLOYEES ───
+function resetTeamForm() {
+  $('tId').value = '';
+  $('tName').value = '';
+  $('tEmail').value = '';
+  $('tPhone').value = '';
+  $('tDepartment').value = '';
+  $('tDesignation').value = '';
+  $('tPassword').value = '';
+  $('teamSubmit').textContent = 'Create team account';
+  $('teamMsg').textContent = '';
+}
+
+if ($('teamForm')) {
+  $('teamForm').onsubmit = async e => {
+    e.preventDefault();
+    const id = $('tId').value;
+    const body = {
+      name: $('tName').value,
+      email: $('tEmail').value,
+      phone: $('tPhone').value,
+      department: $('tDepartment').value,
+      designation: $('tDesignation').value
+    };
+    try {
+      if (id) {
+        await send('/api/admin/employees/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        toast('Team member updated');
+      } else {
+        body.password = $('tPassword').value;
+        await send('/api/admin/employees', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        toast('Team account created');
+      }
+      resetTeamForm();
+      loadTeam();
+      loadLeads();
+    } catch (err) {
+      $('teamMsg').textContent = err.message;
+      toast(err.message);
+    }
+  };
+}
+
+async function loadTeam() {
+  try {
+    const d = await get('/api/admin/employees');
+    state.employees = d.data;
+    $('teamRows').innerHTML = d.data.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('') || '<tr><td colspan="7" class="empty">No team members yet.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function editTeam(id) {
+  const d = await get('/api/admin/employees');
+  const x = d.data.find(v => Number(v.id) === Number(id));
+  if (!x) return;
+  $('tId').value = x.id;
+  $('tName').value = x.name || '';
+  $('tEmail').value = x.email || '';
+  $('tPhone').value = x.phone || '';
+  $('tDepartment').value = x.department || '';
+  $('tDesignation').value = x.designation || '';
+  $('tPassword').value = '';
+  $('teamSubmit').textContent = 'Save team member';
+  $('teamMsg').textContent = 'Editing ' + x.name;
+  showView('teamView');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function toggleEmployee(id, status) {
+  try {
+    await send('/api/admin/employees/' + id + '/status', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: status === 'active' ? 'inactive' : 'active' }) });
+    toast('Team status updated');
+    loadTeam();
+    loadLeads();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteEmployee(id, name) {
+  if (!confirm(`Delete ${name}?`)) return;
+  try {
+    await send('/api/admin/employees/' + id, { method: 'DELETE' });
+    toast('Team member deleted');
+    loadTeam();
+    loadLeads();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function openPassword(id) {
+  $('passwordEmployeeId').value = id;
+  $('newTeamPassword').value = '';
+  openModal('passwordModal');
+}
+
+if ($('passwordForm')) {
+  $('passwordForm').onsubmit = async e => {
+    e.preventDefault();
+    try {
+      await send('/api/admin/employees/' + $('passwordEmployeeId').value + '/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: $('newTeamPassword').value }) });
+      closeModal('passwordModal');
+      toast('Password reset successfully');
+    } catch (err) {
+      toast(err.message);
+    }
+  };
+}
+
+function refreshTeam() {
+  resetTeamForm();
+  loadTeam();
+  toast('Saved team refreshed; form cleared');
+}
+
+// ─── ATTENDANCE ───
+function todayLocal() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+}
+
+function fillAttendanceEmployeeSelect() {
+  if (!$('attendanceEmployee')) return;
+  $('attendanceEmployee').innerHTML = '<option value="">Select employee</option>' + state.employees.filter(x => x.status === 'active').map(e => `<option value="${e.id}">${esc(e.name)} · ${esc(e.employee_code)}</option>`).join('');
+}
+
+function resetAttendanceForm() {
+  if (!$('attendanceForm')) return;
+  $('attendanceForm').reset();
+  $('attendanceMsg').textContent = '';
+  fillAttendanceEmployeeSelect();
+}
+
+async function loadAttendance() {
+  try {
+    if (!$('attendanceDate').value) $('attendanceDate').value = todayLocal();
+    const d = await get('/api/admin/attendance?date=' + encodeURIComponent($('attendanceDate').value));
+    $('attendanceRows').innerHTML = d.data.map(x => `<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.email || '')}</span></td><td><code>${esc(x.employee_code)}</code></td><td>${esc(x.department || '')}</td><td><span class="pill">${esc(x.attendance_status || 'not recorded')}</span></td><td>${esc(x.check_in || '—')}</td><td>${esc(x.check_out || '—')}</td><td>${esc(x.notes || '—')}</td><td class="actions">${x.attendance_id ? `<button class="btn smallbtn" onclick="editAttendance(${x.id},'${escAttr(x.attendance_status || 'present')}','${escAttr(x.check_in || '')}','${escAttr(x.check_out || '')}','${escAttr(x.notes || '')}')">Edit</button><button class="btn smallbtn danger" onclick="deleteAttendance(${x.attendance_id})">Delete</button>` : '<span class="muted">Not recorded</span>'}</td></tr>`).join('') || '<tr><td colspan="8" class="empty">No employees yet.</td></tr>';
+    const total = d.data.filter(x => x.employee_status === 'active').length, recorded = d.data.filter(x => x.attendance_id).length;
+    if ($('attendanceSummary')) $('attendanceSummary').textContent = `${recorded}/${total} active employees recorded`;
+    fillAttendanceEmployeeSelect();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+if ($('attendanceDate')) $('attendanceDate').onchange = loadAttendance;
+if ($('attendanceForm')) {
+  $('attendanceForm').onsubmit = async e => {
+    e.preventDefault();
+    try {
+      await send('/api/admin/attendance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ employee_id: Number($('attendanceEmployee').value), attendance_date: $('attendanceDate').value, status: $('attendanceStatus').value, check_in: $('attendanceIn').value, check_out: $('attendanceOut').value, notes: $('attendanceNotes').value }) });
+      resetAttendanceForm();
+      await loadAttendance();
+      await load();
+      toast('Attendance saved successfully');
+    } catch (err) {
+      $('attendanceMsg').textContent = err.message;
+      toast(err.message);
+    }
+  };
+}
+
+function editAttendance(id, status, cin, cout, notes) {
+  $('attendanceEmployee').value = id;
+  $('attendanceStatus').value = status;
+  $('attendanceIn').value = cin;
+  $('attendanceOut').value = cout;
+  $('attendanceNotes').value = notes;
+  showView('attendanceView');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  $('attendanceMsg').textContent = 'Editing attendance for ' + (state.employees.find(x => Number(x.id) === Number(id))?.name || 'employee');
+}
+
+async function deleteAttendance(id) {
+  if (!confirm('Delete this attendance record?')) return;
+  try {
+    await send('/api/admin/attendance/' + id, { method: 'DELETE' });
+    await loadAttendance();
+    await load();
+    toast('Attendance record deleted');
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function refreshAttendance() {
+  resetAttendanceForm();
+  await loadAttendance();
+  toast('Attendance refreshed; form cleared');
+}
+
+// ─── CUSTOMERS ───
+async function loadCustomers() {
+  try {
+    const d = await get('/api/admin/users');
+    state.customers = d.data;
+    $('urows').innerHTML = d.data.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}</td><td>${esc(x.phone)}</td><td><span class="pill">${esc(x.role)}</span></td><td><span class="pill">${esc(x.status)}</span></td><td>${localDate(x.created_at)}</td><td class="actions">${x.role === 'customer' ? `<button class="btn smallbtn" onclick="openCustomer(${x.id})">View</button><button class="btn smallbtn" onclick="editCustomer(${x.id})">Edit</button><button class="btn smallbtn" onclick="toggleUser(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Suspend' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteCustomer(${x.id},'${escAttr(x.name)}')">Delete</button>` : '—'}</td></tr>`).join('') || '<tr><td colspan="7" class="empty">No customers yet.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function editCustomer(id) {
+  const x = state.customers.find(v => Number(v.id) === Number(id));
+  if (!x) return;
+  const content = `<form id="customerEditForm" class="formgrid"><input type="hidden" id="ceId" value="${x.id}"><input id="ceName" required value="${escAttr(x.name)}" placeholder="Name"><input id="ceEmail" type="email" value="${escAttr(x.email)}" placeholder="Email"><input id="cePhone" value="${escAttr(x.phone)}" placeholder="Phone"><div class="span4 actions"><button class="btn primary" type="submit">Save customer</button><button class="btn" type="button" onclick="closeModal('customerModal')">Cancel</button></div></form>`;
+  $('customerContent').innerHTML = content;
+  openModal('customerModal');
+  $('customerEditForm').onsubmit = async e => {
+    e.preventDefault();
+    try {
+      await send('/api/admin/users/' + x.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: $('ceName').value, email: $('ceEmail').value, phone: $('cePhone').value }) });
+      closeModal('customerModal');
+      toast('Customer updated');
+      loadCustomers();
+    } catch (err) {
+      toast(err.message);
+    }
+  };
+}
+
+async function openCustomer(id) {
+  try {
+    const d = await get('/api/admin/users/' + id), u = d.data.user;
+    $('customerContent').innerHTML = `<div class="notice"><b>${esc(u.name)}</b><br>${esc(u.email)} · ${esc(u.phone)}<br>Status: ${esc(u.status)} · Joined: ${localDate(u.created_at)}</div><div class="history"><div class="box"><h3>Enquiries (${d.data.enquiries.length})</h3>${d.data.enquiries.map(x => `<p><b>${esc(x.enquiry_reference || '')}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')}<br>${esc(x.message)}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Leads (${d.data.leads.length})</h3>${d.data.leads.map(x => `<p><b>#${x.id}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')} · ${esc(x.employee_name || 'Unassigned')}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Site visits (${d.data.visits.length})</h3>${d.data.visits.map(x => `<p>${localDate(x.preferred_at)} · ${esc(x.status)}<br>${esc(x.project_name || 'General')}</p>`).join('') || '<p class="muted">None</p>'}</div></div>`;
+    openModal('customerModal');
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function toggleUser(id, status) {
+  if (!confirm(status === 'active' ? 'Suspend this account?' : 'Activate this account?')) return;
+  try {
+    await send('/api/admin/users/' + id + '/status', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: status === 'active' ? 'suspended' : 'active' }) });
+    toast('Account updated');
+    loadCustomers();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteCustomer(id, name) {
+  if (!confirm(`Permanently delete customer ${name}?`)) return;
+  if (!confirm('Their historical enquiries/leads/site visits will remain but become unlinked. Continue?')) return;
+  try {
+    await send('/api/admin/users/' + id, { method: 'DELETE' });
+    toast('Customer deleted');
+    loadCustomers();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function refreshCustomers() {
+  await loadCustomers();
+  if ($('customerModal')?.classList.contains('open')) closeModal('customerModal');
+  toast('Saved customers refreshed');
+}
+
+// ─── REPORTS & AUDIT ───
+function bars(el, items, labelKey = 'status') {
+  const max = Math.max(1, ...items.map(x => Number(x.count)));
+  $(el).innerHTML = items.map(x => `<div class="bar"><span style="width:140px; font-weight:600;">${esc(x[labelKey])}</span><i style="width:${Math.max(3, Number(x.count) / max * 60)}%"></i><b>${x.count}</b></div>`).join('') || '<span class="muted">No data yet.</span>';
+}
+
+function renderRecentActivity(items) {
+  const el = $('recentActivity');
+  if (!el) return;
+  el.innerHTML = (items || []).map(x => `<div class="activity-item"><b>${esc((x.action || 'activity').replaceAll('_', ' '))} · ${esc(x.entity_type || '')}</b><small>${esc(x.details || '')} · ${localDate(x.created_at)} · ${esc(x.user_name || 'System')}</small></div>`).join('') || '<div class="empty">No recent activity yet.</div>';
+}
+
+async function loadReports() {
+  try {
+    const q = new URLSearchParams();
+    if ($('reportStart').value) q.set('start', $('reportStart').value);
+    if ($('reportEnd').value) q.set('end', $('reportEnd').value);
+    if ($('reportStart').value && $('reportEnd').value && $('reportStart').value > $('reportEnd').value) return toast('Report start date cannot be after end date');
+    const d = await get('/api/admin/report' + (q.toString() ? '?' + q : ''));
+    bars('statusChart', d.data.byStatus);
+    bars('projectChart', d.data.byProject, 'project_name');
+    bars('monthlyChart', d.data.monthly, 'month');
+    bars('visitChart', d.data.visits, 'status');
+    $('conversion').textContent = `Won conversion rate: ${d.data.conversionRate}% · Total leads: ${d.data.totalLeads} · Won: ${d.data.won}${d.data.start ? ' · ' + d.data.start + ' to ' + d.data.end : ''}`;
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function clearReportFilters() {
+  $('reportStart').value = '';
+  $('reportEnd').value = '';
+  loadReports();
+}
+
+async function refreshReports() {
+  clearReportFilters();
+  toast('Reports refreshed; filters cleared');
+}
+
+async function loadAudit() {
+  try {
+    const q = new URLSearchParams();
+    if ($('auditSearch').value) q.set('search', $('auditSearch').value);
+    if ($('auditEntity').value) q.set('entity', $('auditEntity').value);
+    const d = await get('/api/admin/audit-logs' + (q.toString() ? '?' + q : ''));
+    $('auditRows').innerHTML = d.data.map(x => `<tr><td>${localDate(x.created_at)}</td><td>${esc(x.user_name || 'System')}<br>${esc(x.user_email || '')}</td><td><b>${esc(x.action)}</b></td><td><span class="pill">${esc(x.entity_type)}</span></td><td>#${esc(x.entity_id)}</td><td>${esc(x.details)}</td><td><code>${esc(x.ip_address)}</code></td></tr>`).join('') || '<tr><td colspan="7" class="empty">No audit entries match your filter.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+function clearAuditFilters() {
+  $('auditSearch').value = '';
+  $('auditEntity').value = '';
+  loadAudit();
+}
+
+async function refreshAudit() {
+  clearAuditFilters();
+  toast('Audit log refreshed; filters cleared');
+}
+
+async function refreshAll() {
+  resetEnquiryForm();
+  resetLeadFormInline();
+  resetVisitForm();
+  resetTeamForm();
+  resetAttendanceForm();
+  resetProjectForm();
+  if ($('mediaManager')) {
+    $('mediaManager').style.display = 'none';
+    mediaProject = null;
+    $('mediaGrid').innerHTML = '';
+  }
+  try {
+    await load();
+    toast('Dashboard refreshed; forms cleared');
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+load().catch(e => toast(e.message));
+setInterval(() => {
+  if (document.querySelector('.view.active')?.id === 'overview' && !document.activeElement.matches('textarea,select,input')) {
+    load().catch(() => {});
+  }
+}, 15000);
 </script>
 </body>
 </html>
