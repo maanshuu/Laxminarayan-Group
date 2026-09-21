@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Laxminarayan Group — My Account</title>
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="apple-touch-icon" href="assets/favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
@@ -373,7 +375,16 @@ tr:hover td {
 <script>
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
-const ld = v => new Date(/Z$|[+-]\d\d:\d\d$/.test(v) ? v : v + 'Z').toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+const ld = v => {
+  if (!v) return '—';
+  try {
+    let s = String(v).trim();
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) s = s.replace(' ', 'T') + 'Z';
+    else if (!/Z$|[+-]\d\d:\d\d$/.test(s) && s.includes('T')) s += 'Z';
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? esc(v) : d.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' });
+  } catch { return esc(v); }
+};
 
 async function get(u) {
   const r = await fetch(u, { credentials: 'same-origin', cache: 'no-store' });

@@ -1,0 +1,109 @@
+/* ─── FLOATING WHATSAPP CONCIERGE WIDGET ─── */
+.wa-floating-btn,
+.wa-float {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #25D366;
+  color: #ffffff;
+  padding: 12px 20px 12px 14px;
+  border-radius: 9999px;
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.45);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  max-width: fit-content;
+}
+
+.wa-floating-btn:hover,
+.wa-float:hover {
+  background: #20ba5a;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(37, 211, 102, 0.55);
+  color: #fff;
+}
+
+.wa-icon-pulse,
+.wa-float-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.wa-floating-btn svg,
+.wa-float svg,
+.wa-float-icon svg {
+  width: 24px;
+  height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  fill: #ffffff;
+  color: #ffffff;
+  display: block;
+}
+
+.wa-icon-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.4);
+  animation: waPulse 2s infinite ease-out;
+}
+
+@keyframes waPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.wa-badge-text,
+.wa-float-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.wa-badge-status,
+.wa-float-status {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-badge-status::before,
+.wa-float-dot {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .wa-floating-btn,
+  .wa-float {
+    bottom: 84px;
+    right: 18px;
+    padding: 12px;
+  }
+  .wa-badge-text,
+  .wa-float-text {
+    display: none;
+  }
+}
+

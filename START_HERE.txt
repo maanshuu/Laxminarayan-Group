@@ -41,7 +41,7 @@ PROJECT PORTFOLIO UPDATE
 - New project imagery is bundled locally under assets/.
 
 ADMIN PASSWORD RESET:
-If the admin password does not work, stop Node.js and run RESET_ADMIN_PASSWORD.bat. It is a one-time utility that updates the existing admin password safely using bcrypt and invalidates existing admin sessions.
+If you ever need to reset or change the admin password, stop Node.js and run RESET_ADMIN_PASSWORD.bat. It updates the admin password safely using bcrypt and keeps .env synchronized.
 
 
 PROJECT IMAGES: In Admin > Manage projects, use the new file picker to choose a JPG, PNG, WEBP, or GIF from your device (max 8 MB). You can still enter an image path/URL instead.

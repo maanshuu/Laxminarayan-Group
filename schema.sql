@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS enquiries (
   message TEXT NOT NULL DEFAULT '',
   enquiry_reference TEXT UNIQUE,
   admin_response TEXT NOT NULL DEFAULT '',
+  source TEXT NOT NULL DEFAULT 'website',
   status TEXT NOT NULL DEFAULT 'new' CHECK(status IN ('new','contacted','closed')),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL,
@@ -182,5 +183,29 @@ CREATE TABLE IF NOT EXISTS employee_attendance (
   UNIQUE(employee_id,attendance_date),
   FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE
 );
-CREATE INDEX IF NOT EXISTS idx_attendance_date ON employee_attendance(attendance_date);
-CREATE INDEX IF NOT EXISTS idx_attendance_employee ON employee_attendance(employee_id);
+CREATE TABLE IF NOT EXISTS password_resets (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  expires_at TEXT NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token_hash);
+CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
+
+CREATE TABLE IF NOT EXISTS auth_otps (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  identifier TEXT NOT NULL,
+  identifier_type TEXT NOT NULL CHECK(identifier_type IN ('email', 'phone')),
+  otp_hash TEXT NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  max_attempts INTEGER NOT NULL DEFAULT 3,
+  expires_at TEXT NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_auth_otps_identifier ON auth_otps(identifier);
+
+

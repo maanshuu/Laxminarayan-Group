@@ -7,4 +7,22 @@ uploads/
 *.db
 *.db-shm
 *.db-wal
+*.bak
+*.backup_*
 .admin-password-reset-used
+
+# Scratch & Temporary Testing Scripts
+scratch/
+*.log
+
+# Test Screenshots & Temporary Proof Images
+live_test_*.png
+assets/live_*.png
+assets/*_orig.*
+*.tmp
+
+# OS & Editor Metadata
+Thumbs.db
+.DS_Store
+__pycache__/
+*.pyc

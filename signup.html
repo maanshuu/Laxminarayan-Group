@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Laxminarayan Group — Client Registration</title>
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="apple-touch-icon" href="assets/favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
@@ -206,16 +208,16 @@ button:disabled {
   <p>Use an email, phone number, or both. Your credentials are fully encrypted.</p>
   
   <form id="form">
-    <label>FULL NAME</label>
+    <label for="name">FULL NAME</label>
     <input id="name" autocomplete="name" placeholder="Himanshu Kanani" required aria-label="Full Name">
     
-    <label>EMAIL <small>(optional if phone is provided)</small></label>
+    <label for="email">EMAIL <small>(optional if phone is provided)</small></label>
     <input id="email" type="email" autocomplete="email" placeholder="name@example.com" aria-label="Email">
     
-    <label>PHONE <small>(optional if email is provided)</small></label>
+    <label for="phone">PHONE <small>(optional if email is provided)</small></label>
     <input id="phone" type="tel" autocomplete="tel" placeholder="+91 9876543210" aria-label="Phone">
     
-    <label>PASSWORD</label>
+    <label for="password">PASSWORD</label>
     <input id="password" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="At least 8 characters" required aria-label="Password">
     
     <button id="submit">CREATE ACCOUNT →</button>

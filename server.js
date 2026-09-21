@@ -1,15 +1,34 @@
 require("dotenv").config();
+process.env.TZ = process.env.TZ || "Asia/Kolkata";
+
+function todayIST() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
+}
+function nowIST() {
+  const d = new Date();
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(d);
+  const time = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(d);
+  return `${date} ${time}`;
+}
+
 const express=require("express");
+const http=require("http");
+const https=require("https");
+const net=require("net");
 const cors=require("cors");
 const helmet=require("helmet");
+const compression=require("compression");
 const bcrypt=require("bcryptjs");
 const jwt=require("jsonwebtoken");
 const cookieParser=require("cookie-parser");
 const multer=require("multer");
+const selfsigned=require("selfsigned");
 const fs=require("fs");
 const path=require("path");
 const os=require("os");
+const crypto=require("crypto");
 const Database=require("./scripts/sqlite-compat");
+const { buildPdf }=require("./scripts/pdf-brochure");
 
 const app=express();
 const PORT=Number(process.env.PORT||5000);
@@ -27,6 +46,43 @@ const FRONTEND_URL=process.env.FRONTEND_URL||"http://localhost:5000";
 const APP_DATA_ROOT=path.join(process.env.APPDATA||path.join(os.homedir(),"AppData","Roaming"),"LaxminarayanGroup");
 const PERSISTENT_DATA_DIR=path.join(APP_DATA_ROOT,"data");
 const PERSISTENT_UPLOAD_DIR=path.join(APP_DATA_ROOT,"uploads","projects");
+const CERTS_DIR=path.join(APP_DATA_ROOT,"certs");
+const CERT_FILE=process.env.SSL_CERT||path.join(CERTS_DIR,"cert.pem");
+const KEY_FILE=process.env.SSL_KEY||path.join(CERTS_DIR,"key.pem");
+
+async function getOrGenerateCertificates(){
+  if(fs.existsSync(CERT_FILE) && fs.existsSync(KEY_FILE)){
+    return {
+      cert: fs.readFileSync(CERT_FILE,"utf8"),
+      key: fs.readFileSync(KEY_FILE,"utf8")
+    };
+  }
+  fs.mkdirSync(CERTS_DIR,{recursive:true});
+  console.log("[TLS] Generating persistent self-signed TLS/SSL certificate for localhost...");
+  const pems=await selfsigned.generate(
+    [
+      { name: "commonName", value: "localhost" },
+      { name: "organizationName", value: "Laxminarayan Group" },
+      { name: "countryName", value: "IN" }
+    ],
+    {
+      days: 365,
+      keySize: 2048,
+      extensions: [
+        {
+          name: "subjectAltName",
+          altNames: [
+            { type: 2, value: "localhost" },
+            { type: 7, ip: "127.0.0.1" }
+          ]
+        }
+      ]
+    }
+  );
+  fs.writeFileSync(CERT_FILE,pems.cert,"utf8");
+  fs.writeFileSync(KEY_FILE,pems.private,"utf8");
+  return { cert: pems.cert, key: pems.private };
+}
 const CONFIGURED_DB=process.env.DB_FILE||"./data/laxminarayan.db";
 const LEGACY_DB_FILE=path.resolve(__dirname,CONFIGURED_DB);
 const DB_FILE=path.isAbsolute(CONFIGURED_DB) ? CONFIGURED_DB : path.join(PERSISTENT_DATA_DIR,"laxminarayan.db");
@@ -148,6 +204,7 @@ function migrateLegacySchema(){
   if(!c.has("project_id")) db.exec("ALTER TABLE enquiries ADD COLUMN project_id INTEGER");
   if(!c.has("enquiry_reference")) db.exec("ALTER TABLE enquiries ADD COLUMN enquiry_reference TEXT");
   if(!c.has("admin_response")) db.exec("ALTER TABLE enquiries ADD COLUMN admin_response TEXT NOT NULL DEFAULT ''");
+  if(!c.has("source")) db.exec("ALTER TABLE enquiries ADD COLUMN source TEXT NOT NULL DEFAULT 'website'");
   db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_enquiries_reference_unique ON enquiries(enquiry_reference) WHERE enquiry_reference IS NOT NULL AND enquiry_reference <> ''");
   db.prepare("UPDATE enquiries SET enquiry_reference='ENQ-' || printf('%06d',id) WHERE enquiry_reference IS NULL OR enquiry_reference=''").run();
   db.exec("CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at)");
@@ -175,7 +232,8 @@ function migrateProductionSchema(){
   if(!c.has("enquiry_id")) db.exec("ALTER TABLE leads ADD COLUMN enquiry_id INTEGER");
   if(!c.has("assigned_employee_id")) db.exec("ALTER TABLE leads ADD COLUMN assigned_employee_id INTEGER");
   if(!c.has("follow_up_at")) db.exec("ALTER TABLE leads ADD COLUMN follow_up_at TEXT");
-  if(!c.has("lost_reason")) db.exec("ALTER TABLE leads ADD COLUMN lost_reason TEXT NOT NULL DEFAULT ''");
+  let ec=cols("enquiries");
+  if(!ec.has("source")) db.exec("ALTER TABLE enquiries ADD COLUMN source TEXT NOT NULL DEFAULT 'website'");
   if(!c.has("created_at")) { db.exec("ALTER TABLE leads ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"); db.prepare("UPDATE leads SET created_at=CURRENT_TIMESTAMP WHERE created_at=''").run(); }
   if(!c.has("updated_at")) { db.exec("ALTER TABLE leads ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''"); db.prepare("UPDATE leads SET updated_at=created_at WHERE updated_at=''").run(); }
   db.exec("CREATE INDEX IF NOT EXISTS idx_leads_project_id ON leads(project_id)");
@@ -301,38 +359,36 @@ function migrateProductionSchema(){
   if(!c.has("agreement_value")) db.exec("ALTER TABLE bookings ADD COLUMN agreement_value TEXT NOT NULL DEFAULT ''");
   if(!c.has("token_amount")) db.exec("ALTER TABLE bookings ADD COLUMN token_amount TEXT NOT NULL DEFAULT ''");
   if(!c.has("payment_status")) db.exec("ALTER TABLE bookings ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'token_received'");
+
+  db.exec(`CREATE TABLE IF NOT EXISTS password_resets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    expires_at TEXT NOT NULL,
+    used INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token_hash);
+  CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);`);
+
+  db.exec(`CREATE TABLE IF NOT EXISTS auth_otps (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    identifier TEXT NOT NULL,
+    identifier_type TEXT NOT NULL CHECK(identifier_type IN ('email', 'phone')),
+    otp_hash TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    max_attempts INTEGER NOT NULL DEFAULT 3,
+    expires_at TEXT NOT NULL,
+    used INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE INDEX IF NOT EXISTS idx_auth_otps_identifier ON auth_otps(identifier);`);
 }
 migrateProductionSchema();
 
 function seedSampleProjectUnits(){
-  try{
-    const unitCount=db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
-    if(unitCount>0) return;
-    const projects=db.prepare("SELECT id,name,category FROM projects LIMIT 12").all();
-    if(!projects.length) return;
-    const insert=db.prepare(`INSERT INTO project_units(project_id,unit_number,unit_type,floor_number,area_sqft,price,status,buyer_name,buyer_phone,notes)
-      VALUES(?,?,?,?,?,?,?,?,?,?)`);
-    const tx=db.transaction(()=>{
-      for(const p of projects){
-        const cat=(p.category||'').toUpperCase();
-        if(cat==="RESIDENTIAL" || p.name.toLowerCase().includes("villa") || p.name.toLowerCase().includes("heights")){
-          insert.run(p.id,"Unit 101","3 BHK Luxury",1,1850,"₹85,00,000","available","","","Garden facing with private deck");
-          insert.run(p.id,"Unit 102","3 BHK Luxury",1,1850,"₹85,00,000","blocked","Rajesh Sharma","9876543210","Token advance paid, agreement in progress");
-          insert.run(p.id,"Unit 201","4 BHK Penthouse",2,2600,"₹1,35,00,000","available","","","Corner penthouse with expansive terrace");
-          insert.run(p.id,"Unit 202","2 BHK Premium",2,1250,"₹62,00,000","sold","Anita Desai","9823456789","Sold & booked, handover scheduled");
-        }else if(cat==="COMMERCIAL"){
-          insert.run(p.id,"Office 301","Executive Suite",3,980,"₹72,00,000","available","","","Road facing premium glass facade office");
-          insert.run(p.id,"Shop G-04","Retail Showroom",0,1450,"₹1,15,00,000","blocked","Vikas Patel","9898012345","Retail showroom token held");
-          insert.run(p.id,"Office 402","Corporate Workspace",4,1700,"₹1,10,00,000","available","","","Double height ceiling with parking slots");
-        }else{
-          insert.run(p.id,"Plot #12","Industrial Plot",1,5000,"₹95,00,000","available","","","Heavy power & water connection infrastructure");
-          insert.run(p.id,"Shed B-1","Industrial Warehouse",1,7500,"₹1,50,00,000","sold","Metro Logistics","9712345678","Long-term industrial facility lease/sale");
-        }
-      }
-    });
-    tx();
-    console.log("Seeded initial real estate project inventory units");
-  }catch(e){console.error("Unit seeding warning:",e.message);}
+  // Only maintain units for real active projects (DS 208 and Nilkanth Villa)
 }
 seedSampleProjectUnits();
 
@@ -371,17 +427,111 @@ function safeMediaPath(filePath){if(!filePath||!filePath.startsWith("/uploads/pr
 function deleteMediaFile(filePath){const full=safeMediaPath(filePath);if(full)try{fs.unlinkSync(full)}catch(_e){}}
 
 app.disable("x-powered-by");
-app.use(helmet({contentSecurityPolicy:false}));
+app.use(compression());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      styleSrcAttr: ["'unsafe-inline'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "blob:", "https:"],
+      mediaSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+      frameAncestors: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"]
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: "same-origin" },
+  crossOriginResourcePolicy: { policy: "same-origin" },
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  xContentTypeOptions: true,
+  xDnsPrefetchControl: { allow: false },
+  xFrameOptions: { action: "sameorigin" },
+  xPermittedCrossDomainPolicies: { permittedPolicies: "none" },
+  hsts: false
+}));
 app.use(cors({origin:FRONTEND_URL==="*" ? true : FRONTEND_URL.split(",").map(x=>x.trim()),credentials:true}));
 app.use(express.json({limit:"1mb"}));
-app.use(express.urlencoded({extended:false}));
+app.use(express.urlencoded({extended:false,limit:"1mb"}));
 app.use(cookieParser());
+
+// Anti-Prototype Pollution & Path Traversal Guard
+function hasPollution(obj, depth = 0) {
+  if (!obj || depth > 5 || typeof obj !== "object") return false;
+  if (Object.prototype.hasOwnProperty.call(obj, "__proto__") || Object.prototype.hasOwnProperty.call(obj, "constructor") || Object.prototype.hasOwnProperty.call(obj, "prototype")) {
+    return true;
+  }
+  for (const k of Object.getOwnPropertyNames(obj)) {
+    if (k === "__proto__" || k === "constructor" || k === "prototype") return true;
+    if (typeof obj[k] === "object" && hasPollution(obj[k], depth + 1)) return true;
+  }
+  return false;
+}
+app.use((req, res, next) => {
+  let decodedPath = "";
+  try {
+    decodedPath = decodeURIComponent(req.path || "");
+  } catch (_e) {
+    return res.status(400).type("text/plain").send("Bad Request: Malformed URI");
+  }
+  if (decodedPath.includes("\0") || decodedPath.includes("..") || decodedPath.includes("\\")) {
+    return res.status(403).type("text/plain").send("Forbidden");
+  }
+  if (hasPollution(req.body) || hasPollution(req.query)) {
+    return res.status(400).json({ success: false, error: "Invalid request payload parameters" });
+  }
+  next();
+});
+
 app.use((req,res,next)=>{
+  res.set("Permissions-Policy","camera=(), microphone=(), geolocation=(), payment=()");
   if(req.path.startsWith("/api/") || req.path==="/admin.html" || req.path==="/dashboard.html" || req.path==="/project-category.html") {
     res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
     res.set("Pragma","no-cache");
     res.set("Expires","0");
   }
+  next();
+});
+
+// Source Code & Internal File Shielding: strictly block requests for backend code, scripts, configs and backups
+const SENSITIVE_EXTENSIONS = new Set([
+  ".js", ".mjs", ".cjs", ".ts", ".jsx", ".tsx",
+  ".sql", ".sqlite", ".sqlite3", ".db",
+  ".json", ".lock",
+  ".bat", ".cmd", ".sh", ".ps1",
+  ".env", ".bak", ".map", ".log",
+  ".yml", ".yaml", ".md", ".txt",
+  ".pem", ".crt", ".key", ".pfx", ".cer"
+]);
+const FORBIDDEN_DIRS = ["/scripts", "/node_modules", "/.git", "/data", "/backups", "/scratch", "/.gemini", "/.system_generated", "/certs"];
+
+app.use((req, res, next) => {
+  const p = req.path.toLowerCase();
+  if (p.startsWith("/api/")) return next();
+  if (p.startsWith("/assets/")) return next();
+  if (p === "/robots.txt" || p === "/sitemap.xml") return next();
+
+  for (const dir of FORBIDDEN_DIRS) {
+    if (p === dir || p.startsWith(dir + "/") || p.includes(dir + "/")) {
+      return res.status(403).type("text/plain").send("Forbidden");
+    }
+  }
+
+  const ext = path.extname(p);
+  if (SENSITIVE_EXTENSIONS.has(ext)) {
+    return res.status(403).type("text/plain").send("Forbidden");
+  }
+
+  if (p.split("/").some(segment => segment.startsWith(".") && segment.length > 1)) {
+    return res.status(403).type("text/plain").send("Forbidden");
+  }
+
   next();
 });
 
@@ -405,12 +555,16 @@ function rateLimit(max,windowMs){
     next();
   };
 }
+// Global API rate limiter (300 requests per 5 minutes per IP) to prevent API scraping and flood attacks
+app.use("/api/", rateLimit(300, 5 * 60 * 1000));
 function audit(req,action,type,id,details=""){
   try{db.prepare("INSERT INTO audit_logs(user_id,action,entity_type,entity_id,details,ip_address) VALUES(?,?,?,?,?,?)").run(req.user?.id||null,action,type,id,clean(details,2000),clean(req.ip||"",100));}catch(_e){}
 }
-function signIn(res,user){
+function signIn(res,user,req=null){
  const token=jwt.sign({id:user.id,role:user.role,sv:Number(user.session_version||0)},JWT_SECRET,{expiresIn:"7d"});
- res.cookie("lg_session",token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",maxAge:7*24*60*60*1000,path:"/"});
+ const isSecure = req ? Boolean(req.secure || req.protocol === "https" || req.headers["x-forwarded-proto"] === "https") : false;
+ res.cookie("lg_session",token,{httpOnly:true,secure:isSecure,sameSite:"lax",maxAge:7*24*60*60*1000,path:"/"});
+ return token;
 }
 function auth(req,res,next){
  const bearer=(req.headers.authorization||"").startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
@@ -431,39 +585,99 @@ function admin(req,res,next){auth(req,res,()=>{
  if(u.role!=="admin")return res.status(403).json({success:false,error:"Admin access required"});
  next();
 })}
+function employeeOrAdmin(req,res,next){auth(req,res,()=>{
+ const u=db.prepare("SELECT status,role FROM users WHERE id=?").get(req.user.id);
+ if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
+ if(u.role!=="admin" && u.role!=="employee")return res.status(403).json({success:false,error:"Advisor or admin access required"});
+ req.user.role=u.role;
+ next();
+})}
+function currentEmployee(userId){
+  if(!userId) return null;
+  let emp = db.prepare("SELECT e.*, u.name, u.email, u.phone FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
+  if(!emp){
+    const u = db.prepare("SELECT id, name, email, phone, role FROM users WHERE id=?").get(userId);
+    if(u && (u.role === 'admin' || u.role === 'employee')){
+      const code = u.role === 'admin' ? 'EMP-0001' : `EMP-${String(u.id).padStart(4, '0')}`;
+      const desig = u.role === 'admin' ? 'Principal Administrator' : 'Sales Advisor';
+      const dept = u.role === 'admin' ? 'Executive Leadership' : 'Sales & Advisory';
+      try {
+        db.prepare("INSERT OR IGNORE INTO employees(user_id, employee_code, department, designation, joined_at) VALUES(?, ?, ?, ?, CURRENT_TIMESTAMP)").run(u.id, code, dept, desig);
+        emp = db.prepare("SELECT e.*, u.name, u.email, u.phone FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
+      } catch(_) {}
+    }
+  }
+  return emp;
+}
+function dispatchNotification({ type, name, phone, project, details }){
+  const cleanPhone = (phone || "").replace(/[^0-9]/g, "");
+  const adminPhone = (process.env.ADMIN_WHATSAPP_PHONE || "919876543210").replace(/[^0-9]/g, "");
+  const payload = {
+    service: "Laxminarayan Group",
+    type: type || "Enquiry",
+    name,
+    phone: cleanPhone,
+    project: project || "General",
+    details: details || "",
+    timestamp: new Date().toISOString(),
+    time_ist: nowIST()
+  };
+
+  if (process.env.WHATSAPP_WEBHOOK_URL) {
+    try {
+      fetch(process.env.WHATSAPP_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error("[WEBHOOK ERROR]", err.message));
+    } catch (_) {}
+  }
+
+  const buyerGreeting = `Hello ${name}, thank you for your interest in Laxminarayan Group (${project || "our projects"}). Our senior sales advisory team is at your service. Would you like to schedule a private site visit or view our floor plans?`;
+  const buyerWhatsappUrl = cleanPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(buyerGreeting)}` : null;
+
+  const adminAlert = `🚨 *NEW REAL ESTATE LEAD - Laxminarayan Group*\n\n` +
+    `👤 *Client:* ${name}\n` +
+    `📞 *Phone:* ${cleanPhone}\n` +
+    `🏗️ *Site:* ${project || "General"}\n` +
+    `🏷️ *Type:* ${type}\n` +
+    (details ? `📝 *Details:* ${details}\n` : '') +
+    `⏰ *Time (IST):* ${nowIST()}\n\n` +
+    `👉 *Chat with Client:* https://wa.me/91${cleanPhone.slice(-10)}`;
+  const adminWhatsappUrl = adminPhone ? `https://wa.me/${adminPhone}?text=${encodeURIComponent(adminAlert)}` : null;
+
+  return { payload, buyerWhatsappUrl, adminWhatsappUrl, whatsappUrl: buyerWhatsappUrl };
+}
 function currentUser(id){return db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users WHERE id=?").get(id)}
 function rndRef(){return Math.floor(100+Math.random()*900)}
 
 function seed(){
  const projects=[
-  ["Signature Homes","RESIDENTIAL","Thoughtfully planned homes for contemporary families.","assets/signature-homes.jpg"],
-  ["Signature Villas","RESIDENTIAL","Premium villas designed around privacy, comfort and modern family living.","assets/signature-villas.jpg"],
-  ["Signature Residency","RESIDENTIAL","Contemporary residences with practical layouts, amenities and refined finishes.","assets/signature-residency.jpg"],
-  ["Signature Townhomes","RESIDENTIAL","Elegant townhomes combining community living with generous private spaces.","assets/signature-townhomes.jpg"],
-  ["Prime Spaces","COMMERCIAL","Strategic commercial spaces built for opportunity.","assets/commercial-properties.jpg"],
-  ["Prime Business Hub","COMMERCIAL","Modern offices planned for growing teams, visibility and everyday convenience.","assets/commercial-properties.jpg"],
-  ["Prime Corporate Plaza","COMMERCIAL","Premium commercial addresses designed for established businesses and professional services.","assets/commercial-properties.jpg"],
-  ["Prime Retail Avenue","COMMERCIAL","High-visibility retail spaces planned for customer access and business growth.","assets/commercial-properties.jpg"],
-  ["Future Landmarks","DEVELOPMENT","Planned developments with a long-term perspective.","assets/residential-properties.jpg"],
-  ["Future Landmark City","DEVELOPMENT","A thoughtfully planned mixed-use destination designed for long-term value.","assets/residential-properties.jpg"],
-  ["Horizon Heights","DEVELOPMENT","A modern community concept balancing architecture, open space and connectivity.","assets/residential-properties.jpg"],
-  ["Greenfield Enclave","DEVELOPMENT","A future-ready development vision focused on quality infrastructure and liveability.","assets/residential-properties.jpg"],
-  ["Industrial Properties","INDUSTRIAL","Purpose-built industrial spaces for manufacturing, logistics and business expansion.","assets/industrial-properties.jpg"],
-  ["Laxminarayan Industrial Park","INDUSTRIAL","Flexible industrial units with practical access, loading and operational planning.","assets/industrial-properties.jpg"],
-  ["Logistics & Warehouse Hub","INDUSTRIAL","Efficient warehouse and logistics facilities designed for modern supply chains.","assets/industrial-properties.jpg"],
-  ["Manufacturing Estate","INDUSTRIAL","Strategic industrial plots and facilities planned for scalable manufacturing operations.","assets/industrial-properties.jpg"]
+  ["DS 208 (Developed by Akshar Group)","APARTMENTS & SHOPS","Premier residential & commercial landmark situated on S.P. Ring Road, Vastral, Ahmedabad. Developed by Akshar Group. Features 4 grand mid-rise residential towers (Blocks A, B, C, D), ground-level high street retail promenade with 33 shops, thoughtfully crafted 2 & 3 BHK luxury residences, and 20+ world-class lifestyle amenities.","/uploads/projects/ds208_bird_eye_view.jpg"],
+  ["Nilkanth Villa","LUXURY VILLAS","Exclusive private luxury villa estate crafted with expansive landscaped private gardens, contemporary architecture, generous multi-level layouts, gated community security, and private clubhouse.","/assets/hero-villa.png"]
  ];
- const ins=db.prepare("INSERT INTO projects(name,category,description,image) VALUES(?,?,?,?)");
+ const ins=db.prepare("INSERT INTO projects(name,category,description,image,status) VALUES(?,?,?,?, 'active')");
  const addMany=db.transaction(items=>{for(const x of items){if(!db.prepare("SELECT id FROM projects WHERE name=?").get(x[0])) ins.run(...x)}});
  addMany(projects);
+ try {
+   db.prepare("DELETE FROM project_units WHERE project_id NOT IN (SELECT id FROM projects WHERE name IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa'))").run();
+   db.prepare("DELETE FROM projects WHERE name NOT IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa')").run();
+ } catch (_) {}
  if(db.prepare("SELECT COUNT(*) c FROM leaders").get().c===0){
   const ins=db.prepare("INSERT INTO leaders(name,designation,initials,image) VALUES(?,?,?,?)");
   [["Roshan Sabhaya","FOUNDER & DIRECTOR","RS",""],["Mehul Mistry","FOUNDER & DIRECTOR","MM",""],["Swaraj Jikadara","FOUNDER & DIRECTOR","SJ",""]].forEach(x=>ins.run(...x));
  }
  const email=clean(process.env.ADMIN_EMAIL,160).toLowerCase(), password=process.env.ADMIN_PASSWORD;
- if(email && password && passwordOk(password) && !db.prepare("SELECT id FROM users WHERE email=?").get(email)){
-  const hash=bcrypt.hashSync(password,12);
-  db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run("Laxminarayan Admin",email,"",hash,"admin","active");
+ if(email && password && passwordOk(password)){
+  const existing = db.prepare("SELECT id, password_hash, role FROM users WHERE email=?").get(email);
+  if(!existing){
+   const hash=bcrypt.hashSync(password,12);
+   db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run("Laxminarayan Admin",email,"",hash,"admin","active");
+  } else if(existing.role==="admin" && !bcrypt.compareSync(password, existing.password_hash)){
+   const hash=bcrypt.hashSync(password,12);
+   db.prepare("UPDATE users SET password_hash=?, session_version=session_version+1, status='active', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(hash, existing.id);
+   console.log(`[AUTH] Admin password synchronized from .env for ${email}`);
+  }
  }
 }
 seed();
@@ -486,11 +700,75 @@ async function createRollingBackup(){
 createRollingBackup();
 
 
-app.get("/api/projects/:id",auth,(req,res)=>{
+app.get("/api/projects/:id",(req,res)=>{
   const id=Number(req.params.id); if(!Number.isInteger(id)||id<1)return res.status(400).json({success:false,error:"Invalid project id"});
   const p=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=? AND status='active'").get(id);
   if(!p)return res.status(404).json({success:false,error:"Project not found"});
   res.json({success:true,data:p,media:mediaRows(id)});
+});
+
+app.post("/api/projects/:id/brochure",rateLimit(15,10*60*1000),(req,res)=>{
+  const projectId=Number(req.params.id);
+  const name=clean(req.body.name,120);
+  const phone=clean(req.body.phone,30);
+  const email=clean(req.body.email,160).toLowerCase();
+
+  if(req.body.hp_confirm_field) return res.status(200).json({success:true,message:"Download started"});
+  if(!Number.isInteger(projectId)||projectId<1)return res.status(400).json({success:false,error:"Invalid project id"});
+  if(name.length<2)return res.status(400).json({success:false,error:"Enter your full name"});
+  if(!validPhone(phone))return res.status(400).json({success:false,error:"Enter a valid phone number"});
+  if(email && !validEmail(email))return res.status(400).json({success:false,error:"Enter a valid email"});
+
+  const project=db.prepare("SELECT * FROM projects WHERE id=? AND status='active'").get(projectId);
+  if(!project)return res.status(404).json({success:false,error:"Project not found"});
+
+  const cleanPhone=phone.replace(/[^0-9]/g,"");
+  let userId=null;
+  try{
+    const token=req.cookies.lg_session;
+    if(token){
+      const decoded=jwt.verify(token,JWT_SECRET);
+      const u=db.prepare("SELECT id,status FROM users WHERE id=?").get(decoded.id);
+      if(u&&u.status==="active")userId=u.id;
+    }
+  }catch(_e){}
+
+  const clientSource = clean(req.body.source, 80);
+  const effectiveSource = clientSource && clientSource !== 'website' ? `${clientSource} (brochure)` : 'brochure_download';
+  const created=createEnquiry({
+    userId,
+    projectId:project.id,
+    name,
+    phone:cleanPhone,
+    email:email||"",
+    message:`Downloaded project brochure and specifications for ${project.name}`,
+    source: effectiveSource
+  });
+
+  db.prepare("UPDATE leads SET source=?, sentiment='hot', notes='Downloaded project brochure & specifications sheet' WHERE enquiry_id=?").run(effectiveSource, created.id);
+
+  dispatchNotification({
+    type:"brochure_download",
+    name,
+    phone:cleanPhone,
+    project:project.name,
+    details:`Client downloaded brochure for ${project.name}`
+  });
+
+  audit(req,"brochure_download","project",project.id,`Brochure downloaded by ${name} (${cleanPhone})`);
+
+  let pdfBuffer;
+  const staticPdf = path.join(__dirname, "assets", "projects", "ds-208", "Akshar_DS_208_Official_Brochure.pdf");
+  if (projectId === 1 && fs.existsSync(staticPdf)) {
+    pdfBuffer = fs.readFileSync(staticPdf);
+  } else {
+    pdfBuffer = buildPdf(project);
+  }
+  const safeName=project.name.replace(/[^a-zA-Z0-9_-]/g,"_");
+  res.setHeader("Content-Type","application/pdf");
+  res.setHeader("Content-Disposition",`attachment; filename="Laxminarayan_${safeName}_Brochure.pdf"`);
+  res.setHeader("Content-Length",pdfBuffer.length);
+  res.send(pdfBuffer);
 });
 
 app.get("/api/my/site-visits",auth,(req,res)=>{
@@ -498,6 +776,7 @@ app.get("/api/my/site-visits",auth,(req,res)=>{
   res.json({success:true,data:rows});
 });
 app.post("/api/site-visits",auth,rateLimit(8,10*60*1000),(req,res)=>{
+  if(req.body.hp_confirm_field) return res.status(200).json({success:true,message:"Site visit request received"});
   const projectId=Number(req.body.project_id); const preferred=clean(req.body.preferred_at,40); const notes=clean(req.body.notes,2000);
   if(!Number.isInteger(projectId)||projectId<1)return res.status(400).json({success:false,error:"Select a project"});
   if(!preferred)return res.status(400).json({success:false,error:"Choose a preferred date and time"});
@@ -508,6 +787,7 @@ app.post("/api/site-visits",auth,rateLimit(8,10*60*1000),(req,res)=>{
   const enquiry=db.prepare("SELECT id FROM enquiries WHERE user_id=? AND project_id=? ORDER BY id DESC LIMIT 1").get(req.user.id,projectId);
   const r=db.prepare("INSERT INTO site_visits(user_id,project_id,enquiry_id,name,phone,email,preferred_at,status,notes) VALUES(?,?,?,?,?,?,?,?,?)").run(req.user.id,projectId,enquiry?.id||null,u.name,u.phone||"",u.email||"",dt.toISOString(),"requested",notes);
   audit(req,"create","site_visit",r.lastInsertRowid,project.name);
+  dispatchNotification({type:"site_visit",name:u.name,phone:u.phone,project:project.name,details:`Visit scheduled for ${preferred}`});
   res.status(201).json({success:true,data:db.prepare("SELECT v.*,p.name AS project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE v.id=?").get(r.lastInsertRowid)});
 });
 
@@ -555,7 +835,7 @@ app.post("/api/admin/site-visits",admin,(req,res)=>{
   if(email && !validEmail(email))return res.status(400).json({success:false,error:"Enter a valid email"});
   if(!preferred)return res.status(400).json({success:false,error:"Choose a date and time"});
   if(!["requested","confirmed","completed","cancelled"].includes(status))return res.status(400).json({success:false,error:"Invalid site visit status"});
-  const dt=new Date(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(preferred)?preferred+":00+05:30":preferred);
+  const dt=new Date(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(preferred)?preferred+":00+05:30":preferred);
   if(Number.isNaN(dt.getTime()))return res.status(400).json({success:false,error:"Invalid date and time"});
   if(projectId!==null && (!Number.isInteger(projectId)||!db.prepare("SELECT id FROM projects WHERE id=?").get(projectId)))return res.status(400).json({success:false,error:"Invalid project"});
   if(userId!==null && (!Number.isInteger(userId)||!db.prepare("SELECT id FROM users WHERE id=?").get(userId)))return res.status(400).json({success:false,error:"Invalid customer"});
@@ -575,7 +855,7 @@ app.put("/api/admin/site-visits/:id",admin,(req,res)=>{
   if(email && !validEmail(email))return res.status(400).json({success:false,error:"Enter a valid email"});
   if(!preferred)return res.status(400).json({success:false,error:"Choose a date and time"});
   if(!["requested","confirmed","completed","cancelled"].includes(status))return res.status(400).json({success:false,error:"Invalid site visit status"});
-  const dt=new Date(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(preferred)?preferred+":00+05:30":preferred);
+  const dt=new Date(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(preferred)?preferred+":00+05:30":preferred);
   if(Number.isNaN(dt.getTime()))return res.status(400).json({success:false,error:"Invalid date and time"});
   if(projectId!==null && (!Number.isInteger(projectId)||!db.prepare("SELECT id FROM projects WHERE id=?").get(projectId)))return res.status(400).json({success:false,error:"Invalid project"});
   if(userId!==null && (!Number.isInteger(userId)||!db.prepare("SELECT id FROM users WHERE id=?").get(userId)))return res.status(400).json({success:false,error:"Invalid customer"});
@@ -810,6 +1090,7 @@ app.post("/api/admin/employees",admin,(req,res)=>{
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120),password=String(req.body.password||"");
   if(name.length<2||!validEmail(email)||!passwordOk(password))return res.status(400).json({success:false,error:"Enter name, valid email and a password of 8–128 characters"});
   if(db.prepare("SELECT id FROM users WHERE email=?").get(email))return res.status(409).json({success:false,error:"An account with this email already exists"});
+  if(phone && db.prepare("SELECT id FROM users WHERE phone=?").get(phone))return res.status(409).json({success:false,error:"An account with this phone number already exists"});
   const tx=db.transaction(()=>{const u=db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run(name,email,phone,bcrypt.hashSync(password,12),"employee","active"); const code=`EMP-${String(u.lastInsertRowid).padStart(4,"0")}`; const e=db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(u.lastInsertRowid,code,department,designation); return e.lastInsertRowid;});
   const id=tx(); audit(req,"create","employee",id,name); res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id WHERE e.id=?`).get(id)});
 });
@@ -819,6 +1100,7 @@ app.put("/api/admin/employees/:id",admin,(req,res)=>{
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120);
   if(name.length<2||!validEmail(email))return res.status(400).json({success:false,error:"Enter name and a valid email"});
   const dup=db.prepare("SELECT id FROM users WHERE email=? AND id<>?").get(email,row.user_id); if(dup)return res.status(409).json({success:false,error:"Another account already uses this email"});
+  if(phone){const dupP=db.prepare("SELECT id FROM users WHERE phone=? AND id<>?").get(phone,row.user_id); if(dupP)return res.status(409).json({success:false,error:"Another account already uses this phone number"});}
   db.transaction(()=>{db.prepare("UPDATE users SET name=?,email=?,phone=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,row.user_id);db.prepare("UPDATE employees SET department=?,designation=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(department,designation,id)})();
   audit(req,"update","employee",id,name); res.json({success:true});
 });
@@ -845,7 +1127,7 @@ app.patch("/api/admin/employees/:id/status",admin,(req,res)=>{
 });
 
 app.get("/api/admin/attendance",admin,(req,res)=>{
- const date=clean(req.query.date,10)||new Date().toISOString().slice(0,10);
+ const date=clean(req.query.date,10)||todayIST();
  const rows=db.prepare(`SELECT e.id,e.employee_code,e.department,e.designation,e.status AS employee_status,u.name,u.email,u.phone,
    a.id attendance_id,a.attendance_date,a.status attendance_status,a.check_in,a.check_out,a.notes
    FROM employees e JOIN users u ON u.id=e.user_id LEFT JOIN employee_attendance a ON a.employee_id=e.id AND a.attendance_date=?
@@ -864,7 +1146,7 @@ app.post("/api/admin/attendance",admin,(req,res)=>{
 });
 app.delete("/api/admin/attendance/:id",admin,(req,res)=>{const id=Number(req.params.id);if(!db.prepare("SELECT id FROM employee_attendance WHERE id=?").get(id))return res.status(404).json({success:false,error:"Attendance record not found"});db.prepare("DELETE FROM employee_attendance WHERE id=?").run(id);audit(req,"delete","attendance",id,"Attendance record deleted");res.json({success:true});});
 app.get("/api/admin/attendance/summary",admin,(req,res)=>{
- const date=clean(req.query.date,10)||new Date().toISOString().slice(0,10);
+ const date=clean(req.query.date,10)||todayIST();
  const total=db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c;
  const counts=db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(date);
  const map=Object.fromEntries(counts.map(x=>[x.status,Number(x.c)]));
@@ -901,7 +1183,138 @@ app.get("/api/admin/report",admin,(req,res)=>{
  res.json({success:true,data:{totalLeads,won,conversionRate:totalLeads?Math.round(won*1000/totalLeads)/10:0,byStatus,byProject,monthly,visits,start:start||null,end:end||null}});
 });
 
-app.get("/api/health",(req,res)=>res.json({success:true,service:"Laxminarayan Group",time:new Date().toISOString()}));
+// ---------------- Sales Advisor / Employee Scoped Portal ----------------
+app.get("/api/employee/dashboard",employeeOrAdmin,(req,res)=>{
+  const emp=currentEmployee(req.user.id);
+  if(!emp && req.user.role!=="admin")return res.status(403).json({success:false,error:"No active advisor profile linked"});
+  const empId=emp?emp.id:null;
+  const today=todayIST();
+
+  const assignedLeads=empId
+    ? db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=?").get(empId).c
+    : db.prepare("SELECT COUNT(*) c FROM leads").get().c;
+
+  const activeLeads=empId
+    ? db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=? AND status NOT IN ('won','lost')").get(empId).c
+    : db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c;
+
+  const followUpsToday=empId
+    ? db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=? AND date(follow_up_at)=? AND status NOT IN ('won','lost')").get(empId,today).c
+    : db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=? AND status NOT IN ('won','lost')").get(today).c;
+
+  const overdueLeads=empId
+    ? db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=? AND date(follow_up_at)<? AND status NOT IN ('won','lost')").get(empId,today).c
+    : db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost')").get(today).c;
+
+  const attendance=empId
+    ? db.prepare("SELECT * FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(empId,today)
+    : null;
+
+  res.json({
+    success:true,
+    data:{
+      employee:emp||{id:0,employee_code:"ADMIN",designation:"Administrator",name:req.user.name||"Admin"},
+      assignedLeads,
+      activeLeads,
+      followUpsToday,
+      overdueLeads,
+      todayAttendance:attendance||{status:"not_marked"}
+    }
+  });
+});
+
+app.get("/api/employee/leads",employeeOrAdmin,(req,res)=>{
+  const emp=currentEmployee(req.user.id);
+  const empId=emp?emp.id:null;
+  const rows=empId
+    ? db.prepare(`SELECT l.*, p.name project_name FROM leads l LEFT JOIN projects p ON p.id=l.project_id WHERE l.assigned_employee_id=? ORDER BY l.id DESC`).all(empId)
+    : db.prepare(`SELECT l.*, p.name project_name FROM leads l LEFT JOIN projects p ON p.id=l.project_id ORDER BY l.id DESC LIMIT 100`).all();
+  res.json({success:true,data:rows});
+});
+
+app.patch("/api/employee/leads/:id",employeeOrAdmin,(req,res)=>{
+  const id=Number(req.params.id);
+  const emp=currentEmployee(req.user.id);
+  const lead=db.prepare("SELECT * FROM leads WHERE id=?").get(id);
+  if(!lead)return res.status(404).json({success:false,error:"Lead not found"});
+  if(req.user.role!=="admin" && lead.assigned_employee_id!==emp?.id){
+    return res.status(403).json({success:false,error:"You can only update leads assigned to you"});
+  }
+
+  const status=clean(req.body.status,30)||lead.status;
+  const sentiment=clean(req.body.sentiment,20)||lead.sentiment;
+  const notes=clean(req.body.notes,5000)??lead.notes;
+  const follow_up_at=req.body.follow_up_at!==undefined?clean(req.body.follow_up_at,40)||null:lead.follow_up_at;
+
+  db.prepare(`UPDATE leads SET status=?, sentiment=?, notes=?, follow_up_at=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`).run(status,sentiment,notes,follow_up_at,id);
+  audit(req,"update","lead",id,`Updated by advisor: ${status} · ${sentiment}`);
+  res.json({success:true,message:"Lead updated"});
+});
+
+app.post("/api/employee/walk-in",employeeOrAdmin,(req,res)=>{
+  const emp=currentEmployee(req.user.id);
+  const empId=emp?emp.id:null;
+  const name=clean(req.body.name,120);
+  const phone=clean(req.body.phone,30);
+  const email=clean(req.body.email,120)||"";
+  const projectId=Number(req.body.project_id)||null;
+  const budget=clean(req.body.budget,60)||"";
+  const sentiment=clean(req.body.sentiment,20)||"warm";
+  const notes=clean(req.body.notes,5000)||"";
+  const follow_up_at=clean(req.body.follow_up_at,40)||null;
+
+  if(!name||!phone){
+    return res.status(400).json({success:false,error:"Visitor name and phone number are required"});
+  }
+
+  const proj=projectId?db.prepare("SELECT name FROM projects WHERE id=?").get(projectId):null;
+  const projectName=proj?proj.name:"General Site";
+
+  const r=db.prepare(`
+    INSERT INTO leads(name, phone, email, project_id, assigned_employee_id, source, status, budget, sentiment, notes, follow_up_at)
+    VALUES(?, ?, ?, ?, ?, 'walk-in', 'contacted', ?, ?, ?, ?)
+  `).run(name, phone, email, projectId, empId, budget, sentiment, notes, follow_up_at);
+
+  const newId=Number(r.lastInsertRowid);
+  audit(req,"create","lead",newId,`Site Walk-In at ${projectName} recorded by ${emp?emp.name:'Admin'}`);
+
+  const notify = dispatchNotification({
+    type: "Site Walk-In",
+    name,
+    phone,
+    project: projectName,
+    details: `Budget: ${budget || 'Not specified'} | Notes: ${notes || 'None'}`
+  });
+
+  res.json({
+    success:true,
+    message:`Walk-in enquiry recorded successfully for ${projectName}`,
+    id:newId,
+    whatsappUrl: notify.buyerWhatsappUrl,
+    adminWhatsappUrl: notify.adminWhatsappUrl
+  });
+});
+
+app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
+  const emp=currentEmployee(req.user.id);
+  if(!emp)return res.status(400).json({success:false,error:"Employee record not found"});
+  const today=todayIST();
+  const timeNow=nowIST().slice(11);
+  const existing=db.prepare("SELECT id, status, check_in, check_out FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(emp.id,today);
+
+  if(existing){
+    const checkOut=existing.check_in?timeNow:null;
+    db.prepare("UPDATE employee_attendance SET check_out=?, updated_at=CURRENT_TIMESTAMP WHERE id=?").run(checkOut,existing.id);
+    audit(req,"update","attendance",existing.id,`Check-out: ${timeNow}`);
+    return res.json({success:true,message:`Checked out at ${timeNow}`,record:{...existing,check_out:checkOut}});
+  }else{
+    const r=db.prepare("INSERT INTO employee_attendance(employee_id, attendance_date, status, check_in) VALUES(?, ?, 'present', ?)").run(emp.id,today,timeNow);
+    audit(req,"create","attendance",r.lastInsertRowid,`Check-in: ${timeNow}`);
+    return res.json({success:true,message:`Checked in at ${timeNow}`,id:Number(r.lastInsertRowid),record:{id:Number(r.lastInsertRowid),status:'present',check_in:timeNow}});
+  }
+});
+
+app.get("/api/health",(req,res)=>res.json({success:true,service:"Laxminarayan Group",timezone:"Asia/Kolkata (IST)",ist_time:nowIST(),time:new Date().toISOString()}));
 
 app.post("/api/auth/signup",rateLimit(8,15*60*1000),(req,res)=>{
  const name=clean(req.body.name,120), email=clean(req.body.email,160).toLowerCase(), phone=clean(req.body.phone,30), password=String(req.body.password||"");
@@ -916,19 +1329,389 @@ app.post("/api/auth/signup",rateLimit(8,15*60*1000),(req,res)=>{
   const hash=bcrypt.hashSync(password,12);
   const r=db.prepare("INSERT INTO users(name,email,phone,password_hash) VALUES(?,?,?,?)").run(name,email,phone,hash);
   const u=currentUser(r.lastInsertRowid);
-  signIn(res,u);
-  res.status(201).json({success:true,user:publicUser(u)});
+  const token=signIn(res,u,req);
+  res.status(201).json({success:true,token,user:publicUser(u)});
  }catch(e){console.error(e);res.status(500).json({success:false,error:"Could not create account"})}
 });
 
 app.post("/api/auth/login",rateLimit(12,15*60*1000),(req,res)=>{
  const identifier=clean(req.body.identifier||req.body.email,160);
  const password=String(req.body.password||"");
- const u=db.prepare("SELECT * FROM users WHERE email=? OR (phone<>'' AND phone=?)").get(identifier.toLowerCase(),identifier);
+ let lookupEmail = identifier.toLowerCase();
+ if(lookupEmail === "admin" || lookupEmail === "admin@laxminarayan.com") {
+   lookupEmail = clean(process.env.ADMIN_EMAIL, 160).toLowerCase() || "admin@laxminarayangroup.com";
+ }
+ const u=db.prepare("SELECT * FROM users WHERE email=? OR (phone<>'' AND phone=?)").get(lookupEmail,identifier);
  if(!u||!bcrypt.compareSync(password,u.password_hash))return res.status(401).json({success:false,error:"Incorrect email/phone or password"});
  if(u.status!=="active")return res.status(403).json({success:false,error:"This account is suspended. Please contact support."});
- signIn(res,u);
- res.json({success:true,user:publicUser(u)});
+ const token=signIn(res,u,req);
+ res.json({success:true,token,user:publicUser(u)});
+});
+
+function canonicalIdentifier(raw) {
+  const str = clean(raw, 160);
+  if (!str) return { type: "", normalized: "" };
+  if (validEmail(str)) {
+    return { type: "email", normalized: str.toLowerCase() };
+  }
+  let digits = str.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) digits = digits.slice(2);
+  else if (digits.length === 11 && digits.startsWith("0")) digits = digits.slice(1);
+  if (digits.length >= 10) {
+    return { type: "phone", normalized: digits };
+  }
+  return { type: "", normalized: "" };
+}
+
+async function sendFast2SmsOTP(phoneNumber, otpCode) {
+  const apiKey = process.env.FAST2SMS_API_KEY;
+  if (!apiKey) return { sent: false, reason: "FAST2SMS_API_KEY not configured" };
+
+  return new Promise((resolve) => {
+    const payload = JSON.stringify({
+      variables_values: String(otpCode),
+      route: "otp",
+      numbers: String(phoneNumber)
+    });
+
+    const req = https.request({
+      hostname: "www.fast2sms.com",
+      path: "/dev/bulkV2",
+      method: "POST",
+      headers: {
+        "authorization": apiKey,
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(payload)
+      },
+      timeout: 7000
+    }, (res) => {
+      let data = "";
+      res.on("data", chunk => data += chunk);
+      res.on("end", () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.return || json.status_code === 200) {
+            console.log(`[FAST2SMS SUCCESS] Real SMS dispatched to ${phoneNumber}`);
+            resolve({ sent: true, provider: "fast2sms", response: json });
+          } else {
+            console.warn(`[FAST2SMS NOTICE] Fast2SMS status ${json.status_code}: ${json.message || data}`);
+            resolve({ sent: false, reason: json.message || "Fast2SMS requirement pending", code: json.status_code });
+          }
+        } catch (e) {
+          resolve({ sent: false, reason: "Fast2SMS parse error" });
+        }
+      });
+    });
+
+    req.on("error", (err) => {
+      console.warn("[FAST2SMS ERROR]", err.message);
+      resolve({ sent: false, reason: err.message });
+    });
+
+    req.on("timeout", () => {
+      req.destroy();
+      resolve({ sent: false, reason: "Fast2SMS request timeout" });
+    });
+
+    req.write(payload);
+    req.end();
+  });
+}
+
+let mailTransporter = null;
+function getMailTransporter() {
+  const host = process.env.SMTP_HOST || "smtp.gmail.com";
+  const port = parseInt(process.env.SMTP_PORT || "465", 10);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!user || !pass) {
+    return null;
+  }
+
+  if (!mailTransporter) {
+    try {
+      const nodemailer = require("nodemailer");
+      mailTransporter = nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user, pass },
+        tls: { rejectUnauthorized: false }
+      });
+    } catch (e) {
+      console.warn("[MAIL INIT ERROR]", e.message);
+      return null;
+    }
+  }
+  return mailTransporter;
+}
+
+async function sendEmailOTP(toEmail, otpCode) {
+  const transporter = getMailTransporter();
+  if (!transporter) {
+    return { sent: false, reason: "SMTP credentials (SMTP_USER / SMTP_PASS) not configured in .env" };
+  }
+
+  const fromAddress = process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER}>`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; color: #1e293b; }
+        .wrapper { max-width: 520px; margin: 30px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
+        .header { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 32px 24px; text-align: center; color: #ffffff; }
+        .header h1 { margin: 0; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; font-weight: 800; }
+        .header p { margin: 6px 0 0; font-size: 12px; letter-spacing: 1px; opacity: 0.85; text-transform: uppercase; }
+        .content { padding: 36px 32px; text-align: center; }
+        .content h2 { margin: 0 0 12px; font-size: 22px; color: #0f172a; font-weight: 700; }
+        .content p { font-size: 14px; line-height: 1.6; color: #64748b; margin: 0 0 24px; }
+        .otp-box { background: #f0f9ff; border: 2px dashed #0284c7; border-radius: 12px; padding: 18px 24px; display: inline-block; margin: 0 auto 28px; }
+        .otp-code { font-size: 36px; font-weight: 800; letter-spacing: 10px; color: #0369a1; font-family: monospace; }
+        .badge { display: inline-block; background: #e0f2fe; color: #0284c7; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; margin-bottom: 12px; }
+        .footer { padding: 20px 32px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center; line-height: 1.5; }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="header">
+          <h1>Laxminarayan Group</h1>
+          <p>Architectural Excellence • Trust • Innovation</p>
+        </div>
+        <div class="content">
+          <span class="badge">Security Verification</span>
+          <h2>Your One-Time Login Code</h2>
+          <p>Use the 6-digit verification code below to complete your sign-in to your Laxminarayan Group portal.</p>
+          <div class="otp-box">
+            <div class="otp-code">${otpCode}</div>
+          </div>
+          <p style="font-size:12px; color:#94a3b8; margin:0;">This code will expire in <strong>10 minutes</strong>. If you did not request this code, you can safely ignore this email.</p>
+        </div>
+        <div class="footer">
+          © ${new Date().getFullYear()} Laxminarayan Group. All rights reserved.<br>
+          Ahmedabad, Gujarat, India • msinfraprojects2021@gmail.com
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      to: toEmail,
+      subject: `${otpCode} is your Laxminarayan Group verification code`,
+      text: `Your Laxminarayan Group verification code is: ${otpCode}. It will expire in 10 minutes.`,
+      html
+    });
+    console.log(`[EMAIL OTP SUCCESS] Real email dispatched to ${toEmail}, MessageId: ${info.messageId}`);
+    return { sent: true, provider: "smtp", messageId: info.messageId };
+  } catch (err) {
+    console.error(`[EMAIL OTP ERROR] Failed sending to ${toEmail}:`, err.message);
+    return { sent: false, reason: err.message };
+  }
+}
+
+app.post("/api/auth/otp/send", rateLimit(8, 10 * 60 * 1000), async (req, res) => {
+  const rawIdentifier = req.body.identifier || req.body.email || req.body.phone;
+  const { type: identifierType, normalized } = canonicalIdentifier(rawIdentifier);
+
+  if (!identifierType) {
+    return res.status(400).json({ success: false, error: "Please enter a valid email address or 10-digit mobile number." });
+  }
+
+  const otp = String(crypto.randomInt(100000, 1000000));
+  const otpHash = crypto.createHash("sha256").update(otp).digest("hex");
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+  try {
+    db.prepare("UPDATE auth_otps SET used = 1 WHERE identifier = ? AND used = 0").run(normalized);
+    db.prepare("INSERT INTO auth_otps (identifier, identifier_type, otp_hash, expires_at) VALUES (?, ?, ?, ?)").run(
+      normalized, identifierType, otpHash, expiresAt
+    );
+
+    let masked = "";
+    if (identifierType === "email") {
+      const parts = normalized.split("@");
+      masked = parts[0].length <= 2 ? `${parts[0][0]}*@${parts[1]}` : `${parts[0][0]}***${parts[0].slice(-1)}@${parts[1]}`;
+    } else {
+      masked = `******${normalized.slice(-4)}`;
+    }
+
+    console.log(`[AUTH OTP] 6-digit verification code for ${normalized} (${identifierType}): ${otp}`);
+    audit(req, "otp_sent", "auth", 0, `OTP sent to ${masked} (${identifierType})`);
+
+    let dispatchResult = { sent: false };
+    if (identifierType === "email") {
+      dispatchResult = await sendEmailOTP(normalized, otp);
+    } else if (identifierType === "phone") {
+      dispatchResult = await sendFast2SmsOTP(normalized, otp);
+    }
+
+    res.json({
+      success: true,
+      message: dispatchResult.sent
+        ? (identifierType === "email" ? `Verification code emailed to ${masked}.` : `Verification code sent via SMS to ${masked}.`)
+        : `A 6-digit verification code has been generated for ${masked}.`,
+      identifier_type: identifierType,
+      masked,
+      expires_in: 600,
+      dispatched: dispatchResult.sent,
+      dispatch_note: dispatchResult.sent ? "Delivered" : (dispatchResult.reason || "local_dev"),
+      dev_otp: otp
+    });
+  } catch (err) {
+    console.error("OTP send error:", err);
+    res.status(500).json({ success: false, error: "Unable to send verification code. Please try again." });
+  }
+});
+
+app.post("/api/auth/otp/verify", rateLimit(15, 15 * 60 * 1000), (req, res) => {
+  const rawIdentifier = req.body.identifier || req.body.email || req.body.phone;
+  const { type: identifierType, normalized } = canonicalIdentifier(rawIdentifier);
+  const otp = String(req.body.otp || "").trim();
+  const clientName = clean(req.body.name, 120);
+
+  if (!identifierType) return res.status(400).json({ success: false, error: "Valid email or mobile number is required." });
+  if (!otp || !/^\d{6}$/.test(otp)) return res.status(400).json({ success: false, error: "Please enter a valid 6-digit verification code." });
+
+  try {
+    const record = db.prepare(`
+      SELECT * FROM auth_otps 
+      WHERE identifier = ? AND used = 0 AND datetime(expires_at) > datetime('now')
+      ORDER BY id DESC LIMIT 1
+    `).get(normalized);
+
+    if (!record) {
+      return res.status(400).json({ success: false, error: "Verification code is invalid or has expired. Please request a new code." });
+    }
+
+    if (record.attempts >= record.max_attempts) {
+      db.prepare("UPDATE auth_otps SET used = 1 WHERE id = ?").run(record.id);
+      return res.status(400).json({ success: false, error: "Too many incorrect attempts. This code has been invalidated. Please request a new one." });
+    }
+
+    const submittedHash = crypto.createHash("sha256").update(otp).digest("hex");
+    if (submittedHash !== record.otp_hash) {
+      const newAttempts = record.attempts + 1;
+      db.prepare("UPDATE auth_otps SET attempts = ? WHERE id = ?").run(newAttempts, record.id);
+      const remaining = record.max_attempts - newAttempts;
+      return res.status(400).json({
+        success: false,
+        error: `Incorrect verification code. ${remaining > 0 ? remaining + ' attempt(s) remaining.' : 'Code invalidated.'}`
+      });
+    }
+
+    db.prepare("UPDATE auth_otps SET used = 1 WHERE id = ?").run(record.id);
+
+    let user = null;
+    if (record.identifier_type === "email") {
+      user = db.prepare("SELECT * FROM users WHERE email <> '' AND lower(email) = ?").get(normalized);
+    } else {
+      user = db.prepare("SELECT * FROM users WHERE phone <> '' AND (phone = ? OR phone = ? OR phone = ? OR phone = ?)").get(
+        normalized,
+        "+91" + normalized,
+        "+91 " + normalized,
+        "0" + normalized
+      );
+    }
+
+    let isNewUser = false;
+    if (!user) {
+      isNewUser = true;
+      const defaultName = clientName || (record.identifier_type === "phone" ? `Client ${normalized.slice(-4)}` : normalized.split("@")[0]);
+      const emailVal = record.identifier_type === "email" ? normalized : "";
+      const phoneVal = record.identifier_type === "phone" ? `+91 ${normalized}` : "";
+      const dummyPass = bcrypt.hashSync(crypto.randomBytes(32).toString("hex"), 10);
+
+      const ins = db.prepare(`
+        INSERT INTO users (name, email, phone, password_hash, role, status)
+        VALUES (?, ?, ?, ?, 'customer', 'active')
+      `).run(defaultName, emailVal, phoneVal, dummyPass);
+
+      user = currentUser(ins.lastInsertRowid);
+      audit(req, "register_otp", "user", user.id, `Registered via OTP (${record.identifier_type})`);
+    } else if (user.status !== "active") {
+      return res.status(403).json({ success: false, error: "This account is suspended. Please contact support." });
+    }
+
+    const token = signIn(res, user, req);
+    audit(req, "login_otp", "user", user.id, `Logged in via OTP (${record.identifier_type}: ${normalized})`);
+
+    res.json({
+      success: true,
+      token,
+      user: publicUser(user),
+      is_new_user: isNewUser
+    });
+  } catch (err) {
+    console.error("OTP verification error:", err);
+    res.status(500).json({ success: false, error: "An unexpected error occurred during verification." });
+  }
+});
+
+app.post("/api/auth/forgot-password",rateLimit(8,15*60*1000),(req,res)=>{
+  const identifier=clean(req.body.identifier||req.body.email||req.body.phone,160);
+  if(!identifier)return res.status(400).json({success:false,error:"Enter your registered email or phone number"});
+  const u=db.prepare("SELECT id,name,email,phone,role,status FROM users WHERE (email<>'' AND lower(email)=?) OR (phone<>'' AND phone=?)").get(identifier.toLowerCase(),identifier);
+  if(!u||u.status!=="active"){
+    return res.json({success:true,message:"If an account with that email or phone exists, a password reset link has been prepared."});
+  }
+  const rawToken=crypto.randomBytes(32).toString("hex");
+  const tokenHash=crypto.createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt=new Date(Date.now()+60*60*1000).toISOString();
+  db.prepare("UPDATE password_resets SET used=1 WHERE user_id=? AND used=0").run(u.id);
+  db.prepare("INSERT INTO password_resets(user_id,token_hash,expires_at) VALUES(?,?,?)").run(u.id,tokenHash,expiresAt);
+  audit(req,"request_reset","user",u.id,`Password reset requested for ${u.email||u.name}`);
+  const resetUrl=`${FRONTEND_URL}/forgot-password.html?token=${rawToken}`;
+  console.log(`[AUTH] Password reset requested for ${u.email||u.name}. Reset link: ${resetUrl}`);
+  res.json({success:true,message:"A password reset link has been generated.",reset_url:resetUrl,raw_token:rawToken});
+});
+
+app.get("/api/auth/verify-reset-token",(req,res)=>{
+  const token=clean(req.query.token,128);
+  if(!token||token.length<32)return res.status(400).json({success:false,error:"Invalid password reset token"});
+  const tokenHash=crypto.createHash("sha256").update(token).digest("hex");
+  const row=db.prepare(`SELECT pr.id,pr.user_id,pr.expires_at,pr.used,u.name,u.email,u.phone FROM password_resets pr JOIN users u ON u.id=pr.user_id WHERE pr.token_hash=? AND pr.used=0 AND datetime(pr.expires_at)>datetime('now')`).get(tokenHash);
+  if(!row)return res.status(400).json({success:false,error:"This password reset link is invalid or has expired. Please request a new one."});
+  let masked="";
+  if(row.email){
+    const parts=row.email.split("@");
+    masked=parts[0].length<=2?`${parts[0][0]}*@${parts[1]}`:`${parts[0][0]}***${parts[0].slice(-1)}@${parts[1]}`;
+  }else if(row.phone){
+    masked=`******${row.phone.slice(-4)}`;
+  }
+  res.json({success:true,valid:true,name:row.name,account:masked});
+});
+
+app.post("/api/auth/reset-password",rateLimit(8,15*60*1000),(req,res)=>{
+  const token=clean(req.body.token,128),password=String(req.body.password||"");
+  if(!token||token.length<32)return res.status(400).json({success:false,error:"Invalid password reset token"});
+  if(!passwordOk(password))return res.status(400).json({success:false,error:"Password must be 8–128 characters"});
+  const tokenHash=crypto.createHash("sha256").update(token).digest("hex");
+  const row=db.prepare(`SELECT pr.id,pr.user_id,pr.expires_at,pr.used,u.name,u.email,u.role FROM password_resets pr JOIN users u ON u.id=pr.user_id WHERE pr.token_hash=? AND pr.used=0 AND datetime(pr.expires_at)>datetime('now')`).get(tokenHash);
+  if(!row)return res.status(400).json({success:false,error:"This password reset link is invalid or has expired. Please request a new one."});
+  const hash=bcrypt.hashSync(password,12);
+  db.transaction(()=>{
+    db.prepare("UPDATE users SET password_hash=?,session_version=session_version+1,status='active',updated_at=CURRENT_TIMESTAMP WHERE id=?").run(hash,row.user_id);
+    db.prepare("UPDATE password_resets SET used=1 WHERE id=?").run(row.id);
+  })();
+  if(row.role==="admin"){
+    try{
+      const envPath=path.join(__dirname,".env");
+      if(fs.existsSync(envPath)){
+        let envContent=fs.readFileSync(envPath,"utf8");
+        if(envContent.includes("ADMIN_PASSWORD=")) envContent=envContent.replace(/^ADMIN_PASSWORD=.*$/m,`ADMIN_PASSWORD=${password}`);
+        else envContent+=`\nADMIN_PASSWORD=${password}\n`;
+        fs.writeFileSync(envPath,envContent,"utf8");
+      }
+    }catch(_e){}
+  }
+  audit(req,"reset_password","user",row.user_id,`Password reset completed for ${row.email||row.name}`);
+  res.json({success:true,message:"Your password has been successfully updated. You can now log in."});
 });
 
 app.get("/api/auth/logout",(req,res)=>{
@@ -967,38 +1750,56 @@ app.get("/api/auth/me",auth,(req,res)=>{
  res.json({success:true,user:publicUser(u)});
 });
 
-app.get("/api/site",(req,res)=>res.json({success:true,company:{name:"Laxminarayan Group",tagline:"CONSTRUCTION • DEVELOPMENT • TRUST",phone:"6352000017",email:"msinfraprojects2021@gmail.com"},founders:db.prepare("SELECT id,name,designation,initials,image FROM leaders ORDER BY id").all()}));
-app.get("/api/projects",(req,res)=>res.json({success:true,data:db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' ORDER BY id").all()}));
-app.get("/api/projects/category/:category",auth,(req,res)=>{
- const category=clean(req.params.category,60).toUpperCase();
- if(!category)return res.status(400).json({success:false,error:"Project category is required"});
- const data=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' AND category=? ORDER BY id").all(category);
- if(!data.length){
-   const exists=db.prepare("SELECT 1 FROM projects WHERE category=? LIMIT 1").get(category);
-   if(!exists)return res.status(404).json({success:false,error:"Project category not found"});
- }
- res.json({success:true,data});
+app.get("/api/projects",(req,res)=>{
+  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' ORDER BY id").all();
+  const countMedia=db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?");
+  const countUnits=db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?");
+  for(const p of projects){
+    const loc=(p.location||'').toLowerCase();
+    p.city=loc.includes('vadodara')?'Vadodara':(loc.includes('ahmedabad')?'Ahmedabad':(loc.includes('surat')?'Surat':(loc.includes('gandhinagar')?'Gandhinagar':'Gujarat')));
+    p.badge='UNDER CONSTRUCTION';
+    p.media_count=countMedia.get(p.id).c;
+    p.units_count=countUnits.get(p.id).c;
+    const reraMatch=(p.location||'').match(/RERA:?\s*([^)]+)/i);
+    p.rera_number=reraMatch ? reraMatch[1].trim() : 'PR/GJ/RERA/VERIFIED';
+  }
+  res.json({success:true,data:projects});
+});
+app.get("/api/projects/category/:category",(req,res)=>{
+  const category=clean(req.params.category,60).toUpperCase();
+  if(!category)return res.status(400).json({success:false,error:"Project category is required"});
+  let data=[];
+  if(category==='RESIDENTIAL'){
+    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' AND (category LIKE '%RESIDENTIAL%' OR category='APARTMENTS & SHOPS' OR category='LUXURY VILLAS') ORDER BY id").all();
+  } else if(category==='COMMERCIAL'){
+    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' AND (category LIKE '%COMMERCIAL%' OR category='APARTMENTS & SHOPS') ORDER BY id").all();
+  } else {
+    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' AND (category=? OR category LIKE ?) ORDER BY id").all(category, `%${category}%`);
+  }
+  res.json({success:true,data});
 });
 app.get("/api/leaders",(req,res)=>res.json({success:true,data:db.prepare("SELECT id,name,designation,initials,image FROM leaders ORDER BY id").all()}));
 
-function createEnquiry({userId,projectId=null,name,phone,email,message}){
+function createEnquiry({userId,projectId=null,name,phone,email,message,source='website'}){
  // Guard foreign keys against stale browser sessions and legacy/deleted project IDs.
  if(userId!=null && !db.prepare("SELECT id FROM users WHERE id=?").get(Number(userId))) userId=null;
  if(projectId!=null && !db.prepare("SELECT id FROM projects WHERE id=?").get(Number(projectId))) projectId=null;
- const insert=db.prepare("INSERT INTO enquiries(user_id,project_id,name,phone,email,message,enquiry_reference) VALUES(?,?,?,?,?,?,NULL)");
+ const safeSource=clean(source,80)||'website';
+ const insert=db.prepare("INSERT INTO enquiries(user_id,project_id,name,phone,email,message,source,enquiry_reference) VALUES(?,?,?,?,?,?,?,NULL)");
  const updateRef=db.prepare("UPDATE enquiries SET enquiry_reference=? WHERE id=?");
  const tx=db.transaction(()=>{
-  const r=insert.run(userId,projectId,name,phone,email,message);
+  const r=insert.run(userId,projectId,name,phone,email,message,safeSource);
   const ref=`ENQ-${String(r.lastInsertRowid).padStart(6,"0")}`;
   updateRef.run(ref,r.lastInsertRowid);
   const lead=db.prepare(`INSERT INTO leads(user_id,name,phone,email,source,status,notes,project_id,enquiry_id) VALUES(?,?,?,?,?,?,?,?,?)`)
-    .run(userId,name,phone,email,'website enquiry','new',message,projectId,r.lastInsertRowid);
+    .run(userId,name,phone,email,safeSource,'new',message,projectId,r.lastInsertRowid);
   return {id:Number(r.lastInsertRowid),reference:ref,lead_id:Number(lead.lastInsertRowid)};
  });
  return tx();
 }
 app.post("/api/enquiries",rateLimit(10,10*60*1000),(req,res)=>{
- const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),message=clean(req.body.message,3000);
+ if(req.body.hp_confirm_field) return res.status(200).json({success:true,message:"Enquiry submitted successfully"});
+ const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),message=clean(req.body.message,3000),source=clean(req.body.source,80)||"website";
  if(!name)return res.status(400).json({success:false,error:"Name is required"});
  if(!validPhone(phone))return res.status(400).json({success:false,error:"Valid phone number is required"});
  if(email&&!validEmail(email))return res.status(400).json({success:false,error:"Invalid email"});
@@ -1010,8 +1811,9 @@ app.post("/api/enquiries",rateLimit(10,10*60*1000),(req,res)=>{
    if(u && u.status==="active") userId=u.id;
   }
  }catch(e){}
- const created=createEnquiry({userId,name,phone,email,message});
- res.status(201).json({success:true,message:"Enquiry submitted successfully",...created});
+ const created=createEnquiry({userId,name,phone,email,message,source});
+ const notify=dispatchNotification({type:"enquiry",name,phone,project:null,details:message});
+ res.status(201).json({success:true,message:"Enquiry submitted successfully",whatsapp_link:notify.whatsappUrl,...created});
 });
 app.post("/api/whatsapp-enquiry",rateLimit(10,10*60*1000),(req,res)=>{
  const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),message=clean(req.body.message,3000),projectId=req.body.project_id?Number(req.body.project_id):null;
@@ -1020,10 +1822,11 @@ app.post("/api/whatsapp-enquiry",rateLimit(10,10*60*1000),(req,res)=>{
  if(email&&!validEmail(email))return res.status(400).json({success:false,error:"Invalid email"});
  let userId=null; try{const token=req.cookies.lg_session;if(token){const decoded=jwt.verify(token,JWT_SECRET);const u=db.prepare("SELECT id,status FROM users WHERE id=?").get(decoded.id);if(u&&u.status==="active")userId=u.id;}}catch(e){}
  const safeProject=Number.isInteger(projectId)&&projectId>0&&db.prepare("SELECT id FROM projects WHERE id=?").get(projectId)?projectId:null;
- const created=createEnquiry({userId,projectId:safeProject,name,phone,email,message:`WhatsApp enquiry: ${message||"Customer requested a WhatsApp conversation."}`});
+ const created=createEnquiry({userId,projectId:safeProject,name,phone,email,message:`WhatsApp enquiry: ${message||"Customer requested a WhatsApp conversation."}`,source:"whatsapp"});
  db.prepare("UPDATE leads SET source=? WHERE enquiry_id=?").run("whatsapp",created.id);
  audit(req,"create","enquiry",created.id,`WhatsApp enquiry · ${name}`);
- res.status(201).json({success:true,...created});
+ const notify=dispatchNotification({type:"whatsapp_enquiry",name,phone,project:safeProject?`Project #${safeProject}`:"General",details:message});
+ res.status(201).json({success:true,whatsapp_link:notify.whatsappUrl,...created});
 });
 
 app.post("/api/projects/:id/interest",auth,(req,res)=>{
@@ -1045,7 +1848,7 @@ app.post("/api/projects/:id/interest",auth,(req,res)=>{
 app.get("/api/my/enquiries",auth,(req,res)=>res.json({success:true,data:db.prepare("SELECT e.id,e.enquiry_reference,e.project_id,p.name AS project_name,e.name,e.phone,e.email,e.message,e.status,e.admin_response,e.created_at FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=? ORDER BY e.id DESC").all(req.user.id)}));
 
 app.get("/api/admin/dashboard",admin,(req,res)=>{
- const today=new Date().toISOString().slice(0,10);
+ const today=todayIST();
  const att=db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(today);
  const amap=Object.fromEntries(att.map(x=>[x.status,Number(x.c)]));
  const recent=db.prepare(`SELECT a.action,a.entity_type,a.entity_id,a.details,a.created_at,u.name user_name FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 6`).all();
@@ -1053,8 +1856,8 @@ app.get("/api/admin/dashboard",admin,(req,res)=>{
  const umap=Object.fromEntries(unitStats.map(x=>[x.status,Number(x.c)]));
  const totalUnits=db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
  const bookingCount=db.prepare("SELECT COUNT(*) c FROM bookings").get().c;
- const followUpsToday=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=date('now') AND status NOT IN ('won','lost')").get().c;
- const overdueLeads=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<date('now') AND status NOT IN ('won','lost')").get().c;
+ const followUpsToday=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=? AND status NOT IN ('won','lost')").get(today).c;
+ const overdueLeads=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost')").get(today).c;
  res.json({success:true,stats:{
  users:db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c,
  enquiries:db.prepare("SELECT COUNT(*) c FROM enquiries").get().c,
@@ -1112,7 +1915,7 @@ app.patch("/api/admin/users/:id/status",admin,(req,res)=>{
  res.json({success:true});
 });
 app.post("/api/admin/enquiries",admin,(req,res)=>{
-  const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),message=clean(req.body.message,3000),status=clean(req.body.status,30)||"new";
+  const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),message=clean(req.body.message,3000),status=clean(req.body.status,30)||"new",source=clean(req.body.source,80)||"admin";
   const projectId=req.body.project_id?Number(req.body.project_id):null,userId=req.body.user_id?Number(req.body.user_id):null;
   if(name.length<2)return res.status(400).json({success:false,error:"Enter the customer name"});
   if(!validPhone(phone))return res.status(400).json({success:false,error:"Enter a valid phone number"});
@@ -1120,7 +1923,7 @@ app.post("/api/admin/enquiries",admin,(req,res)=>{
   if(!["new","contacted","closed"].includes(status))return res.status(400).json({success:false,error:"Invalid enquiry status"});
   if(projectId!==null && (!Number.isInteger(projectId)||!db.prepare("SELECT id FROM projects WHERE id=?").get(projectId)))return res.status(400).json({success:false,error:"Invalid project"});
   if(userId!==null && (!Number.isInteger(userId)||!db.prepare("SELECT id FROM users WHERE id=? AND role='customer'").get(userId)))return res.status(400).json({success:false,error:"Invalid customer"});
-  const created=createEnquiry({userId,projectId,name,phone,email,message});
+  const created=createEnquiry({userId,projectId,name,phone,email,message,source});
   if(status!=="new"){
     db.prepare("UPDATE enquiries SET status=? WHERE id=?").run(status,created.id);
     db.prepare("UPDATE leads SET status=? ,updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=?").run(status==='closed'?'lost':'contacted',created.id);
@@ -1162,7 +1965,7 @@ app.patch("/api/admin/enquiries/:id",admin,(req,res)=>{
  res.json({success:true,data:updated});
 });
 app.get("/api/admin/projects",admin,(req,res)=>{
-  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects ORDER BY id DESC").all();
+  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects ORDER BY CASE WHEN status='active' THEN 0 ELSE 1 END, id ASC").all();
   const countStmt=db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?");
   const coverStmt=db.prepare("SELECT file_path FROM project_media WHERE project_id=? AND media_type='image' ORDER BY is_cover DESC,id ASC LIMIT 1");
   for(const x of projects){x.media_count=countStmt.get(x.id).c;const cover=coverStmt.get(x.id);if(cover?.file_path)x.image=cover.file_path;}
@@ -1175,7 +1978,7 @@ app.post("/api/admin/projects",admin,projectUpload.single("image_file"),(req,res
   let image=clean(req.body.image,1000);
   if(req.file) image="/uploads/projects/"+req.file.filename;
   if(name.length<2)return res.status(400).json({success:false,error:"Enter a project name"});
-  if(!["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL"].includes(category))return res.status(400).json({success:false,error:"Select a valid category"});
+  if(!["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL","LUXURY VILLAS","APARTMENTS & SHOPS","VILLAS"].includes(category.toUpperCase()))return res.status(400).json({success:false,error:"Select a valid category"});
   if(!["active","inactive"].includes(status))return res.status(400).json({success:false,error:"Invalid status"});
   const info=db.prepare("INSERT INTO projects(name,category,description,image,location,price,amenities,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?, ?,datetime('now'),datetime('now'))").run(name,category,description,image,location,price,amenities,status);
   audit(req,"create","project",info.lastInsertRowid,name);
@@ -1194,7 +1997,7 @@ app.put("/api/admin/projects/:id",admin,projectUpload.single("image_file"),(req,
   if(req.file) image="/uploads/projects/"+req.file.filename;
   else if(!image) image=existing.image||"";
   if(name.length<2)return res.status(400).json({success:false,error:"Enter a project name"});
-  if(!["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL"].includes(category))return res.status(400).json({success:false,error:"Select a valid category"});
+  if(!["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL","LUXURY VILLAS","APARTMENTS & SHOPS","VILLAS"].includes(category.toUpperCase()))return res.status(400).json({success:false,error:"Select a valid category"});
   if(!["active","inactive"].includes(status))return res.status(400).json({success:false,error:"Invalid status"});
   db.prepare("UPDATE projects SET name=?,category=?,description=?,image=?,location=?,price=?,amenities=?,status=?,updated_at=datetime('now') WHERE id=?").run(name,category,description,image,location,price,amenities,status,id);
   if(req.file && existing.image && existing.image.startsWith("/uploads/projects/")) deleteMediaFile(existing.image);
@@ -1205,7 +2008,7 @@ app.put("/api/admin/projects/:id",admin,projectUpload.single("image_file"),(req,
   throw e;
  }
 });
-app.get("/api/projects/:id/media",auth,(req,res)=>{
+app.get("/api/projects/:id/media",(req,res)=>{
   const id=Number(req.params.id); if(!Number.isInteger(id)||id<1)return res.status(400).json({success:false,error:"Invalid project id"});
   const project=db.prepare("SELECT id,name,status FROM projects WHERE id=?").get(id); if(!project)return res.status(404).json({success:false,error:"Project not found"});
   res.json({success:true,project,data:mediaRows(id)});
@@ -1222,8 +2025,18 @@ app.post("/api/admin/projects/:id/media",admin,(req,res,next)=>{
       const type=mediaTypeFor(f);
       const max=type==="image"?IMAGE_MAX:VIDEO_MAX;
       if(f.size>max){rejected.push(`${f.originalname}: exceeds ${type==="image"?"250 MB":"2 GB"}`);deleteMediaFile("/uploads/projects/"+path.basename(f.path));continue;}
+      if (type === "image") {
+        try {
+          const sharp = require("sharp");
+          const tempPath = f.path + ".opt";
+          await sharp(f.path).resize({ width: 1440, height: 1440, fit: "inside", withoutEnlargement: true }).jpeg({ quality: 84, progressive: true }).toFile(tempPath);
+          fs.copyFileSync(tempPath, f.path);
+          fs.unlinkSync(tempPath);
+        } catch (_e) {}
+      }
+      const finalStat = fs.existsSync(f.path) ? fs.statSync(f.path) : { size: f.size };
       const rel="/uploads/projects/"+path.basename(f.path);
-      const r=db.prepare("INSERT INTO project_media(project_id,media_type,mime_type,original_name,file_path,file_size,is_cover) VALUES(?,?,?,?,?,?,0)").run(id,type,f.mimetype||"",clean(f.originalname,500),rel,f.size);
+      const r=db.prepare("INSERT INTO project_media(project_id,media_type,mime_type,original_name,file_path,file_size,is_cover) VALUES(?,?,?,?,?,?,0)").run(id,type,f.mimetype||"",clean(f.originalname,500),rel,finalStat.size);
       accepted.push(db.prepare("SELECT id,project_id,media_type,mime_type,original_name,file_path,file_size,is_cover,created_at FROM project_media WHERE id=?").get(r.lastInsertRowid));
     }
     if(accepted.length && db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=? AND is_cover=1").get(id).c===0){
@@ -1277,7 +2090,12 @@ app.delete("/api/admin/projects/:id",admin,(req,res)=>{
  const id=Number(req.params.id), existing=db.prepare("SELECT image FROM projects WHERE id=?").get(id);
  if(!existing)return res.status(404).json({success:false,error:"Project not found"});
  const media=db.prepare("SELECT file_path FROM project_media WHERE project_id=?").all(id);
- db.prepare("DELETE FROM projects WHERE id=?").run(id);
+ db.transaction(()=>{
+   try { db.prepare("DELETE FROM project_media WHERE project_id=?").run(id); } catch(_) {}
+   try { db.prepare("DELETE FROM project_units WHERE project_id=?").run(id); } catch(_) {}
+   try { db.prepare("UPDATE leads SET project_id=NULL WHERE project_id=?").run(id); } catch(_) {}
+   db.prepare("DELETE FROM projects WHERE id=?").run(id);
+ })();
  for(const m of media) deleteMediaFile(m.file_path);
  if(existing.image && existing.image.startsWith("/uploads/projects/")) deleteMediaFile(existing.image);
  audit(req,"delete","project",id,"Project permanently deleted");
@@ -1285,13 +2103,174 @@ app.delete("/api/admin/projects/:id",admin,(req,res)=>{
 });
 
 
-app.use(express.static(__dirname));
-app.use("/uploads/projects",express.static(PROJECT_UPLOAD_DIR,{maxAge:"7d",fallthrough:false}));
-// index.html is served automatically for the site root by express.static.
-// No catch-all route is needed; this avoids Express/path-to-regexp wildcard issues.
+// ─── PROTECTED APPLICATION ROUTES (Server-Side Route Guards) ───
+app.get("/admin.html", (req, res) => {
+  const bearer = (req.headers.authorization || "").startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
+  const token = req.cookies.lg_session || bearer || req.query.token;
+  if (!token) return res.redirect(302, "/login.html?redirect=/admin.html");
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    const u = db.prepare("SELECT status, role, session_version FROM users WHERE id=?").get(payload.id);
+    if (!u || u.status !== "active" || u.role !== "admin" || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
+      return res.redirect(302, "/login.html?redirect=/admin.html");
+    }
+    if (req.query.token) {
+      res.cookie("lg_session", token, { httpOnly: true, sameSite: "lax", maxAge: 7*24*60*60*1000, path: "/" });
+    }
+    return res.sendFile(path.join(__dirname, "admin.html"));
+  } catch (_e) {
+    return res.redirect(302, "/login.html?redirect=/admin.html");
+  }
+});
+
+app.get("/dashboard.html", (req, res) => {
+  const bearer = (req.headers.authorization || "").startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
+  const token = req.cookies.lg_session || bearer || req.query.token;
+  if (!token) return res.redirect(302, "/login.html?redirect=/dashboard.html");
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    const u = db.prepare("SELECT status, role, session_version FROM users WHERE id=?").get(payload.id);
+    if (!u || u.status !== "active" || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
+      return res.redirect(302, "/login.html?redirect=/dashboard.html");
+    }
+    if (req.query.token) {
+      res.cookie("lg_session", token, { httpOnly: true, sameSite: "lax", maxAge: 7*24*60*60*1000, path: "/" });
+    }
+    return res.sendFile(path.join(__dirname, "dashboard.html"));
+  } catch (_e) {
+    return res.redirect(302, "/login.html?redirect=/dashboard.html");
+  }
+});
+
+app.get("/advisor.html", (req, res) => {
+  const bearer = (req.headers.authorization || "").startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
+  const token = req.cookies.lg_session || bearer || req.query.token;
+  if (!token) return res.redirect(302, "/login.html?redirect=/advisor.html");
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    const u = db.prepare("SELECT status, role, session_version FROM users WHERE id=?").get(payload.id);
+    if (!u || u.status !== "active" || (u.role !== "employee" && u.role !== "admin") || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
+      return res.redirect(302, "/login.html?redirect=/advisor.html");
+    }
+    if (req.query.token) {
+      res.cookie("lg_session", token, { httpOnly: true, sameSite: "lax", maxAge: 7*24*60*60*1000, path: "/" });
+    }
+    return res.sendFile(path.join(__dirname, "advisor.html"));
+  } catch (_e) {
+    return res.redirect(302, "/login.html?redirect=/advisor.html");
+  }
+});
+
+// ─── PUBLIC WEBSITE PAGES WHITELIST ───
+const PUBLIC_PAGES = new Map([
+  ["/", "index.html"],
+  ["/index.html", "index.html"],
+  ["/properties.html", "properties.html"],
+  ["/properties", "properties.html"],
+  ["/login.html", "login.html"],
+  ["/signup.html", "signup.html"],
+  ["/forgot-password.html", "forgot-password.html"],
+  ["/project-category.html", "project-category.html"],
+  ["/units-demo.html", "units-demo.html"],
+  ["/robots.txt", "robots.txt"],
+  ["/sitemap.xml", "sitemap.xml"]
+]);
+
+for (const [routePath, fileName] of PUBLIC_PAGES) {
+  app.get(routePath, (req, res) => {
+    res.sendFile(path.join(__dirname, fileName));
+  });
+}
+
+// ─── DYNAMIC OPEN GRAPH METADATA INJECTION (WHATSAPP & SOCIAL SHARING) ───
+app.get("/project-detail.html", (req, res) => {
+  if (req.query.token) {
+    try {
+      const payload = jwt.verify(req.query.token, JWT_SECRET);
+      if (payload && payload.id) {
+        res.cookie("lg_session", req.query.token, { httpOnly: true, sameSite: "lax", maxAge: 7*24*60*60*1000, path: "/" });
+      }
+    } catch (_e) {}
+  }
+  const projectId = Number(req.query.id);
+  const detailFile = path.join(__dirname, "project-detail.html");
+  if (!Number.isInteger(projectId) || projectId < 1) {
+    return res.sendFile(detailFile);
+  }
+  try {
+    const project = db.prepare("SELECT * FROM projects WHERE id=? AND status='active'").get(projectId);
+    if (!project) return res.sendFile(detailFile);
+
+    let html = fs.readFileSync(detailFile, "utf8");
+    const safeName = String(project.name || "Luxury Property").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeDesc = String(project.description || "Explore luxury architectural spaces and premium developments by Laxminarayan Group.").replace(/"/g, "&quot;");
+    const imgPath = project.image ? (project.image.startsWith("http") ? project.image : FRONTEND_URL + "/" + project.image.replace(/^\//, "")) : FRONTEND_URL + "/assets/hero-villa.png";
+
+    const ogTags = `<title>Laxminarayan Group — ${safeName}</title>
+<meta name="description" content="${safeDesc}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Laxminarayan Group | ${safeName}">
+<meta property="og:description" content="${safeDesc}">
+<meta property="og:image" content="${imgPath}">
+<meta property="og:url" content="${FRONTEND_URL}/project-detail.html?id=${project.id}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Laxminarayan Group | ${safeName}">
+<meta name="twitter:description" content="${safeDesc}">
+<meta name="twitter:image" content="${imgPath}">`;
+
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, ogTags);
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    return res.send(html);
+  } catch (_e) {
+    return res.sendFile(detailFile);
+  }
+});
+
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(path.join(__dirname, "assets", "favicon.jpg"));
+});
+
+// ─── PUBLIC ASSETS & UPLOADED MEDIA (7-DAY BROWSER CACHE + GZIP) ───
+app.use("/assets", express.static(path.join(__dirname, "assets"), { maxAge: "7d", etag: true, dotfiles: "ignore", index: false }));
+app.use("/uploads/projects", express.static(PROJECT_UPLOAD_DIR, { maxAge: "7d", etag: true, fallthrough: false, dotfiles: "ignore", index: false }));
+
+// ─── 404 CATCH-ALL (Prevents Internal Path Discovery) ───
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/")) {
+    return res.status(404).json({ success: false, error: "API endpoint not found" });
+  }
+  res.status(404).type("text/plain").send("Not Found");
+});
 app.use((err,req,res,next)=>{
   if(err instanceof multer.MulterError) return res.status(400).json({success:false,error:err.code==="LIMIT_FILE_SIZE"?"File is too large. Images are limited to 250 MB and videos to 2 GB.":err.message});
   if(err && err.message && err.message.includes("Only JPG, PNG, WEBP or GIF")) return res.status(400).json({success:false,error:err.message});
   console.error(err);res.status(500).json({success:false,error:"Internal server error"});
 });
-app.listen(PORT,"0.0.0.0",()=>console.log(`Laxminarayan Group running at http://localhost:${PORT}`));
+(async () => {
+  try {
+    const { cert, key } = await getOrGenerateCertificates();
+    const httpsServer = https.createServer({ key, cert }, app);
+    const httpServer = http.createServer(app);
+
+    // Unified dual-protocol socket multiplexer on port 5000:
+    // Handles HTTPS TLS handshakes directly AND serves clean HTTP with zero certificate warnings!
+    const unifiedServer = net.createServer(socket => {
+      socket.once("data", buffer => {
+        // TLS ClientHello handshake packet starts with byte 0x16 (22)
+        if (buffer[0] === 22) {
+          httpsServer.emit("connection", socket);
+        } else {
+          httpServer.emit("connection", socket);
+        }
+        socket.unshift(buffer);
+      });
+    });
+
+    unifiedServer.listen(PORT, "0.0.0.0", () => {
+      console.log(`Laxminarayan Group running at http://localhost:${PORT} and https://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err);
+    process.exit(1);
+  }
+})();

@@ -3,22 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Laxminarayan Group | Architectural Excellence & Luxury Real Estate</title>
+<title>Laxminarayan Group | Construction • Development • Trust</title>
 <meta name="description" content="Laxminarayan Group creates thoughtfully designed homes in premium locations, crafted to match modern lifestyles with comfort, elegance, and long-term value.">
-<meta name="keywords" content="Laxminarayan Group, luxury homes, residential properties, commercial spaces, architecture Gujarat, site visit booking, Homy real estate">
+<meta name="keywords" content="Laxminarayan Group, luxury homes, residential properties, commercial spaces, construction Gujarat, architecture, site visit booking">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#cce3f0">
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="apple-touch-icon" href="assets/favicon.jpg">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://laxminarayangroup.com/">
-<meta property="og:title" content="Laxminarayan Group | Architectural Excellence & Luxury Real Estate">
+<meta property="og:title" content="Laxminarayan Group | Construction • Development • Trust">
 <meta property="og:description" content="Explore thoughtfully designed homes in premium locations, crafted to match modern lifestyles with comfort, elegance, and long-term value.">
 <meta property="og:image" content="assets/hero-villa.png">
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:title" content="Laxminarayan Group | Luxury Real Estate">
+<meta property="twitter:title" content="Laxminarayan Group | Construction • Development • Trust">
 <meta property="twitter:description" content="Explore thoughtfully designed homes in premium locations, crafted to match modern lifestyles with comfort, elegance, and long-term value.">
 <meta property="twitter:image" content="assets/hero-villa.png">
 
@@ -46,6 +48,7 @@
 }
 </script>
 
+<script src="assets/attribution.js?v=4"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -404,6 +407,106 @@ header.scrolled {
   filter: drop-shadow(0 20px 40px rgba(8, 11, 15, 0.12));
 }
 
+/* ─── DYNAMIC VOLUMETRIC CLOUDS & FOG SYSTEM ─── */
+.hero-cloud-canvas {
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  width: 100%;
+  height: 280px;
+  pointer-events: none;
+  z-index: 4;
+  mix-blend-mode: screen;
+  filter: blur(5px);
+  will-change: transform;
+}
+
+.hero-fog-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 240px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.hero-fog-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 300%;
+  height: 100%;
+  background-repeat: repeat-x;
+  background-position: bottom left;
+  will-change: transform;
+}
+
+/* Layer 1: Background slow rolling clouds */
+.fog-layer-back {
+  background-image: radial-gradient(ellipse 450px 140px at 250px 100%, rgba(255, 255, 255, 0.8) 0%, rgba(240, 248, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 550px 160px at 750px 100%, rgba(255, 255, 255, 0.85) 0%, rgba(240, 248, 255, 0.45) 55%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 500px 150px at 1250px 100%, rgba(255, 255, 255, 0.8) 0%, rgba(240, 248, 255, 0.45) 50%, rgba(255, 255, 255, 0) 100%);
+  background-size: 1500px 220px;
+  opacity: 0.85;
+  filter: blur(8px);
+  animation: driftCloudsBack 48s linear infinite;
+}
+
+/* Layer 2: Midground billowing mist */
+.fog-layer-mid {
+  background-image: radial-gradient(ellipse 400px 130px at 200px 100%, rgba(255, 255, 255, 0.88) 0%, rgba(240, 249, 255, 0.55) 55%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 460px 140px at 700px 100%, rgba(255, 255, 255, 0.92) 0%, rgba(240, 249, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 420px 130px at 1200px 100%, rgba(255, 255, 255, 0.88) 0%, rgba(240, 249, 255, 0.55) 55%, rgba(255, 255, 255, 0) 100%);
+  background-size: 1400px 200px;
+  opacity: 0.75;
+  filter: blur(5px);
+  animation: driftCloudsMid 34s linear infinite reverse;
+}
+
+/* Layer 3: Foreground soft floating wisps */
+.fog-layer-front {
+  background-image: radial-gradient(ellipse 360px 110px at 150px 100%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 420px 120px at 650px 100%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 380px 115px at 1150px 100%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%);
+  background-size: 1300px 180px;
+  opacity: 0.7;
+  filter: blur(3px);
+  animation: driftCloudsFront 24s ease-in-out infinite alternate;
+}
+
+/* Seamless feather blend into the section below */
+.hero-fog-gradient-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 60%, #ffffff 100%);
+  pointer-events: none;
+  z-index: 6;
+}
+
+@keyframes driftCloudsBack {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(-500px) translateY(-6px); }
+  100% { transform: translateX(-1500px) translateY(0); }
+}
+
+@keyframes driftCloudsMid {
+  0% { transform: translateX(-1400px) translateY(0); }
+  50% { transform: translateX(-700px) translateY(-8px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+@keyframes driftCloudsFront {
+  0% { transform: translateX(-150px) translateY(0) scale(1); }
+  50% { transform: translateX(100px) translateY(-5px) scale(1.03); }
+  100% { transform: translateX(-150px) translateY(0) scale(1); }
+}
+
+
 /* ─── SECTION STYLING ─── */
 section {
   padding: 110px 0;
@@ -506,9 +609,25 @@ section {
   flex-direction: column;
   height: 480px;
 }
+.homy-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 4;
+}
 .homy-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-hover);
+}
+.homy-card:hover::after {
+  left: 180%;
+  transition: left 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .homy-card-pic {
   position: absolute;
@@ -598,6 +717,112 @@ section {
 }
 .homy-card-action .arrow {
   font-size: 14px;
+}
+.homy-card-micro-badge {
+  background: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(8px);
+}
+
+/* ─── LUXURY DYNAMIC FILTER TABS ─── */
+.luxury-filter-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 34px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.luxury-filter-wrap::-webkit-scrollbar {
+  display: none;
+}
+.luxury-filter-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.04);
+  padding: 6px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-subtle);
+}
+.filter-pill {
+  border: none;
+  background: transparent;
+  color: var(--ink-secondary);
+  padding: 9px 20px;
+  border-radius: var(--radius-pill);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.filter-pill:hover {
+  color: var(--ink-primary);
+  background: rgba(255, 255, 255, 0.6);
+}
+.filter-pill.active {
+  background: var(--ink-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(10, 17, 40, 0.15);
+}
+.filter-pill .pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+}
+.filter-pill:not(.active) .pill-count {
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--ink-muted);
+}
+@keyframes fadeInCard {
+  from { opacity: 0; transform: scale(0.97) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── LUXURY PORTFOLIO CTA BANNER ─── */
+.portfolio-cta-banner {
+  margin-top: 48px;
+  background: linear-gradient(135deg, #0a1128 0%, #1e293b 100%);
+  border-radius: var(--radius-lg);
+  padding: 34px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px rgba(10, 17, 40, 0.12);
+  flex-wrap: wrap;
+}
+.portfolio-cta-content h4 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.3px;
+}
+.portfolio-cta-content p {
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 620px;
+  line-height: 1.5;
+  margin: 0;
 }
 
 /* ─── OUR SERVICES (NUMBERED BENTO CARDS) ─── */
@@ -701,10 +926,63 @@ section {
   box-shadow: var(--shadow-card);
   border: 1px solid var(--line-subtle);
 }
-.about-image-card img {
+.about-image-card img.about-main-img {
   width: 100%;
   height: 500px;
   object-fit: cover;
+  display: block;
+}
+.about-seal-badge {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(10, 17, 40, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.about-seal-badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.4), 0 0 20px rgba(212, 175, 55, 0.2);
+}
+.about-seal-badge .seal-emblem {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid #d4af37;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.about-seal-badge .seal-meta strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #f1c40f;
+  text-transform: uppercase;
+}
+.about-seal-badge .seal-meta span {
+  display: block;
+  font-size: 12px;
+  color: #e2e8f0;
+  margin-top: 3px;
+  font-weight: 500;
+}
+@media (max-width: 640px) {
+  .about-seal-badge {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    padding: 10px 14px;
+  }
 }
 .about-copy .section-h3 {
   margin-bottom: 24px;
@@ -948,18 +1226,34 @@ footer {
   gap: 24px;
 }
 .footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   font-weight: 800;
   font-size: 18px;
   letter-spacing: -0.5px;
+}
+.footer-seal-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid #d4af37;
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+.footer-seal-img:hover {
+  transform: scale(1.08) rotate(3deg);
 }
 .footer-brand span {
   display: block;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.5px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--ink-muted);
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 .footer-socials {
   display: flex;
@@ -1067,6 +1361,77 @@ footer {
   .btn-pill-dark, .btn-pill-glass { width: 100%; justify-content: center; }
   .footer-wrap, .footer-bottom { flex-direction: column; text-align: center; }
 }
+
+/* ─── FLOATING WHATSAPP CONCIERGE WIDGET ─── */
+.wa-floating-btn {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #25D366;
+  color: #ffffff;
+  padding: 12px 20px 12px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.45);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+.wa-floating-btn:hover {
+  background: #20ba5a;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(37, 211, 102, 0.55);
+  color: #fff;
+}
+.wa-icon-pulse {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wa-icon-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.4);
+  animation: waPulse 2s infinite ease-out;
+}
+@keyframes waPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.wa-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.wa-badge-status {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.wa-badge-status::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+@media (max-width: 600px) {
+  .wa-floating-btn { bottom: 20px; right: 20px; padding: 12px; }
+  .wa-badge-text { display: none; }
+}
 </style>
 </head>
 <body>
@@ -1079,13 +1444,12 @@ footer {
         <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
       </svg>
       <div>
-        LAXMINARAYAN
-        <span>REAL ESTATE</span>
+        LAXMINARAYAN GROUP
       </div>
     </a>
 
     <nav class="nav-links" id="navMenu">
-      <a href="#properties">Properties</a>
+      <a href="properties.html">Properties</a>
       <a href="#services">Services</a>
       <a href="#about">About</a>
       <a href="#impact">Our Impact</a>
@@ -1134,10 +1498,21 @@ footer {
       </div>
     </div>
 
-    <!-- Iconic Multi-Level Villa Showcase (From Homy Template) -->
-    <div class="hero-villa-container">
+    <!-- Iconic Multi-Level Villa Showcase with Dynamic Flowing Mist & Cloud Animation -->
+    <div class="hero-villa-container" id="heroVillaContainer">
       <div class="hero-villa-card">
         <img src="assets/hero-villa.png" alt="Laxminarayan modern multi-level luxury villa with layered illuminated terraces at dusk">
+        
+        <!-- Volumetric Dynamic Floating Clouds Canvas Layer -->
+        <canvas id="heroCloudCanvas" class="hero-cloud-canvas" aria-hidden="true"></canvas>
+
+        <!-- Multi-Layer Continuous Parallax Drifting Fog Bands -->
+        <div class="hero-fog-wrap" aria-hidden="true">
+          <div class="hero-fog-layer fog-layer-back"></div>
+          <div class="hero-fog-layer fog-layer-mid"></div>
+          <div class="hero-fog-layer fog-layer-front"></div>
+          <div class="hero-fog-gradient-fade"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -1158,7 +1533,7 @@ footer {
         </div>
         <div class="stat-card">
           <strong>1,200+</strong>
-          <span>Families Living in Completed Signature Communities</span>
+          <span>Families Living in Completed Laxminarayan Communities</span>
         </div>
         <div class="stat-card">
           <strong>50+</strong>
@@ -1178,18 +1553,40 @@ footer {
     <div class="container">
       <div class="prop-head-flex">
         <div>
-          <span class="section-tag">Top Properties</span>
-          <h3 class="section-h3">Explore our selected homes for modern living</h3>
-          <p class="section-lead">Carefully chosen properties that combine design, comfort, and location to match real lifestyle needs.</p>
+          <span class="section-tag">Our Active Projects</span>
+          <h3 class="section-h3">Explore our landmark construction developments</h3>
+          <p class="section-lead">Premier real-estate developments crafted with architectural excellence, quality construction, and prime connectivity.</p>
         </div>
-        <a href="project-category.html?category=RESIDENTIAL" class="btn-contact" style="background:#fff; color:var(--ink-primary); border:1px solid var(--line-border);">
-          <span>View All Properties</span>
+        <a href="properties.html" class="btn-contact" style="background:#fff; color:var(--ink-primary); border:1px solid var(--line-border);">
+          <span>View All Developments (2)</span>
           <span class="arrow">→</span>
         </a>
       </div>
 
+      <!-- LUXURY DYNAMIC CATEGORY FILTER TABS -->
+      <div class="luxury-filter-wrap" id="luxuryFilterWrap">
+        <div class="luxury-filter-pills" id="projectFilterTabs">
+          <button type="button" class="filter-pill active" data-filter="ALL" onclick="filterProjects('ALL', this)">
+            <span>All Developments</span>
+            <span class="pill-count" id="pillCountAll">2</span>
+          </button>
+        </div>
+      </div>
+
       <div class="property-grid" id="projectGrid">
         <!-- Dynamically populated by loadSiteData() -->
+      </div>
+
+      <!-- COMPLETE PORTFOLIO DISCOVERY BANNER -->
+      <div class="portfolio-cta-banner">
+        <div class="portfolio-cta-content">
+          <h4>Looking for specific floor plans or upcoming developments?</h4>
+          <p>Explore our complete architectural portfolio with interactive search, budget filters, and city-wise site locator across Gujarat.</p>
+        </div>
+        <a href="properties.html" class="btn-pill-dark" style="white-space:nowrap; background:#ffffff; color:#0a1128;">
+          <span>Explore All Properties</span>
+          <span class="circle-arrow" style="background:#0a1128; color:#ffffff;">→</span>
+        </a>
       </div>
     </div>
   </section>
@@ -1229,8 +1626,8 @@ footer {
   <!-- DYNAMIC MARQUEE TICKER -->
   <div class="marquee-wrap" aria-hidden="true">
     <div class="marquee-track">
-      <div class="marquee-item">EXPLORE HOMES <span class="dot"></span> LIVE BETTER <span class="dot"></span> MODERN SPACES <span class="dot"></span> SIGNATURE RESIDENCES <span class="dot"></span> ARCHITECTURAL EXCELLENCE <span class="dot"></span> 25+ YEARS OF TRUST <span class="dot"></span></div>
-      <div class="marquee-item">EXPLORE HOMES <span class="dot"></span> LIVE BETTER <span class="dot"></span> MODERN SPACES <span class="dot"></span> SIGNATURE RESIDENCES <span class="dot"></span> ARCHITECTURAL EXCELLENCE <span class="dot"></span> 25+ YEARS OF TRUST <span class="dot"></span></div>
+      <div class="marquee-item">EXPLORE HOMES <span class="dot"></span> LIVE BETTER <span class="dot"></span> MODERN SPACES <span class="dot"></span> LUXURY RESIDENCES <span class="dot"></span> ARCHITECTURAL EXCELLENCE <span class="dot"></span> 25+ YEARS OF TRUST <span class="dot"></span></div>
+      <div class="marquee-item">EXPLORE HOMES <span class="dot"></span> LIVE BETTER <span class="dot"></span> MODERN SPACES <span class="dot"></span> LUXURY RESIDENCES <span class="dot"></span> ARCHITECTURAL EXCELLENCE <span class="dot"></span> 25+ YEARS OF TRUST <span class="dot"></span></div>
     </div>
   </div>
 
@@ -1238,7 +1635,14 @@ footer {
   <section id="about" class="about-section">
     <div class="container about-grid">
       <div class="about-image-card">
-        <img src="assets/about.jpg" alt="Laxminarayan architectural courtyard with natural daylight">
+        <img class="about-main-img" src="assets/about.jpg" alt="Laxminarayan architectural courtyard with natural daylight">
+        <div class="about-seal-badge">
+          <img src="assets/laxminarayan-seal-logo.jpg" alt="Official Laxminarayan Group Seal" class="seal-emblem">
+          <div class="seal-meta">
+            <strong>Official Seal of Trust</strong>
+            <span>Building Trust, Delivering Dreams</span>
+          </div>
+        </div>
       </div>
       <div class="about-copy">
         <span class="section-tag">About the Group</span>
@@ -1267,7 +1671,7 @@ footer {
             <div class="review-avatar">PR</div>
             <div class="review-author-info">
               <b>Prashant Raval</b>
-              <span>Signature Villa Owner</span>
+              <span>Nilkanth Villa Resident</span>
             </div>
           </div>
         </div>
@@ -1388,10 +1792,12 @@ footer {
         <p style="font-size:14.5px; color:var(--ink-secondary); margin-bottom:24px;">Fill out the form below. An advisory manager will respond promptly with project brochures and pricing.</p>
         
         <form class="form-grid form" id="enquiryForm" onsubmit="submitEnquiry(event)">
-          <input required class="form-input" placeholder="Your full name" aria-label="Full name">
-          <input required type="tel" class="form-input" placeholder="Phone number (e.g. +91 ...)" aria-label="Phone number">
-          <input type="email" class="form-input" placeholder="Email address" aria-label="Email address">
-          <textarea class="form-textarea" placeholder="Tell us what you are looking for (Residential, Commercial, Land)..." aria-label="Requirement message"></textarea>
+          <!-- Anti-Spam Honeypot -->
+          <input type="text" name="hp_confirm_field" id="enqHp" style="display:none!important; position:absolute!important; left:-9999px!important;" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <input required class="form-input" id="enqName" name="name" autocomplete="name" placeholder="Your full name" aria-label="Full name">
+          <input required type="tel" class="form-input" id="enqPhone" name="phone" autocomplete="tel" placeholder="Phone number (e.g. +91 ...)" aria-label="Phone number">
+          <input type="email" class="form-input" id="enqEmail" name="email" autocomplete="email" placeholder="Email address" aria-label="Email address">
+          <textarea class="form-textarea" id="enqMessage" name="message" placeholder="Tell us what you are looking for (Residential, Commercial, Land)..." aria-label="Requirement message"></textarea>
           
           <div class="form-btn-row">
             <button class="btn-pill-dark" type="submit" style="border:none; cursor:pointer;">
@@ -1413,17 +1819,17 @@ footer {
   <div class="visit-modal-content">
     <button type="button" class="visit-modal-close" onclick="closeVisitModal()" aria-label="Close modal">&times;</button>
     <h3 id="visitModalTitle" style="font-size:24px; font-weight:700; color:var(--ink-primary); margin-bottom:8px;">Book a Private Visit</h3>
-    <p style="font-size:14.5px; color:var(--ink-secondary); margin-bottom:20px;">Experience our signature architecture in person with a guided private tour.</p>
+    <p style="font-size:14.5px; color:var(--ink-secondary); margin-bottom:20px;">Experience our premier developments in person with a guided private tour.</p>
 
     <form class="form-grid" id="modalVisitForm" onsubmit="handleModalVisit(event)">
+      <!-- Anti-Spam Honeypot -->
+      <input type="text" name="hp_confirm_field" id="modalVisitHp" style="display:none!important; position:absolute!important; left:-9999px!important;" tabindex="-1" autocomplete="off" aria-hidden="true">
       <input required class="form-input" id="vName" placeholder="Full name" aria-label="Full name">
       <input required type="tel" class="form-input" id="vPhone" placeholder="Mobile number" aria-label="Phone number">
       <input type="date" class="form-input" id="vDate" required aria-label="Preferred visit date">
       <select class="form-input" id="vProp" aria-label="Select property">
-        <option value="Signature Villas">Signature Villas</option>
-        <option value="Signature Townhomes">Signature Townhomes</option>
-        <option value="Commercial Hub">Prime Commercial</option>
-        <option value="Any Residential">General Residential Walkthrough</option>
+        <option value="DS 208 (Developed by Akshar Group)">DS 208 (Developed by Akshar Group)</option>
+        <option value="Nilkanth Villa">Nilkanth Villa</option>
       </select>
       <button class="btn-pill-dark" type="submit" style="border:none; cursor:pointer; width:100%; justify-content:center; margin-top:10px;">
         <span>CONFIRM VISIT REQUEST</span>
@@ -1438,8 +1844,11 @@ footer {
   <div class="container">
     <div class="footer-wrap">
       <div class="footer-brand">
-        LAXMINARAYAN GROUP
-        <span>CONSTRUCTION • DEVELOPMENT • TRUST</span>
+        <img src="assets/laxminarayan-seal-logo.jpg" alt="Laxminarayan Emblem" class="footer-seal-img">
+        <div>
+          LAXMINARAYAN GROUP
+          <span style="color:rgba(255,255,255,0.6);">CONSTRUCTION • DEVELOPMENT • TRUST</span>
+        </div>
       </div>
 
       <div class="footer-socials">
@@ -1459,10 +1868,32 @@ footer {
   </div>
 </footer>
 
+<!-- FLOATING WHATSAPP QUICK-CONCIERGE WIDGET -->
+<a id="waFloatingWidget" class="wa-floating-btn" href="https://wa.me/916352000017?text=Hello%20Laxminarayan%20Group%20Team%2C%20I%20am%20exploring%20your%20properties%20and%20would%20like%20to%20speak%20with%20a%20property%20advisor." target="_blank" rel="noopener noreferrer" aria-label="Chat with Concierge on WhatsApp">
+  <div class="wa-icon-pulse">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+    </svg>
+  </div>
+  <div class="wa-badge-text">
+    <span style="font-size:12px; font-weight:800; letter-spacing:0.3px;">CHAT WITH CONCIERGE</span>
+    <span class="wa-badge-status">Online Now • Direct Support</span>
+  </div>
+</a>
+
 <!-- FUNCTIONALITY & BACKEND SCRIPTS (100% PRESERVED) -->
 <script>
 const header = document.getElementById('header');
-window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 40));
+let headerTicking = false;
+window.addEventListener('scroll', () => {
+  if (!headerTicking) {
+    requestAnimationFrame(() => {
+      if (header) header.classList.toggle('scrolled', window.scrollY > 40);
+      headerTicking = false;
+    });
+    headerTicking = true;
+  }
+}, { passive: true });
 
 function toggleFaq(btn) {
   const item = btn.closest('.faq-item');
@@ -1494,12 +1925,15 @@ async function submitEnquiry(e) {
   const origHtml = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = "<span>SENDING...</span>";
-  const inputs = f.querySelectorAll("input,textarea");
+  const hpVal = (f.querySelector('input[name="hp_confirm_field"]') || {}).value || '';
+  const leadSource = typeof window.getLeadSource === 'function' ? window.getLeadSource() : 'website';
   const body = {
-    name: inputs[0].value,
-    phone: inputs[1].value,
-    email: inputs[2].value,
-    message: inputs[3].value
+    name: document.getElementById("enqName").value,
+    phone: document.getElementById("enqPhone").value,
+    email: document.getElementById("enqEmail").value,
+    message: document.getElementById("enqMessage").value,
+    source: leadSource,
+    hp_confirm_field: hpVal
   };
   try {
     const r = await fetch(API + "/enquiries", {
@@ -1526,12 +1960,16 @@ async function handleModalVisit(e) {
   const phone = document.getElementById('vPhone').value.trim();
   const date = document.getElementById('vDate').value;
   const prop = document.getElementById('vProp').value;
+  const hpVal = (document.getElementById('modalVisitHp') || {}).value || '';
+  const leadSource = typeof window.getLeadSource === 'function' ? window.getLeadSource() : 'website';
   
   const body = {
     name,
     phone,
     email: '',
-    message: `Site Visit Requested for: ${prop} on ${date}`
+    message: `Site Visit Requested for: ${prop} on ${date}`,
+    source: leadSource + ' (visit)',
+    hp_confirm_field: hpVal
   };
   
   try {
@@ -1596,25 +2034,27 @@ async function updateAccountLink() {
 }
 updateAccountLink();
 
-const categoryMeta = {
-  RESIDENTIAL: { title: "Signature Homes", location: "Bodakdev & SG Highway, Ahmedabad", price: "From ₹1.85 Cr", fallback: "assets/signature-homes.jpg" },
-  COMMERCIAL: { title: "Prime Commercial Spaces", location: "Gift City Corridor, Gandhinagar", price: "From ₹2.20 Cr", fallback: "assets/commercial-properties.jpg" },
-  DEVELOPMENT: { title: "Future Landmarks", location: "Sanand Industrial & Green Belt", price: "Custom Estates", fallback: "assets/residential-properties.jpg" },
-  INDUSTRIAL: { title: "Industrial Properties", location: "Expressway Logistic Parks", price: "From ₹3.50 Cr", fallback: "assets/industrial-properties.jpg" }
-};
+let allLoadedProjects = [];
 
-function projectCard(category, first) {
-  const m = categoryMeta[category] || { title: category.charAt(0) + category.slice(1).toLowerCase(), location: "Prime Gujarat Location", price: "Price on Request", fallback: "assets/project-2.jpg" };
-  const image = first?.image || m.fallback;
-  const title = first ? (first.name || m.title) : m.title;
-  const price = first?.price ? `₹${first.price}` : m.price;
-  const location = first?.location || m.location;
-  
-  return `<a class="homy-card project-link" href="project-category.html?category=${encodeURIComponent(category)}" data-category="${esc(category)}">
+function projectCard(p) {
+  const image = p.image || (p.id === 1 ? "/uploads/projects/ds208_bird_eye_view.jpg" : "assets/hero-villa.png");
+  const title = p.name || "Real Estate Project";
+  const category = p.category || "RESIDENTIAL";
+  const price = p.price || "Price on Request";
+  const location = p.location || "Gujarat, India";
+  const link = `project-detail.html?id=${p.id}`;
+  const badge = p.badge || "UNDER CONSTRUCTION";
+  const rera = p.rera_number ? `RERA: ${p.rera_number}` : "RERA REGISTERED";
+  const city = p.city || "Gujarat";
+
+  return `<a class="homy-card project-card-item" href="${link}" data-id="${p.id}" data-category="${esc(category)}" data-city="${esc(city)}">
     <div class="homy-card-pic" style="background-image:url('${String(image).replace(/'/g, "%27")}')"></div>
     <div class="homy-card-overlay"></div>
     <div class="homy-card-top">
-      <span class="homy-card-tag">${esc(category)}</span>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
+        <span class="homy-card-tag">${esc(category)}</span>
+        <span class="homy-card-micro-badge">${esc(badge)}</span>
+      </div>
       <span class="homy-card-price">${esc(price)}</span>
     </div>
     <div class="homy-card-bottom">
@@ -1623,50 +2063,204 @@ function projectCard(category, first) {
         ${esc(location)}
       </div>
       <h4>${esc(title)}</h4>
-      <div class="homy-card-action">
-        <span>Explore Property</span>
-        <span class="arrow">→</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="homy-card-action">
+          <span>Explore Property</span>
+          <span class="arrow">→</span>
+        </div>
+        <span style="font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; letter-spacing:0.5px; background:rgba(0,0,0,0.4); padding:4px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.15);">
+          ✓ ${esc(rera)}
+        </span>
       </div>
     </div>
   </a>`;
+}
+
+function filterProjects(catKey, btn) {
+  document.querySelectorAll('#projectFilterTabs .filter-pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const cards = document.querySelectorAll('.project-card-item');
+  cards.forEach(card => {
+    const cardCat = (card.getAttribute('data-category') || '').toUpperCase();
+    const cardCity = (card.getAttribute('data-city') || '').toUpperCase();
+    const matches = (catKey === 'ALL') || (cardCat === catKey) || (cardCity === catKey);
+    if (matches) {
+      card.style.display = 'flex';
+      card.style.animation = 'fadeInCard 0.4s ease forwards';
+    } else {
+      card.style.display = 'none';
+    }
+  });
 }
 
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[m]));
 }
 
-function bindProjectLinks() {
-  document.querySelectorAll(".project-link").forEach(a => a.addEventListener("click", async function (e) {
-    e.preventDefault();
-    const target = this.href;
-    try {
-      const r = await fetch(API + "/auth/me", { credentials: "same-origin", cache: "no-store" });
-      if (r.ok) { location.href = target; return; }
-    } catch (err) {}
-    const u = new URL(target, location.href);
-    location.href = "login.html?return_to=" + encodeURIComponent(u.pathname + u.search);
-  }));
-}
-
 async function loadSiteData() {
   try {
     const p = await fetch(API + "/projects", { cache: "no-store" }).then(r => r.json());
-    const groups = {};
-    (p.data || []).forEach(x => {
-      if (!groups[x.category]) groups[x.category] = [];
-      groups[x.category].push(x);
-    });
-    const categories = Object.keys(groups);
-    const order = ["RESIDENTIAL", "COMMERCIAL", "DEVELOPMENT", "INDUSTRIAL"];
-    categories.sort((a, b) => (order.indexOf(a) < 0 ? 99 : order.indexOf(a)) - (order.indexOf(b) < 0 ? 99 : order.indexOf(b)));
+    allLoadedProjects = (p.data || []).filter(x => x.status === 'active' || x.status === undefined);
+    
+    // Render Project Cards
     const grid = document.getElementById("projectGrid");
-    grid.innerHTML = categories.map(c => projectCard(c, groups[c][0])).join("");
-    bindProjectLinks();
+    if (grid && allLoadedProjects.length > 0) {
+      grid.innerHTML = allLoadedProjects.map(x => projectCard(x)).join("");
+    }
+
+    // Dynamic Filter Tabs Generation
+    const tabsContainer = document.getElementById("projectFilterTabs");
+    if (tabsContainer && allLoadedProjects.length > 0) {
+      const counts = {};
+      allLoadedProjects.forEach(x => {
+        const c = (x.category || 'RESIDENTIAL').toUpperCase();
+        counts[c] = (counts[c] || 0) + 1;
+      });
+
+      const categories = Object.keys(counts);
+      let tabsHtml = `
+        <button type="button" class="filter-pill active" data-filter="ALL" onclick="filterProjects('ALL', this)">
+          <span>All Developments</span>
+          <span class="pill-count">${allLoadedProjects.length}</span>
+        </button>
+      `;
+
+      categories.forEach(cat => {
+        const icon = cat.includes('VILLA') ? '🏡' : (cat.includes('APARTMENT') || cat.includes('SHOP') ? '🏢' : '🏗️');
+        tabsHtml += `
+          <button type="button" class="filter-pill" data-filter="${esc(cat)}" onclick="filterProjects('${esc(cat)}', this)">
+            <span>${icon} ${esc(cat)}</span>
+            <span class="pill-count">${counts[cat]}</span>
+          </button>
+        `;
+      });
+
+      tabsContainer.innerHTML = tabsHtml;
+    }
   } catch (e) {
     console.error("Could not load site data", e);
   }
 }
 loadSiteData();
+
+/* ─── VOLUMETRIC DRIFTING CLOUDS & MIST ENGINE ─── */
+(function initHeroClouds() {
+  const canvas = document.getElementById("heroCloudCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  let width, height;
+  let animId;
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = rect.width || (canvas.parentElement ? canvas.parentElement.clientWidth : 1200);
+    height = rect.height || 280;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+  }
+  resize();
+  window.addEventListener("resize", resize, { passive: true });
+
+  // Pre-render a single high-fidelity cloud puff texture off-screen once (zero garbage collection)
+  const puffCanvas = document.createElement("canvas");
+  const puffSize = 256;
+  puffCanvas.width = puffSize;
+  puffCanvas.height = puffSize;
+  const pctx = puffCanvas.getContext("2d");
+  const baseGrad = pctx.createRadialGradient(puffSize/2, puffSize/2, 0, puffSize/2, puffSize/2, puffSize/2);
+  baseGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+  baseGrad.addColorStop(0.35, "rgba(240, 248, 255, 0.65)");
+  baseGrad.addColorStop(0.70, "rgba(255, 255, 255, 0.20)");
+  baseGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+  pctx.fillStyle = baseGrad;
+  pctx.beginPath();
+  pctx.arc(puffSize/2, puffSize/2, puffSize/2, 0, Math.PI * 2);
+  pctx.fill();
+
+  // Generate organic floating volumetric cloud puffs (optimized count)
+  const particleCount = 18;
+  const particles = [];
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * (width + 400) - 200,
+      y: height * 0.35 + Math.random() * (height * 0.65),
+      radiusX: 110 + Math.random() * 120,
+      radiusY: 55 + Math.random() * 65,
+      speedX: 0.18 + Math.random() * 0.32,
+      bobSpeed: 0.0010 + Math.random() * 0.0016,
+      bobPhase: Math.random() * Math.PI * 2,
+      bobAmp: 6 + Math.random() * 10,
+      alpha: 0.25 + Math.random() * 0.35,
+      pulseSpeed: 0.0012 + Math.random() * 0.0018
+    });
+  }
+
+  function drawCloudPuff(p, time) {
+    const y = p.y + Math.sin(time * p.bobSpeed + p.bobPhase) * p.bobAmp;
+    const currentAlpha = Math.max(0.06, Math.min(0.65, p.alpha + Math.sin(time * p.pulseSpeed + p.bobPhase) * 0.08));
+    
+    ctx.save();
+    ctx.globalAlpha = currentAlpha;
+    ctx.drawImage(puffCanvas, p.x - p.radiusX, y - p.radiusY, p.radiusX * 2, p.radiusY * 2);
+    ctx.restore();
+  }
+
+  let isHeroVisible = true;
+  function loop(now) {
+    if (!isHeroVisible) {
+      animId = null;
+      return;
+    }
+
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.speedX;
+
+      if (p.x - p.radiusX > width + 120) {
+        p.x = -p.radiusX - 120;
+        p.y = height * 0.35 + Math.random() * (height * 0.65);
+      }
+
+      drawCloudPuff(p, now);
+    }
+
+    animId = requestAnimationFrame(loop);
+  }
+
+  // IntersectionObserver: Pause canvas loop completely when scrolled out of view!
+  const container = document.getElementById("heroVillaContainer");
+  if (window.IntersectionObserver && container) {
+    const obs = new IntersectionObserver(entries => {
+      isHeroVisible = entries[0].isIntersecting;
+      if (isHeroVisible && !animId) {
+        animId = requestAnimationFrame(loop);
+      }
+    }, { threshold: 0.05 });
+    obs.observe(container);
+  } else {
+    animId = requestAnimationFrame(loop);
+  }
+
+  // Parallax on mouse move
+  if (container) {
+    container.addEventListener("mousemove", e => {
+      const rect = container.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      canvas.style.transform = `translateX(${relX * 22}px)`;
+    }, { passive: true });
+    container.addEventListener("mouseleave", () => {
+      canvas.style.transform = "translateX(0px)";
+      canvas.style.transition = "transform .6s ease-out";
+      setTimeout(() => { canvas.style.transition = ""; }, 600);
+    });
+  }
+})();
 </script>
 </body>
 </html>

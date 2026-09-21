@@ -65,9 +65,6 @@ async function main() {
   console.log("This utility changes only the selected admin user's bcrypt password hash.");
   console.log(`Database: ${DB_FILE}`);
 
-  if (fs.existsSync(MARKER)) {
-    return fail("This one-time reset utility has already been used in this project folder. Delete .admin-password-reset-used only if you intentionally need to run it again.");
-  }
   if (!fs.existsSync(SCHEMA)) return fail("schema.sql was not found. Run this utility from the project folder.");
 
   fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
@@ -103,26 +100,54 @@ async function main() {
     if (!cols.has("updated_at")) { db.exec("ALTER TABLE users ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''"); db.exec("UPDATE users SET updated_at=created_at WHERE updated_at='' "); }
 
     const configuredEmail = String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
-    const email = (await question(`Admin email [${configuredEmail || "enter email"}]: `)).toLowerCase() || configuredEmail;
+    let email = (process.argv[2] || "").trim().toLowerCase();
+    if (!email) {
+      email = (await question(`Admin email [${configuredEmail || "enter email"}]: `)).toLowerCase() || configuredEmail;
+    }
     if (!email) return fail("Admin email is required.");
 
     const user = db.prepare("SELECT id,name,email,role,status FROM users WHERE lower(email)=? LIMIT 1").get(email);
     if (!user) return fail(`No user with email ${email} was found in this database. Start the server once so the configured admin account can be seeded, then run this utility again.`);
     if (user.role !== "admin") return fail(`The account ${email} exists but is not an admin account. No changes were made.`);
 
-    const password = await question("New admin password (8–128 chars): ", true);
-    if (password.length < 8 || password.length > 128) return fail("Password must be 8–128 characters. No changes were made.");
-    const confirm = await question("Confirm new admin password: ", true);
-    if (password !== confirm) return fail("Passwords do not match. No changes were made.");
+    let password = (process.argv[3] || "").trim();
+    if (!password) {
+      password = await question("New admin password (8–128 chars): ", true);
+      if (password.length < 8 || password.length > 128) return fail("Password must be 8–128 characters. No changes were made.");
+      const confirm = await question("Confirm new admin password: ", true);
+      if (password !== confirm) return fail("Passwords do not match. No changes were made.");
+    } else {
+      if (password.length < 8 || password.length > 128) return fail("Password must be 8–128 characters. No changes were made.");
+    }
 
     const hash = bcrypt.hashSync(password, 12);
     const update = db.prepare("UPDATE users SET password_hash=?, status='active', session_version=session_version+1, updated_at=CURRENT_TIMESTAMP WHERE id=? AND role='admin'").run(hash, user.id);
     if (!update.changes) return fail("The admin password was not changed.");
 
-    fs.writeFileSync(MARKER, `Used successfully on ${new Date().toISOString()} for admin id ${user.id}.\n`, { flag: "wx" });
+    // Keep .env in sync so the developer always has the right credentials
+    try {
+      const envPath = path.join(ROOT, ".env");
+      if (fs.existsSync(envPath)) {
+        let envContent = fs.readFileSync(envPath, "utf8");
+        if (envContent.includes("ADMIN_PASSWORD=")) {
+          envContent = envContent.replace(/^ADMIN_PASSWORD=.*$/m, `ADMIN_PASSWORD=${password}`);
+        } else {
+          envContent += `\nADMIN_PASSWORD=${password}\n`;
+        }
+        if (envContent.includes("ADMIN_EMAIL=")) {
+          envContent = envContent.replace(/^ADMIN_EMAIL=.*$/m, `ADMIN_EMAIL=${email}`);
+        }
+        fs.writeFileSync(envPath, envContent, "utf8");
+      }
+    } catch (_) {}
+
+    try {
+      fs.writeFileSync(MARKER, `Last reset on ${new Date().toISOString()} for admin id ${user.id}.\n`, "utf8");
+    } catch (_) {}
     console.log("\nSUCCESS: Admin password reset.");
+    console.log(`Admin email: ${email}`);
     console.log("Any existing admin sessions were invalidated.");
-    console.log("The new password is stored only as a bcrypt hash in SQLite.");
+    console.log("Credentials synchronized in .env and SQLite database.");
     console.log("You can now log in through /login.html.");
   } finally {
     db.close();

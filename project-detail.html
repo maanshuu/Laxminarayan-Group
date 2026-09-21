@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Laxminarayan Group — Project Details</title>
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="apple-touch-icon" href="assets/favicon.jpg">
+<script src="assets/attribution.js?v=4"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
@@ -50,6 +53,7 @@ body {
   font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 a { text-decoration: none; color: inherit; transition: all .25s ease; }
@@ -61,12 +65,13 @@ header {
   top: 0;
   z-index: 100;
   padding: 14px 0;
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.98);
   border-bottom: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
   margin-bottom: 35px;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 .nav {
   display: flex;
@@ -104,51 +109,422 @@ header {
   transform: translateY(-1px);
 }
 
-/* ─── HERO CARD ─── */
-.hero {
-  border-radius: var(--radius-lg);
-  min-height: 420px;
-  background-size: cover;
-  background-position: center;
+/* ─── LUXURY PROJECT HEADER BAR ─── */
+.project-title-bar {
   display: flex;
+  justify-content: space-between;
   align-items: flex-end;
-  padding: 50px 45px;
-  margin-bottom: 30px;
-  box-shadow: var(--shadow-float);
-  border: 1px solid var(--line);
-  position: relative;
-  overflow: hidden;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 22px;
 }
-#cat {
-  display: inline-block;
+.project-title-info {
+  flex: 1 1 500px;
+  min-width: 0;
+  max-width: 100%;
+}
+.project-eyebrow-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.project-cat-badge {
+  display: inline-flex;
+  align-items: center;
   padding: 5px 14px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+  background: var(--sky-light);
   border: 1px solid var(--line-sky);
   border-radius: var(--radius-pill);
   color: var(--sky-deep);
   font-size: 11px;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   font-weight: 800;
-  margin-bottom: 16px;
 }
-.hero h1 {
+.project-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-pill);
+  color: #059669;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+.project-rera-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.project-main-title {
   font-family: var(--font-serif);
-  font-size: clamp(36px, 4.5vw, 54px);
-  font-weight: 600;
-  line-height: 1.1;
-  color: #fff;
-  margin-bottom: 12px;
-  letter-spacing: -1px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  font-size: clamp(24px, 3.8vw, 42px);
+  font-weight: 700;
+  color: var(--ink-heading);
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
-.hero p {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 16px;
-  line-height: 1.7;
-  max-width: 650px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+.project-location-sub {
+  font-size: 14px;
+  color: var(--ink-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.project-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-heading);
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-action-pill:hover {
+  border-color: var(--sky-primary);
+  color: var(--sky-deep);
+  transform: translateY(-1px);
+}
+
+/* ─── 5-PHOTO ARCHITECTURAL MOSAIC BENTO ─── */
+.hero-mosaic-container {
+  display: grid;
+  grid-template-columns: 58% 42%;
+  gap: 12px;
+  height: 480px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-float);
+  margin-bottom: 32px;
+  position: relative;
+  background: #0f172a;
+}
+@media (max-width: 900px) {
+  .hero-mosaic-container {
+    grid-template-columns: 1fr;
+    height: 380px;
+  }
+  .mosaic-grid-right {
+    display: none !important;
+  }
+}
+.btn-text-mobile { display: none; }
+.btn-text-desktop { display: inline; }
+
+@media (max-width: 600px) {
+  .hero-mosaic-container {
+    height: 280px;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+  }
+  .btn-text-mobile { display: inline; }
+  .btn-text-desktop { display: none; }
+  .project-title-bar { margin-bottom: 16px; gap: 10px; }
+  .project-main-title { font-size: clamp(22px, 5.5vw, 32px); line-height: 1.2; word-break: break-word; }
+  .project-title-actions { width: 100%; display: flex; gap: 8px; }
+  .project-title-actions .btn-action-pill { flex: 1; justify-content: center; padding: 9px 10px; font-size: 11.5px; }
+  .mosaic-caption { bottom: 12px; left: 14px; right: 115px; }
+  .mosaic-caption h3 { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mosaic-more-overlay { bottom: 10px; right: 10px; }
+  .btn-view-all-photos {
+    padding: 7px 12px;
+    font-size: 11px;
+    gap: 5px;
+  }
+  .lightbox-stage {
+    padding: 10px 45px;
+  }
+  .lightbox-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  .lightbox-prev-btn { left: 8px; }
+  .lightbox-next-btn { right: 8px; }
+}
+
+.hero-mosaic-container.single-cover {
+  grid-template-columns: 1fr !important;
+  height: 500px;
+}
+.hero-mosaic-container.single-cover .mosaic-main {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-lg);
+}
+.hero-mosaic-container.single-cover .mosaic-grid-right {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .hero-mosaic-container.single-cover {
+    height: 300px;
+  }
+  #waFloatingWidget {
+    display: none !important;
+  }
+}
+
+.mosaic-tile {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0f172a;
+}
+.mosaic-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: block;
+}
+.mosaic-tile:hover img {
+  transform: scale(1.04);
+}
+.mosaic-main {
+  height: 100%;
+}
+.mosaic-grid-right {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  height: 100%;
+}
+.mosaic-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.05) 30%, rgba(15, 23, 42, 0.75) 100%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.mosaic-tile:hover .mosaic-overlay-gradient {
+  opacity: 0.85;
+}
+.mosaic-caption {
+  position: absolute;
+  bottom: 22px;
+  left: 24px;
+  right: 24px;
+  color: #ffffff;
+  pointer-events: none;
+}
+.mosaic-tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin-bottom: 4px;
+}
+.mosaic-caption h3 {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Floating View All Button */
+.mosaic-more-overlay {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 5;
+}
+.btn-view-all-photos {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease;
+}
+.btn-view-all-photos:hover {
+  background: var(--sky-primary);
+  border-color: var(--sky-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+}
+
+/* ─── FULL-SCREEN LUXURY LIGHTBOX SLIDER ─── */
+.lightbox-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 26, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 99999;
+  display: none;
+  flex-direction: column;
+  color: #ffffff;
+  overflow: hidden;
+}
+.lightbox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.8);
+}
+.lightbox-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.lightbox-counter-badge {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+.lightbox-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lightbox-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.lightbox-close-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  transform: scale(1.05);
+}
+
+.lightbox-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 20px 80px;
+  min-height: 0;
+}
+.lightbox-main-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+.lightbox-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 26px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.lightbox-nav-btn:hover {
+  background: var(--sky-primary);
+  border-color: var(--sky-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+.lightbox-prev-btn { left: 24px; }
+.lightbox-next-btn { right: 24px; }
+
+.lightbox-caption-bar {
+  text-align: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+/* Bottom Thumbnail Filmstrip */
+.lightbox-filmstrip {
+  display: flex;
+  gap: 10px;
+  padding: 12px 30px 18px;
+  overflow-x: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.6);
+  justify-content: center;
+}
+.filmstrip-thumb {
+  width: 72px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  flex-shrink: 0;
+}
+.filmstrip-thumb:hover {
+  opacity: 0.85;
+}
+.filmstrip-thumb.active {
+  opacity: 1;
+  border-color: #38bdf8;
+  transform: scale(1.05);
 }
 
 /* ─── PANELS ─── */
@@ -159,6 +535,8 @@ header {
   padding: 36px 40px;
   margin-bottom: 30px;
   box-shadow: var(--shadow-card);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 480px;
 }
 .panel h2 {
   font-family: var(--font-serif);
@@ -175,30 +553,291 @@ header {
   margin-bottom: 14px;
 }
 
-.specs-grid {
+.specs-grid { display: none; }
+.spec-box { display: none; }
+
+/* ─── LUXURY EXECUTIVE OVERVIEW HIGHLIGHTS BENTO ─── */
+.overview-bento-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin: 25px 0 30px;
+  margin: 24px 0 20px;
 }
-.spec-box {
-  padding: 22px;
+@media (max-width: 980px) {
+  .overview-bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 580px) {
+  .overview-bento-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.overview-metric-card {
+  padding: 20px 22px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(2, 132, 199, 0.16);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.overview-metric-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--sky-gradient);
+  opacity: 0.9;
+}
+.overview-metric-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--sky-primary);
+  box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.14);
+}
+.overview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.overview-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--sky-light);
+  border: 1px solid var(--line-sky);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.overview-card-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--sky-deep);
+}
+.overview-card-value {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink-heading);
+  line-height: 1.35;
+}
+.overview-card-sub {
+  font-size: 12px;
+  color: var(--ink-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Quick amenity preview tags inside overview */
+.overview-amenity-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 24px;
+  padding: 16px 20px;
   background: var(--bg-sky-tint);
   border: 1px solid var(--line-sky);
   border-radius: var(--radius-md);
 }
-.spec-box span {
-  display: block;
+.overview-amenity-pill-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-heading);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s ease;
+}
+.overview-amenity-pill-item:hover {
+  border-color: var(--sky-primary);
+  transform: translateY(-1px);
+}
+
+/* ─── DEDICATED LUXURY AMENITIES SHOWCASE ─── */
+.amenities-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  margin-bottom: 30px;
+  box-shadow: var(--shadow-card);
+}
+.amenities-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.amenities-eyebrow {
   font-size: 11px;
+  font-weight: 800;
+  color: var(--sky-primary);
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--sky-deep);
-  font-weight: 800;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
-.spec-box strong {
-  font-size: 16px;
+.amenities-heading {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 28px;
   color: var(--ink-heading);
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+.amenities-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sky-light);
+  border: 1px solid var(--line-sky);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--sky-deep);
+}
+
+/* Amenity category tabs */
+.amenities-tabs-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.amenity-tab-pill {
+  background: #ffffff;
+  border: 1px solid var(--line-strong);
+  color: var(--ink-body);
+  padding: 9px 20px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.amenity-tab-pill:hover {
+  border-color: var(--sky-primary);
+  color: var(--sky-deep);
+  background: var(--bg-sky-tint);
+  transform: translateY(-1px);
+}
+.amenity-tab-pill.active {
+  background: var(--sky-primary);
+  color: #ffffff;
+  border-color: var(--sky-primary);
+  box-shadow: 0 4px 14px var(--sky-glow);
+}
+
+/* Amenity cards grid */
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.luxury-amenity-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  animation: fadeInAmenity 0.35s ease forwards;
+}
+@keyframes fadeInAmenity {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.luxury-amenity-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--sky-primary);
+  box-shadow: 0 16px 32px -8px rgba(2, 132, 199, 0.16), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+}
+.amenity-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.amenity-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(3, 105, 161, 0.05) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  transition: transform 0.25s ease;
+}
+.luxury-amenity-card:hover .amenity-icon-box {
+  transform: scale(1.08) rotate(3deg);
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(3, 105, 161, 0.1) 100%);
+}
+.amenity-cat-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--sky-deep);
+  background: var(--sky-light);
+  border: 1px solid var(--line-sky);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+.amenity-title {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: var(--ink-heading);
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.amenity-desc {
+  font-size: 13px;
+  color: var(--ink-body);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+.amenity-card-footer {
+  padding-top: 14px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--sky-deep);
   font-weight: 700;
 }
 
@@ -245,6 +884,8 @@ header {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 18px;
   margin-top: 15px;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 460px;
 }
 .gallery img, .gallery video {
   width: 100%;
@@ -253,6 +894,8 @@ header {
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* ─── FORM ─── */
@@ -308,6 +951,489 @@ footer {
   .panel { padding: 24px 20px; }
   .foot { flex-direction: column; text-align: center; }
 }
+
+/* ─── HOME LOAN EMI & FINANCING CALCULATOR ─── */
+.emi-calc-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 28px;
+  margin-top: 24px;
+}
+.emi-slider-group {
+  margin-bottom: 22px;
+}
+.emi-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-heading);
+}
+.emi-val-badge {
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--sky-primary);
+  background: var(--sky-light);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-sky);
+}
+.emi-range-input {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  accent-color: var(--sky-primary);
+}
+.emi-summary-card {
+  background: linear-gradient(145deg, #080b0f 0%, #0f172a 100%);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-float);
+  position: relative;
+  overflow: hidden;
+}
+.emi-summary-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 75% 25%, rgba(2, 132, 199, 0.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+.emi-output-main {
+  margin-bottom: 20px;
+}
+.emi-output-label {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.emi-output-amount {
+  font-size: 32px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: -0.5px;
+}
+.emi-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+}
+.emi-breakdown-row:last-of-type {
+  border-bottom: none;
+}
+.emi-breakdown-label {
+  color: #94a3b8;
+}
+.emi-breakdown-val {
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.emi-ratio-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: #38bdf8;
+  overflow: hidden;
+  display: flex;
+  margin: 16px 0 20px;
+}
+.emi-ratio-interest {
+  background: #f59e0b;
+  height: 100%;
+  transition: width .3s ease;
+}
+.btn-emi-apply {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #fff;
+  border: none;
+  padding: 14px 20px;
+  border-radius: var(--radius-pill);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: all .2s ease;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+.btn-emi-apply:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+}
+
+/* ─── FLOATING WHATSAPP CONCIERGE WIDGET ─── */
+.wa-floating-btn {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #25D366;
+  color: #ffffff;
+  padding: 12px 20px 12px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.45);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+.wa-floating-btn:hover {
+  background: #20ba5a;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(37, 211, 102, 0.55);
+  color: #fff;
+}
+.wa-icon-pulse {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wa-icon-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.4);
+  animation: waPulse 2s infinite ease-out;
+}
+@keyframes waPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.wa-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.wa-badge-status {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.wa-badge-status::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+@media (max-width: 800px) {
+  .emi-calc-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .wa-floating-btn { bottom: 68px; right: 20px; padding: 12px; }
+  .wa-badge-text { display: none; }
+}
+
+/* ─── SHIMMER SKELETON LOADERS (OPTION C) ─── */
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite linear;
+  border-radius: var(--radius-sm);
+  color: transparent !important;
+}
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── INTERACTIVE FLOOR PLANS & UNIT LAYOUTS (OPTION A) ─── */
+.floorplan-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.floorplan-tab {
+  background: var(--sky-surface);
+  border: 1px solid var(--sky-border);
+  color: var(--ink-heading);
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.floorplan-tab:hover {
+  border-color: var(--sky-primary);
+  color: var(--sky-deep);
+}
+.floorplan-tab.active {
+  background: var(--sky-primary);
+  color: #fff;
+  border-color: var(--sky-primary);
+  box-shadow: 0 4px 14px var(--sky-glow);
+}
+.floorplan-content-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 28px;
+  align-items: center;
+}
+.blueprint-card {
+  background: #09121d;
+  border-radius: var(--radius-md);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-float);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.blueprint-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.07) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+.blueprint-svg-wrap {
+  width: 100%;
+  max-width: 440px;
+  margin: 12px 0 16px;
+  cursor: zoom-in;
+  transition: transform .25s ease;
+}
+.blueprint-svg-wrap:hover {
+  transform: scale(1.02);
+}
+.blueprint-zoom-btn {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .2s ease;
+}
+.blueprint-zoom-btn:hover {
+  background: #38bdf8;
+  color: #080b0f;
+}
+.plan-specs-card {
+  background: var(--sky-surface);
+  border: 1px solid var(--sky-border);
+  border-radius: var(--radius-md);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.plan-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 20px 0;
+}
+.plan-spec-item {
+  background: #fff;
+  border: 1px solid var(--sky-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.plan-spec-item span {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 2px;
+}
+.plan-spec-item strong {
+  font-size: 16px;
+  color: var(--ink-heading);
+}
+
+/* ─── LOCATION ADVANTAGES & PROXIMITY RADAR (OPTION B) ─── */
+.proximity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 24px 0 28px;
+}
+.proximity-card {
+  background: var(--sky-surface);
+  border: 1px solid var(--sky-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all .25s ease;
+  position: relative;
+}
+.proximity-card:hover {
+  border-color: var(--sky-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.08);
+}
+.proximity-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.proximity-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: var(--sky-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.proximity-time {
+  background: #0284c7;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.4px;
+}
+.proximity-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink-heading);
+  margin-bottom: 4px;
+}
+.proximity-desc {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.map-embed-card {
+  background: #0f172a;
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  box-shadow: var(--shadow-card);
+}
+
+/* ─── MOBILE STICKY BOTTOM ACTION BAR (OPTION C) ─── */
+.mobile-sticky-bar {
+  display: none;
+}
+@media (max-width: 768px) {
+  .floorplan-content-grid { grid-template-columns: 1fr; }
+  .proximity-grid { grid-template-columns: 1fr; }
+  .mobile-sticky-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 998;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    padding: 10px 16px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .mobile-sticky-price {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+  .mobile-sticky-price span {
+    font-size: 10px;
+    color: var(--ink-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .mobile-sticky-price strong {
+    font-size: 16px;
+    color: var(--ink-heading);
+    font-weight: 800;
+  }
+  .mobile-sticky-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-sticky-visit {
+    background: var(--sky-primary);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 12.5px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn-sticky-wa {
+    background: #25D366;
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+}
 </style>
 </head>
 <body>
@@ -317,43 +1443,381 @@ footer {
       LAXMINARAYAN GROUP
       <span>CONSTRUCTION • DEVELOPMENT</span>
     </a>
-    <a class="back-btn" href="index.html#projects">← Back to Portfolio</a>
+    <a class="back-btn" href="properties.html">← Back to Portfolio</a>
   </div>
 </header>
 
 <main class="container">
-  <!-- PROJECT HERO -->
-  <div id="hero" class="hero">
-    <div>
-      <div id="cat">PROJECT</div>
-      <h1 id="title">Loading…</h1>
-      <p id="desc"></p>
+  <!-- LUXURY PROJECT TITLE BAR -->
+  <div class="project-title-bar">
+    <div class="project-title-info">
+      <div class="project-eyebrow-row">
+        <span class="project-cat-badge" id="cat">PROJECT</span>
+        <span class="project-status-badge" id="statusBadge">UNDER CONSTRUCTION</span>
+        <span class="project-rera-pill" id="topReraPill">🛡️ 100% RERA APPROVED</span>
+      </div>
+      <h1 class="project-main-title" id="title">Loading…</h1>
+      <div class="project-location-sub">
+        <span style="color:var(--sky-primary); font-size:16px;">📍</span>
+        <span id="topLocationText">Ahmedabad, Gujarat</span>
+      </div>
+      <p id="desc" style="display:none;"></p>
+      <div id="hero" style="display:none;"></div>
+    </div>
+    <div class="project-title-actions">
+      <button type="button" class="btn-action-pill" id="sharePropBtn" onclick="shareProjectDetail()">
+        <span id="sharePropIcon">🔗</span> <span id="sharePropText">Share Property</span>
+      </button>
+      <a class="btn-action-pill" href="#siteVisitPanel" style="background:var(--sky-gradient); color:#fff; border-color:transparent; box-shadow:0 4px 14px var(--sky-glow);">
+        <span>📅 Book Private Tour</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 5-PHOTO ARCHITECTURAL MOSAIC BENTO -->
+  <div class="hero-mosaic-container" id="heroMosaic">
+    <!-- Master Elevation Tile (58%) -->
+    <div class="mosaic-tile mosaic-main" id="mosaicTile0" onclick="openLightbox(0)">
+      <img id="mosaicImg0" src="assets/favicon.jpg" alt="Master View" loading="eager">
+      <div class="mosaic-overlay-gradient"></div>
+      <div class="mosaic-caption">
+        <span class="mosaic-tag" id="mosaicTag0">ARCHITECTURAL PERSPECTIVE</span>
+        <h3 id="mosaicTitle0">Master Elevation & Horizon</h3>
+      </div>
+    </div>
+
+    <!-- 4 Satellite Tiles (42%) -->
+    <div class="mosaic-grid-right" id="mosaicGridRight">
+      <div class="mosaic-tile" id="mosaicTile1" onclick="openLightbox(1)">
+        <img id="mosaicImg1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="View 2" loading="lazy">
+        <div class="mosaic-overlay-gradient"></div>
+        <div class="mosaic-caption" style="bottom:12px; left:14px; right:14px;">
+          <span class="mosaic-tag" id="mosaicTag1" style="font-size:9px;">ELEVATION</span>
+          <h3 id="mosaicTitle1" style="font-size:13px; font-weight:600;">Facade View</h3>
+        </div>
+      </div>
+
+      <div class="mosaic-tile" id="mosaicTile2" onclick="openLightbox(2)">
+        <img id="mosaicImg2" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="View 3" loading="lazy">
+        <div class="mosaic-overlay-gradient"></div>
+        <div class="mosaic-caption" style="bottom:12px; left:14px; right:14px;">
+          <span class="mosaic-tag" id="mosaicTag2" style="font-size:9px;">BALCONY LIVING</span>
+          <h3 id="mosaicTitle2" style="font-size:13px; font-weight:600;">Private Sundeck</h3>
+        </div>
+      </div>
+
+      <div class="mosaic-tile" id="mosaicTile3" onclick="openLightbox(3)">
+        <img id="mosaicImg3" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="View 4" loading="lazy">
+        <div class="mosaic-overlay-gradient"></div>
+        <div class="mosaic-caption" style="bottom:12px; left:14px; right:14px;">
+          <span class="mosaic-tag" id="mosaicTag3" style="font-size:9px;">LANDSCAPE</span>
+          <h3 id="mosaicTitle3" style="font-size:13px; font-weight:600;">Central Greenery</h3>
+        </div>
+      </div>
+
+      <div class="mosaic-tile" id="mosaicTile4" onclick="openLightbox(4)">
+        <img id="mosaicImg4" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="View 5" loading="lazy">
+        <div class="mosaic-overlay-gradient"></div>
+        <div class="mosaic-caption" style="bottom:12px; left:14px; right:14px;">
+          <span class="mosaic-tag" id="mosaicTag4" style="font-size:9px;">SAMPLE SUITE</span>
+          <h3 id="mosaicTitle4" style="font-size:13px; font-weight:600;">Living Pavilion</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating View All Photos Button -->
+    <div class="mosaic-more-overlay">
+      <button type="button" class="btn-view-all-photos" id="btnViewAllMosaic" onclick="openLightbox(0)">
+        <span>📷</span>
+        <span class="btn-text-desktop">View All <strong id="mosaicTotalCount">17</strong> Photos & Renders</span>
+        <span class="btn-text-mobile"><strong id="mosaicTotalCountMobile">17</strong> Photos</span>
+      </button>
     </div>
   </div>
 
   <!-- PROJECT INFORMATION BENTO -->
-  <div class="panel">
-    <h2>Project Overview & Specifications</h2>
-    <p id="description"></p>
+  <div class="panel" id="overviewPanel">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+      <div>
+        <div style="font-size:11px; font-weight:800; color:var(--sky-primary); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px;">Master Specifications</div>
+        <h2 style="margin:0;">Project Overview & Executive Highlights</h2>
+      </div>
+      <div id="reraHeaderBadge" style="display:flex; align-items:center; gap:8px; background:var(--sky-surface); border:1px solid var(--sky-border); padding:6px 14px; border-radius:var(--radius-pill); font-size:12px; font-weight:600; color:var(--sky-deep);">
+        <span>🛡️ 100% RERA Approved & Clear Title</span>
+      </div>
+    </div>
     
-    <div class="specs-grid">
-      <div class="spec-box">
-        <span>Location</span>
-        <strong id="location">—</strong>
+    <p id="description" style="max-width:840px; margin-bottom:24px; font-size:15.5px; line-height:1.75; color:var(--ink-body);"></p>
+    
+    <!-- 4 Balanced Executive Metric Cards -->
+    <div class="overview-bento-grid">
+      <div class="overview-metric-card">
+        <div class="overview-card-header">
+          <div class="overview-card-icon">📍</div>
+          <span class="overview-card-label">Prime Location</span>
+        </div>
+        <div class="overview-card-value" id="overviewLocationText">—</div>
+        <div class="overview-card-sub" id="overviewLocationSub">Prime Growth Corridor</div>
       </div>
-      <div class="spec-box">
-        <span>Pricing / Configuration</span>
-        <strong id="price">—</strong>
+
+      <div class="overview-metric-card">
+        <div class="overview-card-header">
+          <div class="overview-card-icon">💎</div>
+          <span class="overview-card-label">Pricing & Typology</span>
+        </div>
+        <div class="overview-card-value" id="overviewPriceText">—</div>
+        <div class="overview-card-sub" id="overviewPriceSub">Tailored Payment Plans</div>
       </div>
-      <div class="spec-box">
-        <span>Key Amenities</span>
-        <strong id="amenities">—</strong>
+
+      <div class="overview-metric-card">
+        <div class="overview-card-header">
+          <div class="overview-card-icon">🛡️</div>
+          <span class="overview-card-label">RERA Registration</span>
+        </div>
+        <div class="overview-card-value" id="overviewReraText" style="font-size:12.5px; word-break:break-all; font-family:monospace; font-weight:700;">—</div>
+        <div class="overview-card-sub" id="overviewReraSub">✓ Regulatory Verified</div>
+      </div>
+
+      <div class="overview-metric-card">
+        <div class="overview-card-header">
+          <div class="overview-card-icon">✨</div>
+          <span class="overview-card-label">Curated Amenities</span>
+        </div>
+        <div class="overview-card-value" id="overviewAmenitiesCount">—</div>
+        <div class="overview-card-sub">
+          <a href="#amenitiesPanel" style="color:var(--sky-primary); font-weight:700; text-decoration:none;">View Full Showcase ↓</a>
+        </div>
       </div>
     </div>
 
+    <!-- Quick Signature Amenities Highlight Ribbon -->
+    <div class="overview-amenity-pills" id="overviewPillsContainer">
+      <span style="font-size:11px; font-weight:800; color:var(--sky-deep); letter-spacing:1.2px; text-transform:uppercase; margin-right:4px;">KEY HIGHLIGHTS:</span>
+      <div id="overviewQuickPills" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+    </div>
+
+    <!-- Legacy hidden anchors for backward compatibility -->
+    <div style="display:none;"><strong id="location"></strong><strong id="price"></strong><strong id="amenities"></strong></div>
+
     <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
       <button class="btn" id="interest">I’m Interested →</button>
+      <button type="button" id="brochureBtn" style="background:#fff; color:var(--sky-deep); border:1px solid var(--sky-primary); padding:12px 24px; border-radius:var(--radius-pill); font-weight:700; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:8px; transition:all .2s;">📄 Download Brochure (PDF)</button>
+      <a href="#amenitiesPanel" style="color:var(--sky-deep); font-weight:700; font-size:13px; padding:12px 18px; display:inline-flex; align-items:center; gap:6px;">✨ Explore All Amenities ↓</a>
       <span id="interestMsg" class="muted"></span>
+    </div>
+  </div>
+
+  <!-- DEDICATED LUXURY AMENITIES SHOWCASE -->
+  <div class="panel amenities-panel" id="amenitiesPanel">
+    <div class="amenities-header-row">
+      <div>
+        <div class="amenities-eyebrow">WORLD-CLASS EXPERIENCES</div>
+        <h2 class="amenities-heading">Curated Lifestyle & Master Amenities</h2>
+      </div>
+      <div class="amenities-badge-pill" id="amenitiesTotalBadge">
+        <span>✨ 14 Signature Lifestyle Touchpoints</span>
+      </div>
+    </div>
+    <p class="muted" style="margin-bottom:20px; max-width:760px; font-size:14.5px;">Thoughtfully engineered to elevate daily living with dedicated zones for wellness, recreation, nature, and round-the-clock convenience.</p>
+
+    <!-- Filter Tabs -->
+    <div class="amenities-tabs-wrap" id="amenitiesTabsContainer"></div>
+
+    <!-- Cards Grid -->
+    <div class="amenities-grid" id="amenitiesCardsGrid"></div>
+  </div>
+
+  <!-- INTERACTIVE FLOOR PLANS & UNIT LAYOUTS (OPTION A) -->
+  <div class="panel" id="floorplansPanel">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+      <div>
+        <div style="font-size:11px; font-weight:800; color:var(--sky-primary); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px;">Architectural Planning</div>
+        <h2 style="margin:0;">Interactive Floor Plans & Unit Layouts</h2>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; background:var(--sky-surface); border:1px solid var(--sky-border); padding:6px 14px; border-radius:var(--radius-pill); font-size:12px; font-weight:600; color:var(--sky-deep);">
+        <span>📐 100% Vaastu Compliant • Optimal Cross-Ventilation</span>
+      </div>
+    </div>
+    <p class="muted" style="margin-bottom:20px;">Explore tailored floor layouts designed for abundant natural light, privacy, and expansive living spaces.</p>
+
+    <!-- Plan Tabs -->
+    <div class="floorplan-tabs" id="planTabs">
+      <button type="button" class="floorplan-tab active" data-unit="2bhk" onclick="switchFloorPlan('2bhk', this)">
+        <span>2 BHK Luxury Suite</span>
+      </button>
+      <button type="button" class="floorplan-tab" data-unit="3bhk" onclick="switchFloorPlan('3bhk', this)">
+        <span>3 BHK Grand Residence</span>
+      </button>
+      <button type="button" class="floorplan-tab" data-unit="4bhk" onclick="switchFloorPlan('4bhk', this)">
+        <span>4 BHK Sky Villa / Penthouse</span>
+      </button>
+      <button type="button" class="floorplan-tab" data-unit="comm" onclick="switchFloorPlan('comm', this)">
+        <span>Commercial Suite / Showroom</span>
+      </button>
+    </div>
+
+    <!-- Active Plan View Grid -->
+    <div class="floorplan-content-grid">
+      <!-- Blueprint Preview Box -->
+      <div class="blueprint-card">
+        <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+          <span style="font-size:11px; color:#38bdf8; font-weight:700; letter-spacing:1px; text-transform:uppercase;">ARCHITECTURAL BLUEPRINT</span>
+          <span id="planUnitBadge" style="font-size:10px; background:rgba(56,189,248,0.18); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:12px; font-weight:700;">UNIT TYPE A-101</span>
+        </div>
+
+        <!-- Dynamic SVG Blueprint Drawing -->
+        <div class="blueprint-svg-wrap" id="blueprintGraphic" onclick="openBlueprintModal()">
+          <svg id="blueprintSvg" viewBox="0 0 400 280" style="width:100%; height:auto; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="10" width="380" height="260" rx="8" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3" />
+            <rect x="25" y="25" width="190" height="135" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+            <text x="120" y="85" fill="#e0f2fe" font-size="13" font-weight="700" text-anchor="middle" font-family="sans-serif">LIVING PAVILION</text>
+            <text x="120" y="105" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">16'0" × 13'6"</text>
+            <rect x="25" y="165" width="190" height="90" fill="rgba(2,132,199,0.1)" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="120" y="210" fill="#38bdf8" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">GARDEN TERRACE</text>
+            <text x="120" y="228" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">16'0" × 7'0"</text>
+            <rect x="220" y="25" width="155" height="145" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+            <text x="297" y="90" fill="#e0f2fe" font-size="12.5" font-weight="700" text-anchor="middle" font-family="sans-serif">MASTER SUITE</text>
+            <text x="297" y="110" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">14'0" × 12'0"</text>
+            <rect x="220" y="175" width="155" height="80" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+            <text x="297" y="212" fill="#e0f2fe" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">CULINARY KITCHEN</text>
+            <text x="297" y="230" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">11'0" × 8'0"</text>
+          </svg>
+        </div>
+
+        <button type="button" class="blueprint-zoom-btn" onclick="openBlueprintModal()">
+          <span>🔍 Click to Enlarge Floor Blueprint</span>
+        </button>
+      </div>
+
+      <!-- Plan Dimensions and Inquire Card -->
+      <div class="plan-specs-card">
+        <div>
+          <span style="font-size:11px; font-weight:800; color:var(--sky-primary); text-transform:uppercase; letter-spacing:1px;" id="planSubTitle">2 BHK RESIDENTIAL CONFIGURATION</span>
+          <h3 style="font-size:22px; color:var(--ink-heading); margin:4px 0 10px;" id="planHeading">2 BHK Luxury Suite</h3>
+          <p style="font-size:13.5px; color:var(--ink-body); line-height:1.6;" id="planSummary">Designed for contemporary couples and growing families. Features generous ceiling clearance, a private viewing terrace, and an en-suite master bath.</p>
+
+          <div class="plan-specs-grid">
+            <div class="plan-spec-item">
+              <span>Carpet Area</span>
+              <strong id="planCarpet">1,180 sq.ft</strong>
+            </div>
+            <div class="plan-spec-item">
+              <span>Super Built-up Area</span>
+              <strong id="planSuperBuilt">1,650 sq.ft</strong>
+            </div>
+            <div class="plan-spec-item">
+              <span>Vaastu Alignment</span>
+              <strong id="planFacing">East Facing</strong>
+            </div>
+            <div class="plan-spec-item">
+              <span>Balconies & Baths</span>
+              <strong id="planBaths">2 Terraces • 2 Baths</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:10px;">
+          <button type="button" class="btn" onclick="selectPlanForInquiry()" style="padding:12px 22px; font-size:12.5px;">Enquire For This Unit Layout →</button>
+          <span style="font-size:11.5px; color:var(--ink-muted);">Pre-allotment reservations available</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCATION ADVANTAGES & PROXIMITY RADAR (OPTION B) -->
+  <div class="panel" id="locationRadarPanel">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:8px;">
+      <div>
+        <div style="font-size:11px; font-weight:800; color:var(--sky-primary); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px;">Connectivity & Transit</div>
+        <h2 style="margin:0;">Location Advantages & Proximity Radar</h2>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; background:var(--sky-surface); border:1px solid var(--sky-border); padding:6px 14px; border-radius:var(--radius-pill); font-size:12px; font-weight:600; color:var(--sky-deep);">
+        <span>📍 Prime Gujarat Corridor • Direct Arterial Connectivity</span>
+      </div>
+    </div>
+    <p class="muted">Positioned strategically at the center of rapid transit networks, business districts, and esteemed educational institutes.</p>
+
+    <!-- Radar Cards Grid -->
+    <div class="proximity-grid">
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">✈️</div>
+            <span class="proximity-time">🚗 18 Mins</span>
+          </div>
+          <div class="proximity-title">International Airport</div>
+          <div class="proximity-desc">SVP International Airport via direct ring-road expressway corridor (14.2 km).</div>
+        </div>
+      </div>
+
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🛣️</div>
+            <span class="proximity-time">🚗 4 Mins</span>
+          </div>
+          <div class="proximity-title">SG Highway Interchange</div>
+          <div class="proximity-desc">Quick signal-free access to major commercial boulevards and high-street retail (2.1 km).</div>
+        </div>
+      </div>
+
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🚇</div>
+            <span class="proximity-time">🚗 6 Mins</span>
+          </div>
+          <div class="proximity-title">Metro Rail Transit</div>
+          <div class="proximity-desc">Upcoming rapid mass transit station connecting Gandhinagar and Central Ahmedabad (3.4 km).</div>
+        </div>
+      </div>
+
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🏥</div>
+            <span class="proximity-time">🚗 8 Mins</span>
+          </div>
+          <div class="proximity-title">Super-Speciality Healthcare</div>
+          <div class="proximity-desc">World-class emergency care at KD Hospital, Zydus Hospital, and Apollo Clinic (4.8 km).</div>
+        </div>
+      </div>
+
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🎓</div>
+            <span class="proximity-time">🚗 10 Mins</span>
+          </div>
+          <div class="proximity-title">Top International Schools</div>
+          <div class="proximity-desc">Renowned institutes including Delhi Public School, Zydus School, and Nirma University (5.6 km).</div>
+        </div>
+      </div>
+
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🛍️</div>
+            <span class="proximity-time">🚗 15 Mins</span>
+          </div>
+          <div class="proximity-title">GIFT City & Financial Hub</div>
+          <div class="proximity-desc">India’s premier international financial services centre, tech parks, and luxury retail (11.0 km).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Embed & Route Guidance -->
+    <div class="map-embed-card">
+      <div>
+        <div style="font-size:11px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">NAVIGATE TO SITE</div>
+        <h4 style="font-size:20px; font-weight:700; margin:0 0 6px;">Experience the Location Firsthand</h4>
+        <p style="font-size:13.5px; color:#cbd5e1; margin:0; max-width:560px;">Our advisory managers arrange private chauffeur-assisted pickups for registered property walkthroughs.</p>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <a id="getDirectionsBtn" href="https://maps.google.com/?q=Laxminarayan+Group+Ahmedabad+Gujarat" target="_blank" rel="noopener noreferrer" style="background:#fff; color:#0f172a; padding:12px 22px; border-radius:var(--radius-pill); font-weight:700; font-size:13px; display:inline-flex; align-items:center; gap:6px; transition:all .2s;">
+          <span>📍 Open Google Maps Directions ↗</span>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -363,11 +1827,115 @@ footer {
     <div id="gallery" class="gallery"></div>
   </div>
 
+  <!-- HOME LOAN EMI & FINANCING CALCULATOR -->
+  <div class="panel" id="emiPanel">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+      <div>
+        <div style="font-size:11px; font-weight:800; color:var(--sky-primary); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px;">Mortgage & Financial Planning</div>
+        <h2 style="margin:0;">Home Loan EMI & Financing Calculator</h2>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; background:var(--sky-surface); border:1px solid var(--sky-border); padding:6px 14px; border-radius:var(--radius-pill); font-size:12px; font-weight:600; color:var(--sky-deep);">
+        <span>🏦 Pre-Approved Banking Partners: SBI • HDFC • ICICI • Axis</span>
+      </div>
+    </div>
+    <p class="muted" style="margin-bottom:24px;">Tailor your financing plan to calculate estimated monthly payments, total interest, and verified bank loan options for this property.</p>
+
+    <div class="emi-calc-grid">
+      <!-- Input Controls -->
+      <div class="emi-controls" style="display:flex; flex-direction:column; gap:22px;">
+        <div class="emi-slider-group">
+          <div class="emi-slider-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label for="emiPriceRange" style="font-size:13px; font-weight:700; color:var(--ink-heading);">Total Property Value</label>
+            <span class="emi-val-badge" id="emiPriceBadge">₹ 1.25 Cr</span>
+          </div>
+          <input id="emiPriceRange" class="emi-range-input" type="range" min="2000000" max="100000000" step="500000" value="12500000" aria-label="Total Property Value">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:4px;">
+            <span>₹ 20 Lakhs</span>
+            <span>₹ 10 Cr</span>
+          </div>
+        </div>
+
+        <div class="emi-slider-group">
+          <div class="emi-slider-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label for="emiDownPaymentRange" style="font-size:13px; font-weight:700; color:var(--ink-heading);">Down Payment (<span id="emiDownPaymentPct">20</span>%)</label>
+            <span class="emi-val-badge" id="emiDownPaymentBadge">₹ 25.0 Lakhs</span>
+          </div>
+          <input id="emiDownPaymentRange" class="emi-range-input" type="range" min="10" max="60" step="5" value="20" aria-label="Down Payment Percentage">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:4px;">
+            <span>10% (Min)</span>
+            <span>60%</span>
+          </div>
+        </div>
+
+        <div class="emi-slider-group">
+          <div class="emi-slider-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label for="emiInterestRange" style="font-size:13px; font-weight:700; color:var(--ink-heading);">Annual Interest Rate (%)</label>
+            <span class="emi-val-badge" id="emiInterestBadge">8.5 %</span>
+          </div>
+          <input id="emiInterestRange" class="emi-range-input" type="range" min="7.0" max="14.0" step="0.1" value="8.5" aria-label="Annual Interest Rate">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:4px;">
+            <span>7.0%</span>
+            <span>14.0%</span>
+          </div>
+        </div>
+
+        <div class="emi-slider-group">
+          <div class="emi-slider-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label for="emiTenureRange" style="font-size:13px; font-weight:700; color:var(--ink-heading);">Loan Tenure</label>
+            <span class="emi-val-badge" id="emiTenureBadge">20 Years (240 M)</span>
+          </div>
+          <input id="emiTenureRange" class="emi-range-input" type="range" min="5" max="30" step="1" value="20" aria-label="Loan Tenure in Years">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:4px;">
+            <span>5 Years</span>
+            <span>30 Years</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Summary Card -->
+      <div class="emi-summary-card">
+        <div>
+          <div class="emi-output-main">
+            <div class="emi-output-label">Estimated Monthly EMI</div>
+            <div class="emi-output-amount" id="emiMonthlyVal">₹ 86,782</div>
+            <div style="font-size:12px; color:#94a3b8; margin-top:4px;">per month for <span id="emiMonthsText">240</span> months</div>
+          </div>
+
+          <div style="margin:20px 0 10px;">
+            <div class="emi-breakdown-row">
+              <span class="emi-breakdown-label">Principal Loan Amount</span>
+              <span class="emi-breakdown-val" id="emiPrincipalVal">₹ 1,00,00,000</span>
+            </div>
+            <div class="emi-breakdown-row">
+              <span class="emi-breakdown-label">Total Interest Payable</span>
+              <span class="emi-breakdown-val" style="color:#f59e0b;" id="emiTotalInterestVal">₹ 1,08,27,680</span>
+            </div>
+            <div class="emi-breakdown-row">
+              <span class="emi-breakdown-label">Total Amount Payable</span>
+              <span class="emi-breakdown-val" id="emiTotalPayableVal">₹ 2,08,27,680</span>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:14px;">
+            <span style="display:flex; align-items:center; gap:6px;"><span style="width:8px; height:8px; border-radius:2px; background:#38bdf8; display:inline-block;"></span> Principal (<span id="emiPrincipalRatio">48%</span>)</span>
+            <span style="display:flex; align-items:center; gap:6px;"><span style="width:8px; height:8px; border-radius:2px; background:#f59e0b; display:inline-block;"></span> Interest (<span id="emiInterestRatio">52%</span>)</span>
+          </div>
+          <div class="emi-ratio-bar">
+            <div class="emi-ratio-interest" id="emiInterestBar" style="width:52%;"></div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-emi-apply" id="btnEmiApply">Apply for Home Loan Assistance →</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SITE VISIT REQUEST -->
   <div class="panel">
     <h2>Schedule a Private Site Visit</h2>
     <p class="muted">Select your preferred date and time. An advisory manager will confirm your private walkthrough.</p>
     <form id="visitForm" class="form">
+      <input type="text" name="hp_confirm_field" class="hp-input" style="display:none !important; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
       <input id="visitAt" type="datetime-local" required aria-label="Preferred date and time">
       <textarea id="visitNotes" placeholder="Any specific requirements or questions for our development team?" aria-label="Notes"></textarea>
       <div style="grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
@@ -377,6 +1945,76 @@ footer {
     </form>
   </div>
 </main>
+
+<!-- FLOATING WHATSAPP QUICK-CONCIERGE WIDGET -->
+<a id="waFloatingWidget" class="wa-floating-btn" href="https://wa.me/916352000017?text=Hello%20Laxminarayan%20Group%20Team%2C%20I%20am%20interested%20in%20your%20luxury%20properties." target="_blank" rel="noopener noreferrer" aria-label="Chat with Concierge on WhatsApp">
+  <div class="wa-icon-pulse">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+    </svg>
+  </div>
+  <div class="wa-badge-text">
+    <span style="font-size:12px; font-weight:800; letter-spacing:0.3px;">CHAT WITH CONCIERGE</span>
+    <span class="wa-badge-status">Online Now • Direct Support</span>
+  </div>
+</a>
+
+<!-- BROCHURE MODAL -->
+<div id="brochureModal" style="position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:100; padding:20px;">
+  <div style="background:#fff; border-radius:20px; max-width:440px; width:100%; padding:32px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative;">
+    <button id="closeBrochureModal" type="button" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:20px; color:#94a3b8; cursor:pointer;">✕</button>
+    <div style="font-size:11px; font-weight:800; color:var(--sky-primary); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px;">Instant PDF Download</div>
+    <h3 style="font-family:var(--font-serif); font-size:24px; color:var(--ink-heading); margin-bottom:8px;">Project Brochure & Floor Plans</h3>
+    <p style="font-size:13px; color:var(--ink-body); margin-bottom:20px;">Enter your details to download the official specifications and investment datasheet for <b id="brochureProjectName">this project</b>.</p>
+    <form id="brochureForm" style="display:flex; flex-direction:column; gap:14px;">
+      <input type="text" name="hp_confirm_field" class="hp-input" style="display:none !important; position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
+      <div>
+        <label for="brochureName" style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#64748b; margin-bottom:4px;">Your Full Name</label>
+        <input id="brochureName" type="text" required placeholder="e.g. Rahul Sharma" style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit; font-size:14px;">
+      </div>
+      <div>
+        <label for="brochurePhone" style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#64748b; margin-bottom:4px;">WhatsApp Number</label>
+        <input id="brochurePhone" type="tel" required placeholder="e.g. 9876543210" style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit; font-size:14px;">
+      </div>
+      <div>
+        <label for="brochureEmail" style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#64748b; margin-bottom:4px;">Email (Optional)</label>
+        <input id="brochureEmail" type="email" placeholder="e.g. rahul@example.com" style="width:100%; padding:12px 14px; border:1px solid #cbd5e1; border-radius:8px; font-family:inherit; font-size:14px;">
+      </div>
+      <button id="brochureSubmitBtn" type="submit" style="margin-top:6px; background:linear-gradient(135deg, var(--sky-primary), var(--sky-deep)); color:#fff; border:none; padding:14px; border-radius:9999px; font-weight:700; font-size:13px; cursor:pointer; box-shadow:0 4px 14px var(--sky-glow);">DOWNLOAD BROCHURE NOW ↓</button>
+      <div id="brochureMsg" style="font-size:12px; color:var(--sky-deep); text-align:center;"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ENLARGED BLUEPRINT MODAL -->
+<div id="blueprintModal" style="position:fixed; inset:0; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; z-index:1001; padding:20px;">
+  <div style="background:#09121d; border:1px solid rgba(56,189,248,0.3); border-radius:20px; max-width:760px; width:100%; padding:32px; box-shadow:0 25px 60px rgba(0,0,0,0.5); position:relative; color:#fff;">
+    <button type="button" onclick="closeBlueprintModal()" style="position:absolute; top:18px; right:18px; background:rgba(255,255,255,0.1); border:none; width:36px; height:36px; border-radius:50%; font-size:18px; color:#94a3b8; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+    <div style="font-size:11px; font-weight:800; color:#38bdf8; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px;">Architectural Blueprint Layout</div>
+    <h3 style="font-size:24px; font-family:var(--font-serif); margin-bottom:14px;" id="modalBlueprintTitle">2 BHK Luxury Suite (1,180 sq.ft)</h3>
+    <div style="background:#050c14; border-radius:12px; padding:20px; border:1px solid rgba(56,189,248,0.15); margin-bottom:20px;" id="modalBlueprintSvg"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <span style="font-size:12px; color:#94a3b8;">*Dimensions are tentative architectural estimates compliant with statutory building codes.</span>
+      <button type="button" class="btn" onclick="closeBlueprintModal(); selectPlanForInquiry();" style="padding:10px 22px; font-size:12.5px;">Inquire for This Layout →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE STICKY BOTTOM ACTION BAR (OPTION C) -->
+<div id="mobileStickyBar" class="mobile-sticky-bar">
+  <div class="mobile-sticky-price">
+    <span>Starting From</span>
+    <strong id="stickyPriceText">Contact Team</strong>
+  </div>
+  <div class="mobile-sticky-actions">
+    <a href="#visitForm" class="btn-sticky-visit" onclick="document.getElementById('visitForm').scrollIntoView({behavior:'smooth'}); return false;">Book Visit ↗</a>
+    <a id="stickyWaBtn" href="https://wa.me/916352000017" target="_blank" rel="noopener noreferrer" class="btn-sticky-wa" aria-label="WhatsApp">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+      </svg>
+    </a>
+  </div>
+</div>
 
 <footer>
   <div class="container foot">
@@ -390,16 +2028,170 @@ const id = Number(new URLSearchParams(location.search).get('id'));
 const $ = x => document.getElementById(x);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
 
+// ─── AMENITY METADATA & LUXURY DESCRIPTIONS ───
+const AMENITY_META = {
+  'clubhouse': { icon: '🏛️', cat: 'wellness', catName: 'Wellness & Club', title: 'Grand Resident Clubhouse', desc: 'Central recreational pavilion for private gatherings, indoor entertainment, and community celebrations.' },
+  'exclusive residents clubhouse': { icon: '🏛️', cat: 'wellness', catName: 'Wellness & Club', title: 'Exclusive Residents Clubhouse', desc: 'Private clubhouse lounge reserved strictly for estate residents and their invited guests.' },
+  'landscaped garden': { icon: '🌿', cat: 'leisure', catName: 'Greenery & Leisure', title: 'Designer Landscaped Garden', desc: 'Lush manicured greens with curated flora, tranquil water features, and peaceful walking promenades.' },
+  'private landscaped garden': { icon: '🌿', cat: 'leisure', catName: 'Greenery & Leisure', title: 'Private Landscaped Garden', desc: 'Spacious individual estate lawns for bespoke outdoor leisure, private gatherings, and morning tea.' },
+  'children play area': { icon: '🛝', cat: 'leisure', catName: 'Greenery & Leisure', title: 'Safe Children’s Play Enclave', desc: 'Dedicated soft-turf adventure park equipped with child-safe swings, slides, and zero vehicular traffic.' },
+  'indoor games': { icon: '🎱', cat: 'wellness', catName: 'Wellness & Club', title: 'Indoor Gaming & Recreation Zone', desc: 'Air-conditioned leisure arcade featuring table tennis, pool, carrom, chess, and interactive games.' },
+  'gymnasium': { icon: '🏋️', cat: 'wellness', catName: 'Wellness & Club', title: 'High-Tech Fitness Studio', desc: 'State-of-the-art cardiovascular and strength conditioning equipment for everyday health and wellness.' },
+  '33 high-street retail shops': { icon: '🛍️', cat: 'convenience', catName: 'Convenience & Retail', title: '33 High-Street Retail Promenade', desc: 'Ground-level commercial arcade providing instant doorstep access to daily essentials, pharmacy, and cafes.' },
+  'senior citizen sit-outs': { icon: '🪑', cat: 'leisure', catName: 'Greenery & Leisure', title: 'Shaded Senior Citizen Sit-Outs', desc: 'Serene, shaded pavilions with ergonomic seating designed for relaxed conversations and peaceful evenings.' },
+  'senior citizen sit-out': { icon: '🪑', cat: 'leisure', catName: 'Greenery & Leisure', title: 'Senior Citizen Sit-Out Pavilions', desc: 'Serene, shaded pavilions with ergonomic seating designed for relaxed conversations and peaceful evenings.' },
+  'jogging track with yoga deck': { icon: '🧘', cat: 'wellness', catName: 'Wellness & Club', title: 'Jogging Track & Sunrise Yoga Deck', desc: 'Continuous rubberized morning jogging track paired with an open-air timber deck for yoga and meditation.' },
+  '24/7 cctv & security cabin': { icon: '🛡️', cat: 'security', catName: 'Security & Access', title: 'Multi-Tier 24/7 CCTV & Security Cabin', desc: 'Comprehensive campus perimeter surveillance, guarded access boom barriers, and round-the-clock patrol.' },
+  'gated community with 24/7 security': { icon: '🛡️', cat: 'security', catName: 'Security & Access', title: 'Gated Community with 24/7 Security', desc: 'High-walled private perimeter with biometric/intercom access, 24/7 guard personnel, and patrol vigilance.' },
+  'automatic elevators': { icon: '🛗', cat: 'convenience', catName: 'Convenience & Retail', title: 'High-Speed Automatic Elevators', desc: 'Dual energy-efficient passenger elevators per residential tower equipped with ARD emergency safety rescue.' },
+  'vastu compliant entry': { icon: '🧭', cat: 'convenience', catName: 'Convenience & Retail', title: '100% Vaastu-Compliant Orientation', desc: 'Architecturally aligned main entrances and layout planning crafted to invite harmony, prosperity, and natural light.' },
+  'vastu compliant architecture': { icon: '🧭', cat: 'convenience', catName: 'Convenience & Retail', title: 'Vaastu-Aligned Architecture', desc: 'Architecturally aligned planning crafted according to authentic Vedic principles for natural airflow and harmony.' },
+  'solar power system': { icon: '☀️', cat: 'eco', catName: 'Eco & Sustainable', title: 'Rooftop Solar Photovoltaic Grid', desc: 'Clean solar power generation offsetting common area electricity consumption and lowering monthly maintenance.' },
+  'rainwater harvesting': { icon: '💧', cat: 'eco', catName: 'Eco & Sustainable', title: 'Scientific Rainwater Harvesting', desc: 'Deep aquifer recharge borewells collecting rooftop runoff to preserve local groundwater levels sustainably.' },
+  'fire hydrant system': { icon: '🚒', cat: 'security', catName: 'Security & Access', title: 'Advanced Fire Hydrant & Life Safety', desc: 'Automated wet riser fire detection network, smoke ventilation shafts, and high-pressure hose reels.' },
+  '3 covered car parks': { icon: '🚗', cat: 'security', catName: 'Security & Access', title: '3 Dedicated Covered Car Parks', desc: 'Wide private sheltered portico accommodating up to 3 luxury family vehicles with seamless driveway access.' },
+  'underground cabling': { icon: '⚡', cat: 'eco', catName: 'Eco & Sustainable', title: 'Concealed Underground Infrastructure', desc: 'Aesthetic streetscape completely free of overhead wires, with underground power, fiber optic, and drainage.' }
+};
+
+function getAmenityMeta(raw) {
+  const key = raw.toLowerCase().trim();
+  if (AMENITY_META[key]) return AMENITY_META[key];
+  for (const [k, meta] of Object.entries(AMENITY_META)) {
+    if (key.includes(k) || k.includes(key)) return meta;
+  }
+  let cat = 'convenience';
+  let catName = 'Lifestyle Amenity';
+  let icon = '✨';
+  if (/gym|fit|sport|pool|swim|court|track|yoga|run|play/i.test(key)) {
+    cat = 'wellness'; catName = 'Wellness & Sports'; icon = '🏋️';
+  } else if (/garden|tree|green|park|landscape|lawn|flora/i.test(key)) {
+    cat = 'leisure'; catName = 'Greenery & Leisure'; icon = '🌿';
+  } else if (/cctv|guard|security|gate|fence|fire|safe/i.test(key)) {
+    cat = 'security'; catName = 'Security & Access'; icon = '🛡️';
+  } else if (/solar|eco|water|rain|waste|electric|ev/i.test(key)) {
+    cat = 'eco'; catName = 'Eco & Sustainable'; icon = '☀️';
+  }
+  return {
+    icon,
+    cat,
+    catName,
+    title: raw,
+    desc: `Curated ${raw.toLowerCase()} crafted to elevate daily comfort, functionality, and architectural prestige.`
+  };
+}
+
+function renderOverviewAndAmenities(p) {
+  // 1. Process Location & RERA
+  let fullLoc = p.location || 'Prime Location, Gujarat';
+  let rera = 'PR/GJ/RERA/VERIFIED';
+  const rMatch = fullLoc.match(/\(RERA:\s*([^)]+)\)/i);
+  if (rMatch) {
+    rera = rMatch[1].trim();
+    fullLoc = fullLoc.replace(/\(RERA:[^)]+\)/i, '').trim();
+  }
+  const locParts = fullLoc.split(',').map(s => s.trim()).filter(Boolean);
+  const mainLoc = locParts.length > 2 ? `${locParts[1] || locParts[0]}, ${locParts[2] || locParts[1]}` : (locParts.join(', ') || 'Gujarat');
+  const subLoc = locParts[0] ? `Near ${locParts[0]}` : 'Prime Corridor';
+
+  if ($('overviewLocationText')) $('overviewLocationText').textContent = mainLoc;
+  if ($('overviewLocationSub')) $('overviewLocationSub').textContent = `${subLoc} • AUDA Approved`;
+  if ($('overviewPriceText')) $('overviewPriceText').textContent = p.price || 'Price on Request';
+  if ($('overviewPriceSub')) $('overviewPriceSub').textContent = p.category ? `${p.category} Typology` : 'Master Layout';
+  if ($('overviewReraText')) $('overviewReraText').textContent = rera;
+  if ($('overviewReraSub')) $('overviewReraSub').textContent = '✓ Approved & Bank Loan Eligible';
+
+  // 2. Process Amenities
+  const rawList = (p.amenities || '').split(',').map(s => s.trim()).filter(Boolean);
+  const count = rawList.length;
+
+  if ($('overviewAmenitiesCount')) $('overviewAmenitiesCount').textContent = `${count} Master Amenities`;
+  if ($('amenitiesTotalBadge')) $('amenitiesTotalBadge').innerHTML = `<span>✨ ${count} Signature Lifestyle Touchpoints</span>`;
+
+  // Render Quick Highlight Ribbon
+  const topHighlights = rawList.slice(0, 5);
+  const pillsHtml = topHighlights.map(name => {
+    const meta = getAmenityMeta(name);
+    return `<span class="overview-amenity-pill-item">${meta.icon} ${meta.title}</span>`;
+  }).join('') + (rawList.length > 5 ? `<a href="#amenitiesPanel" class="overview-amenity-pill-item" style="background:var(--sky-light); border-color:var(--sky-primary); color:var(--sky-deep); text-decoration:none; font-weight:700;">+${rawList.length - 5} More in Showcase ↓</a>` : '');
+  
+  if ($('overviewQuickPills')) $('overviewQuickPills').innerHTML = pillsHtml;
+
+  // 3. Build Dynamic Categories & Amenity Cards
+  const categoriesMap = new Map();
+  categoriesMap.set('all', { name: 'All Amenities', count: 0, icon: '✨' });
+
+  const cardsData = rawList.map(name => {
+    const meta = getAmenityMeta(name);
+    if (!categoriesMap.has(meta.cat)) {
+      categoriesMap.set(meta.cat, { name: meta.catName, count: 0, icon: meta.icon });
+    }
+    categoriesMap.get('all').count++;
+    categoriesMap.get(meta.cat).count++;
+    return { raw: name, ...meta };
+  });
+
+  // Render Category Filter Tabs
+  const tabsContainer = $('amenitiesTabsContainer');
+  if (tabsContainer) {
+    let tabsHtml = '';
+    for (const [catKey, catObj] of categoriesMap.entries()) {
+      const activeClass = catKey === 'all' ? 'active' : '';
+      tabsHtml += `<button type="button" class="amenity-tab-pill ${activeClass}" data-cat="${catKey}" onclick="filterAmenityCategory('${catKey}', this)">${catObj.icon} ${catObj.name} (${catObj.count})</button>`;
+    }
+    tabsContainer.innerHTML = tabsHtml;
+  }
+
+  // Render Amenity Cards Grid
+  const cardsGrid = $('amenitiesCardsGrid');
+  if (cardsGrid) {
+    cardsGrid.innerHTML = cardsData.map(item => `
+      <div class="luxury-amenity-card" data-category="${item.cat}">
+        <div class="amenity-card-top">
+          <div class="amenity-icon-box">${item.icon}</div>
+          <span class="amenity-cat-tag">${item.catName}</span>
+        </div>
+        <h4 class="amenity-title">${item.title}</h4>
+        <p class="amenity-desc">${item.desc}</p>
+        <div class="amenity-card-footer">
+          <span>✓ Master Plan Inclusion</span>
+          <span style="color:#10b981; font-weight:700;">Active Standard</span>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+window.filterAmenityCategory = function(cat, btn) {
+  document.querySelectorAll('.amenity-tab-pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const cards = document.querySelectorAll('.luxury-amenity-card');
+  cards.forEach(card => {
+    if (cat === 'all' || card.getAttribute('data-category') === cat) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+};
+
 async function load() {
   if (!Number.isInteger(id) || id < 1) {
-    location.replace('index.html#projects');
+    location.replace('properties.html');
     return;
   }
-  const me = await fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' });
-  if (!me.ok) {
-    location.replace('login.html?return_to=' + encodeURIComponent(location.pathname + location.search));
-    return;
-  }
+  try {
+    const me = await fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' });
+    if (me.ok) {
+      const md = await me.json();
+      if (md.success && md.user) {
+        const a = document.getElementById('accountLink');
+        if (a) {
+          a.textContent = md.user.role === 'admin' ? 'Admin Dashboard' : 'My Account';
+          a.href = md.user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+        }
+      }
+    }
+  } catch (_) {}
   const r = await fetch('/api/projects/' + id, { credentials: 'same-origin', cache: 'no-store' });
   const d = await r.json();
   if (!r.ok || !d.success) {
@@ -408,16 +2200,32 @@ async function load() {
   }
   const p = d.data;
   document.title = 'Laxminarayan Group — ' + p.name;
-  $('title').textContent = p.name;
-  $('cat').textContent = p.category;
-  $('desc').textContent = p.description;
-  $('description').textContent = p.description;
-  $('location').textContent = p.location || 'Contact our advisory team';
-  $('price').textContent = p.price || 'Contact our advisory team';
-  $('amenities').textContent = p.amenities || 'Contact our advisory team';
-  $('hero').style.backgroundImage = `linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%), url('${String(p.image || '').replace(/'/g, '%27')}')`;
+  if ($('title')) $('title').textContent = p.name;
+  if ($('cat')) $('cat').textContent = p.category;
+  if ($('desc')) $('desc').textContent = p.description;
+  if ($('description')) $('description').textContent = p.description;
+  if ($('location')) $('location').textContent = p.location || 'Contact our advisory team';
+  if ($('price')) $('price').textContent = p.price || 'Contact our advisory team';
+  if ($('amenities')) $('amenities').textContent = p.amenities || 'Contact our advisory team';
+  renderOverviewAndAmenities(p);
+  if ($('hero')) {
+    $('hero').style.backgroundImage = `linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%), url('${String(p.image || '').replace(/'/g, '%27')}')`;
+  }
+  renderHeroMosaic(p, d.media || []);
   
-  $('gallery').innerHTML = (d.media || []).map(x => x.media_type === 'video' ? `<video controls preload="metadata" src="${esc(x.file_path)}"></video>` : `<img loading="lazy" src="${esc(x.file_path)}" alt="${esc(p.name)}">`).join('') || '<p class="muted">Project gallery coming soon.</p>';
+  if ($('gallery')) {
+    $('gallery').innerHTML = (d.media || []).map((x, idx) => x.media_type === 'video' 
+      ? `<video controls preload="none" src="${esc(x.file_path)}"></video>` 
+      : `<div class="gallery-item-card" onclick="openLightbox(${idx})" style="cursor:pointer; position:relative; overflow:hidden; border-radius:12px; height:220px; background:#0f172a;" title="${esc(x.original_name || p.name)}">
+           <img loading="lazy" decoding="async" src="${esc(x.file_path)}" alt="${esc(x.original_name || p.name)}" style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+           <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(15,23,42,0) 40%, rgba(15,23,42,0.85) 100%); pointer-events:none;"></div>
+           <div style="position:absolute; bottom:12px; left:14px; right:14px; color:#fff; pointer-events:none; display:flex; justify-content:space-between; align-items:flex-end;">
+             <span style="font-size:12px; font-weight:600; text-shadow:0 1px 4px rgba(0,0,0,0.8);">${esc(x.original_name || 'Project Photograph')}</span>
+             <span style="font-size:11px; background:rgba(2,132,199,0.85); padding:3px 8px; border-radius:9999px; font-weight:700;">🔍 Expand</span>
+           </div>
+         </div>`
+    ).join('') || '<p class="muted">Project gallery coming soon.</p>';
+  }
   
   $('interest').onclick = async () => {
     const b = $('interest');
@@ -471,9 +2279,810 @@ async function load() {
       btn.disabled = false;
     }
   };
+
+  // Wire Brochure Modal
+  if ($('brochureBtn')) {
+    $('brochureBtn').onclick = () => {
+      $('brochureProjectName').textContent = p.name || 'this project';
+      $('brochureModal').style.display = 'flex';
+      fetch('/api/auth/me', { credentials: 'same-origin', cache: 'no-store' })
+        .then(r => r.json())
+        .then(m => {
+          if (m && m.user) {
+            if ($('brochureName') && m.user.name) $('brochureName').value = m.user.name;
+            if ($('brochurePhone') && m.user.phone) $('brochurePhone').value = m.user.phone;
+            if ($('brochureEmail') && m.user.email) $('brochureEmail').value = m.user.email;
+          }
+        }).catch(() => {});
+    };
+  }
+  if ($('closeBrochureModal')) {
+    $('closeBrochureModal').onclick = () => { $('brochureModal').style.display = 'none'; };
+  }
+  if ($('brochureForm')) {
+    $('brochureForm').onsubmit = async e => {
+      e.preventDefault();
+      const submitBtn = $('brochureSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'PREPARING DOWNLOAD...';
+      $('brochureMsg').textContent = '';
+      try {
+        const res = await fetch('/api/projects/' + id + '/brochure', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: $('brochureName').value,
+            phone: $('brochurePhone').value,
+            email: $('brochureEmail').value,
+            source: (typeof window.getLeadSource === 'function' ? window.getLeadSource() : 'website')
+          })
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Unable to download brochure');
+        }
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const dlLink = document.createElement('a');
+        dlLink.href = blobUrl;
+        dlLink.download = 'Laxminarayan_' + (p.name || 'Project').replace(/[^a-zA-Z0-9_-]/g, '_') + '_Brochure.pdf';
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+        URL.revokeObjectURL(blobUrl);
+
+        $('brochureMsg').textContent = '✓ Download started! An advisor will reach out on WhatsApp.';
+        setTimeout(() => {
+          $('brochureModal').style.display = 'none';
+          $('brochureMsg').textContent = '';
+        }, 2200);
+      } catch (err) {
+        $('brochureMsg').textContent = err.message;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'DOWNLOAD BROCHURE NOW ↓';
+      }
+    };
+  }
+
+  // Configure DS 208 specific authentic floor plans & CAD drawings
+  if (p.id === 1) {
+    floorPlans['2bhk'] = {
+      badge: 'BLOCKS A & D (UNITS 101-106)',
+      subTitle: '2 BHK RESIDENTIAL CONFIGURATION',
+      heading: '2 BHK Typical Unit Plan (Type A & Type B)',
+      summary: 'Vestibule (5\'1"×5\'6"), Living (10\'0"×15\'9"), Balcony (10\'0"×4\'0"), Dining (10\'0"×7\'0"), Kitchen (10\'0"×7\'3"), Store (4\'8"×5\'6"), Wash Yard (5\'7"×5\'1"), Bedroom-01 (10\'1"×11\'1"), Bedroom-02 (10\'1"×11\'5"), Attached Bath (6\'10"×4\'0") & Common Bath (8\'2"×4\'4").',
+      carpet: '1,180 sq.ft',
+      superBuilt: '1,220 sq.ft',
+      facing: 'East / North-East (100% Vaastu)',
+      baths: 'Private Viewing Balcony • 2 Baths • Wash Yard • Store',
+      img: 'assets/projects/ds-208/floor_plans/ds208_2bhk_unit_floorplan.png'
+    };
+    floorPlans['3bhk'] = {
+      badge: 'BLOCKS B & C (UNITS 101-104)',
+      subTitle: '3 BHK LUXURY RESIDENTIAL',
+      heading: '3 BHK Grand Residence (Blocks B & C)',
+      summary: 'Vestibule (5\'8"×5\'6"), Living Pavilion (11\'3"×16\'9"), Balcony (11\'3"×5\'0"), Dining (10\'0"×8\'9"), Kitchen (10\'0"×7\'8"), Wash Yard (5\'2"×5\'9"), Store (5\'0"×5\'3"), Bedroom-01 (10\'0"×10\'7"), Bedroom-02 (12\'4"×11\'1") with Dressing (4\'11"×3\'2"), Bedroom-03 (11\'8"×11\'1"), 3 Baths.',
+      carpet: '1,550 sq.ft',
+      superBuilt: '1,620 sq.ft',
+      facing: 'East / North-East (100% Vaastu)',
+      baths: 'Wide Balcony • 3 Baths • Dressing Suite • Wash Yard',
+      img: 'assets/projects/ds-208/floor_plans/ds208_3bhk_unit_floorplan.png'
+    };
+    floorPlans['shops'] = {
+      badge: 'GROUND FLOOR HIGH-STREET',
+      subTitle: 'COMMERCIAL RETAIL PROMENADE',
+      heading: 'Ground Floor High-Street (33 Retail Shops)',
+      summary: '33 prime road-facing commercial shops ranging from 365 to 450 sq.ft along 18-meter and 24-meter wide access roads. Features grand double-height frontage with dedicated customer parking and separate commercial restrooms.',
+      carpet: '365 - 450 sq.ft',
+      superBuilt: 'Up to 520 sq.ft',
+      facing: 'Main 18m & 24m Wide Road Facing',
+      baths: 'Dedicated Commercial Restrooms • Customer Parking',
+      img: 'assets/projects/ds-208/floor_plans/ds208_ground_shops_floorplan.png'
+    };
+    floorPlans['master'] = {
+      badge: 'BLOCKS A, B, C, D MASTER CLUSTER',
+      subTitle: 'TYPICAL CLUSTER ARCHITECTURE',
+      heading: 'Master Typical Floor Plan (All 4 Blocks)',
+      summary: 'Comprehensive master plan depicting Block A, B, C, and D layout with wide foyers, dual passenger elevators per block, central landscaped garden view, common corridors, and fire egress stairs.',
+      carpet: 'All 4 Towers',
+      superBuilt: 'Full Floor Cluster',
+      facing: 'All Directions with Central Garden View',
+      baths: 'Dual Elevators per Block • Grand Entrance Foyers',
+      img: 'assets/projects/ds-208/floor_plans/ds208_typical_master_floorplan.png'
+    };
+
+    const tabsContainer = $('planTabs');
+    if (tabsContainer) {
+      tabsContainer.innerHTML = `
+        <button type="button" class="floorplan-tab active" data-unit="2bhk" onclick="switchFloorPlan('2bhk', this)">
+          <span>2 BHK Unit Plan</span>
+        </button>
+        <button type="button" class="floorplan-tab" data-unit="3bhk" onclick="switchFloorPlan('3bhk', this)">
+          <span>3 BHK Luxury Suite</span>
+        </button>
+        <button type="button" class="floorplan-tab" data-unit="shops" onclick="switchFloorPlan('shops', this)">
+          <span>Ground Floor (33 Shops)</span>
+        </button>
+        <button type="button" class="floorplan-tab" data-unit="master" onclick="switchFloorPlan('master', this)">
+          <span>Master Typical Plan</span>
+        </button>
+      `;
+      switchFloorPlan('2bhk', tabsContainer.children[0]);
+    }
+  }
+
+  // Configure Nilkanth Villa specific authentic luxury villa plans
+  if (p.id === 2) {
+    floorPlans['villa4bhk'] = {
+      badge: '4 BHK LUXURY VILLA (TYPE A)',
+      subTitle: '4 BHK CONTEMPORARY VILLA',
+      heading: '4 BHK Luxury Villa (Ground + First Floor)',
+      summary: 'Spacious independent villa featuring double-height foyer, expansive living room opening to private lawn, designer modular kitchen with utility yard, ground floor guest suite, and 3 grand master suites with ensuite dressing rooms on first floor.',
+      carpet: '2,850 sq.ft',
+      superBuilt: '3,200 sq.ft',
+      facing: 'East / North Facing (100% Vaastu)',
+      baths: 'Private Garden • 4 Ensuite Baths • Powder Room • 2 Car Park',
+      img: ''
+    };
+    floorPlans['villa5bhk'] = {
+      badge: '5 BHK PRESIDENTIAL ESTATE',
+      subTitle: '5 BHK GRAND ESTATE VILLA',
+      heading: '5 BHK Presidential Estate Villa (G + 2 Floors)',
+      summary: 'Bespoke grand estate villa with private plunge pool, personal elevator shaft, double-height grand family lounge, 5 king suites with private sundecks, home theatre / lounge on terrace floor, and 3 covered car ports.',
+      carpet: '3,650 sq.ft',
+      superBuilt: '4,200 sq.ft',
+      facing: 'North-East Corner (100% Vaastu)',
+      baths: 'Private Plunge Pool • 5 Master Baths • Sundecks • 3 Car Parks',
+      img: ''
+    };
+    floorPlans['enclave'] = {
+      badge: 'NILKANTH VILLA MASTER ENCLAVE',
+      subTitle: 'EXCLUSIVE GATED ENCLAVE',
+      heading: 'Nilkanth Villa Master Layout & Amenities',
+      summary: 'Private gated community featuring wide internal concrete avenues, lush landscaped central gardens, clubhouse with indoor recreation, underground cabling, 24/7 boom barrier security, and dedicated visitor parking.',
+      carpet: 'Entire Enclave',
+      superBuilt: 'Gated Villa Society',
+      facing: 'All Directions with Central Green Vista',
+      baths: 'Exclusive Clubhouse • 24/7 Security • Landscaped Central Park',
+      img: ''
+    };
+
+    const tabsContainer = $('planTabs');
+    if (tabsContainer) {
+      tabsContainer.innerHTML = `
+        <button type="button" class="floorplan-tab active" data-unit="villa4bhk" onclick="switchFloorPlan('villa4bhk', this)">
+          <span>4 BHK Luxury Villa</span>
+        </button>
+        <button type="button" class="floorplan-tab" data-unit="villa5bhk" onclick="switchFloorPlan('villa5bhk', this)">
+          <span>5 BHK Presidential Estate</span>
+        </button>
+        <button type="button" class="floorplan-tab" data-unit="enclave" onclick="switchFloorPlan('enclave', this)">
+          <span>Master Enclave Plan</span>
+        </button>
+      `;
+      switchFloorPlan('villa4bhk', tabsContainer.children[0]);
+    }
+  }
+
+  // Configure dynamic plans for any future projects added via Admin (p.id > 2)
+  if (p.id > 2) {
+    const catName = (p.category || 'DEVELOPMENT').toUpperCase();
+    floorPlans['standard'] = {
+      badge: `${catName} DEVELOPMENT`,
+      subTitle: `${(p.name || 'Project').toUpperCase()} SPECIFICATIONS`,
+      heading: `${p.name || 'Project'} Architectural Overview`,
+      summary: p.description || 'Thoughtfully planned development featuring modern architectural planning, generous ceiling heights, expansive natural daylight, and premium lifestyle conveniences.',
+      carpet: 'Flexible Carpet Layouts',
+      superBuilt: p.price || 'Contact Advisory Team',
+      facing: 'Vaastu Compliant Design',
+      baths: p.amenities ? p.amenities.split(',').slice(0, 3).join(' • ') : 'Premium Amenities & Features',
+      img: p.image || ''
+    };
+
+    const tabsContainer = $('planTabs');
+    if (tabsContainer) {
+      tabsContainer.innerHTML = `
+        <button type="button" class="floorplan-tab active" data-unit="standard" onclick="switchFloorPlan('standard', this)">
+          <span>Architectural Layout</span>
+        </button>
+      `;
+      switchFloorPlan('standard', tabsContainer.children[0]);
+    }
+  }
+
+  // Personalize WhatsApp floating widget with project details
+  const waWidget = $('waFloatingWidget');
+  if (waWidget) {
+    const waText = `Hello Laxminarayan Group Team, I am interested in ${p.name} (${p.category || 'Luxury Property'}) and would like to speak with a property advisor regarding pricing and site visits.`;
+    waWidget.href = 'https://wa.me/916352000017?text=' + encodeURIComponent(waText);
+  }
+
+  // Configure Google Maps Directions Link
+  const directionsBtn = $('getDirectionsBtn');
+  if (directionsBtn) {
+    directionsBtn.href = `https://maps.google.com/?q=${encodeURIComponent((p.name || 'Laxminarayan Group') + ' ' + (p.location || 'Ahmedabad Gujarat'))}`;
+  }
+
+  // Configure Mobile Sticky Bar
+  const stickyPrice = $('stickyPriceText');
+  if (stickyPrice) {
+    stickyPrice.textContent = p.price || 'Contact Team';
+  }
+  const stickyWa = $('stickyWaBtn');
+  if (stickyWa && waWidget) {
+    stickyWa.href = waWidget.href;
+  }
+  let stickyTicking = false;
+  window.addEventListener('scroll', () => {
+    if (!stickyTicking) {
+      requestAnimationFrame(() => {
+        const bar = $('mobileStickyBar');
+        if (bar && window.innerWidth <= 768) {
+          bar.style.display = window.scrollY > 350 ? 'flex' : 'none';
+        }
+        stickyTicking = false;
+      });
+      stickyTicking = true;
+    }
+  }, { passive: true });
+
+  // Initialize Home Loan EMI Calculator
+  initEmiCalculator(p);
+}
+
+const floorPlans = {
+  '2bhk': {
+    badge: 'UNIT TYPE A-101',
+    subTitle: '2 BHK RESIDENTIAL CONFIGURATION',
+    heading: '2 BHK Luxury Suite',
+    summary: 'Designed for contemporary couples and growing families. Features generous ceiling clearance, a private viewing terrace, and an en-suite master bath.',
+    carpet: '1,180 sq.ft',
+    superBuilt: '1,650 sq.ft',
+    facing: 'East Facing (Vaastu)',
+    baths: '2 Terraces • 2 Baths',
+    svg: `<svg id="blueprintSvg" viewBox="0 0 400 280" style="width:100%; height:auto; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="380" height="260" rx="8" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3" />
+      <rect x="25" y="25" width="190" height="135" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="120" y="85" fill="#e0f2fe" font-size="13" font-weight="700" text-anchor="middle" font-family="sans-serif">LIVING PAVILION</text>
+      <text x="120" y="105" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">16'0" × 13'6"</text>
+      <rect x="25" y="165" width="190" height="90" fill="rgba(2,132,199,0.1)" stroke="#38bdf8" stroke-width="1.5" />
+      <text x="120" y="210" fill="#38bdf8" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">GARDEN TERRACE</text>
+      <text x="120" y="228" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">16'0" × 7'0"</text>
+      <rect x="220" y="25" width="155" height="145" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="297" y="90" fill="#e0f2fe" font-size="12.5" font-weight="700" text-anchor="middle" font-family="sans-serif">MASTER SUITE</text>
+      <text x="297" y="110" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">14'0" × 12'0"</text>
+      <rect x="220" y="175" width="155" height="80" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="297" y="212" fill="#e0f2fe" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">CULINARY KITCHEN</text>
+      <text x="297" y="230" fill="#94a3b8" font-size="10" text-anchor="middle" font-family="sans-serif">11'0" × 8'0"</text>
+    </svg>`
+  },
+  '3bhk': {
+    badge: 'UNIT TYPE B-201',
+    subTitle: '3 BHK PREMIUM RESIDENTIAL',
+    heading: '3 BHK Grand Residence',
+    summary: 'Expansive family residence with dual-aspect cross-ventilation, dedicated dining pavilion, utility yard, and three lavish en-suite master retreats.',
+    carpet: '1,680 sq.ft',
+    superBuilt: '2,350 sq.ft',
+    facing: 'North-East (Vaastu)',
+    baths: '3 Terraces • 3 Baths',
+    svg: `<svg id="blueprintSvg" viewBox="0 0 400 280" style="width:100%; height:auto; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="380" height="260" rx="8" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3" />
+      <rect x="25" y="25" width="150" height="120" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="100" y="80" fill="#e0f2fe" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">GRAND LIVING</text>
+      <text x="100" y="98" fill="#94a3b8" font-size="9.5" text-anchor="middle" font-family="sans-serif">18'0" × 14'0"</text>
+      <rect x="25" y="150" width="150" height="105" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="100" y="200" fill="#e0f2fe" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">DINING & BALCONY</text>
+      <text x="100" y="218" fill="#94a3b8" font-size="9.5" text-anchor="middle" font-family="sans-serif">14'0" × 10'6"</text>
+      <rect x="180" y="25" width="105" height="120" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="232" y="80" fill="#e0f2fe" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">GUEST SUITE</text>
+      <text x="232" y="98" fill="#94a3b8" font-size="9.5" text-anchor="middle" font-family="sans-serif">12'0" × 11'0"</text>
+      <rect x="180" y="150" width="105" height="105" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="232" y="200" fill="#e0f2fe" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">KITCHEN</text>
+      <text x="232" y="218" fill="#94a3b8" font-size="9.5" text-anchor="middle" font-family="sans-serif">11'0" × 9'6"</text>
+      <rect x="290" y="25" width="95" height="230" fill="rgba(2,132,199,0.1)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="337" y="135" fill="#38bdf8" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">MASTER</text>
+      <text x="337" y="152" fill="#38bdf8" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">SUITE</text>
+      <text x="337" y="172" fill="#94a3b8" font-size="9.5" text-anchor="middle" font-family="sans-serif">16' × 13'</text>
+    </svg>`
+  },
+  '4bhk': {
+    badge: 'UNIT TYPE C-301 (SKY VILLA)',
+    subTitle: '4 BHK LUXURY PENTHOUSE',
+    heading: '4 BHK Sky Villa / Penthouse',
+    summary: 'Ultra-exclusive corner sky villa featuring private elevator foyer access, wraparound sundeck, double-height ceiling living salon, and private plunge pool terrace.',
+    carpet: '2,480 sq.ft',
+    superBuilt: '3,470 sq.ft',
+    facing: 'North-East Corner',
+    baths: '4 Terraces • 4 Baths + Powder',
+    svg: `<svg id="blueprintSvg" viewBox="0 0 400 280" style="width:100%; height:auto; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="380" height="260" rx="8" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3" />
+      <rect x="25" y="25" width="220" height="150" fill="rgba(56,189,248,0.08)" stroke="#38bdf8" stroke-width="2" />
+      <text x="135" y="95" fill="#e0f2fe" font-size="14" font-weight="800" text-anchor="middle" font-family="sans-serif">DOUBLE-HEIGHT LIVING SALON</text>
+      <text x="135" y="115" fill="#94a3b8" font-size="10.5" text-anchor="middle" font-family="sans-serif">24'0" × 18'6" (Panoramic Deck)</text>
+      <rect x="25" y="180" width="220" height="75" fill="rgba(2,132,199,0.12)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="135" y="222" fill="#38bdf8" font-size="13" font-weight="700" text-anchor="middle" font-family="sans-serif">WRAPAROUND SKY DECK</text>
+      <rect x="250" y="25" width="125" height="110" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="312" y="75" fill="#e0f2fe" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">ROYAL SUITE 1</text>
+      <text x="312" y="93" fill="#94a3b8" font-size="9.5" text-anchor="middle" font-family="sans-serif">16'0" × 14'0"</text>
+      <rect x="250" y="140" width="125" height="115" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="312" y="195" fill="#e0f2fe" font-size="12" font-weight="700" text-anchor="middle" font-family="sans-serif">ROYAL SUITE 2</text>
+      <text x="312" y="213" fill="#94a3b8" font-size="9.5" text-anchor="middle" font-family="sans-serif">15'0" × 13'6"</text>
+    </svg>`
+  },
+  'comm': {
+    badge: 'UNIT TYPE COMM-G02',
+    subTitle: 'HIGH-VISIBILITY COMMERCIAL',
+    heading: 'Commercial Suite / Showroom',
+    summary: 'Highway-facing prime commercial space engineered for high footfall retail flagships, corporate branch offices, and upscale diagnostic/wellness centers.',
+    carpet: '950 sq.ft',
+    superBuilt: '1,380 sq.ft',
+    facing: 'Main Road Facing',
+    baths: 'Executive Restroom • Pantry',
+    svg: `<svg id="blueprintSvg" viewBox="0 0 400 280" style="width:100%; height:auto; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="10" width="380" height="260" rx="8" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3" />
+      <rect x="25" y="25" width="260" height="230" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="2" />
+      <text x="155" y="130" fill="#e0f2fe" font-size="14" font-weight="800" text-anchor="middle" font-family="sans-serif">OPEN SHOWROOM / WORKSPACE</text>
+      <text x="155" y="150" fill="#94a3b8" font-size="11" text-anchor="middle" font-family="sans-serif">32'0" × 24'0" (14 Ft Clear Height)</text>
+      <rect x="290" y="25" width="85" height="110" fill="rgba(56,189,248,0.06)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="332" y="75" fill="#e0f2fe" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">EXECUTIVE</text>
+      <text x="332" y="92" fill="#e0f2fe" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">CABIN</text>
+      <rect x="290" y="145" width="85" height="110" fill="rgba(2,132,199,0.1)" stroke="#38bdf8" stroke-width="1.8" />
+      <text x="332" y="195" fill="#38bdf8" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">PANTRY &</text>
+      <text x="332" y="212" fill="#38bdf8" font-size="11" font-weight="700" text-anchor="middle" font-family="sans-serif">RESTROOM</text>
+    </svg>`
+  }
+};
+
+let currentPlanKey = '2bhk';
+
+function switchFloorPlan(planKey, tabBtn) {
+  const plan = floorPlans[planKey];
+  if (!plan) return;
+  currentPlanKey = planKey;
+
+  document.querySelectorAll('.floorplan-tab').forEach(t => t.classList.remove('active'));
+  if (tabBtn) tabBtn.classList.add('active');
+
+  $('planUnitBadge').textContent = plan.badge;
+  $('planSubTitle').textContent = plan.subTitle;
+  $('planHeading').textContent = plan.heading;
+  $('planSummary').textContent = plan.summary;
+  $('planCarpet').textContent = plan.carpet;
+  $('planSuperBuilt').textContent = plan.superBuilt;
+  $('planFacing').textContent = plan.facing;
+  $('planBaths').textContent = plan.baths;
+  if (plan.img) {
+    $('blueprintGraphic').innerHTML = `
+      <div style="width:100%; text-align:center;">
+        <img src="${plan.img}" alt="${plan.heading}" style="width:100%; max-height:360px; object-fit:contain; border-radius:8px; display:block; margin:auto; background:#ffffff; padding:10px; border:1px solid rgba(56,189,248,0.3); box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+        <div style="margin-top:10px; font-size:11px; color:#38bdf8; font-weight:700; letter-spacing:0.5px; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span>🔍 Click to Zoom Official Architectural CAD Plan</span>
+        </div>
+      </div>
+    `;
+  } else {
+    $('blueprintGraphic').innerHTML = plan.svg;
+  }
+}
+
+function openBlueprintModal() {
+  const plan = floorPlans[currentPlanKey];
+  if (!plan) return;
+  $('modalBlueprintTitle').textContent = `${plan.heading} (${plan.carpet} Carpet / ${plan.superBuilt} Built-up)`;
+  if (plan.img) {
+    $('modalBlueprintSvg').innerHTML = `
+      <div style="text-align:center; padding:12px; background:#0f172a; border-radius:10px;">
+        <img src="${plan.img}" alt="${plan.heading}" style="max-width:100%; max-height:80vh; object-fit:contain; border-radius:8px; display:block; margin:auto; background:#ffffff; padding:12px; box-shadow:0 12px 36px rgba(0,0,0,0.6);">
+        <div style="margin-top:14px; font-size:12px; color:#38bdf8; font-weight:700;">Official Architectural Drawing • Akshar DS 208 (RERA Approved)</div>
+      </div>
+    `;
+  } else {
+    $('modalBlueprintSvg').innerHTML = plan.svg;
+  }
+  $('blueprintModal').style.display = 'flex';
+}
+
+function closeBlueprintModal() {
+  $('blueprintModal').style.display = 'none';
+}
+
+function selectPlanForInquiry() {
+  const plan = floorPlans[currentPlanKey];
+  if (!plan) return;
+  const notesField = $('visitNotes');
+  const visitAt = $('visitAt');
+  const visitMsg = $('visitMsg');
+  if (notesField) {
+    notesField.value = `[Floor Plan Layout Reservation Enquiry]\nLayout: ${plan.heading}\nCarpet Area: ${plan.carpet} (Super Built-up: ${plan.superBuilt})\nFacing: ${plan.facing}\nConfiguration: ${plan.baths}\nPlease verify available inventory and allotment for this configuration.`;
+    notesField.style.borderColor = 'var(--sky-primary)';
+    notesField.style.background = '#f0f9ff';
+    setTimeout(() => {
+      notesField.style.borderColor = '';
+      notesField.style.background = '';
+    }, 3000);
+  }
+  if (visitMsg) {
+    visitMsg.innerHTML = `<span style="color:var(--sky-deep); font-weight:700;">✓ Selected ${plan.heading}! Pick your visit date above or submit request.</span>`;
+  }
+  $('visitForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (visitAt && !visitAt.value) {
+    visitAt.focus();
+  }
+}
+
+function parsePriceEstimate(str) {
+  if (!str) return 12500000;
+  const s = String(str).toLowerCase();
+  const crMatch = s.match(/([\d.]+)\s*(?:cr|crore)/i);
+  if (crMatch) return Math.round(parseFloat(crMatch[1]) * 10000000);
+  const lkMatch = s.match(/([\d.]+)\s*(?:lakh|lac|l)/i);
+  if (lkMatch) return Math.round(parseFloat(lkMatch[1]) * 100000);
+  const numMatch = s.replace(/[^\d.]/g, '');
+  if (numMatch && !isNaN(numMatch) && Number(numMatch) >= 1000000) return Math.round(Number(numMatch));
+  return 12500000;
+}
+
+function formatINRBadge(val) {
+  if (val >= 10000000) {
+    return '₹ ' + (val / 10000000).toFixed(2) + ' Cr';
+  } else if (val >= 100000) {
+    return '₹ ' + (val / 100000).toFixed(1) + ' Lakhs';
+  } else {
+    return '₹ ' + Math.round(val).toLocaleString('en-IN');
+  }
+}
+
+function formatExactINR(val) {
+  return '₹ ' + Math.round(val).toLocaleString('en-IN');
+}
+
+function initEmiCalculator(p) {
+  const priceRange = $('emiPriceRange');
+  const downPaymentRange = $('emiDownPaymentRange');
+  const interestRange = $('emiInterestRange');
+  const tenureRange = $('emiTenureRange');
+
+  if (!priceRange || !downPaymentRange || !interestRange || !tenureRange) return;
+
+  const estimatedPrice = parsePriceEstimate(p.price);
+  if (estimatedPrice >= 2000000 && estimatedPrice <= 100000000) {
+    priceRange.value = estimatedPrice;
+  }
+
+  function calculate() {
+    const totalPrice = Number(priceRange.value);
+    const dpPct = Number(downPaymentRange.value);
+    const annualRate = Number(interestRange.value);
+    const tenureYears = Number(tenureRange.value);
+
+    const downPaymentAmt = totalPrice * (dpPct / 100);
+    const principal = totalPrice - downPaymentAmt;
+    const monthlyRate = (annualRate / 12) / 100;
+    const totalMonths = tenureYears * 12;
+
+    let emi = 0;
+    if (monthlyRate > 0) {
+      const compound = Math.pow(1 + monthlyRate, totalMonths);
+      emi = (principal * monthlyRate * compound) / (compound - 1);
+    } else {
+      emi = principal / totalMonths;
+    }
+
+    const totalPayable = emi * totalMonths;
+    const totalInterest = Math.max(0, totalPayable - principal);
+    const principalRatio = totalPayable > 0 ? Math.round((principal / totalPayable) * 100) : 50;
+    const interestRatio = 100 - principalRatio;
+
+    // Update Slider Badges
+    $('emiPriceBadge').textContent = formatINRBadge(totalPrice);
+    $('emiDownPaymentPct').textContent = dpPct;
+    $('emiDownPaymentBadge').textContent = `${formatINRBadge(downPaymentAmt)} (${dpPct}%)`;
+    $('emiInterestBadge').textContent = `${annualRate.toFixed(1)} %`;
+    $('emiTenureBadge').textContent = `${tenureYears} Years (${totalMonths} M)`;
+
+    // Update Output Numbers
+    $('emiMonthlyVal').textContent = formatExactINR(emi);
+    $('emiMonthsText').textContent = totalMonths;
+    $('emiPrincipalVal').textContent = formatExactINR(principal);
+    $('emiTotalInterestVal').textContent = formatExactINR(totalInterest);
+    $('emiTotalPayableVal').textContent = formatExactINR(totalPayable);
+    $('emiPrincipalRatio').textContent = `${principalRatio}%`;
+    $('emiInterestRatio').textContent = `${interestRatio}%`;
+    $('emiInterestBar').style.width = `${interestRatio}%`;
+
+    return { totalPrice, downPaymentAmt, principal, annualRate, tenureYears, emi };
+  }
+
+  [priceRange, downPaymentRange, interestRange, tenureRange].forEach(input => {
+    input.addEventListener('input', calculate);
+  });
+
+  calculate();
+
+  const btnApply = $('btnEmiApply');
+  if (btnApply) {
+    btnApply.onclick = () => {
+      const calc = calculate();
+      const notesField = $('visitNotes');
+      const visitAt = $('visitAt');
+      const visitMsg = $('visitMsg');
+      if (notesField) {
+        notesField.value = `[Home Loan & Financing Request]\nProperty: ${p.name}\nEstimated Loan: ${formatExactINR(calc.principal)}\nDown Payment: ${formatINRBadge(calc.downPaymentAmt)}\nTenure: ${calc.tenureYears} Years @ ${calc.annualRate}%\nMonthly EMI: ${formatExactINR(calc.emi)}/mo\nPlease share pre-approved bank options (SBI / HDFC / ICICI / Axis).`;
+        notesField.style.borderColor = 'var(--sky-primary)';
+        notesField.style.background = '#f0f9ff';
+        setTimeout(() => {
+          notesField.style.borderColor = '';
+          notesField.style.background = '';
+        }, 3000);
+      }
+      if (visitMsg) {
+        visitMsg.innerHTML = '<span style="color:var(--sky-deep); font-weight:700;">✓ Financing preferences applied! Pick your date & time above to schedule an advisory consultation.</span>';
+      }
+      $('visitForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (visitAt && !visitAt.value) {
+        visitAt.focus();
+      }
+    };
+  }
+}
+
+/* ─── LUXURY LIGHTBOX & MOSAIC CONTROLLER (OPTION A) ─── */
+let currentLightboxIndex = 0;
+let currentLightboxMedia = [];
+let currentProjectName = '';
+let currentProjectCat = '';
+
+function renderHeroMosaic(p, mediaList) {
+  currentProjectName = p.name || 'Project';
+  currentProjectCat = p.category || 'Luxury Development';
+  
+  if ($('topLocationText')) $('topLocationText').textContent = p.location || 'Ahmedabad, Gujarat';
+  if ($('topReraPill')) {
+    $('topReraPill').textContent = p.rera_number ? `🛡️ RERA: ${p.rera_number}` : '🛡️ 100% RERA Approved';
+  }
+  if ($('statusBadge')) {
+    $('statusBadge').textContent = p.status || (p.id === 1 ? 'UNDER CONSTRUCTION' : 'READY FOR POSSESSION');
+  }
+  
+  let items = [];
+  if (Array.isArray(mediaList) && mediaList.length > 0) {
+    items = mediaList.filter(m => m.media_type !== 'video');
+  }
+  if (items.length === 0 && p.image) {
+    items = [{ file_path: p.image, original_name: p.name + ' - Master Elevation', media_type: 'image' }];
+  }
+  currentLightboxMedia = items;
+
+  const totalCount = items.length;
+  if ($('mosaicTotalCount')) $('mosaicTotalCount').textContent = totalCount;
+  if ($('mosaicTotalCountMobile')) $('mosaicTotalCountMobile').textContent = totalCount;
+
+  const mosaic = $('heroMosaic');
+  const rightGrid = $('mosaicGridRight');
+
+  if (totalCount === 0) {
+    if (mosaic) mosaic.style.display = 'none';
+    return;
+  }
+
+  // Gracefully handle projects with fewer than 5 images (e.g. single cover or villa)
+  if (totalCount < 5) {
+    if (mosaic) mosaic.classList.add('single-cover');
+    if (rightGrid) rightGrid.style.display = 'none';
+    if ($('mosaicImg0')) $('mosaicImg0').src = items[0].file_path;
+    if ($('mosaicTitle0')) $('mosaicTitle0').textContent = items[0].original_name || p.name;
+    if ($('mosaicTag0')) $('mosaicTag0').textContent = (p.category || 'LUXURY').toUpperCase();
+    for (let i = 1; i <= 4; i++) {
+      const tileEl = $('mosaicTile' + i);
+      const imgEl = $('mosaicImg' + i);
+      if (tileEl) tileEl.style.display = 'none';
+      if (imgEl) { imgEl.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"; imgEl.alt = ''; }
+    }
+    renderLightboxFilmstrip(items);
+    return;
+  }
+
+  // 5 or more images: Full Luxury Architectural Mosaic Bento
+  if (mosaic) mosaic.classList.remove('single-cover');
+  if (rightGrid) rightGrid.style.display = 'grid';
+
+  // Master elevation tile (Left 58%)
+  if ($('mosaicImg0')) $('mosaicImg0').src = items[0].file_path;
+  if ($('mosaicTitle0')) $('mosaicTitle0').textContent = items[0].original_name || 'Master Architectural Elevation';
+  if ($('mosaicTag0')) $('mosaicTag0').textContent = 'MASTER ELEVATION';
+
+  // 4 Satellite tiles (Right 42%)
+  let tileIndices = [1, 2, 3, 4];
+  if (p.id === 1 && items.length >= 15) {
+    // High-impact architectural perspectives: Front Facade, Private Balcony, Central Garden, Sample Living Suite
+    tileIndices = [1, 3, 7, 14];
+  }
+
+  const tags = ['FACADE & RETAIL', 'SKY LIVING', 'CENTRAL GREENS', 'SAMPLE RESIDENCE'];
+
+  for (let i = 0; i < 4; i++) {
+    const itemIndex = tileIndices[i] < items.length ? tileIndices[i] : (i + 1) % items.length;
+    const mediaItem = items[itemIndex];
+    const tileEl = $('mosaicTile' + (i + 1));
+    const imgEl = $('mosaicImg' + (i + 1));
+    const titleEl = $('mosaicTitle' + (i + 1));
+    const tagEl = $('mosaicTag' + (i + 1));
+
+    if (tileEl && mediaItem) {
+      tileEl.onclick = () => openLightbox(itemIndex);
+    }
+    if (imgEl && mediaItem) {
+      imgEl.src = mediaItem.file_path;
+      imgEl.alt = mediaItem.original_name || `Showcase Photo ${i + 2}`;
+    }
+    if (titleEl && mediaItem) {
+      titleEl.textContent = mediaItem.original_name || `Showcase Photo ${i + 2}`;
+    }
+    if (tagEl) {
+      tagEl.textContent = tags[i];
+    }
+  }
+
+  renderLightboxFilmstrip(items);
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const photoParam = urlParams.get('photo');
+  const lightboxParam = urlParams.get('lightbox');
+  if (photoParam !== null && !isNaN(photoParam)) {
+    openLightbox(parseInt(photoParam, 10));
+  } else if (lightboxParam === '1' || lightboxParam === 'true') {
+    openLightbox(0);
+  }
+}
+
+function renderLightboxFilmstrip(items) {
+  const filmstrip = $('lbFilmstrip');
+  if (filmstrip) {
+    filmstrip.innerHTML = items.map((m, idx) => `
+      <img id="lbThumb_${idx}" class="filmstrip-thumb ${idx === 0 ? 'active' : ''}" src="${esc(m.file_path)}" alt="${esc(m.original_name || 'Thumbnail')}" onclick="goToLightboxSlide(${idx})">
+    `).join('');
+  }
+}
+
+function openLightbox(index) {
+  if (!currentLightboxMedia || currentLightboxMedia.length === 0) return;
+  currentLightboxIndex = Math.max(0, Math.min(index, currentLightboxMedia.length - 1));
+  const lb = $('luxuryLightbox');
+  if (lb) {
+    lb.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    updateLightboxDisplay();
+  }
+}
+
+function closeLightbox() {
+  const lb = $('luxuryLightbox');
+  if (lb) {
+    lb.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+}
+
+function nextLightboxSlide() {
+  if (!currentLightboxMedia || currentLightboxMedia.length === 0) return;
+  currentLightboxIndex = (currentLightboxIndex + 1) % currentLightboxMedia.length;
+  updateLightboxDisplay();
+}
+
+function prevLightboxSlide() {
+  if (!currentLightboxMedia || currentLightboxMedia.length === 0) return;
+  currentLightboxIndex = (currentLightboxIndex - 1 + currentLightboxMedia.length) % currentLightboxMedia.length;
+  updateLightboxDisplay();
+}
+
+function goToLightboxSlide(index) {
+  if (!currentLightboxMedia || currentLightboxMedia.length === 0) return;
+  currentLightboxIndex = Math.max(0, Math.min(index, currentLightboxMedia.length - 1));
+  updateLightboxDisplay();
+}
+
+function updateLightboxDisplay() {
+  if (!currentLightboxMedia || currentLightboxMedia.length === 0) return;
+  const item = currentLightboxMedia[currentLightboxIndex];
+  if (!item) return;
+
+  if ($('lbMainImg')) {
+    $('lbMainImg').src = item.file_path;
+    $('lbMainImg').alt = item.original_name || 'Project Photo';
+  }
+  if ($('lbCounterBadge')) {
+    $('lbCounterBadge').textContent = `${currentLightboxIndex + 1} / ${currentLightboxMedia.length}`;
+  }
+  if ($('lbProjectTitle')) {
+    $('lbProjectTitle').textContent = currentProjectName;
+  }
+  if ($('lbProjectCat')) {
+    $('lbProjectCat').textContent = currentProjectCat.toUpperCase();
+  }
+  if ($('lbCaptionText')) {
+    $('lbCaptionText').textContent = item.original_name || `Photograph ${currentLightboxIndex + 1}`;
+  }
+
+  const waBtn = $('lbWaInquireBtn');
+  if (waBtn) {
+    const text = `Hello Laxminarayan Group Team, I am viewing photos of ${currentProjectName} and would like to inquire about "${item.original_name || 'this photo'}".`;
+    waBtn.href = `https://wa.me/916352000017?text=${encodeURIComponent(text)}`;
+  }
+
+  document.querySelectorAll('.filmstrip-thumb').forEach((thumb, idx) => {
+    if (idx === currentLightboxIndex) {
+      thumb.classList.add('active');
+      thumb.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    } else {
+      thumb.classList.remove('active');
+    }
+  });
+}
+
+window.addEventListener('keydown', (e) => {
+  const lb = $('luxuryLightbox');
+  if (!lb || lb.style.display !== 'flex') return;
+  if (e.key === 'ArrowRight') {
+    nextLightboxSlide();
+  } else if (e.key === 'ArrowLeft') {
+    prevLightboxSlide();
+  } else if (e.key === 'Escape') {
+    closeLightbox();
+  }
+});
+
+function shareProjectDetail() {
+  const url = window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      const icon = $('sharePropIcon');
+      const text = $('sharePropText');
+      if (icon) icon.textContent = '✓';
+      if (text) text.textContent = 'Link Copied!';
+      setTimeout(() => {
+        if (icon) icon.textContent = '🔗';
+        if (text) text.textContent = 'Share Property';
+      }, 2500);
+    }).catch(() => {});
+  } else {
+    prompt('Copy this project link:', url);
+  }
 }
 
 load().catch(e => console.error(e));
 </script>
+
+<!-- FULL-SCREEN LUXURY LIGHTBOX SLIDER (OPTION A) -->
+<div id="luxuryLightbox" class="lightbox-modal" role="dialog" aria-modal="true" aria-label="Luxury Project Gallery Lightbox">
+  <div class="lightbox-header">
+    <div class="lightbox-title-wrap">
+      <span class="lightbox-counter-badge" id="lbCounterBadge">1 / 17</span>
+      <div style="display:flex; flex-direction:column;">
+        <span style="font-size:14.5px; font-weight:700; color:#fff;" id="lbProjectTitle">Project Gallery</span>
+        <span style="font-size:11px; color:#38bdf8; letter-spacing:0.5px; font-weight:600;" id="lbProjectCat">LUXURY LIVING</span>
+      </div>
+    </div>
+    <div class="lightbox-actions">
+      <a id="lbWaInquireBtn" href="https://wa.me/916352000017" target="_blank" rel="noopener noreferrer" style="background:#25D366; color:#fff; padding:7px 16px; border-radius:var(--radius-pill); font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:6px; text-decoration:none; box-shadow:0 4px 12px rgba(37,211,102,0.3);">
+        <span>💬 Inquire on WhatsApp</span>
+      </a>
+      <button type="button" class="lightbox-close-btn" id="closeLightboxBtn" onclick="closeLightbox()" aria-label="Close Lightbox">✕</button>
+    </div>
+  </div>
+
+  <div class="lightbox-stage">
+    <button type="button" class="lightbox-nav-btn lightbox-prev-btn" id="lbPrevBtn" onclick="prevLightboxSlide()" aria-label="Previous Photo">‹</button>
+    <img id="lbMainImg" class="lightbox-main-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" alt="Gallery Image">
+    <button type="button" class="lightbox-nav-btn lightbox-next-btn" id="lbNextBtn" onclick="nextLightboxSlide()" aria-label="Next Photo">›</button>
+  </div>
+
+  <div class="lightbox-caption-bar" id="lbCaptionText">
+    Master Elevation View
+  </div>
+
+  <div class="lightbox-filmstrip" id="lbFilmstrip"></div>
+</div>
 </body>
 </html>

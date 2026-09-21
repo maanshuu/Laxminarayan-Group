@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Explore Laxminarayan Group luxury real estate and commercial projects.">
+<meta name="description" content="Explore Laxminarayan Group luxury residential and commercial projects.">
 <title>Laxminarayan Group — Projects</title>
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="apple-touch-icon" href="assets/favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
@@ -397,6 +399,115 @@ footer {
   .grid { grid-template-columns: 1fr; }
   .notice { flex-direction: column; align-items: flex-start; }
 }
+
+/* ─── FLOATING WHATSAPP CONCIERGE WIDGET ─── */
+.wa-floating-btn {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #25D366;
+  color: #ffffff;
+  padding: 12px 20px 12px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.45);
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+.wa-floating-btn:hover {
+  background: #20ba5a;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(37, 211, 102, 0.55);
+  color: #fff;
+}
+.wa-icon-pulse {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wa-icon-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.4);
+  animation: waPulse 2s infinite ease-out;
+}
+@keyframes waPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.wa-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.wa-badge-status {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.wa-badge-status::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+@media (max-width: 600px) {
+  .wa-floating-btn { bottom: 20px; right: 20px; padding: 12px; }
+  .wa-badge-text { display: none; }
+}
+
+/* ─── SKELETON WIREFRAME SHIMMER ─── */
+.skeleton-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-subtle);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+.skeleton-pic {
+  height: 220px;
+  background: linear-gradient(90deg, #edf2f7 25%, #f7fafc 50%, #edf2f7 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.skeleton-bar {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #edf2f7 25%, #f7fafc 50%, #edf2f7 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-bar.w-30 { width: 30%; height: 18px; border-radius: var(--radius-pill); }
+.skeleton-bar.w-70 { width: 70%; height: 22px; }
+.skeleton-bar.w-90 { width: 90%; }
+.skeleton-bar.w-50 { width: 50%; }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 </style>
 </head>
 <body>
@@ -438,7 +549,35 @@ footer {
       <p id="sectionDesc">A focused collection from this Laxminarayan Group portfolio.</p>
     </div>
     
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid">
+      <div class="skeleton-card">
+        <div class="skeleton-pic"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-bar w-30"></div>
+          <div class="skeleton-bar w-70"></div>
+          <div class="skeleton-bar w-90"></div>
+          <div class="skeleton-bar w-50"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-pic"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-bar w-30"></div>
+          <div class="skeleton-bar w-70"></div>
+          <div class="skeleton-bar w-90"></div>
+          <div class="skeleton-bar w-50"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-pic"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-bar w-30"></div>
+          <div class="skeleton-bar w-70"></div>
+          <div class="skeleton-bar w-90"></div>
+          <div class="skeleton-bar w-50"></div>
+        </div>
+      </div>
+    </div>
     
     <div class="notice">
       <div>
@@ -457,11 +596,26 @@ footer {
   </div>
 </footer>
 
+<!-- FLOATING WHATSAPP QUICK-CONCIERGE WIDGET -->
+<a id="waFloatingWidget" class="wa-floating-btn" href="https://wa.me/916352000017?text=Hello%20Laxminarayan%20Group%20Team%2C%20I%20am%20interested%20in%20your%20properties%20and%20would%20like%20to%20speak%20with%20an%20advisor." target="_blank" rel="noopener noreferrer" aria-label="Chat with Concierge on WhatsApp">
+  <div class="wa-icon-pulse">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+    </svg>
+  </div>
+  <div class="wa-badge-text">
+    <span style="font-size:12px; font-weight:800; letter-spacing:0.3px;">CHAT WITH CONCIERGE</span>
+    <span class="wa-badge-status">Online Now • Direct Support</span>
+  </div>
+</a>
+
 <script>
 const API = "/api";
 const meta = {
-  RESIDENTIAL: { title: "Signature Homes", desc: "Thoughtfully planned residential projects created around modern family living.", kicker: "RESIDENTIAL PORTFOLIO", hero: "assets/signature-homes.jpg" },
-  COMMERCIAL: { title: "Prime Spaces", desc: "Strategic commercial spaces designed for visibility, convenience and business growth.", kicker: "COMMERCIAL PORTFOLIO", hero: "assets/commercial-properties.jpg" },
+  "APARTMENTS & SHOPS": { title: "DS 208 - Apartments & Shops", desc: "Thoughtfully planned residential and commercial retail development on S.P. Ring Road, Vastral, Ahmedabad.", kicker: "APARTMENTS & RETAIL", hero: "/uploads/projects/ds208_bird_eye_view.jpg" },
+  "LUXURY VILLAS": { title: "Nilkanth Villa", desc: "Exclusive private luxury villa estate crafted with landscaped gardens, contemporary architecture, and gated security.", kicker: "LUXURY VILLAS", hero: "assets/hero-villa.png" },
+  RESIDENTIAL: { title: "Residential Projects", desc: "Thoughtfully planned residential projects created around modern family living.", kicker: "RESIDENTIAL PORTFOLIO", hero: "/uploads/projects/ds208_bird_eye_view.jpg" },
+  COMMERCIAL: { title: "Prime Commercial", desc: "Strategic commercial spaces designed for visibility, convenience and business growth.", kicker: "COMMERCIAL PORTFOLIO", hero: "assets/commercial-properties.jpg" },
   DEVELOPMENT: { title: "Future Landmarks", desc: "Long-term development projects planned with quality infrastructure, connectivity and value in mind.", kicker: "DEVELOPMENT PORTFOLIO", hero: "assets/residential-properties.jpg" },
   INDUSTRIAL: { title: "Industrial Properties", desc: "Purpose-built industrial spaces for manufacturing, logistics, warehousing and expansion.", kicker: "INDUSTRIAL PORTFOLIO", hero: "assets/industrial-properties.jpg" }
 };
@@ -477,16 +631,15 @@ if (!cat) {
 async function load() {
   try {
     const me = await fetch(API + "/auth/me", { credentials: "same-origin", cache: "no-store" });
-    if (!me.ok) {
-      const returnTo = location.pathname + location.search;
-      location.replace("login.html?return_to=" + encodeURIComponent(returnTo));
-      return;
-    }
-    const md = await me.json();
-    if (md.success && md.user) {
-      const a = document.getElementById("accountLink");
-      a.textContent = md.user.role === "admin" ? "Admin Dashboard" : "My Account";
-      a.href = md.user.role === "admin" ? "admin.html" : "dashboard.html";
+    if (me.ok) {
+      const md = await me.json();
+      if (md.success && md.user) {
+        const a = document.getElementById("accountLink");
+        if (a) {
+          a.textContent = md.user.role === "admin" ? "Admin Dashboard" : "My Account";
+          a.href = md.user.role === "admin" ? "admin.html" : "dashboard.html";
+        }
+      }
     }
     const r = await fetch(API + "/projects/category/" + encodeURIComponent(cat), { credentials: "same-origin", cache: "no-store" });
     const d = await r.json();
@@ -507,6 +660,12 @@ async function load() {
     document.getElementById("sectionTitle").textContent = m.title;
     document.getElementById("sectionDesc").textContent = m.desc;
     document.querySelector(".hero").style.backgroundImage = `linear-gradient(180deg, rgba(2, 132, 199, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%), url("${escAttr(m.hero)}")`;
+
+    const waWidget = document.getElementById("waFloatingWidget");
+    if (waWidget) {
+      const waText = `Hello Laxminarayan Group Team, I am exploring your ${m.title || (cat + ' Portfolio')} and would like to speak with a property advisor regarding availability and visits.`;
+      waWidget.href = "https://wa.me/916352000017?text=" + encodeURIComponent(waText);
+    }
     
     document.getElementById("grid").innerHTML = items.length ? items.map(x => `
       <article class="project">

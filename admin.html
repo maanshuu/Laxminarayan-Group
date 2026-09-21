@@ -7,9 +7,13 @@
 <title>Laxminarayan Group — Executive Admin CRM</title>
 <meta http-equiv="Cache-Control" content="no-store">
 <meta http-equiv="Pragma" content="no-cache">
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="apple-touch-icon" href="assets/favicon.jpg">
+<script src="assets/attribution.js?v=4"></script>
+<script src="assets/cost-sheet.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
 
 <style>
 :root {
@@ -839,6 +843,12 @@ textarea {
   color: #ffffff;
   box-shadow: 0 2px 6px rgba(8, 11, 15, 0.2);
 }
+.channel-opt {
+  transition: background 0.15s ease;
+}
+.channel-opt:hover {
+  background: #f8fafc;
+}
 
 .kanban-wrapper {
   display: flex;
@@ -1057,61 +1067,270 @@ textarea {
   color: #1e293b;
 }
 
-/* ─── UNIT INVENTORY MATRIX ─── */
+/* ─── LUXURY UNIT INVENTORY MATRIX (MAYFAIR HERITAGE) ─── */
 .unit-matrix {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 16px;
-  margin-top: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
 }
 .unit-card {
   background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 2px 8px rgba(8, 11, 15, 0.04);
-  transition: all .2s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 22px;
   position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .unit-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(8, 11, 15, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  border-color: #d97706;
 }
-.unit-card.available { border-top: 4px solid #10b981; }
-.unit-card.blocked { border-top: 4px solid #f59e0b; background: #fffdf7; }
-.unit-card.sold { border-top: 4px solid #64748b; background: #f8fafc; }
+.unit-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 28px;
+  right: 28px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.45), transparent);
+}
+.unit-card.available {
+  border-color: #e5e7eb;
+}
+.unit-card.blocked {
+  border-color: #fde68a;
+  background: #fffdfa;
+}
+.unit-card.sold {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
 
 .unit-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+  align-items: flex-start;
+  margin-bottom: 12px;
 }
 .unit-num {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+}
+.unit-sub {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 3px;
+  letter-spacing: 0.2px;
+}
+
+/* Luxury Status Badges (Replacing cheap emojis) */
+.unit-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.unit-badge.available {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+.unit-badge.blocked {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+.unit-badge.sold {
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid #334155;
+}
+
+/* Client Reservation & Allotment Banners */
+.unit-client-banner {
+  border-radius: 9px;
+  padding: 7px 12px;
+  font-size: 11.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+.unit-client-banner.hold {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+.unit-client-banner.allotted {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+/* Pricing Row */
+.unit-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  margin-bottom: 14px;
+}
+.unit-price-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+.unit-price-val {
   font-size: 18px;
   font-weight: 800;
-  color: var(--ink);
+  color: #0f172a;
+  letter-spacing: -0.4px;
 }
-.unit-type-pill {
+.unit-price-rate {
+  font-size: 11px;
+  font-weight: 700;
+  color: #d97706;
+}
+
+/* 2x2 Architectural Spec Matrix */
+.unit-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.unit-spec-box {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.unit-spec-lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.unit-spec-val {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 2px;
+}
+
+/* Clean Action Geometry */
+.unit-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: auto;
+}
+.unit-btn-quote {
+  flex: 1;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 9999px;
   font-size: 11.5px;
   font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.unit-btn-quote:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+.unit-btn-status {
+  padding: 7px 11px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.unit-btn-status.hold {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+.unit-btn-status.hold:hover {
+  background: #fde68a;
+}
+.unit-btn-status.sold {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+.unit-btn-status.sold:hover {
+  background: #fecaca;
+}
+.unit-btn-status.release {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+.unit-btn-status.release:hover {
+  background: #a7f3d0;
+}
+.unit-btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   color: #475569;
-  background: #f1f5f9;
-  padding: 3px 8px;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
-.unit-price {
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--sky);
-  margin: 6px 0;
-  font-family: monospace;
+.unit-btn-icon:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
-.unit-meta {
-  font-size: 12.5px;
-  color: var(--ink-light);
-  margin-bottom: 12px;
-  line-height: 1.4;
+.unit-btn-icon.danger:hover {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fecaca;
 }
 
 /* ─── RESPONSIVE ─── */
@@ -1146,7 +1365,8 @@ textarea {
     <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
   </div>
   <div class="top-actions-flex">
-    <a href="index.html" class="top-link" target="_blank">View Website ↗</a>
+    <a href="index.html" class="top-link" target="_blank">Website ↗</a>
+    <a href="properties.html" class="top-link" target="_blank">Portfolio ↗</a>
     <button onclick="location.href='/api/auth/logout'">LOG OUT</button>
   </div>
 </div>
@@ -1156,7 +1376,7 @@ textarea {
   <div class="headrow">
     <div>
       <h1 style="margin-bottom:5px">Business Dashboard</h1>
-      <p class="muted" style="margin-top:0">Manage enquiries, leads, site visits, team, customers, projects and reporting from one place.</p>
+      <p class="muted" style="margin-top:0">Manage enquiries, site visits, team, customers, projects and reporting from one place.</p>
     </div>
     <div class="actions">
       <button class="btn" onclick="refreshAll()">Refresh</button>
@@ -1167,8 +1387,8 @@ textarea {
   <div class="stats">
     <div class="stat"><strong id="users">0</strong>Customers</div>
     <div class="stat"><strong id="enq">0</strong>Enquiries</div>
-    <div class="stat"><strong id="leads">0</strong>Leads</div>
-    <div class="stat"><strong id="openLeads">0</strong>Open pipeline</div>
+    <div class="stat"><strong id="leads">0</strong>Total Enquiries</div>
+    <div class="stat"><strong id="openLeads">0</strong>Open enquiries</div>
     <div class="stat"><strong id="visits">0</strong>Site visits</div>
     <div class="stat"><strong id="statUnits">38</strong>Total units</div>
     <div class="stat"><strong id="statAvailable">21</strong>Available units</div>
@@ -1182,19 +1402,19 @@ textarea {
   <!-- SPEED-TO-LEAD ACTION PULSE BANNER -->
   <div id="speedAlertBanner" class="speed-alert-banner">
     <div class="speed-alert-content">
-      <span class="speed-badge">ACTION PULSE</span>
-      <span id="speedAlertText" style="font-weight:600; font-size:13.5px;">All leads and follow-ups are synchronized with database.</span>
+      <span class="speed-badge">Quick Update</span>
+      <span id="speedAlertText" style="font-weight:600; font-size:13.5px;">All enquiry follow-ups and unit allocations are up to date.</span>
     </div>
     <div class="actions">
-      <button class="btn gold" style="font-size:12px; padding:6px 14px;" onclick="showView('leadsView')">Open Pipeline Board →</button>
+      <button class="btn gold" style="font-size:12px; padding:6px 14px;" onclick="showView('leadsView')">View Enquiries →</button>
     </div>
   </div>
 
   <!-- SEGMENTED CONTROL TABS -->
   <div class="tabs">
     <button class="tab active" data-view="overview">Overview</button>
-    <button class="tab" data-view="leadsView">Lead Pipeline</button>
-    <button class="tab" data-view="unitsView">Unit Inventory</button>
+    <button class="tab" data-view="leadsView">Enquiries</button>
+    <button class="tab" data-view="unitsView">Units</button>
     <button class="tab" data-view="bookingsView">Bookings & Deals</button>
     <button class="tab" data-view="visitsView">Site visits</button>
     <button class="tab" data-view="projectsView">Projects</button>
@@ -1202,7 +1422,7 @@ textarea {
     <button class="tab" data-view="attendanceView">Attendance</button>
     <button class="tab" data-view="customersView">Customers</button>
     <button class="tab" data-view="reportsView">Reports</button>
-    <button class="tab" data-view="auditView">Audit log</button>
+    <button class="tab" data-view="auditView">Activity History</button>
   </div>
 
   <!-- OVERVIEW VIEW -->
@@ -1223,11 +1443,11 @@ textarea {
       <div class="quick-card">
         <span class="section-kicker">Today</span>
         <h3 style="margin:3px 0 6px">Quick actions</h3>
-        <div class="quick-stat"><span>Open pipeline leads</span><strong id="heroOpenLeads">0</strong></div>
+        <div class="quick-stat"><span>Open enquiries</span><strong id="heroOpenLeads">0</strong></div>
         <div class="quick-stat"><span>New enquiries today</span><strong id="heroNewEnquiries">0</strong></div>
         <div class="actions">
-          <button class="btn gold" onclick="openLeadModal()">+ Register Lead</button>
-          <button class="btn" onclick="showView('unitsView')">Unit Inventory</button>
+          <button class="btn gold" onclick="openLeadModal()">+ Add Enquiry</button>
+          <button class="btn" onclick="showView('unitsView')">Units</button>
         </div>
       </div>
     </div>
@@ -1316,23 +1536,87 @@ textarea {
     <div class="view-switcher-bar">
       <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
         <div class="view-switch-btns">
-          <button id="viewBtnKanban" class="view-switch-btn active" onclick="switchLeadView('kanban')">⊞ Pipeline Kanban</button>
-          <button id="viewBtnTable" class="view-switch-btn" onclick="switchLeadView('table')">☰ Data Table</button>
+          <button id="viewBtnKanban" class="view-switch-btn active" onclick="switchLeadView('kanban')">⊞ Board View</button>
+          <button id="viewBtnTable" class="view-switch-btn" onclick="switchLeadView('table')">☰ List View</button>
         </div>
         <select id="leadFilterProject" onchange="renderKanban();" style="max-width:200px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Projects</option>
         </select>
         <select id="leadFilterPriority" onchange="renderKanban();" style="max-width:160px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Priorities</option>
-          <option value="hot">🔥 Hot Leads</option>
-          <option value="warm">⚡ Warm Leads</option>
-          <option value="cold">❄️ Cold Leads</option>
+          <option value="hot">🔥 Hot Enquiries</option>
+          <option value="warm">⚡ Warm Enquiries</option>
+          <option value="cold">❄️ Cold Enquiries</option>
         </select>
-        <input id="leadFilterSearch" oninput="renderKanban();" placeholder="Search name, phone, email..." style="max-width:210px; padding:6px 12px; font-size:12.5px;">
+        <!-- Custom Channel Filter with Authentic Brand SVGs / Emoticons -->
+        <div class="channel-dropdown-wrap" style="position:relative; display:inline-block;">
+          <button type="button" id="channelSelectBtn" onclick="toggleChannelSelectMenu(event)" 
+            style="display:inline-flex; align-items:center; justify-content:space-between; gap:8px; height:34px; padding:6px 12px; font-size:12.5px; font-weight:600; color:#1e293b; background:#ffffff; border:1px solid #dbe2ea; border-radius:8px; cursor:pointer; min-width:145px; box-shadow:0 1px 2px rgba(0,0,0,0.03); transition:all 0.15s ease;">
+            <span id="channelSelectCurrent" style="display:inline-flex; align-items:center; gap:7px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="vertical-align:-2px; flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>All Sources</span>
+            </span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+
+          <div id="channelSelectMenu" style="display:none; position:absolute; top:calc(100% + 4px); left:0; z-index:999; min-width:190px; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.12), 0 8px 10px -6px rgba(0,0,0,0.06); padding:5px; overflow:hidden;">
+            <div class="channel-opt" onclick="setFilterChannel('')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#1e293b; border-radius:6px; cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="vertical-align:-2px; flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>All Sources</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('instagram')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#be185d; border-radius:6px; cursor:pointer;">
+              <img src="assets/instagram.svg" width="15" height="15" alt="Instagram" style="vertical-align:-2px; border-radius:3px; flex-shrink:0;">
+              <span>Instagram</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('facebook')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#1d4ed8; border-radius:6px; cursor:pointer;">
+              <img src="assets/facebook.svg" width="15" height="15" alt="Facebook" style="vertical-align:-2px; flex-shrink:0;">
+              <span>Facebook</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('whatsapp')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#15803d; border-radius:6px; cursor:pointer;">
+              <img src="assets/whatsapp.svg" width="15" height="15" alt="WhatsApp" style="vertical-align:-2px; flex-shrink:0;">
+              <span>WhatsApp</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('google')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#b91c1c; border-radius:6px; cursor:pointer;">
+              <img src="assets/google.svg" width="15" height="15" alt="Google" style="vertical-align:-2px; flex-shrink:0;">
+              <span>Google</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('website')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#475569; border-radius:6px; cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>Website</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('brochure')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#0369a1; border-radius:6px; cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; flex-shrink:0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Brochure Downloads</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('admin')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#92400e; border-radius:6px; cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; flex-shrink:0;"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="22" x2="9" y2="22.01"/><line x1="15" y1="22" x2="15" y2="22.01"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/></svg>
+              <span>Direct Staff</span>
+            </div>
+            <div class="channel-opt" onclick="setFilterChannel('walk-in')" style="display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12.5px; font-weight:600; color:#b45309; border-radius:6px; cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; flex-shrink:0;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Site Walk-In</span>
+            </div>
+          </div>
+
+          <!-- Hidden synced select element to ensure zero breaking changes to existing scripts -->
+          <select id="leadFilterSource" onchange="syncChannelDropdownUI(); renderKanban(); renderLeadRows();" style="display:none;">
+            <option value="">All Sources</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="google">Google</option>
+            <option value="website">Website</option>
+            <option value="brochure">Brochure</option>
+            <option value="admin">Direct Staff</option>
+            <option value="walk-in">Site Walk-In</option>
+          </select>
+        </div>
+        <input id="leadFilterSearch" oninput="renderKanban(); renderLeadRows();" placeholder="Search name, phone, email..." style="max-width:210px; padding:6px 12px; font-size:12.5px;">
       </div>
       <div class="actions">
-        <button class="btn primary" onclick="openLeadModal()">+ Register Lead</button>
-        <button class="btn" onclick="refreshLeads()">Refresh Pipeline</button>
+        <button class="btn" onclick="openCostSheetModal()" style="font-weight:700; border-color:#0284c7; color:#0284c7; display:inline-flex; align-items:center; gap:6px;">📄 Cost Sheet</button>
+        <button class="btn primary" onclick="openLeadModal()">+ Add Enquiry</button>
+        <button class="btn" onclick="refreshLeads()">Refresh</button>
       </div>
     </div>
 
@@ -1341,7 +1625,7 @@ textarea {
       <!-- 7 Stages: new, contacted, qualified, site_visit, negotiation, won, lost -->
       <div class="kanban-col" data-stage="new">
         <div class="kanban-col-head">
-          <div class="kanban-col-title" style="color:#0284c7;"><span style="width:8px; height:8px; border-radius:50%; background:#0284c7; display:inline-block;"></span> New Inquiries</div>
+          <div class="kanban-col-title" style="color:#0284c7;"><span style="width:8px; height:8px; border-radius:50%; background:#0284c7; display:inline-block;"></span> New Enquiries</div>
           <span class="kanban-count-badge" id="badge-new">0</span>
         </div>
         <div class="kanban-cards" id="col-new"></div>
@@ -1357,7 +1641,7 @@ textarea {
 
       <div class="kanban-col" data-stage="qualified">
         <div class="kanban-col-head">
-          <div class="kanban-col-title" style="color:#8b5cf6;"><span style="width:8px; height:8px; border-radius:50%; background:#8b5cf6; display:inline-block;"></span> Qualified</div>
+          <div class="kanban-col-title" style="color:#8b5cf6;"><span style="width:8px; height:8px; border-radius:50%; background:#8b5cf6; display:inline-block;"></span> Interested</div>
           <span class="kanban-count-badge" id="badge-qualified">0</span>
         </div>
         <div class="kanban-cards" id="col-qualified"></div>
@@ -1373,7 +1657,7 @@ textarea {
 
       <div class="kanban-col" data-stage="negotiation">
         <div class="kanban-col-head">
-          <div class="kanban-col-title" style="color:#ea580c;"><span style="width:8px; height:8px; border-radius:50%; background:#ea580c; display:inline-block;"></span> Negotiation</div>
+          <div class="kanban-col-title" style="color:#ea580c;"><span style="width:8px; height:8px; border-radius:50%; background:#ea580c; display:inline-block;"></span> Discussion</div>
           <span class="kanban-count-badge" id="badge-negotiation">0</span>
         </div>
         <div class="kanban-cards" id="col-negotiation"></div>
@@ -1381,7 +1665,7 @@ textarea {
 
       <div class="kanban-col" data-stage="won">
         <div class="kanban-col-head">
-          <div class="kanban-col-title" style="color:#059669;"><span style="width:8px; height:8px; border-radius:50%; background:#059669; display:inline-block;"></span> Won / Booked</div>
+          <div class="kanban-col-title" style="color:#059669;"><span style="width:8px; height:8px; border-radius:50%; background:#059669; display:inline-block;"></span> Booked</div>
           <span class="kanban-count-badge" id="badge-won">0</span>
         </div>
         <div class="kanban-cards" id="col-won"></div>
@@ -1389,7 +1673,7 @@ textarea {
 
       <div class="kanban-col" data-stage="lost">
         <div class="kanban-col-head">
-          <div class="kanban-col-title" style="color:#64748b;"><span style="width:8px; height:8px; border-radius:50%; background:#64748b; display:inline-block;"></span> Lost</div>
+          <div class="kanban-col-title" style="color:#64748b;"><span style="width:8px; height:8px; border-radius:50%; background:#64748b; display:inline-block;"></span> Closed</div>
           <span class="kanban-count-badge" id="badge-lost">0</span>
         </div>
         <div class="kanban-cards" id="col-lost"></div>
@@ -1401,29 +1685,29 @@ textarea {
       <div class="panel">
         <div class="toolbar">
           <div>
-            <h2 style="margin:0" id="leadFormTitleInline">Add lead</h2>
-            <p class="muted" style="margin-bottom:0">Create a lead manually or edit a website-generated lead. Saved leads appear in the table below.</p>
+            <h2 style="margin:0" id="leadFormTitleInline">Add enquiry</h2>
+            <p class="muted" style="margin-bottom:0">Create an enquiry manually or edit a website-generated enquiry. Saved enquiries appear in the table below.</p>
           </div>
           <div class="actions">
-            <button class="btn" type="button" onclick="resetLeadFormInline()">+ New lead</button>
-            <button class="btn" type="button" onclick="refreshLeads()">Refresh saved leads</button>
+            <button class="btn" type="button" onclick="resetLeadFormInline()">+ New enquiry</button>
+            <button class="btn" type="button" onclick="refreshLeads()">Refresh saved enquiries</button>
           </div>
         </div>
         <form id="leadFormInline" class="formgrid" style="margin-top:14px">
           <input id="leadIdInline" type="hidden">
           <select id="leadUserInline"><option value="">No linked customer account</option></select>
-          <input id="leadNameInline" required placeholder="Lead/customer name">
+          <input id="leadNameInline" required placeholder="Enquiry/customer name">
           <input id="leadPhoneInline" placeholder="Phone">
           <input id="leadEmailInline" type="email" placeholder="Email">
           <input id="leadSourceInline" placeholder="Source (website, phone, walk-in...)" value="admin">
           <select id="leadProjectInline"><option value="">No project / General</option></select>
-          <select id="leadStatusInline"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select>
-          <select id="leadEmployeeInline"><option value="">Unassigned</option></select>
+          <select id="leadStatusInline"><option value="new">New Enquiries</option><option value="contacted">Contacted</option><option value="qualified">Interested</option><option value="site_visit">Site Visit</option><option value="negotiation">Discussion</option><option value="won">Booked</option><option value="lost">Closed</option></select>
+          <select id="leadEmployeeInline"><option value="">Not Assigned</option></select>
           <input id="leadFollowInline" type="datetime-local">
           <textarea id="leadNotesInline" class="span2" placeholder="Notes"></textarea>
           <textarea id="leadLostInline" class="span2" placeholder="Lost reason (optional)"></textarea>
           <div class="span4 actions">
-            <button class="btn primary" type="submit" id="leadSubmitInline">Save lead</button>
+            <button class="btn primary" type="submit" id="leadSubmitInline">Save enquiry</button>
             <button class="btn" type="button" onclick="resetLeadFormInline()">Clear</button>
             <span id="leadFormMsgInline" class="muted"></span>
           </div>
@@ -1432,14 +1716,14 @@ textarea {
       <div class="panel">
         <div class="toolbar">
           <div>
-            <h2 style="margin:0">Saved leads</h2>
-            <p class="muted" style="margin-bottom:0">Saved records are read-only here. Use Edit to load a lead into the form above, or click on any row in the Kanban pipeline to open the 360° Drawer.</p>
+            <h2 style="margin:0">Saved enquiries</h2>
+            <p class="muted" style="margin-bottom:0">Saved records are read-only here. Use Edit to load an enquiry into the form above, or click on any card in the Board View to open the 360° Drawer.</p>
           </div>
         </div>
         <table>
           <thead>
             <tr>
-              <th>Lead</th>
+              <th>Enquiry</th>
               <th>Customer</th>
               <th>Project</th>
               <th>Status</th>
@@ -1460,12 +1744,12 @@ textarea {
     <div class="panel">
       <div class="toolbar">
         <div>
-          <h2 style="margin:0">Unit Inventory Matrix</h2>
+          <h2 style="margin:0">Units Matrix</h2>
           <p class="muted" style="margin-bottom:0">Real-time asset availability across all developer projects. Track units available, held on token, or sold.</p>
         </div>
         <div class="actions">
           <button class="btn primary" onclick="openUnitModal()">+ Add New Unit</button>
-          <button class="btn" onclick="loadUnits()">Refresh Inventory</button>
+          <button class="btn" onclick="loadUnits()">Refresh Units</button>
         </div>
       </div>
       <div class="toolbar" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
@@ -1778,15 +2062,15 @@ textarea {
           <button class="btn primary" onclick="loadReports()">Apply filters</button>
           <button class="btn" onclick="clearReportFilters()">Clear filters</button>
           <button class="btn" onclick="refreshReports()">Refresh</button>
-          <a class="btn" href="/api/admin/reports.csv">Export leads CSV</a>
+          <a class="btn" href="/api/admin/reports.csv">Export enquiries CSV</a>
         </div>
       </div>
       <div class="charts">
-        <div class="panel"><h3>Lead status</h3><div id="statusChart"></div></div>
-        <div class="panel"><h3>Leads by project</h3><div id="projectChart"></div></div>
+        <div class="panel"><h3>Enquiry status</h3><div id="statusChart"></div></div>
+        <div class="panel"><h3>Enquiries by project</h3><div id="projectChart"></div></div>
       </div>
       <div class="panel" style="margin-top:16px;">
-        <h3>Monthly leads</h3>
+        <h3>Monthly enquiries</h3>
         <div id="monthlyChart"></div>
         <p id="conversion" style="font-size:18px; font-weight:700; color:var(--sky); margin-top:12px;"></p>
       </div>
@@ -1802,8 +2086,8 @@ textarea {
     <div class="panel">
       <div class="toolbar">
         <div>
-          <h2 style="margin:0">Audit log</h2>
-          <p class="muted" style="margin-bottom:0">Security/history record. Audit entries are intentionally not editable or deletable.</p>
+          <h2 style="margin:0">Activity History</h2>
+          <p class="muted" style="margin-bottom:0">Security and history record. Activity entries are intentionally not editable or deletable.</p>
         </div>
         <div class="actions">
           <input class="filter" id="auditSearch" placeholder="Search action / details / user">
@@ -1867,24 +2151,24 @@ textarea {
 <div id="leadModal" class="modal">
   <div class="modal-card">
     <div class="modal-head">
-      <h2 id="leadModalTitle">Add lead</h2>
+      <h2 id="leadModalTitle">Add enquiry</h2>
       <button class="btn" onclick="closeModal('leadModal')">Close</button>
     </div>
     <form id="leadForm" class="formgrid">
       <input id="leadId" type="hidden">
-      <input id="leadName" required placeholder="Lead/customer name">
+      <input id="leadName" required placeholder="Enquiry/customer name">
       <input id="leadPhone" placeholder="Phone">
       <input id="leadEmail" type="email" placeholder="Email">
       <input id="leadSource" placeholder="Source (website, phone, walk-in...)" value="admin">
       <select id="leadProject"><option value="">No project / General</option></select>
       <select id="leadUser"><option value="">No linked customer account</option></select>
-      <select id="leadStatus"><option>new</option><option>contacted</option><option>qualified</option><option>site_visit</option><option>negotiation</option><option>won</option><option>lost</option></select>
-      <select id="leadEmployee"><option value="">Unassigned</option></select>
+      <select id="leadStatus"><option value="new">New Enquiries</option><option value="contacted">Contacted</option><option value="qualified">Interested</option><option value="site_visit">Site Visit</option><option value="negotiation">Discussion</option><option value="won">Booked</option><option value="lost">Closed</option></select>
+      <select id="leadEmployee"><option value="">Not Assigned</option></select>
       <input id="leadFollow" type="datetime-local" placeholder="Follow-up">
       <textarea id="leadNotes" class="span2" placeholder="Notes"></textarea>
       <textarea id="leadLost" class="span2" placeholder="Lost reason (optional)"></textarea>
       <div class="span4 actions">
-        <button class="btn primary" type="submit">Save lead</button>
+        <button class="btn primary" type="submit">Save enquiry</button>
         <button class="btn" type="button" onclick="closeModal('leadModal')">Cancel</button>
       </div>
     </form>
@@ -2035,19 +2319,20 @@ textarea {
 <div id="leadDrawer" class="lead-drawer">
   <div class="drawer-header">
     <div>
-      <span class="section-kicker" id="drawerLeadSource">WEBSITE LEAD</span>
-      <h2 id="drawerLeadName" style="margin:2px 0 0; font-size:20px; color:var(--ink);">Lead Details</h2>
+      <span class="section-kicker" id="drawerLeadSource">WEBSITE ENQUIRY</span>
+      <h2 id="drawerLeadName" style="margin:2px 0 0; font-size:20px; color:var(--ink);">Enquiry Details</h2>
     </div>
     <button class="btn smallbtn" onclick="closeLeadDrawer()" style="font-size:16px;">✕</button>
   </div>
   <div class="drawer-body">
-    <div style="font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#475569; margin-bottom:6px;">SALES PIPELINE PROGRESS</div>
+    <div style="font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:#475569; margin-bottom:6px;">ENQUIRY PROGRESS</div>
     <div class="stage-stepper" id="drawerStageStepper"></div>
 
     <div style="display:flex; gap:8px; margin:16px 0; flex-wrap:wrap;">
-      <a id="drawerWaBtn" href="#" target="_blank" class="btn btn-wa">💬 WhatsApp Lead</a>
+      <a id="drawerWaBtn" href="#" target="_blank" class="btn btn-wa">💬 WhatsApp</a>
       <a id="drawerCallBtn" href="#" class="btn btn-call">📞 Call Directly</a>
       <button class="btn smallbtn" onclick="openVisitFromDrawer()">📅 Schedule Visit</button>
+      <button class="btn smallbtn" style="border-color:#0284c7; color:#0284c7; font-weight:700;" onclick="openCostSheetFromDrawer()">📄 Generate Cost Sheet</button>
     </div>
 
     <form id="drawerForm" class="formgrid" style="margin-top:16px;">
@@ -2080,10 +2365,10 @@ textarea {
       <label class="span2"><b>Next Follow-Up Date & Time</b>
         <input id="drawerFollowUp" type="datetime-local" style="margin-top:4px;">
       </label>
-      <label class="span4"><b>Lead Interaction Notes</b>
+      <label class="span4"><b>Enquiry Interaction Notes</b>
         <textarea id="drawerNotes" style="min-height:90px; margin-top:4px;"></textarea>
       </label>
-      <label class="span4"><b>Lost Reason (if disqualified)</b>
+      <label class="span4"><b>Closed Reason (optional)</b>
         <input id="drawerLostReason" placeholder="e.g. Budget mismatch, bought in another project" style="margin-top:4px;">
       </label>
     </form>
@@ -2124,14 +2409,35 @@ function escAttr(s) {
   return esc(s);
 }
 
+function toDatetimeLocalIST(v) {
+  if (!v) return '';
+  try {
+    let s = String(v).trim();
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) {
+      s = s.replace(' ', 'T') + 'Z';
+    }
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return '';
+    const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(d);
+    const time = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
+    return `${date}T${time}`;
+  } catch {
+    return '';
+  }
+}
+
 function localDate(v) {
   if (!v) return '—';
   try {
+    let s = String(v).trim();
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) {
+      s = s.replace(' ', 'T') + 'Z';
+    }
     return new Intl.DateTimeFormat('en-IN', {
       dateStyle: 'medium',
       timeStyle: 'short',
       timeZone: 'Asia/Kolkata'
-    }).format(new Date(v));
+    }).format(new Date(s));
   } catch {
     return esc(v);
   }
@@ -2217,7 +2523,7 @@ async function load() {
     if (d.stats.overdueLeads > 0) {
       $('speedAlertBanner').style.borderColor = '#f87171';
       $('speedAlertBanner').style.background = '#fff1f2';
-      $('speedAlertText').innerHTML = `<b style="color:#e11d48;">Attention: ${d.stats.overdueLeads} lead follow-up(s) overdue!</b> · ${d.stats.followUpsToday} appointment(s) or site visit(s) scheduled for today.`;
+      $('speedAlertText').innerHTML = `<b style="color:#e11d48;">Attention: ${d.stats.overdueLeads} enquiry follow-up(s) overdue!</b> · ${d.stats.followUpsToday} appointment(s) or site visit(s) scheduled for today.`;
     } else if (d.stats.followUpsToday > 0) {
       $('speedAlertBanner').style.borderColor = '#38bdf8';
       $('speedAlertBanner').style.background = '#f0f9ff';
@@ -2225,7 +2531,7 @@ async function load() {
     } else {
       $('speedAlertBanner').style.borderColor = 'rgba(56,189,248,0.2)';
       $('speedAlertBanner').style.background = '#f8fafc';
-      $('speedAlertText').textContent = 'All lead follow-ups and unit inventory allocations are up-to-date.';
+      $('speedAlertText').textContent = 'All enquiry follow-ups and unit allocations are up to date.';
     }
   }
 
@@ -2247,8 +2553,9 @@ async function load() {
 function fillProjectSelect(id, includeGeneral = true) {
   const el = $(id);
   if (!el) return;
+  const activeProjects = (state.projects || []).filter(p => p.status === 'active');
   el.innerHTML = (includeGeneral ? '<option value="">No project / General</option>' : '<option value="">Select project</option>') +
-    state.projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    activeProjects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
 }
 
 function fillUserSelect(id) {
@@ -2261,7 +2568,7 @@ function fillUserSelect(id) {
 function fillEmployeeSelect(id) {
   const el = $(id);
   if (!el) return;
-  el.innerHTML = '<option value="">Unassigned</option>' +
+  el.innerHTML = '<option value="">Not Assigned</option>' +
     state.employees.filter(x => x.status === 'active').map(e => `<option value="${e.id}">${esc(e.name)} · ${esc(e.employee_code)}</option>`).join('');
 }
 
@@ -2352,7 +2659,10 @@ async function loadEnquiries() {
       const p = (x.phone || '').replace(/[^0-9]/g, '');
       return `
         <tr>
-          <td><b>${esc(x.enquiry_reference || ('ENQ-' + x.id))}</b></td>
+          <td>
+            <b>${esc(x.enquiry_reference || ('ENQ-' + x.id))}</b><br>
+            <div style="margin-top:4px;">${window.renderSourceBadge ? window.renderSourceBadge(x.source) : ''}</div>
+          </td>
           <td>${localDate(x.created_at)}</td>
           <td><b>${esc(x.name)}</b></td>
           <td>
@@ -2381,7 +2691,7 @@ async function loadEnquiries() {
 async function convertEnquiryToLead(id) {
   try {
     const res = await send(`/api/admin/enquiries/${id}/convert`, { method: 'POST' });
-    toast(res.message || 'Enquiry upgraded to Qualified Lead');
+    toast(res.message || 'Enquiry moved to Interested');
     await loadEnquiries();
     await loadLeads();
     await load();
@@ -2413,14 +2723,70 @@ function switchLeadView(mode) {
   }
 }
 
+function toggleChannelSelectMenu(e) {
+  if (e) e.stopPropagation();
+  const m = $('channelSelectMenu');
+  if (!m) return;
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+
+function setFilterChannel(val) {
+  const sel = $('leadFilterSource');
+  if (sel) {
+    sel.value = val;
+    syncChannelDropdownUI();
+    renderKanban();
+    renderLeadRows();
+  }
+  const m = $('channelSelectMenu');
+  if (m) m.style.display = 'none';
+}
+
+function syncChannelDropdownUI() {
+  const sel = $('leadFilterSource');
+  const labelEl = $('channelSelectCurrent');
+  if (!sel || !labelEl) return;
+  const val = (sel.value || '').toLowerCase().trim();
+  
+  if (val.includes('instagram') || val === 'ig') {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('instagram', 15) : ''} <span style="color:#be185d; font-weight:700;">Instagram</span>`;
+  } else if (val.includes('facebook') || val === 'fb') {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('facebook', 15) : ''} <span style="color:#1d4ed8; font-weight:700;">Facebook</span>`;
+  } else if (val.includes('whatsapp') || val === 'wa') {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('whatsapp', 15) : ''} <span style="color:#15803d; font-weight:700;">WhatsApp</span>`;
+  } else if (val.includes('google') || val === 'gads') {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('google', 15) : ''} <span style="color:#b91c1c; font-weight:700;">Google</span>`;
+  } else if (val.includes('brochure')) {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('brochure', 15) : ''} <span style="color:#0369a1; font-weight:700;">Brochure</span>`;
+  } else if (val.includes('walk-in') || val === 'walkin') {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('walk-in', 15) : ''} <span style="color:#b45309; font-weight:700;">Site Walk-In</span>`;
+  } else if (val === 'admin' || val.includes('staff')) {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('admin', 15) : ''} <span style="color:#92400e; font-weight:700;">Direct Staff</span>`;
+  } else if (val.includes('website')) {
+    labelEl.innerHTML = `${window.getChannelIcon ? window.getChannelIcon('website', 15) : ''} <span style="color:#475569; font-weight:700;">Website</span>`;
+  } else {
+    labelEl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" style="vertical-align:-2px; flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> <span>All Sources</span>`;
+  }
+}
+
+document.addEventListener('click', function(e) {
+  const m = $('channelSelectMenu');
+  const btn = $('channelSelectBtn');
+  if (m && m.style.display !== 'none' && !m.contains(e.target) && (!btn || !btn.contains(e.target))) {
+    m.style.display = 'none';
+  }
+});
+
 function renderKanban() {
   const pid = $('leadFilterProject')?.value;
   const pri = $('leadFilterPriority')?.value;
+  const src = ($('leadFilterSource')?.value || '').toLowerCase().trim();
   const q = ($('leadFilterSearch')?.value || '').toLowerCase().trim();
 
   let list = state.leads || [];
   if (pid) list = list.filter(l => Number(l.project_id) === Number(pid));
   if (pri) list = list.filter(l => (l.sentiment || 'warm') === pri);
+  if (src) list = list.filter(l => (l.source || 'website').toLowerCase().includes(src));
   if (q) list = list.filter(l =>
     (l.name && l.name.toLowerCase().includes(q)) ||
     (l.phone && l.phone.toLowerCase().includes(q)) ||
@@ -2440,7 +2806,7 @@ function renderKanban() {
     if (!col) return;
 
     if (!stageCards.length) {
-      col.innerHTML = '<div style="text-align:center; padding:28px 10px; color:#94a3b8; font-size:12px; font-weight:500;">No leads here</div>';
+      col.innerHTML = '<div style="text-align:center; padding:28px 10px; color:#94a3b8; font-size:12px; font-weight:500;">No enquiries here</div>';
       return;
     }
 
@@ -2460,10 +2826,10 @@ function renderKanban() {
           <div class="card-tags">
             <span class="tag-priority tag-${sentiment}">${sentiment === 'hot' ? '🔥 Hot' : (sentiment === 'cold' ? '❄️ Cold' : '⚡ Warm')}</span>
             ${isOverdue ? '<span class="tag-overdue">⚠️ Overdue</span>' : ''}
-            <span class="card-tag" style="background:#f1f5f9; color:#475569;">${esc(x.source || 'web')}</span>
+            ${window.renderSourceBadge ? window.renderSourceBadge(x.source) : `<span class="card-tag" style="background:#f1f5f9; color:#475569;">${esc(x.source || 'web')}</span>`}
           </div>
           <div class="card-footer">
-            <span class="card-assignee">${x.employee_name ? ('👤 ' + esc(x.employee_name)) : '⚪ Unassigned'}</span>
+            <span class="card-assignee">${x.employee_name ? ('👤 ' + esc(x.employee_name)) : '⚪ Not Assigned'}</span>
             <div class="card-actions" onclick="event.stopPropagation()">
               ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greeting from Laxminarayan Group.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp">💬</a>` : ''}
               ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Direct Call">📞</a>` : ''}
@@ -2475,6 +2841,54 @@ function renderKanban() {
   });
 }
 
+function renderLeadRows() {
+  const pid = $('leadFilterProject')?.value;
+  const pri = $('leadFilterPriority')?.value;
+  const src = ($('leadFilterSource')?.value || '').toLowerCase().trim();
+  const q = ($('leadFilterSearch')?.value || '').toLowerCase().trim();
+
+  let list = state.leads || [];
+  if (pid) list = list.filter(l => Number(l.project_id) === Number(pid));
+  if (pri) list = list.filter(l => (l.sentiment || 'warm') === pri);
+  if (src) list = list.filter(l => (l.source || 'website').toLowerCase().includes(src));
+  if (q) list = list.filter(l =>
+    (l.name && l.name.toLowerCase().includes(q)) ||
+    (l.phone && l.phone.toLowerCase().includes(q)) ||
+    (l.email && l.email.toLowerCase().includes(q)) ||
+    (l.notes && l.notes.toLowerCase().includes(q))
+  );
+
+  const tbody = $('leadRows');
+  if (!tbody) return;
+
+  tbody.innerHTML = list.length ? list.map(x => `
+    <tr>
+      <td>
+        <b>#${x.id}</b><br>
+        <span class="small">${localDate(x.created_at)}</span><br>
+        <div style="margin-top:4px;">${window.renderSourceBadge ? window.renderSourceBadge(x.source) : esc(x.source || '')}</div>
+      </td>
+      <td>
+        <b>${esc(x.name)}</b><br>${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
+        ${x.budget ? `<br><span style="font-size:11.5px; color:#0f766e; font-weight:700;">💰 ${esc(x.budget)}</span>` : ''}
+      </td>
+      <td>
+        <b>${esc(x.project_name || 'General')}</b>
+        ${x.unit_number ? `<br><span class="pill" style="font-size:11px;">Unit ${esc(x.unit_number)}</span>` : ''}
+      </td>
+      <td><span class="pill">${esc(x.status)}</span></td>
+      <td>${esc(x.employee_name || 'Not Assigned')}</td>
+      <td>${x.follow_up_at ? localDate(x.follow_up_at) : '—'}</td>
+      <td>${esc(x.notes || '—')}</td>
+      <td class="actions">
+        <button class="btn smallbtn" onclick="openLeadDrawer(${x.id})">360° Drawer</button>
+        <button class="btn smallbtn" onclick="editLeadInline(${x.id})">Edit</button>
+        <button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="8" class="empty">No saved enquiries matching filters. Use + Add Enquiry to create one.</td></tr>';
+}
+
 async function loadLeads() {
   try {
     const d = await get('/api/admin/leads');
@@ -2482,38 +2896,13 @@ async function loadLeads() {
 
     // Populate project filter in lead toolbar
     const leadPFilter = $('leadFilterProject');
-    if (leadPFilter && leadPFilter.options.length <= 1) {
-      leadPFilter.innerHTML = '<option value="">All Projects</option>' + state.projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    if (leadPFilter) {
+      const activeProjects = (state.projects || []).filter(p => p.status === 'active');
+      leadPFilter.innerHTML = '<option value="">All Projects</option>' + activeProjects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
     }
 
     renderKanban();
-
-    // Data table rows (Preserved Table #leadRows)
-    $('leadRows').innerHTML = d.data.length ? d.data.map(x => `
-      <tr>
-        <td>
-          <b>#${x.id}</b><br>
-          <span class="small">${localDate(x.created_at)}<br>${esc(x.source || '')}</span>
-        </td>
-        <td>
-          <b>${esc(x.name)}</b><br>${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
-          ${x.budget ? `<br><span style="font-size:11.5px; color:#0f766e; font-weight:700;">💰 ${esc(x.budget)}</span>` : ''}
-        </td>
-        <td>
-          <b>${esc(x.project_name || 'General')}</b>
-          ${x.unit_number ? `<br><span class="pill" style="font-size:11px;">Unit ${esc(x.unit_number)}</span>` : ''}
-        </td>
-        <td><span class="pill">${esc(x.status)}</span></td>
-        <td>${esc(x.employee_name || 'Unassigned')}</td>
-        <td>${x.follow_up_at ? localDate(x.follow_up_at) : '—'}</td>
-        <td>${esc(x.notes || '—')}</td>
-        <td class="actions">
-          <button class="btn smallbtn" onclick="openLeadDrawer(${x.id})">360° Drawer</button>
-          <button class="btn smallbtn" onclick="editLeadInline(${x.id})">Edit</button>
-          <button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button>
-        </td>
-      </tr>
-    `).join('') : '<tr><td colspan="8" class="empty">No saved leads yet. Use + Register Lead to create one or submit an enquiry.</td></tr>';
+    renderLeadRows();
   } catch (e) {
     toast(e.message);
   }
@@ -2521,13 +2910,13 @@ async function loadLeads() {
 
 // ─── LEAD 360° DRAWER ───
 const PIPELINE_STAGES = [
-  { id: 'new', label: '1. New' },
+  { id: 'new', label: '1. New Enquiries' },
   { id: 'contacted', label: '2. Contacted' },
-  { id: 'qualified', label: '3. Qualified' },
+  { id: 'qualified', label: '3. Interested' },
   { id: 'site_visit', label: '4. Site Visit' },
-  { id: 'negotiation', label: '5. Negotiation' },
-  { id: 'won', label: '6. Won Deal' },
-  { id: 'lost', label: 'Lost' }
+  { id: 'negotiation', label: '5. Discussion' },
+  { id: 'won', label: '6. Booked' },
+  { id: 'lost', label: 'Closed' }
 ];
 
 function renderDrawerStepper(currentStatus) {
@@ -2552,7 +2941,7 @@ async function changeDrawerStage(newStage) {
     });
     state.currentDrawerLead.status = newStage;
     renderDrawerStepper(newStage);
-    toast(`Lead stage updated to ${newStage.replace('_', ' ').toUpperCase()}`);
+    toast(`Enquiry stage updated to ${newStage.replace('_', ' ').toUpperCase()}`);
     await loadLeads();
     await load();
   } catch (e) {
@@ -2568,8 +2957,8 @@ function openLeadDrawer(id) {
   fillProjectSelect('drawerProject');
   fillEmployeeSelect('drawerEmployee');
 
-  $('drawerLeadSource').textContent = ((x.source || 'WEBSITE').toUpperCase()) + ' LEAD #' + x.id;
-  $('drawerLeadName').textContent = x.name || 'Lead Details';
+  $('drawerLeadSource').innerHTML = (window.renderSourceBadge ? window.renderSourceBadge(x.source) : '') + ' <span style="margin-left:8px; font-weight:800; color:#64748b;">ENQUIRY #' + x.id + '</span>';
+  $('drawerLeadName').textContent = x.name || 'Enquiry Details';
   $('drawerLeadId').value = x.id;
   $('drawerName').value = x.name || '';
   $('drawerPhone').value = x.phone || '';
@@ -2578,18 +2967,27 @@ function openLeadDrawer(id) {
   $('drawerBudget').value = x.budget || '';
   $('drawerSentiment').value = x.sentiment || 'warm';
   $('drawerEmployee').value = x.assigned_employee_id || '';
-  $('drawerFollowUp').value = x.follow_up_at ? new Date(x.follow_up_at).toISOString().slice(0, 16) : '';
+  $('drawerFollowUp').value = toDatetimeLocalIST(x.follow_up_at);
   $('drawerNotes').value = x.notes || '';
   $('drawerLostReason').value = x.lost_reason || '';
 
   const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
   $('drawerCallBtn').href = x.phone ? ('tel:' + x.phone) : '#';
-  $('drawerWaBtn').href = cleanPhone ? (`https://wa.me/91${cleanPhone}?text=` + encodeURIComponent(`Hello ${x.name}, greeting from Laxminarayan Group.`)) : '#';
+  const waText = `Hello ${x.name}, greeting from Laxminarayan Group regarding ${x.project_name || 'our projects'}. I would be pleased to share our project brochure, master layout and current payment milestones with you.`;
+  $('drawerWaBtn').href = cleanPhone ? (`https://wa.me/91${cleanPhone.slice(-10)}?text=` + encodeURIComponent(waText)) : '#';
 
   renderDrawerStepper(x.status || 'new');
 
   $('drawerBackdrop').classList.add('open');
   $('leadDrawer').classList.add('open');
+}
+
+function openCostSheetFromDrawer() {
+  const name = $('drawerName')?.value || '';
+  const phone = $('drawerPhone')?.value || '';
+  const projSel = $('drawerProject');
+  const projName = projSel?.options[projSel.selectedIndex]?.text || '';
+  openCostSheetModal({ clientName: name, clientPhone: phone, projectName: projName });
 }
 
 function closeLeadDrawer() {
@@ -2620,7 +3018,7 @@ async function saveLeadFromDrawer() {
       body: JSON.stringify(body)
     });
     closeLeadDrawer();
-    toast('Lead updated successfully');
+    toast('Enquiry updated successfully');
     await loadLeads();
     await load();
   } catch (e) {
@@ -2651,7 +3049,7 @@ function openVisitFromDrawer() {
   $('visitPhoneInline').value = lead.phone || '';
   $('visitEmailInline').value = lead.email || '';
   $('visitProjectInline').value = lead.project_id || '';
-  $('visitNotesInline').value = 'Scheduled from Lead Pipeline #' + lead.id;
+  $('visitNotesInline').value = 'Scheduled from Enquiry #' + lead.id;
   document.getElementById('visitsView').scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('visitPreferredInline').focus();
 }
@@ -2664,7 +3062,7 @@ function openLeadModal(x = null) {
   $('leadId').value = '';
   $('leadSource').value = 'admin';
   if (x) {
-    $('leadModalTitle').textContent = 'Edit lead';
+    $('leadModalTitle').textContent = 'Edit enquiry';
     $('leadId').value = x.id;
     $('leadName').value = x.name || '';
     $('leadPhone').value = x.phone || '';
@@ -2674,11 +3072,11 @@ function openLeadModal(x = null) {
     $('leadUser').value = x.user_id || '';
     $('leadStatus').value = x.status || 'new';
     $('leadEmployee').value = x.assigned_employee_id || '';
-    $('leadFollow').value = x.follow_up_at ? new Date(x.follow_up_at).toISOString().slice(0, 16) : '';
+    $('leadFollow').value = toDatetimeLocalIST(x.follow_up_at);
     $('leadNotes').value = x.notes || '';
     $('leadLost').value = x.lost_reason || '';
   } else {
-    $('leadModalTitle').textContent = 'Register New Lead';
+    $('leadModalTitle').textContent = 'Register New Enquiry';
   }
   openModal('leadModal');
 }
@@ -2704,7 +3102,7 @@ if ($('leadForm')) {
       if (id) await send('/api/admin/leads/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       else await send('/api/admin/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       closeModal('leadModal');
-      toast(id ? 'Lead updated' : 'Lead registered');
+      toast(id ? 'Enquiry updated' : 'Enquiry registered');
       await loadLeads();
       await load();
     } catch (err) {
@@ -2718,8 +3116,8 @@ function resetLeadFormInline() {
   if (!f) return;
   f.reset();
   $('leadIdInline').value = '';
-  $('leadFormTitleInline').textContent = 'Add lead';
-  $('leadSubmitInline').textContent = 'Save lead';
+  $('leadFormTitleInline').textContent = 'Add enquiry';
+  $('leadSubmitInline').textContent = 'Save enquiry';
   $('leadFormMsgInline').textContent = '';
   $('leadSourceInline').value = 'admin';
   fillProjectSelect('leadProjectInline');
@@ -2742,12 +3140,12 @@ function editLeadInline(id) {
   $('leadProjectInline').value = x.project_id || '';
   $('leadStatusInline').value = x.status || 'new';
   $('leadEmployeeInline').value = x.assigned_employee_id || '';
-  $('leadFollowInline').value = x.follow_up_at ? new Date(x.follow_up_at).toISOString().slice(0, 16) : '';
+  $('leadFollowInline').value = toDatetimeLocalIST(x.follow_up_at);
   $('leadNotesInline').value = x.notes || '';
   $('leadLostInline').value = x.lost_reason || '';
-  $('leadFormTitleInline').textContent = 'Edit lead';
+  $('leadFormTitleInline').textContent = 'Edit enquiry';
   $('leadSubmitInline').textContent = 'Save changes';
-  $('leadFormMsgInline').textContent = 'Editing lead #' + x.id;
+  $('leadFormMsgInline').textContent = 'Editing enquiry #' + x.id;
   switchLeadView('table');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   $('leadNameInline').focus();
@@ -2791,7 +3189,7 @@ if ($('leadFormInline')) {
       resetLeadFormInline();
       await loadLeads();
       await load();
-      toast(id ? 'Lead updated successfully' : 'Lead created successfully');
+      toast(id ? 'Enquiry updated successfully' : 'Enquiry created successfully');
     } catch (err) {
       $('leadFormMsgInline').textContent = err.message;
       toast(err.message);
@@ -2800,10 +3198,10 @@ if ($('leadFormInline')) {
 }
 
 async function deleteLead(id) {
-  if (!confirm('Delete this lead? This cannot be undone.')) return;
+  if (!confirm('Delete this enquiry? This cannot be undone.')) return;
   try {
     await send('/api/admin/leads/' + id, { method: 'DELETE' });
-    toast('Lead deleted');
+    toast('Enquiry deleted');
     await loadLeads();
     await load();
   } catch (e) {
@@ -2814,7 +3212,7 @@ async function deleteLead(id) {
 async function refreshLeads() {
   resetLeadFormInline();
   await loadLeads();
-  toast('Pipeline refreshed');
+  toast('Refreshed');
 }
 
 // ─── UNIT INVENTORY MATRIX ───
@@ -2824,8 +3222,9 @@ async function loadUnits() {
     state.units = d.data;
 
     const pFilter = $('unitFilterProject');
-    if (pFilter && pFilter.options.length <= 1) {
-      pFilter.innerHTML = '<option value="">All Projects</option>' + state.projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+    if (pFilter) {
+      const activeProjects = (state.projects || []).filter(p => p.status === 'active');
+      pFilter.innerHTML = '<option value="">All Projects</option>' + activeProjects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
     }
 
     const total = state.units.length;
@@ -2871,40 +3270,102 @@ function renderUnits() {
     return;
   }
 
+  function formatUnitRate(priceStr, areaSqft) {
+    if (!areaSqft || areaSqft <= 0) return '';
+    const clean = String(priceStr || '').toLowerCase();
+    let num = clean.replace(/[^0-9.]/g, '');
+    if (!num) return '';
+    let val = parseFloat(num);
+    if (clean.includes('cr') || clean.includes('crore')) val = val * 10000000;
+    else if (clean.includes('lakh') || clean.includes('lac') || val < 500) val = val * 100000;
+    if (val > 10000) {
+      const rate = Math.round(val / areaSqft);
+      return '₹ ' + rate.toLocaleString('en-IN') + ' / sq.ft';
+    }
+    return '';
+  }
+
   grid.innerHTML = list.map(u => {
     const statusClass = u.status === 'available' ? 'available' : (u.status === 'blocked' ? 'blocked' : 'sold');
-    const statusLabel = u.status === 'available' ? '🟢 Available' : (u.status === 'blocked' ? '🟡 Blocked' : '🔴 Sold');
+    const badgeMarkup = u.status === 'available' 
+      ? '<span class="unit-badge available">✨ OPEN ALLOTMENT</span>'
+      : (u.status === 'blocked' 
+        ? '<span class="unit-badge blocked">⏳ UNDER RESERVATION</span>' 
+        : '<span class="unit-badge sold">✦ ACQUIRED / CLOSED</span>');
+
+    const priceLabel = u.status === 'sold' ? 'Agreement Value' : (u.status === 'blocked' ? 'Reserved Value' : 'Quotation Guide');
+    const rateText = formatUnitRate(u.price, u.area_sqft);
+
     return `
       <div class="unit-card ${statusClass}">
-        <div class="unit-head">
-          <span class="unit-num">${esc(u.unit_number)}</span>
-          <span class="unit-type-pill">${esc(u.unit_type || 'Residential')}</span>
+        <div>
+          <div class="unit-head">
+            <div>
+              <div class="unit-num">${esc(u.unit_number)}</div>
+              <div class="unit-sub">📍 ${esc(u.project_name || 'Project')} · Floor ${u.floor_number ?? 1}</div>
+            </div>
+            ${badgeMarkup}
+          </div>
+
+          ${u.status === 'blocked' && u.buyer_name ? `
+            <div class="unit-client-banner hold">
+              <span>⏳ Hold for: <strong>${esc(u.buyer_name)}</strong> ${u.buyer_phone ? '(' + esc(u.buyer_phone) + ')' : ''}</span>
+            </div>
+          ` : ''}
+
+          ${u.status === 'sold' ? `
+            <div class="unit-client-banner allotted">
+              <span>👑 Purchaser: <strong>${esc(u.buyer_name || 'Allottee')}</strong> (Deal Closed)</span>
+            </div>
+          ` : ''}
+
+          <div class="unit-price-row">
+            <div>
+              <div class="unit-price-label">${priceLabel}</div>
+              <div class="unit-price-val">${esc(u.price || 'Price on Request')}</div>
+            </div>
+            ${rateText ? `<div class="unit-price-rate">${rateText}</div>` : ''}
+          </div>
+
+          <div class="unit-spec-grid">
+            <div class="unit-spec-box">
+              <div class="unit-spec-lbl">Carpet Area</div>
+              <div class="unit-spec-val">${u.area_sqft ? (u.area_sqft + ' sq.ft') : '—'}</div>
+            </div>
+            <div class="unit-spec-box">
+              <div class="unit-spec-lbl">Configuration</div>
+              <div class="unit-spec-val">${esc(u.unit_type || 'Residential')}</div>
+            </div>
+            <div class="unit-spec-box">
+              <div class="unit-spec-lbl">Floor Level</div>
+              <div class="unit-spec-val">Floor ${u.floor_number ?? 1}</div>
+            </div>
+            <div class="unit-spec-box">
+              <div class="unit-spec-lbl">Orientation / Notes</div>
+              <div class="unit-spec-val" style="font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escAttr(u.notes || 'East Facing / Prime')}">${esc(u.notes || 'East Facing / Prime')}</div>
+            </div>
+          </div>
         </div>
-        <div style="font-size:12px; color:#64748b; font-weight:600;">📍 ${esc(u.project_name || 'Project')} · Floor ${u.floor_number ?? 1}</div>
-        <div class="unit-price">${esc(u.price || 'Price on Request')}</div>
-        <div class="unit-meta">
-          <span>📐 <b>${u.area_sqft || 0}</b> sq.ft.</span><br>
-          <span>Status: <b>${statusLabel}</b></span>
-          ${u.buyer_name ? `<br><span style="color:#b45309; font-weight:600;">👤 ${esc(u.buyer_name)} ${u.buyer_phone ? ('(' + esc(u.buyer_phone) + ')') : ''}</span>` : ''}
-          ${u.notes ? `<br><span class="small" style="color:#64748b;">${esc(u.notes)}</span>` : ''}
-        </div>
-        <div class="actions" style="margin-top:10px; border-top:1px solid #f1f5f9; padding-top:10px; gap:6px;">
+
+        <div class="unit-actions-row">
+          <button class="unit-btn-quote" onclick="openCostSheetModal({ unitNumber: '${escAttr(u.unit_number)}', areaSqft: ${u.area_sqft || 1400}, projectName: '${escAttr(u.project_name || '')}' })" title="Generate Quotation & Cost Sheet">📄 Quote</button>
           ${u.status === 'available' ? `
-            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'blocked')" style="background:#fef3c7; color:#92400e; border:none;">Hold / Block</button>
-            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'sold')" style="background:#fee2e2; color:#991b1b; border:none;">Mark Sold</button>
+            <button class="unit-btn-status hold" onclick="promptUnitStatus(${u.id}, 'blocked')" title="Place unit on reservation hold">Hold</button>
+            <button class="unit-btn-status sold" onclick="promptUnitStatus(${u.id}, 'sold')" title="Mark unit as sold">Sold</button>
           ` : (u.status === 'blocked' ? `
-            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'available')" style="background:#d1fae5; color:#065f46; border:none;">Release</button>
-            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'sold')" style="background:#fee2e2; color:#991b1b; border:none;">Mark Sold</button>
+            <button class="unit-btn-status release" onclick="promptUnitStatus(${u.id}, 'available')" title="Release reservation back to inventory">Release</button>
+            <button class="unit-btn-status sold" onclick="promptUnitStatus(${u.id}, 'sold')" title="Convert to final sale">Sold</button>
           ` : `
-            <button class="btn smallbtn" onclick="promptUnitStatus(${u.id}, 'available')" style="background:#d1fae5; color:#065f46; border:none;">Release</button>
+            <button class="unit-btn-status release" onclick="promptUnitStatus(${u.id}, 'available')" title="Reopen allotment">Release</button>
           `)}
-          <button class="btn smallbtn" onclick="editUnit(${u.id})">Edit</button>
-          <button class="btn smallbtn danger" onclick="deleteUnit(${u.id}, '${escAttr(u.unit_number)}')">Delete</button>
+          <button class="unit-btn-icon" onclick="editUnit(${u.id})" title="Edit Unit Specs">✏️</button>
+          <button class="unit-btn-icon danger" onclick="deleteUnit(${u.id}, '${escAttr(u.unit_number)}')" title="Delete Unit">🗑️</button>
         </div>
       </div>
     `;
   }).join('');
 }
+
 
 async function promptUnitStatus(id, newStatus) {
   let buyerName = '';
@@ -3029,10 +3490,18 @@ async function loadBookings() {
   try {
     const d = await get('/api/admin/bookings');
     state.bookings = d.data;
-    $('bookingRows').innerHTML = d.data.length ? d.data.map(x => `
+    $('bookingRows').innerHTML = d.data.length ? d.data.map(x => {
+      const cp = (x.customer_phone || '').replace(/[^0-9]/g, '');
+      return `
       <tr>
         <td><b>${esc(x.booking_reference || ('BK-' + x.id))}</b><br><span class="small">${localDate(x.created_at)}</span></td>
-        <td><b>${esc(x.customer_name)}</b><br>${esc(x.customer_phone)}<br><span class="small">${esc(x.customer_email || '')}</span></td>
+        <td>
+          <b>${esc(x.customer_name)}</b><br>${esc(x.customer_phone)}<br><span class="small">${esc(x.customer_email || '')}</span>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            ${cp ? `<a href="https://wa.me/91${cp}?text=${encodeURIComponent('Hello ' + x.customer_name + ', your booking ' + (x.booking_reference || '') + ' at Laxminarayan Group is confirmed.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp Booking Acknowledgment">💬</a>` : ''}
+            ${x.customer_phone ? `<a href="tel:${escAttr(x.customer_phone)}" class="card-icon-btn card-call" title="Call">📞</a>` : ''}
+          </div>
+        </td>
         <td><b>${esc(x.project_name || 'General')}</b><br><span class="pill" style="margin-top:4px;">${x.unit_number ? ('Unit ' + esc(x.unit_number)) : (esc(x.allotted_unit || 'Custom Allotment'))}</span></td>
         <td><b style="color:var(--ink); font-family:monospace; font-size:14px;">${esc(x.agreement_value || '—')}</b></td>
         <td><span style="color:#059669; font-weight:700; font-family:monospace;">${esc(x.token_amount || '—')}</span></td>
@@ -3042,7 +3511,7 @@ async function loadBookings() {
           <button class="btn smallbtn danger" onclick="deleteBooking(${x.id}, '${escAttr(x.booking_reference)}')">Delete</button>
         </td>
       </tr>
-    `).join('') : '<tr><td colspan="8" class="empty">No bookings recorded yet. Use + New Booking or convert directly from Won Lead.</td></tr>';
+    `;}).join('') : '<tr><td colspan="8" class="empty">No bookings recorded yet. Use + New Booking or convert directly from an Enquiry.</td></tr>';
   } catch (e) {
     toast(e.message);
   }
@@ -3147,7 +3616,7 @@ function editVisit(id) {
     $('visitPhoneInline').value = x.phone || '';
     $('visitEmailInline').value = x.email || '';
     $('visitProjectInline').value = x.project_id || '';
-    $('visitPreferredInline').value = x.preferred_at ? new Date(x.preferred_at).toISOString().slice(0, 16) : '';
+    $('visitPreferredInline').value = toDatetimeLocalIST(x.preferred_at);
     $('visitStatusInline').value = x.status || 'requested';
     $('visitNotesInline').value = x.notes || '';
     $('visitAdminInline').value = x.admin_notes || '';
@@ -3201,7 +3670,29 @@ if ($('visitFormInline')) {
 async function loadVisits() {
   try {
     const d = await get('/api/admin/site-visits');
-    $('visitRows').innerHTML = d.data.map(x => `<tr><td><b>#${x.id}</b></td><td>${localDate(x.preferred_at)}</td><td>${esc(x.name)}<br>${esc(x.phone)}<br>${esc(x.email)}</td><td>${esc(x.project_name || 'General')}</td><td><span class="pill">${esc(x.status)}</span></td><td>${esc(x.notes || '—')}</td><td>${esc(x.admin_notes || '—')}</td><td class="actions"><button class="btn smallbtn" onclick="editVisit(${x.id})">Edit</button><button class="btn smallbtn danger" onclick="deleteVisit(${x.id})">Delete</button></td></tr>`).join('') || '<tr><td colspan="8" class="empty">No saved site visits yet.</td></tr>';
+    $('visitRows').innerHTML = d.data.length ? d.data.map(x => {
+      const vp = (x.phone || '').replace(/[^0-9]/g, '');
+      return `
+      <tr>
+        <td><b>#${x.id}</b></td>
+        <td>${localDate(x.preferred_at)}</td>
+        <td>
+          <b>${esc(x.name)}</b><br>${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            ${vp ? `<a href="https://wa.me/91${vp}?text=${encodeURIComponent('Hello ' + x.name + ', regarding your site visit scheduled on ' + localDate(x.preferred_at) + ' with Laxminarayan Group.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp Site Visit Details">💬</a>` : ''}
+            ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Call">📞</a>` : ''}
+          </div>
+        </td>
+        <td>${esc(x.project_name || 'General')}</td>
+        <td><span class="pill">${esc(x.status)}</span></td>
+        <td>${esc(x.notes || '—')}</td>
+        <td>${esc(x.admin_notes || '—')}</td>
+        <td class="actions">
+          <button class="btn smallbtn" onclick="editVisit(${x.id})">Edit</button>
+          <button class="btn smallbtn danger" onclick="deleteVisit(${x.id})">Delete</button>
+        </td>
+      </tr>
+    `;}).join('') : '<tr><td colspan="8" class="empty">No saved site visits yet.</td></tr>';
   } catch (e) {
     toast(e.message);
   }
@@ -3614,7 +4105,7 @@ function editCustomer(id) {
 async function openCustomer(id) {
   try {
     const d = await get('/api/admin/users/' + id), u = d.data.user;
-    $('customerContent').innerHTML = `<div class="notice"><b>${esc(u.name)}</b><br>${esc(u.email)} · ${esc(u.phone)}<br>Status: ${esc(u.status)} · Joined: ${localDate(u.created_at)}</div><div class="history"><div class="box"><h3>Enquiries (${d.data.enquiries.length})</h3>${d.data.enquiries.map(x => `<p><b>${esc(x.enquiry_reference || '')}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')}<br>${esc(x.message)}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Leads (${d.data.leads.length})</h3>${d.data.leads.map(x => `<p><b>#${x.id}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')} · ${esc(x.employee_name || 'Unassigned')}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Site visits (${d.data.visits.length})</h3>${d.data.visits.map(x => `<p>${localDate(x.preferred_at)} · ${esc(x.status)}<br>${esc(x.project_name || 'General')}</p>`).join('') || '<p class="muted">None</p>'}</div></div>`;
+    $('customerContent').innerHTML = `<div class="notice"><b>${esc(u.name)}</b><br>${esc(u.email)} · ${esc(u.phone)}<br>Status: ${esc(u.status)} · Joined: ${localDate(u.created_at)}</div><div class="history"><div class="box"><h3>Enquiries (${d.data.enquiries.length})</h3>${d.data.enquiries.map(x => `<p><b>${esc(x.enquiry_reference || '')}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')}<br>${esc(x.message)}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Pipeline (${d.data.leads.length})</h3>${d.data.leads.map(x => `<p><b>#${x.id}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')} · ${esc(x.employee_name || 'Not Assigned')}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Site visits (${d.data.visits.length})</h3>${d.data.visits.map(x => `<p>${localDate(x.preferred_at)} · ${esc(x.status)}<br>${esc(x.project_name || 'General')}</p>`).join('') || '<p class="muted">None</p>'}</div></div>`;
     openModal('customerModal');
   } catch (e) {
     toast(e.message);
@@ -3634,7 +4125,7 @@ async function toggleUser(id, status) {
 
 async function deleteCustomer(id, name) {
   if (!confirm(`Permanently delete customer ${name}?`)) return;
-  if (!confirm('Their historical enquiries/leads/site visits will remain but become unlinked. Continue?')) return;
+  if (!confirm('Their historical enquiries and site visits will remain but become unlinked. Continue?')) return;
   try {
     await send('/api/admin/users/' + id, { method: 'DELETE' });
     toast('Customer deleted');
@@ -3673,7 +4164,7 @@ async function loadReports() {
     bars('projectChart', d.data.byProject, 'project_name');
     bars('monthlyChart', d.data.monthly, 'month');
     bars('visitChart', d.data.visits, 'status');
-    $('conversion').textContent = `Won conversion rate: ${d.data.conversionRate}% · Total leads: ${d.data.totalLeads} · Won: ${d.data.won}${d.data.start ? ' · ' + d.data.start + ' to ' + d.data.end : ''}`;
+    $('conversion').textContent = `Won conversion rate: ${d.data.conversionRate}% · Total enquiries: ${d.data.totalLeads} · Won: ${d.data.won}${d.data.start ? ' · ' + d.data.start + ' to ' + d.data.end : ''}`;
   } catch (e) {
     toast(e.message);
   }
@@ -3710,7 +4201,7 @@ function clearAuditFilters() {
 
 async function refreshAudit() {
   clearAuditFilters();
-  toast('Audit log refreshed; filters cleared');
+  toast('Activity History refreshed; filters cleared');
 }
 
 async function refreshAll() {
@@ -3733,7 +4224,39 @@ async function refreshAll() {
   }
 }
 
-load().catch(e => toast(e.message));
+load().then(() => {
+  const p = new URLSearchParams(window.location.search);
+  const tab = p.get('tab');
+  if (tab) {
+    showView(tab);
+    if (tab === 'projectsView' && typeof loadProjects === 'function') loadProjects();
+    if (tab === 'leadsView' && typeof loadLeads === 'function') loadLeads();
+    if (tab === 'unitsView' && typeof loadUnits === 'function') loadUnits();
+  }
+  if (p.get('openLeadModal') === '1') {
+    setTimeout(() => {
+      openLeadModal();
+    }, 250);
+  }
+  if (p.get('openCostSheet') === '1') {
+    setTimeout(() => {
+      openCostSheetModal({
+        clientName: 'Harsh Vardhan',
+        clientPhone: '9898012345',
+        projectName: 'DS 208 (Developed by Akshar Group)',
+        unitNumber: 'Tower A - 302',
+        areaSqft: 1850,
+        baseRate: 4200
+      });
+    }, 250);
+  }
+}).catch(e => {
+  if (e.message && (e.message.includes('Please log in') || e.message.includes('Session expired') || e.message.includes('Admin access required') || e.message.includes('Account is not active'))) {
+    location.replace('login.html?return_to=admin.html');
+  } else {
+    toast(e.message);
+  }
+});
 setInterval(() => {
   if (document.querySelector('.view.active')?.id === 'overview' && !document.activeElement.matches('textarea,select,input')) {
     load().catch(() => {});

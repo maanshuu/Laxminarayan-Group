@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laxminarayan Group — Unit Inventory Luxury Design Showcase</title>
+<link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-page: #f8fafc;
+  --ink-primary: #0f172a;
+  --ink-secondary: #475569;
+  --ink-muted: #94a3b8;
+  --radius-pill: 9999px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg-page);
+  color: var(--ink-primary);
+  font-family: "Plus Jakarta Sans", sans-serif;
+  line-height: 1.6;
+  padding-bottom: 80px;
+}
+
+.demo-header {
+  background: #0a1128;
+  color: #fff;
+  padding: 40px 5%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.demo-badge {
+  display: inline-block;
+  background: rgba(2, 132, 199, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 12px;
+}
+.demo-h1 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.demo-sub {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
+  max-width: 800px;
+}
+
+/* ─── OPTION SELECTOR TABS ─── */
+.option-tabs-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 16px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+.option-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.opt-tab {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.opt-tab:hover {
+  background: #e2e8f0;
+}
+.opt-tab.active {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+}
+
+.container {
+  width: min(1280px, 94%);
+  margin: 40px auto 0;
+}
+
+.design-section {
+  display: none;
+}
+.design-section.active {
+  display: block;
+  animation: fadeIn 0.35s ease forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.design-meta-card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.design-meta-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink-primary);
+  margin-bottom: 4px;
+}
+.design-meta-desc {
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  max-width: 700px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+/* ================================================================
+   OPTION 1: "MAYFAIR HERITAGE" (Champagne Gold, Warm Slate & Ivory)
+   ================================================================ */
+.opt1-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 24px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+}
+.opt1-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  border-color: #d97706;
+}
+.opt1-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 30px;
+  right: 30px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(217, 119, 6, 0.4), transparent);
+}
+
+.opt1-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.opt1-unit-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+}
+.opt1-unit-sub {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+
+/* Status Badges Option 1 */
+.opt1-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.opt1-badge.available {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+.opt1-badge.blocked {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.opt1-badge.sold {
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid #334155;
+}
+
+.opt1-price-row {
+  margin: 16px 0;
+  padding: 12px 14px;
+  background: #fbfbfd;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.opt1-price-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+.opt1-price-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.opt1-price-rate {
+  font-size: 11.5px;
+  color: #d97706;
+  font-weight: 700;
+}
+
+.opt1-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.opt1-spec-box {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.opt1-spec-lbl {
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.opt1-spec-val {
+  font-size: 13.5px;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.opt1-buyer-ribbon {
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #854d0e;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.opt1-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid #f1f5f9;
+}
+.opt1-btn-quote {
+  flex: 1;
+  background: #0f172a;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.opt1-btn-quote:hover {
+  background: #d97706;
+}
+.opt1-btn-action {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  padding: 9px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.2s;
+}
+.opt1-btn-action:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+/* ================================================================
+   OPTION 2: "ARCHITECTURAL ATELIER" (Swiss Precision & Sapphire Sky)
+   ================================================================ */
+.opt2-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 22px;
+  position: relative;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+.opt2-card:hover {
+  border-color: #0284c7;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(2, 132, 199, 0.1);
+}
+.opt2-status-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 14px 0 0 14px;
+}
+.opt2-status-line.available { background: #10b981; }
+.opt2-status-line.blocked { background: #f59e0b; }
+.opt2-status-line.sold { background: #475569; }
+
+.opt2-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-left: 6px;
+}
+.opt2-unit-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+.opt2-unit-tag {
+  background: #f0f9ff;
+  color: #0284c7;
+  border: 1px solid #bae6fd;
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+.opt2-badge-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  margin-left: 6px;
+}
+.opt2-badge-capsule.available {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.opt2-badge-capsule.blocked {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.opt2-badge-capsule.sold {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+.opt2-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.opt2-pulse.available { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.opt2-pulse.blocked { background: #f59e0b; }
+.opt2-pulse.sold { background: #64748b; }
+
+.opt2-price-hero {
+  margin-left: 6px;
+  margin-bottom: 14px;
+}
+.opt2-price-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0284c7;
+  letter-spacing: -0.5px;
+}
+.opt2-price-loc {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.opt2-specs-table {
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  margin-left: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.opt2-spec-col {
+  display: flex;
+  flex-direction: column;
+}
+.opt2-spec-col span {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.opt2-spec-col strong {
+  font-size: 13.5px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.opt2-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  margin-left: 6px;
+}
+.opt2-btn-primary {
+  flex: 1;
+  background: #0284c7;
+  color: #fff;
+  border: none;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.opt2-btn-primary:hover {
+  background: #0369a1;
+}
+.opt2-btn-secondary {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ================================================================
+   OPTION 3: "EXECUTIVE GLASSMORPHIC" (Obsidian & Metallic Frost)
+   ================================================================ */
+.opt3-card {
+  background: linear-gradient(145deg, #0d1527 0%, #070c18 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+.opt3-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 20px 40px rgba(2, 132, 199, 0.25);
+}
+.opt3-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 10%, rgba(56, 189, 248, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.opt3-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+}
+.opt3-unit-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+.opt3-unit-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.opt3-badge-neon {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.opt3-badge-neon.available {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+.opt3-badge-neon.blocked {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+}
+.opt3-badge-neon.sold {
+  background: rgba(100, 116, 139, 0.25);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.opt3-price-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  position: relative;
+  z-index: 2;
+}
+.opt3-price-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: #38bdf8;
+}
+.opt3-price-rate {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.opt3-spec-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 2;
+}
+.opt3-spec-row:last-child {
+  border-bottom: none;
+  margin-bottom: 18px;
+}
+.opt3-spec-row strong {
+  color: #fff;
+}
+
+.opt3-actions {
+  display: flex;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+}
+.opt3-btn-quote {
+  flex: 1;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+  transition: all 0.2s;
+}
+.opt3-btn-quote:hover {
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
+  transform: translateY(-1px);
+}
+.opt3-btn-action {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ─── COMPARISON SUMMARY TABLE ─── */
+.comparison-table-wrap {
+  margin-top: 50px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+.comparison-table-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.comp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+}
+.comp-table th, .comp-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
+}
+.comp-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<header class="demo-header">
+  <div style="width:min(1280px,94%); margin:auto;">
+    <span class="demo-badge">Design Evaluation Lab</span>
+    <h1 class="demo-h1">Unit Inventory Luxury Redesign Showcase</h1>
+    <p class="demo-sub">Compare 3 distinct luxury design directions crafted to replace cheap emoji dots and cluttered buttons with high-prestige real estate inventory architecture.</p>
+  </div>
+</header>
+
+<!-- TOP SWITCHER -->
+<div class="option-tabs-wrap">
+  <div class="option-tabs">
+    <button class="opt-tab active" onclick="switchDesign('opt1', this)">
+      <span>👑 Option 1: Mayfair Heritage (Ivory & Gold)</span>
+    </button>
+    <button class="opt-tab" onclick="switchDesign('opt2', this)">
+      <span>📐 Option 2: Architectural Atelier (Swiss Sapphire)</span>
+    </button>
+    <button class="opt-tab" onclick="switchDesign('opt3', this)">
+      <span>💎 Option 3: Executive Obsidian (Dark Luxury)</span>
+    </button>
+  </div>
+  <div style="display:flex; gap:12px; align-items:center;">
+    <a href="admin.html" style="font-size:13px; font-weight:700; color:#0284c7; text-decoration:none;">← Return to Admin CRM</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ==================== OPTION 1 ==================== -->
+  <section id="opt1" class="design-section active">
+    <div class="design-meta-card">
+      <div>
+        <div class="design-meta-title">Option 1: "Mayfair Heritage" — Private Office & Cognac Gold</div>
+        <div class="design-meta-desc">Inspired by London & Geneva private wealth brokerages (Sotheby's / Knight Frank). Uses subtle gold keylines, bespoke serif typography for unit numbers, and warm champagne luxury badges.</div>
+      </div>
+      <span style="background:#fef3c7; color:#92400e; font-weight:800; font-size:11px; padding:6px 14px; border-radius:9999px; border:1px solid #fde68a;">BEST FOR: ULTRA-LUXURY RESIDENTIAL & HERITAGE INVESTORS</span>
+    </div>
+
+    <div class="cards-grid">
+      <!-- 1. Available Unit -->
+      <div class="opt1-card">
+        <div class="opt1-head">
+          <div>
+            <div class="opt1-unit-title">Shop G-01</div>
+            <div class="opt1-unit-sub">Ground High-Street Retail • Floor 0</div>
+          </div>
+          <span class="opt1-badge available">✨ OPEN ALLOTMENT</span>
+        </div>
+
+        <div class="opt1-price-row">
+          <div>
+            <div class="opt1-price-label">Quotation Guide</div>
+            <div class="opt1-price-val">₹ 35.00 Lakh</div>
+          </div>
+          <div class="opt1-price-rate">₹ 9,589 / sq.ft</div>
+        </div>
+
+        <div class="opt1-spec-grid">
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Carpet Area</div>
+            <div class="opt1-spec-val">365 sq.ft</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Orientation</div>
+            <div class="opt1-spec-val">18m Road Facing</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Project Landmark</div>
+            <div class="opt1-spec-val">DS 208 (Vastral)</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">RERA Verification</div>
+            <div class="opt1-spec-val">Approved ✓</div>
+          </div>
+        </div>
+
+        <div class="opt1-actions">
+          <button class="opt1-btn-quote" onclick="alert('Demo: Launches official branded cost sheet calculator for Shop G-01')">📄 Cost Sheet & Quote</button>
+          <button class="opt1-btn-action" onclick="alert('Demo: Places unit under client hold')">Reserve</button>
+          <button class="opt1-btn-action" title="More Actions">⋯</button>
+        </div>
+      </div>
+
+      <!-- 2. Blocked / Reserved Unit -->
+      <div class="opt1-card" style="border-color:#fde68a;">
+        <div class="opt1-head">
+          <div>
+            <div class="opt1-unit-title">Shop G-02</div>
+            <div class="opt1-unit-sub">Prime Corner Commercial • Floor 0</div>
+          </div>
+          <span class="opt1-badge blocked">⏳ UNDER RESERVATION</span>
+        </div>
+
+        <div class="opt1-buyer-ribbon">
+          <span>👤 Hold for: <strong>Rajesh Shah</strong> (+91 98250 12345)</span>
+        </div>
+
+        <div class="opt1-price-row">
+          <div>
+            <div class="opt1-price-label">Reserved Value</div>
+            <div class="opt1-price-val">₹ 42.00 Lakh</div>
+          </div>
+          <div class="opt1-price-rate">₹ 9,333 / sq.ft</div>
+        </div>
+
+        <div class="opt1-spec-grid">
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Carpet Area</div>
+            <div class="opt1-spec-val">450 sq.ft</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Orientation</div>
+            <div class="opt1-spec-val">Corner High-Street</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Project Landmark</div>
+            <div class="opt1-spec-val">DS 208 (Vastral)</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Token Status</div>
+            <div class="opt1-spec-val">Token Pending</div>
+          </div>
+        </div>
+
+        <div class="opt1-actions">
+          <button class="opt1-btn-quote" onclick="alert('Demo: Launches official branded cost sheet calculator')">📄 Cost Sheet & Quote</button>
+          <button class="opt1-btn-action" style="background:#fee2e2; color:#991b1b; border-color:#fecaca;" onclick="alert('Demo: Marks as sold')">Mark Sold</button>
+          <button class="opt1-btn-action" style="background:#d1fae5; color:#065f46; border-color:#a7f3d0;" onclick="alert('Demo: Releases hold')">Release</button>
+        </div>
+      </div>
+
+      <!-- 3. Sold / Allotted Unit -->
+      <div class="opt1-card" style="background:#fafafa; border-color:#cbd5e1; opacity:0.92;">
+        <div class="opt1-head">
+          <div>
+            <div class="opt1-unit-title" style="color:#64748b;">Block A - 101</div>
+            <div class="opt1-unit-sub">3 BHK Luxury Suite • Tower A • Floor 1</div>
+          </div>
+          <span class="opt1-badge sold">✦ ACQUIRED / CLOSED</span>
+        </div>
+
+        <div class="opt1-buyer-ribbon" style="background:#f1f5f9; border-color:#e2e8f0; color:#334155;">
+          <span>👑 Allotted to: <strong>Dr. Amit Patel</strong> (Deal Finalized)</span>
+        </div>
+
+        <div class="opt1-price-row" style="background:#f1f5f9;">
+          <div>
+            <div class="opt1-price-label">Agreement Value</div>
+            <div class="opt1-price-val" style="color:#475569;">₹ 54.50 Lakh</div>
+          </div>
+          <div class="opt1-price-rate" style="color:#64748b;">Closed ✓</div>
+        </div>
+
+        <div class="opt1-spec-grid">
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Carpet Area</div>
+            <div class="opt1-spec-val">1,180 sq.ft</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Vaastu</div>
+            <div class="opt1-spec-val">East Facing</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Allotment Date</div>
+            <div class="opt1-spec-val">Sept 2026</div>
+          </div>
+          <div class="opt1-spec-box">
+            <div class="opt1-spec-lbl">Registry</div>
+            <div class="opt1-spec-val">In Progress</div>
+          </div>
+        </div>
+
+        <div class="opt1-actions">
+          <button class="opt1-btn-quote" style="background:#475569;" onclick="alert('Demo: Generates finalized ledger & receipt')">📄 View Agreement Ledger</button>
+          <button class="opt1-btn-action" title="More Actions">⋯</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== OPTION 2 ==================== -->
+  <section id="opt2" class="design-section">
+    <div class="design-meta-card">
+      <div>
+        <div class="design-meta-title">Option 2: "Architectural Atelier" — Swiss Precision & Sapphire</div>
+        <div class="design-meta-desc">Inspired by Swiss architectural blueprints and modern high-end developer dashboards. Clean hairline status indicators, crisp technical spec matrix, and prominent quick-action geometry.</div>
+      </div>
+      <span style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:11px; padding:6px 14px; border-radius:9999px; border:1px solid #bae6fd;">BEST FOR: HIGH-VOLUME SALES TEAMS & ARCHITECTURAL CLARITY</span>
+    </div>
+
+    <div class="cards-grid">
+      <!-- 1. Available Unit -->
+      <div class="opt2-card">
+        <div class="opt2-status-line available"></div>
+        <div class="opt2-head">
+          <div class="opt2-unit-title">Shop G-01</div>
+          <span class="opt2-unit-tag">RETAIL PROMENADE</span>
+        </div>
+
+        <div class="opt2-badge-capsule available">
+          <span class="opt2-pulse available"></span>
+          <span>AVAILABLE FOR ALLOTMENT</span>
+        </div>
+
+        <div class="opt2-price-hero">
+          <div class="opt2-price-num">₹ 35,00,000</div>
+          <div class="opt2-price-loc">DS 208 · S.P. Ring Road Vastral · Ground Level</div>
+        </div>
+
+        <div class="opt2-specs-table">
+          <div class="opt2-spec-col">
+            <span>Carpet</span>
+            <strong>365 sq.ft</strong>
+          </div>
+          <div class="opt2-spec-col">
+            <span>Built-up</span>
+            <strong>480 sq.ft</strong>
+          </div>
+          <div class="opt2-spec-col">
+            <span>Frontage</span>
+            <strong>18m Main Road</strong>
+          </div>
+        </div>
+
+        <div class="opt2-actions">
+          <button class="opt2-btn-primary" onclick="alert('Demo: Opens Cost Sheet')">📄 Generate Quote</button>
+          <button class="opt2-btn-secondary" onclick="alert('Demo: Hold Unit')">Hold</button>
+          <button class="opt2-btn-secondary" onclick="alert('Demo: Edit')">Edit</button>
+        </div>
+      </div>
+
+      <!-- 2. Blocked Unit -->
+      <div class="opt2-card">
+        <div class="opt2-status-line blocked"></div>
+        <div class="opt2-head">
+          <div class="opt2-unit-title">Shop G-02</div>
+          <span class="opt2-unit-tag" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">CORNER HIGH-STREET</span>
+        </div>
+
+        <div class="opt2-badge-capsule blocked">
+          <span class="opt2-pulse blocked"></span>
+          <span>RESERVED · RAJESH SHAH</span>
+        </div>
+
+        <div class="opt2-price-hero">
+          <div class="opt2-price-num" style="color:#d97706;">₹ 42,00,000</div>
+          <div class="opt2-price-loc">DS 208 · Hold valid for 48 Hours</div>
+        </div>
+
+        <div class="opt2-specs-table">
+          <div class="opt2-spec-col">
+            <span>Carpet</span>
+            <strong>450 sq.ft</strong>
+          </div>
+          <div class="opt2-spec-col">
+            <span>Built-up</span>
+            <strong>590 sq.ft</strong>
+          </div>
+          <div class="opt2-spec-col">
+            <span>Type</span>
+            <strong>Corner Suite</strong>
+          </div>
+        </div>
+
+        <div class="opt2-actions">
+          <button class="opt2-btn-primary" style="background:#0f172a;" onclick="alert('Demo: Opens Cost Sheet')">📄 View Quote</button>
+          <button class="opt2-btn-secondary" style="background:#fee2e2; color:#991b1b;" onclick="alert('Demo: Mark Sold')">Sold</button>
+          <button class="opt2-btn-secondary" style="background:#d1fae5; color:#065f46;" onclick="alert('Demo: Release')">Release</button>
+        </div>
+      </div>
+
+      <!-- 3. Sold Unit -->
+      <div class="opt2-card" style="background:#f8fafc; opacity:0.9;">
+        <div class="opt2-status-line sold"></div>
+        <div class="opt2-head">
+          <div class="opt2-unit-title" style="color:#64748b;">Block A - 101</div>
+          <span class="opt2-unit-tag" style="background:#e2e8f0; color:#475569; border-color:#cbd5e1;">RESIDENTIAL</span>
+        </div>
+
+        <div class="opt2-badge-capsule sold">
+          <span class="opt2-pulse sold"></span>
+          <span>DEED EXECUTED · DR. AMIT PATEL</span>
+        </div>
+
+        <div class="opt2-price-hero">
+          <div class="opt2-price-num" style="color:#475569;">₹ 54,50,000</div>
+          <div class="opt2-price-loc">DS 208 · Tower A · Booked & Registered</div>
+        </div>
+
+        <div class="opt2-specs-table">
+          <div class="opt2-spec-col">
+            <span>Carpet</span>
+            <strong>1,180 sq.ft</strong>
+          </div>
+          <div class="opt2-spec-col">
+            <span>Balconies</span>
+            <strong>2 Terraces</strong>
+          </div>
+          <div class="opt2-spec-col">
+            <span>Status</span>
+            <strong>Booked</strong>
+          </div>
+        </div>
+
+        <div class="opt2-actions">
+          <button class="opt2-btn-primary" style="background:#475569;" onclick="alert('Demo: Booking Sheet')">📄 Booking Ledger</button>
+          <button class="opt2-btn-secondary" onclick="alert('Demo: View Buyer')">Buyer File</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== OPTION 3 ==================== -->
+  <section id="opt3" class="design-section">
+    <div class="design-meta-card">
+      <div>
+        <div class="design-meta-title">Option 3: "Executive Obsidian" — Dark Room Luxury & Holographic Accents</div>
+        <div class="design-meta-desc">Inspired by high-frequency Dubai & Singapore real estate trading desks. Deep midnight surfaces, frosted glass capsules, glowing emerald/amber telemetry, and luxury lighting effects.</div>
+      </div>
+      <span style="background:#0f172a; color:#38bdf8; font-weight:800; font-size:11px; padding:6px 14px; border-radius:9999px; border:1px solid #38bdf8;">BEST FOR: HIGH-TECH EXECUTIVE BOARDROOMS & INVESTOR PRESENTATIONS</span>
+    </div>
+
+    <div class="cards-grid">
+      <!-- 1. Available Unit -->
+      <div class="opt3-card">
+        <div class="opt3-head">
+          <div>
+            <div class="opt3-unit-title">Shop G-01</div>
+            <div class="opt3-unit-sub">Commercial High-Street Retail • Floor 0</div>
+          </div>
+          <span class="opt3-badge-neon available">● ACTIVE INVENTORY</span>
+        </div>
+
+        <div class="opt3-price-box">
+          <div>
+            <span style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; font-weight:700;">Base Valuation</span>
+            <div class="opt3-price-val">₹ 35,00,000</div>
+          </div>
+          <div class="opt3-price-rate">₹ 9,589 / sq.ft</div>
+        </div>
+
+        <div class="opt3-spec-row">
+          <span>Usable Carpet Area</span>
+          <strong>365 sq.ft</strong>
+        </div>
+        <div class="opt3-spec-row">
+          <span>Arterial Corridor</span>
+          <strong>18m Main Boulevard</strong>
+        </div>
+        <div class="opt3-spec-row">
+          <span>Allotment Priority</span>
+          <strong style="color:#34d399;">Immediate Release</strong>
+        </div>
+
+        <div class="opt3-actions">
+          <button class="opt3-btn-quote" onclick="alert('Demo: Generates Cost Sheet')">⚡ Instant Quotation</button>
+          <button class="opt3-btn-action" onclick="alert('Demo: Reserve')">Reserve</button>
+          <button class="opt3-btn-action">⋯</button>
+        </div>
+      </div>
+
+      <!-- 2. Blocked Unit -->
+      <div class="opt3-card">
+        <div class="opt3-head">
+          <div>
+            <div class="opt3-unit-title">Shop G-02</div>
+            <div class="opt3-unit-sub">Corner Flagship Retail • Floor 0</div>
+          </div>
+          <span class="opt3-badge-neon blocked">⏳ UNDER RESERVATION</span>
+        </div>
+
+        <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.25); border-radius:10px; padding:10px 14px; font-size:12px; color:#fde68a; margin-bottom:14px; position:relative; z-index:2;">
+          🔒 Client Hold: <strong>Rajesh Shah</strong> (+91 98250 12345)
+        </div>
+
+        <div class="opt3-price-box">
+          <div>
+            <span style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; font-weight:700;">Locked Price</span>
+            <div class="opt3-price-val" style="color:#fbbf24;">₹ 42,00,000</div>
+          </div>
+          <div class="opt3-price-rate">₹ 9,333 / sq.ft</div>
+        </div>
+
+        <div class="opt3-spec-row">
+          <span>Usable Carpet Area</span>
+          <strong>450 sq.ft</strong>
+        </div>
+        <div class="opt3-spec-row">
+          <span>Hold Expiry</span>
+          <strong>48 Hours (Auto-Release)</strong>
+        </div>
+
+        <div class="opt3-actions">
+          <button class="opt3-btn-quote" style="background:#f59e0b; border-color:#fbbf24; color:#0f172a;" onclick="alert('Demo: Finalize Token')">Mark Sold</button>
+          <button class="opt3-btn-action" onclick="alert('Demo: Release')">Release</button>
+        </div>
+      </div>
+
+      <!-- 3. Sold Unit -->
+      <div class="opt3-card" style="opacity:0.75;">
+        <div class="opt3-head">
+          <div>
+            <div class="opt3-unit-title" style="color:#94a3b8;">Block A - 101</div>
+            <div class="opt3-unit-sub">3 BHK Grand Residence • Tower A</div>
+          </div>
+          <span class="opt3-badge-neon sold">🔒 TRANSACTION CLOSED</span>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:10px 14px; font-size:12px; color:#cbd5e1; margin-bottom:14px; position:relative; z-index:2;">
+          👑 Purchaser: <strong>Dr. Amit Patel</strong> (Fully Booked)
+        </div>
+
+        <div class="opt3-price-box">
+          <div>
+            <span style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; font-weight:700;">Sale Agreement</span>
+            <div class="opt3-price-val" style="color:#94a3b8;">₹ 54,50,000</div>
+          </div>
+          <div class="opt3-price-rate">Settled</div>
+        </div>
+
+        <div class="opt3-spec-row">
+          <span>Carpet Area</span>
+          <strong>1,180 sq.ft</strong>
+        </div>
+        <div class="opt3-spec-row">
+          <span>Status</span>
+          <strong>Registry Allotted</strong>
+        </div>
+
+        <div class="opt3-actions">
+          <button class="opt3-btn-quote" style="background:rgba(255,255,255,0.1);" onclick="alert('Demo: View Agreement')">📄 Customer Ledger</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== EXECUTIVE COMPARISON TABLE ==================== -->
+  <div class="comparison-table-wrap">
+    <div class="comparison-table-title">Executive Design Comparison Matrix</div>
+    <p style="font-size:14px; color:var(--ink-secondary);">Review the strengths and aesthetic personality of each direction before picking your team's standard:</p>
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Design Direction</th>
+          <th>Status Badge Style</th>
+          <th>Color Palette</th>
+          <th>Best Fit For</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Option 1: Mayfair Heritage</strong></td>
+          <td>Warm Ivory & Cognac Gold capsules with luxury serifs</td>
+          <td>Champagne Gold (#d97706), Soft Ivory, Deep Slate (#0f172a)</td>
+          <td>Ultra-luxury residential villas, high-net-worth investors, executive prestige</td>
+        </tr>
+        <tr>
+          <td><strong>Option 2: Architectural Atelier</strong></td>
+          <td>Swiss precision hairline lines & sapphire badges</td>
+          <td>Sapphire Sky (#0284c7), Pure White, Crisp Emerald (#10b981)</td>
+          <td>High-speed sales advisors, commercial showrooms, architectural clarity</td>
+        </tr>
+        <tr>
+          <td><strong>Option 3: Executive Obsidian</strong></td>
+          <td>Frosted glass neon capsules & midnight gradients</td>
+          <td>Midnight Navy (#0a1128), Cyan Glow (#38bdf8), Carbon</td>
+          <td>Modern command centers, boardroom presentations, high-tech fintech look</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function switchDesign(optId, btn) {
+  document.querySelectorAll('.design-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.opt-tab').forEach(b => b.classList.remove('active'));
+  
+  const target = document.getElementById(optId);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>
