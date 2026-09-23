@@ -29,6 +29,7 @@ const os=require("os");
 const crypto=require("crypto");
 const Database=require("./scripts/sqlite-compat");
 const { buildPdf }=require("./scripts/pdf-brochure");
+const { buildAllotmentPdf }=require("./scripts/pdf-allotment");
 
 const app=express();
 const PORT=Number(process.env.PORT||5000);
@@ -609,14 +610,15 @@ function currentEmployee(userId){
   }
   return emp;
 }
-function dispatchNotification({ type, name, phone, project, details }){
+function dispatchNotification({ type, name, phone, email, project, details }){
   const cleanPhone = (phone || "").replace(/[^0-9]/g, "");
-  const adminPhone = (process.env.ADMIN_WHATSAPP_PHONE || "919876543210").replace(/[^0-9]/g, "");
+  const adminPhone = (process.env.ADMIN_WHATSAPP_PHONE || "916352000017").replace(/[^0-9]/g, "");
   const payload = {
     service: "Laxminarayan Group",
     type: type || "Enquiry",
     name,
     phone: cleanPhone,
+    email: email || "",
     project: project || "General",
     details: details || "",
     timestamp: new Date().toISOString(),
@@ -633,6 +635,56 @@ function dispatchNotification({ type, name, phone, project, details }){
     } catch (_) {}
   }
 
+  // ─── INSTANT ADMIN EMAIL NOTIFICATION (REAL-TIME ALERT) ───
+  try {
+    const transporter = getMailTransporter();
+    if (transporter) {
+      const adminEmail = process.env.ADMIN_EMAIL || "msinfraprojects2021@gmail.com";
+      const fromAddress = process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER || "msinfraprojects2021@gmail.com"}>`;
+      const leadTypeBadge = (type || "Enquiry").toUpperCase().replace(/_/g, " ");
+      const subject = `🚨 [NEW VIP LEAD] ${name} (${leadTypeBadge}) — Laxminarayan Group`;
+
+      const html = `
+        <div style="font-family:'Segoe UI',Roboto,Helvetica,sans-serif; max-width:600px; margin:0 auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
+          <div style="background:linear-gradient(135deg, #0a1128 0%, #0369a1 100%); padding:24px 28px; color:#ffffff;">
+            <div style="font-size:11px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:#38bdf8; margin-bottom:6px;">Laxminarayan Group • Sales Advisory Alert</div>
+            <h2 style="margin:0; font-size:22px; font-weight:700;">New Real Estate Lead Captured</h2>
+          </div>
+          <div style="padding:28px;">
+            <table style="width:100%; border-collapse:collapse; font-size:14px; margin-bottom:24px;">
+              <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0; color:#64748b; width:130px; font-weight:600;">Client Name:</td><td style="padding:10px 0; color:#0f172a; font-weight:700;">${name}</td></tr>
+              <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0; color:#64748b; font-weight:600;">Phone Number:</td><td style="padding:10px 0; color:#0f172a; font-weight:700;"><a href="tel:+91${cleanPhone.slice(-10)}" style="color:#0284c7; text-decoration:none;">+91 ${cleanPhone.slice(-10)}</a></td></tr>
+              ${email ? `<tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0; color:#64748b; font-weight:600;">Email:</td><td style="padding:10px 0; color:#0f172a;"><a href="mailto:${email}" style="color:#0284c7; text-decoration:none;">${email}</a></td></tr>` : ''}
+              <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0; color:#64748b; font-weight:600;">Project / Site:</td><td style="padding:10px 0; color:#0f172a; font-weight:700;">${project || "General Portfolio"}</td></tr>
+              <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0; color:#64748b; font-weight:600;">Lead Type:</td><td style="padding:10px 0;"><span style="background:#e0f2fe; color:#0369a1; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700;">${leadTypeBadge}</span></td></tr>
+              ${details ? `<tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:10px 0; color:#64748b; font-weight:600;">Message / Notes:</td><td style="padding:10px 0; color:#334155; line-height:1.5;">${details}</td></tr>` : ''}
+              <tr><td style="padding:10px 0; color:#64748b; font-weight:600;">Time (IST):</td><td style="padding:10px 0; color:#64748b; font-size:13px;">${nowIST()}</td></tr>
+            </table>
+
+            <div style="text-align:center; margin-top:20px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+              <a href="https://wa.me/91${cleanPhone.slice(-10)}" target="_blank" style="display:inline-block; background:#25D366; color:#ffffff; padding:12px 24px; border-radius:9999px; font-weight:700; text-decoration:none; font-size:13.5px; box-shadow:0 4px 14px rgba(37,211,102,0.35);">
+                💬 Open WhatsApp Chat
+              </a>
+              <a href="tel:+91${cleanPhone.slice(-10)}" style="display:inline-block; background:#0284c7; color:#ffffff; padding:12px 24px; border-radius:9999px; font-weight:700; text-decoration:none; font-size:13.5px; box-shadow:0 4px 14px rgba(2,132,199,0.35);">
+                📞 Call Client Now
+              </a>
+            </div>
+          </div>
+          <div style="background:#f8fafc; padding:14px 28px; font-size:11px; color:#94a3b8; text-align:center; border-top:1px solid #e2e8f0;">
+            Laxminarayan Group CRM Automation • Instant Real-Time Alert
+          </div>
+        </div>
+      `;
+
+      transporter.sendMail({
+        from: fromAddress,
+        to: adminEmail,
+        subject,
+        html
+      }).catch(err => console.warn("[ADMIN LEAD EMAIL FAILED]", err.message));
+    }
+  } catch (_e) {}
+
   const buyerGreeting = `Hello ${name}, thank you for your interest in Laxminarayan Group (${project || "our projects"}). Our senior sales advisory team is at your service. Would you like to schedule a private site visit or view our floor plans?`;
   const buyerWhatsappUrl = cleanPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(buyerGreeting)}` : null;
 
@@ -648,6 +700,104 @@ function dispatchNotification({ type, name, phone, project, details }){
 
   return { payload, buyerWhatsappUrl, adminWhatsappUrl, whatsappUrl: buyerWhatsappUrl };
 }
+
+// ─── DAILY 8:00 PM CRM LEAD DIGEST AUTOMATION ───
+let lastDigestSentDate = "";
+async function sendDailyLeadDigestEmail() {
+  const todayDate = todayIST();
+  if (lastDigestSentDate === todayDate) return;
+
+  try {
+    const transporter = getMailTransporter();
+    if (!transporter) return;
+
+    const leadsCount = db.prepare("SELECT COUNT(*) c FROM leads WHERE DATE(created_at)=?").get(todayDate)?.c || 0;
+    const enquiriesCount = db.prepare("SELECT COUNT(*) c FROM enquiries WHERE DATE(created_at)=?").get(todayDate)?.c || 0;
+    const visitsCount = db.prepare("SELECT COUNT(*) c FROM site_visits WHERE DATE(created_at)=?").get(todayDate)?.c || 0;
+    const leadsList = db.prepare("SELECT name, phone, source, created_at FROM leads WHERE DATE(created_at)=? ORDER BY id DESC LIMIT 15").all(todayDate);
+
+    const adminEmail = process.env.ADMIN_EMAIL || "msinfraprojects2021@gmail.com";
+    const fromAddress = process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER || "msinfraprojects2021@gmail.com"}>`;
+    const subject = `📊 [Daily CRM Digest] ${todayDate} — ${leadsCount} New Leads | Laxminarayan Group`;
+
+    const rowsHtml = leadsList.map(l => `
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:10px 8px; font-weight:700; color:#0f172a;">${l.name}</td>
+        <td style="padding:10px 8px; color:#0284c7;"><a href="https://wa.me/91${(l.phone||'').replace(/[^0-9]/g,'').slice(-10)}" style="color:#0284c7; text-decoration:none;">${l.phone}</a></td>
+        <td style="padding:10px 8px;"><span style="background:#e0f2fe; color:#0369a1; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:600;">${l.source}</span></td>
+      </tr>
+    `).join('') || `<tr><td colspan="3" style="padding:14px; text-align:center; color:#94a3b8;">No new leads registered today.</td></tr>`;
+
+    const html = `
+      <div style="font-family:'Segoe UI',Roboto,Helvetica,sans-serif; max-width:620px; margin:0 auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
+        <div style="background:linear-gradient(135deg, #0a1128 0%, #0369a1 100%); padding:24px 28px; color:#ffffff;">
+          <div style="font-size:11px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:#38bdf8; margin-bottom:4px;">Executive Daily Digest</div>
+          <h2 style="margin:0; font-size:22px; font-weight:700;">Laxminarayan Group CRM Summary</h2>
+          <div style="font-size:13px; color:#bae6fd; margin-top:4px;">Date: ${todayDate} (IST)</div>
+        </div>
+        <div style="padding:24px 28px;">
+          <div style="display:flex; gap:12px; margin-bottom:24px;">
+            <div style="flex:1; background:#f0fdf4; border:1px solid #bbf7d0; padding:14px; border-radius:8px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:#15803d; text-transform:uppercase;">New Leads</div>
+              <div style="font-size:24px; font-weight:800; color:#166534;">${leadsCount}</div>
+            </div>
+            <div style="flex:1; background:#eff6ff; border:1px solid #bfdbfe; padding:14px; border-radius:8px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:#1d4ed8; text-transform:uppercase;">Inquiries</div>
+              <div style="font-size:24px; font-weight:800; color:#1e40af;">${enquiriesCount}</div>
+            </div>
+            <div style="flex:1; background:#fffbeb; border:1px solid #fde68a; padding:14px; border-radius:8px; text-align:center;">
+              <div style="font-size:11px; font-weight:700; color:#b45309; text-transform:uppercase;">Site Visits</div>
+              <div style="font-size:24px; font-weight:800; color:#92400e;">${visitsCount}</div>
+            </div>
+          </div>
+
+          <h3 style="font-size:15px; color:#0f172a; margin-bottom:12px;">Today's Registered Leads</h3>
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+              <tr style="border-bottom:2px solid #e2e8f0; text-align:left; color:#64748b; font-size:11px; text-transform:uppercase;">
+                <th style="padding:8px;">Client</th>
+                <th style="padding:8px;">Phone</th>
+                <th style="padding:8px;">Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div style="text-align:center; margin-top:28px;">
+            <a href="https://laxminarayangroup.com/admin.html" target="_blank" style="display:inline-block; background:#0284c7; color:#ffffff; padding:12px 28px; border-radius:9999px; font-weight:700; text-decoration:none; font-size:13.5px;">
+              Open Admin CRM Dashboard →
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: fromAddress,
+      to: adminEmail,
+      subject,
+      html
+    });
+
+    lastDigestSentDate = todayDate;
+    console.log(`[DAILY CRM DIGEST] Successfully sent report for ${todayDate} to ${adminEmail}`);
+  } catch (err) {
+    console.warn("[DAILY CRM DIGEST ERROR]", err.message);
+  }
+}
+
+// Check every 10 minutes; automatically triggers when 20:00 (8:00 PM IST) arrives
+setInterval(() => {
+  try {
+    const timeStr = nowIST();
+    const hour = parseInt(timeStr.split(" ")[1]?.split(":")[0] || "0", 10);
+    if (hour >= 20 && lastDigestSentDate !== todayIST()) {
+      sendDailyLeadDigestEmail();
+    }
+  } catch (_) {}
+}, 10 * 60 * 1000);
 function currentUser(id){return db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users WHERE id=?").get(id)}
 function rndRef(){return Math.floor(100+Math.random()*900)}
 
@@ -702,7 +852,7 @@ createRollingBackup();
 
 app.get("/api/projects/:id",(req,res)=>{
   const id=Number(req.params.id); if(!Number.isInteger(id)||id<1)return res.status(400).json({success:false,error:"Invalid project id"});
-  const p=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=? AND status='active'").get(id);
+  const p=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=? AND status IN ('active','completed','sold_out')").get(id);
   if(!p)return res.status(404).json({success:false,error:"Project not found"});
   res.json({success:true,data:p,media:mediaRows(id)});
 });
@@ -719,7 +869,7 @@ app.post("/api/projects/:id/brochure",rateLimit(15,10*60*1000),(req,res)=>{
   if(!validPhone(phone))return res.status(400).json({success:false,error:"Enter a valid phone number"});
   if(email && !validEmail(email))return res.status(400).json({success:false,error:"Enter a valid email"});
 
-  const project=db.prepare("SELECT * FROM projects WHERE id=? AND status='active'").get(projectId);
+  const project=db.prepare("SELECT * FROM projects WHERE id=? AND status IN ('active','completed','sold_out')").get(projectId);
   if(!project)return res.status(404).json({success:false,error:"Project not found"});
 
   const cleanPhone=phone.replace(/[^0-9]/g,"");
@@ -787,8 +937,34 @@ app.post("/api/site-visits",auth,rateLimit(8,10*60*1000),(req,res)=>{
   const enquiry=db.prepare("SELECT id FROM enquiries WHERE user_id=? AND project_id=? ORDER BY id DESC LIMIT 1").get(req.user.id,projectId);
   const r=db.prepare("INSERT INTO site_visits(user_id,project_id,enquiry_id,name,phone,email,preferred_at,status,notes) VALUES(?,?,?,?,?,?,?,?,?)").run(req.user.id,projectId,enquiry?.id||null,u.name,u.phone||"",u.email||"",dt.toISOString(),"requested",notes);
   audit(req,"create","site_visit",r.lastInsertRowid,project.name);
-  dispatchNotification({type:"site_visit",name:u.name,phone:u.phone,project:project.name,details:`Visit scheduled for ${preferred}`});
+  dispatchNotification({type:"site_visit",name:u.name,phone:u.phone,email:u.email,project:project.name,details:`Visit scheduled for ${preferred}`});
+
+  // Automated Client Confirmation Email
+  if (u.email) {
+    sendSiteVisitConfirmationEmail({ name: u.name, email: u.email, phone: u.phone, project: project.name, preferred_at: dt.toISOString(), notes }).catch(e => console.warn("[AUTO VISIT EMAIL ERROR]", e.message));
+  }
+  // Automated WhatsApp Site Visit Notification
+  if (u.phone) {
+    const formattedDate = dt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "medium", timeStyle: "short" });
+    const visitWa = `🗓️ *SITE VISIT CONFIRMED — LAXMINARAYAN GROUP*\n\n` +
+      `Dear ${u.name},\n` +
+      `Your private site tour for *${project.name}* is confirmed for *${formattedDate}* (IST).\n\n` +
+      `Our hospitality lounge will welcome you on arrival. Complimentary valet parking is provided.\n` +
+      `Direct Advisory Desk: +91 63520 00017`;
+    sendWhatsAppCloudMessage({ to: u.phone, text: visitWa }).catch(e => console.warn("[AUTO VISIT WA ERROR]", e.message));
+  }
+
   res.status(201).json({success:true,data:db.prepare("SELECT v.*,p.name AS project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE v.id=?").get(r.lastInsertRowid)});
+});
+
+app.post("/api/admin/trigger-daily-digest", admin, async (req, res) => {
+  try {
+    lastDigestSentDate = ""; // reset to force generation
+    await sendDailyLeadDigestEmail();
+    res.json({ success: true, message: "Daily CRM lead digest sent to admin email successfully." });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 // ---------------- Production CRM administration ----------------
@@ -1036,7 +1212,31 @@ app.post("/api/admin/bookings",admin,(req,res)=>{
   });
   const bookingId=tx();
   audit(req,"create","booking",bookingId,`${bookingRef} · ${customerName} · ${allottedUnit}`);
-  res.status(201).json({success:true,data:db.prepare("SELECT b.*,p.name AS project_name FROM bookings b LEFT JOIN projects p ON p.id=b.project_id WHERE b.id=?").get(bookingId)});
+  const createdRecord = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type
+    FROM bookings b
+    LEFT JOIN projects p ON p.id = b.project_id
+    LEFT JOIN project_units pu ON pu.id = b.unit_id
+    WHERE b.id = ?`).get(bookingId);
+
+  // Automated Real Email Allotment Letter with PDF Attachment
+  if (customerEmail && createdRecord) {
+    sendBookingAllotmentEmail(createdRecord).catch(e => console.warn("[AUTO ALLOTMENT EMAIL ERROR]", e.message));
+  }
+
+  // Automated WhatsApp Booking Confirmation
+  if (customerPhone && createdRecord) {
+    const waText = `🎉 *BOOKING CONFIRMED — LAXMINARAYAN GROUP*\n\n` +
+      `Dear ${customerName},\n` +
+      `Your booking for *${createdRecord.project_name || 'Laxminarayan Project'}* is officially confirmed!\n\n` +
+      `📌 *Booking Ref:* ${bookingRef}\n` +
+      `🏢 *Unit Allotted:* ${allottedUnit || (createdRecord.unit_number ? 'Unit ' + createdRecord.unit_number : 'Reserved')}\n` +
+      `💰 *Token Advance:* ₹${tokenAmount || 'Received'}\n\n` +
+      `Your official signed PDF Allotment Letter has been issued. Welcome to the Laxminarayan Group family!\n\n` +
+      `Direct Advisory Desk: +91 63520 00017`;
+    sendWhatsAppCloudMessage({ to: customerPhone, text: waText }).catch(e => console.warn("[AUTO BOOKING WA ERROR]", e.message));
+  }
+
+  res.status(201).json({success:true,data:createdRecord});
 });
 
 app.put("/api/admin/bookings/:id",admin,(req,res)=>{
@@ -1070,6 +1270,212 @@ app.delete("/api/admin/bookings/:id",admin,(req,res)=>{
   res.json({success:true});
 });
 
+app.get("/api/admin/bookings/:id/allotment-letter", admin, (req, res) => {
+  const id = Number(req.params.id);
+  const booking = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type
+    FROM bookings b
+    LEFT JOIN projects p ON p.id = b.project_id
+    LEFT JOIN project_units pu ON pu.id = b.unit_id
+    WHERE b.id = ?`).get(id);
+  if (!booking) return res.status(404).json({ success: false, error: "Booking record not found" });
+
+  const pdfBuffer = buildAllotmentPdf(booking);
+  const safeRef = (booking.booking_reference || `BK_${id}`).replace(/[^a-zA-Z0-9_-]/g, "_");
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="Laxminarayan_Allotment_Letter_${safeRef}.pdf"`);
+  res.setHeader("Content-Length", pdfBuffer.length);
+  res.send(pdfBuffer);
+});
+
+// ─── SEND OFFICIAL ALLOTMENT LETTER & PDF ATTACHMENT VIA EMAIL ───
+app.post("/api/admin/bookings/:id/send-email", admin, async (req, res) => {
+  const id = Number(req.params.id);
+  const booking = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type
+    FROM bookings b
+    LEFT JOIN projects p ON p.id = b.project_id
+    LEFT JOIN project_units pu ON pu.id = b.unit_id
+    WHERE b.id = ?`).get(id);
+  if (!booking) return res.status(404).json({ success: false, error: "Booking record not found" });
+  if (!booking.customer_email) return res.status(400).json({ success: false, error: "No customer email address on this booking record" });
+
+  try {
+    const result = await sendBookingAllotmentEmail(booking);
+    if (result.sent) {
+      audit(req, "email_allotment", "booking", id, `Emailed PDF allotment letter to ${booking.customer_email}`);
+      return res.json({ success: true, message: `Official Allotment Letter & PDF successfully emailed to ${booking.customer_email}` });
+    } else {
+      return res.status(500).json({ success: false, error: result.reason || "Failed to send email via SMTP" });
+    }
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ─── INTEGRATIONS & SMTP / WHATSAPP HEALTH CHECK ───
+app.get("/api/admin/integrations/status", admin, async (req, res) => {
+  const smtpConfigured = Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+  let smtpConnected = false;
+  let smtpError = null;
+
+  if (smtpConfigured) {
+    try {
+      const transporter = getMailTransporter();
+      if (transporter) {
+        await transporter.verify();
+        smtpConnected = true;
+      }
+    } catch (e) {
+      smtpError = e.message;
+    }
+  }
+
+  const waCloudConfigured = Boolean(process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.WHATSAPP_ACCESS_TOKEN);
+  const fast2smsConfigured = Boolean(process.env.FAST2SMS_API_KEY);
+
+  res.json({
+    success: true,
+    smtp: {
+      configured: smtpConfigured,
+      connected: smtpConnected,
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      user: process.env.SMTP_USER || "Not configured",
+      from: process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER}>`,
+      error: smtpError
+    },
+    whatsapp: {
+      cloud_api_configured: waCloudConfigured,
+      phone_number_id: process.env.WHATSAPP_PHONE_NUMBER_ID ? "Configured" : "None",
+      mode: waCloudConfigured ? "Meta WhatsApp Cloud API" : "1-Click Direct WhatsApp (Smart Deep-Links)"
+    },
+    sms: {
+      configured: fast2smsConfigured,
+      provider: "Fast2SMS India Route"
+    }
+  });
+});
+
+app.post("/api/admin/integrations/test-email", admin, async (req, res) => {
+  const to = req.body.to || process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+  const transporter = getMailTransporter();
+  if (!transporter) return res.status(400).json({ success: false, error: "SMTP credentials not configured in .env" });
+
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER}>`,
+      to,
+      subject: `✅ SMTP Verification Test — Laxminarayan Group`,
+      html: `
+        <div style="font-family:'Segoe UI',Roboto,sans-serif; max-width:540px; margin:20px auto; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:32px; box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+          <div style="display:inline-block; background:#f0fdf4; border:1px solid #86efac; color:#166534; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:4px 10px; border-radius:9999px; margin-bottom:12px;">Live Mail Server Active</div>
+          <h2 style="color:#0f172a; margin:0 0 12px; font-size:20px;">Laxminarayan Group SMTP Verification</h2>
+          <p style="color:#475569; font-size:14px; line-height:1.65; margin:0 0 20px;">
+            Your official mail server (<strong>${process.env.SMTP_HOST || 'smtp.gmail.com'}</strong>) is operating properly. All automated client OTP codes, site visit appointment notifications, and official PDF Allotment Letters are fully functional.
+          </p>
+          <div style="font-size:12px; color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:14px;">
+            Dispatched at ${nowIST()} • Host: ${process.env.SMTP_HOST || 'smtp.gmail.com'} • Sender: ${process.env.SMTP_USER}
+          </div>
+        </div>
+      `
+    });
+    audit(req, "test_email", "integration", 0, `Test email dispatched to ${to}`);
+    res.json({ success: true, message: `Test verification email dispatched successfully to ${to}`, messageId: info.messageId });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ─── META (FACEBOOK & INSTAGRAM) LEAD ADS WEBHOOK ───
+// 1. Handshake verification for Meta Developer Portal
+app.get("/api/webhooks/meta-leads", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+  const expectedToken = process.env.META_VERIFY_TOKEN || "laxminarayan_lead_token_2026";
+
+  if (mode === "subscribe" && token === expectedToken) {
+    console.log("[META WEBHOOK] Handshake verified successfully");
+    return res.status(200).send(challenge);
+  }
+  console.warn("[META WEBHOOK] Handshake verification rejected");
+  return res.sendStatus(403);
+});
+
+// 2. Real-time lead ingestion from Meta / LeadBridge / Zapier
+app.post("/api/webhooks/meta-leads", (req, res) => {
+  try {
+    const body = req.body || {};
+    let leadsToProcess = [];
+
+    // Format A: Direct payload (from Zapier, Make, LeadBridge, or custom ad bridge)
+    if (body.name || body.phone || body.email) {
+      leadsToProcess.push({
+        name: clean(body.name || "Meta Ad Lead", 120),
+        phone: clean(body.phone || "", 30),
+        email: clean(body.email || "", 160).toLowerCase(),
+        source: clean(body.platform || body.source || "instagram", 80).toLowerCase(),
+        project_name: clean(body.project_name || body.project || "", 120),
+        campaign: clean(body.campaign_name || body.ad_name || "Direct Ad Campaign", 200)
+      });
+    }
+    // Format B: Raw Meta LeadGen webhook structure
+    else if (body.object === "page" && Array.isArray(body.entry)) {
+      for (const entry of body.entry) {
+        if (Array.isArray(entry.changes)) {
+          for (const ch of entry.changes) {
+            if (ch.field === "leadgen" && ch.value) {
+              const val = ch.value;
+              leadsToProcess.push({
+                name: clean(val.leadgen_name || "Instagram Ad Lead", 120),
+                phone: clean(val.phone_number || "", 30),
+                email: clean(val.email || "", 160).toLowerCase(),
+                source: "instagram",
+                project_name: clean(val.project_name || "", 120),
+                campaign: `Form: ${clean(val.form_id || "", 50)} | Ad: ${clean(val.ad_id || "", 50)}`
+              });
+            }
+          }
+        }
+      }
+    }
+
+    if (!leadsToProcess.length) {
+      return res.status(200).json({ success: true, message: "Webhook received, no lead payload to process" });
+    }
+
+    for (const lead of leadsToProcess) {
+      let projId = null;
+      if (lead.project_name) {
+        const p = db.prepare("SELECT id FROM projects WHERE name LIKE ? OR category LIKE ? LIMIT 1").get(`%${lead.project_name}%`, `%${lead.project_name}%`);
+        if (p) projId = p.id;
+      }
+      if (!projId) {
+        const def = db.prepare("SELECT id FROM projects WHERE status='active' LIMIT 1").get();
+        if (def) projId = def.id;
+      }
+
+      const effectiveSource = lead.source.includes("face") ? "facebook" : "instagram";
+      const insertRes = db.prepare(`
+        INSERT INTO leads (name, phone, email, project_id, status, source, sentiment, notes, created_at, updated_at)
+        VALUES (?, ?, ?, ?, 'new', ?, 'hot', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `).run(
+        lead.name,
+        lead.phone,
+        lead.email,
+        projId,
+        effectiveSource,
+        `Auto-captured via Meta Lead Ad. Campaign: ${lead.campaign}`
+      );
+
+      audit({ user: null, ip: req.ip }, "create", "lead", insertRes.lastInsertRowid, `Live ad lead captured: ${lead.name} via ${effectiveSource}`);
+      console.log(`[META LEAD INGESTED] Lead ID: ${insertRes.lastInsertRowid}, Name: ${lead.name}, Source: ${effectiveSource}`);
+    }
+
+    return res.status(200).json({ success: true, count: leadsToProcess.length });
+  } catch (err) {
+    console.error("[META WEBHOOK ERROR]", err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 app.patch("/api/admin/site-visits/:id",admin,(req,res)=>{
   const id=Number(req.params.id);
@@ -1162,11 +1568,101 @@ app.get("/api/admin/audit-logs",admin,(req,res)=>{
  res.json({success:true,data:rows});
 });
 
-app.get("/api/admin/reports.csv",admin,(req,res)=>{
-  const rows=db.prepare(`SELECT l.id,l.name,l.phone,l.email,l.source,l.status,l.notes,p.name project_name,eu.name employee_name,l.follow_up_at,l.created_at,l.updated_at FROM leads l LEFT JOIN projects p ON p.id=l.project_id LEFT JOIN employees e ON e.id=l.assigned_employee_id LEFT JOIN users eu ON eu.id=e.user_id ORDER BY l.id DESC`).all();
-  const cols=["id","name","phone","email","source","status","notes","project_name","employee_name","follow_up_at","created_at","updated_at"];
-  const csv=[cols.join(","),...rows.map(r=>cols.map(k=>`"${String(r[k]??"").replace(/"/g,'""')}"`).join(","))].join("\\r\\n");
-  res.set("Content-Type","text/csv; charset=utf-8");res.set("Content-Disposition","attachment; filename=laxminarayan-crm-leads.csv");res.send(csv);
+function formatCsvOutput(headers, rows) {
+  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const headerLine = headers.map(h => esc(h.label)).join(',');
+  const rowLines = rows.map(r => headers.map(h => esc(h.key ? r[h.key] : (h.fn ? h.fn(r) : ''))).join(','));
+  return '\uFEFF' + [headerLine, ...rowLines].join('\r\n');
+}
+
+app.get("/api/admin/reports.csv", admin, (req, res) => {
+  const rows = db.prepare(`SELECT l.id, l.name, l.phone, l.email, l.source, l.sentiment, l.status, l.budget, l.notes, p.name AS project_name, eu.name AS employee_name, l.follow_up_at, l.created_at, l.updated_at FROM leads l LEFT JOIN projects p ON p.id = l.project_id LEFT JOIN employees e ON e.id = l.assigned_employee_id LEFT JOIN users eu ON eu.id = e.user_id ORDER BY l.id DESC`).all();
+  const headers = [
+    { label: "ID", key: "id" },
+    { label: "Name", key: "name" },
+    { label: "Phone", key: "phone" },
+    { label: "Email", key: "email" },
+    { label: "Project", key: "project_name" },
+    { label: "Priority", key: "sentiment" },
+    { label: "Status", key: "status" },
+    { label: "Source", key: "source" },
+    { label: "Budget", key: "budget" },
+    { label: "Assigned Advisor", key: "employee_name" },
+    { label: "Follow-Up Date", key: "follow_up_at" },
+    { label: "Notes", key: "notes" },
+    { label: "Created Date", key: "created_at" }
+  ];
+  res.set("Content-Type", "text/csv; charset=utf-8");
+  res.set("Content-Disposition", "attachment; filename=Laxminarayan_Leads_Report.csv");
+  res.send(formatCsvOutput(headers, rows));
+});
+
+app.get("/api/admin/reports/leads.csv", admin, (req, res) => {
+  res.redirect("/api/admin/reports.csv");
+});
+
+app.get("/api/admin/reports/units.csv", admin, (req, res) => {
+  const rows = db.prepare(`SELECT pu.*, p.name AS project_name FROM project_units pu LEFT JOIN projects p ON p.id = pu.project_id ORDER BY pu.project_id ASC, pu.unit_number ASC`).all();
+  const headers = [
+    { label: "Unit ID", key: "id" },
+    { label: "Project Name", key: "project_name" },
+    { label: "Unit Number", key: "unit_number" },
+    { label: "Unit Type", key: "unit_type" },
+    { label: "Status", key: "status" },
+    { label: "Floor", key: "floor" },
+    { label: "Carpet Area (SqFt)", key: "carpet_area" },
+    { label: "Super Built-Up (SqFt)", key: "super_built_up" },
+    { label: "Base Price", key: "base_price" },
+    { label: "Buyer Name", key: "buyer_name" },
+    { label: "Buyer Phone", key: "buyer_phone" },
+    { label: "Booking Ref", key: "booking_reference" },
+    { label: "Last Updated", key: "updated_at" }
+  ];
+  res.set("Content-Type", "text/csv; charset=utf-8");
+  res.set("Content-Disposition", "attachment; filename=Laxminarayan_Units_Inventory.csv");
+  res.send(formatCsvOutput(headers, rows));
+});
+
+app.get("/api/admin/reports/visits.csv", admin, (req, res) => {
+  const rows = db.prepare(`SELECT sv.*, p.name AS project_name, u.name AS user_name FROM site_visits sv LEFT JOIN projects p ON p.id = sv.project_id LEFT JOIN users u ON u.id = sv.user_id ORDER BY sv.id DESC`).all();
+  const headers = [
+    { label: "Visit ID", key: "id" },
+    { label: "Customer Name", key: "name" },
+    { label: "Phone", key: "phone" },
+    { label: "Email", key: "email" },
+    { label: "Project", key: "project_name" },
+    { label: "Scheduled Date/Time", key: "preferred_time" },
+    { label: "Status", key: "status" },
+    { label: "Customer Notes", key: "notes" },
+    { label: "Admin Notes", key: "admin_notes" },
+    { label: "Created At", key: "created_at" }
+  ];
+  res.set("Content-Type", "text/csv; charset=utf-8");
+  res.set("Content-Disposition", "attachment; filename=Laxminarayan_Site_Visits.csv");
+  res.send(formatCsvOutput(headers, rows));
+});
+
+app.get("/api/admin/reports/bookings.csv", admin, (req, res) => {
+  const rows = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type FROM bookings b LEFT JOIN projects p ON p.id = b.project_id LEFT JOIN project_units pu ON pu.id = b.unit_id ORDER BY b.id DESC`).all();
+  const headers = [
+    { label: "Booking ID", key: "id" },
+    { label: "Booking Reference", key: "booking_reference" },
+    { label: "Customer Name", key: "customer_name" },
+    { label: "Phone", key: "customer_phone" },
+    { label: "Email", key: "customer_email" },
+    { label: "Project", key: "project_name" },
+    { label: "Unit Number", fn: r => r.unit_number || r.allotted_unit || '' },
+    { label: "Unit Type", key: "unit_type" },
+    { label: "Agreement Value", key: "agreement_value" },
+    { label: "Token Received", key: "token_amount" },
+    { label: "Payment Status", key: "payment_status" },
+    { label: "Deal Status", key: "status" },
+    { label: "Notes", key: "notes" },
+    { label: "Booking Date", key: "created_at" }
+  ];
+  res.set("Content-Type", "text/csv; charset=utf-8");
+  res.set("Content-Disposition", "attachment; filename=Laxminarayan_Bookings_Report.csv");
+  res.send(formatCsvOutput(headers, rows));
 });
 
 app.get("/api/admin/report",admin,(req,res)=>{
@@ -1335,8 +1831,8 @@ app.post("/api/auth/signup",rateLimit(8,15*60*1000),(req,res)=>{
 });
 
 app.post("/api/auth/login",rateLimit(12,15*60*1000),(req,res)=>{
- const identifier=clean(req.body.identifier||req.body.email,160);
- const password=String(req.body.password||"");
+ const identifier=clean(req.body.identifier||req.body.email,160).trim();
+ const password=String(req.body.password||"").trim();
  let lookupEmail = identifier.toLowerCase();
  if(lookupEmail === "admin" || lookupEmail === "admin@laxminarayan.com") {
    lookupEmail = clean(process.env.ADMIN_EMAIL, 160).toLowerCase() || "admin@laxminarayangroup.com";
@@ -1513,6 +2009,369 @@ async function sendEmailOTP(toEmail, otpCode) {
     console.error(`[EMAIL OTP ERROR] Failed sending to ${toEmail}:`, err.message);
     return { sent: false, reason: err.message };
   }
+}
+
+// ─── AUTOMATED BOOKING ALLOTMENT EMAIL WITH OFFICIAL SIGNED PDF ───
+async function sendBookingAllotmentEmail(booking) {
+  if (!booking || !booking.customer_email) {
+    return { sent: false, reason: "No customer email address on file" };
+  }
+
+  const transporter = getMailTransporter();
+  if (!transporter) {
+    return { sent: false, reason: "SMTP transporter not available" };
+  }
+
+  const fromAddress = process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER || "msinfraprojects2021@gmail.com"}>`;
+  const bookingRef = booking.booking_reference || `BK-${booking.id}`;
+  const pdfBuffer = buildAllotmentPdf(booking);
+  const safeRef = bookingRef.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const attachmentFilename = `Laxminarayan_Allotment_Letter_${safeRef}.pdf`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8fafc; color: #1e293b; }
+        .wrapper { max-width: 620px; margin: 30px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
+        .header { background: linear-gradient(135deg, #0a1128 0%, #0369a1 100%); padding: 36px 32px; text-align: center; color: #ffffff; }
+        .header-tag { display: inline-block; background: rgba(255,255,255,0.15); color: #bae6fd; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
+        .header h1 { margin: 0; font-size: 24px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; }
+        .header p { margin: 6px 0 0; font-size: 13px; letter-spacing: 0.5px; opacity: 0.88; }
+        .content { padding: 36px 32px; }
+        .greeting { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+        .lead-text { font-size: 14.5px; line-height: 1.65; color: #475569; margin-bottom: 24px; }
+        .summary-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; margin-bottom: 24px; }
+        .summary-title { font-size: 12px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #0284c7; margin-bottom: 14px; }
+        .summary-grid { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .summary-grid td { padding: 8px 0; }
+        .summary-label { color: #64748b; font-weight: 600; width: 42%; }
+        .summary-val { color: #0f172a; font-weight: 700; text-align: right; }
+        .highlight-badge { background: #f0fdf4; border: 1px solid #86efac; color: #166534; padding: 3px 10px; border-radius: 6px; font-size: 12px; }
+        .notice-box { background: #eff6ff; border-left: 4px solid #0284c7; border-radius: 6px; padding: 14px 18px; margin-bottom: 26px; }
+        .notice-box p { margin: 0; font-size: 13.5px; color: #1e40af; line-height: 1.5; }
+        .cta-center { text-align: center; margin: 30px 0 10px; }
+        .cta-btn { display: inline-block; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff !important; font-weight: 700; font-size: 14px; text-decoration: none; padding: 14px 32px; border-radius: 9999px; box-shadow: 0 4px 15px rgba(2,132,199,0.35); }
+        .footer { padding: 24px 32px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #94a3b8; text-align: center; line-height: 1.6; }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="header">
+          <span class="header-tag">Official Allotment Document</span>
+          <h1>Laxminarayan Group</h1>
+          <p>Architectural Distinction • Executive Real Estate</p>
+        </div>
+        <div class="content">
+          <div class="greeting">Congratulations, ${booking.customer_name}!</div>
+          <p class="lead-text">
+            We are honored to confirm your provisional allotment with <strong>Laxminarayan Group</strong>. Your booking has been officially recorded in our registry under reference <strong>${bookingRef}</strong>.
+          </p>
+
+          <div class="summary-card">
+            <div class="summary-title">Reservation & Financial Summary</div>
+            <table class="summary-grid">
+              <tr>
+                <td class="summary-label">Booking Reference:</td>
+                <td class="summary-val">${bookingRef}</td>
+              </tr>
+              <tr>
+                <td class="summary-label">Project Landmark:</td>
+                <td class="summary-val">${booking.project_name || 'Laxminarayan Landmark'}</td>
+              </tr>
+              <tr>
+                <td class="summary-label">Allotted Unit:</td>
+                <td class="summary-val">${booking.allotted_unit || (booking.unit_number ? 'Unit ' + booking.unit_number : 'Exclusive Residence')}</td>
+              </tr>
+              <tr>
+                <td class="summary-label">Token Advance:</td>
+                <td class="summary-val">₹${booking.token_amount || 'Received'}</td>
+              </tr>
+              <tr>
+                <td class="summary-label">Agreement Value:</td>
+                <td class="summary-val">₹${booking.agreement_value || 'As per cost sheet'}</td>
+              </tr>
+              <tr>
+                <td class="summary-label">Deal Status:</td>
+                <td class="summary-val"><span class="highlight-badge">Confirmed & Secured</span></td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="notice-box">
+            <p>
+              📎 <strong>Official PDF Attached:</strong> Your digital <strong>Allotment Letter & Booking Confirmation</strong> is attached to this email as an official PDF document bearing the corporate developer seal.
+            </p>
+          </div>
+
+          <p style="font-size:13.5px; color:#64748b; line-height:1.6; margin-bottom:20px;">
+            Our dedicated Senior Relationship Desk is at your service for any questions regarding documentation, milestone schedules, or customized layout options.
+          </p>
+
+          <div class="cta-center">
+            <a href="https://laxminarayangroup.com/dashboard.html" class="cta-btn">Access Client Portal →</a>
+          </div>
+        </div>
+        <div class="footer">
+          <strong>Laxminarayan Group Corporate Office</strong><br>
+          5, Ground floor, Madhav Evenue, Odhav Circle, Ahmedabad, Gujarat 382380<br>
+          Direct: +91 63520 00017 • Email: msinfraprojects2021@gmail.com<br>
+          © ${new Date().getFullYear()} Laxminarayan Group. All Rights Reserved.
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      to: booking.customer_email,
+      subject: `Official Allotment Letter: ${bookingRef} — ${booking.project_name || 'Laxminarayan Group'}`,
+      text: `Dear ${booking.customer_name},\n\nCongratulations! Your booking for ${booking.project_name || 'Laxminarayan Group'} (${bookingRef}) is confirmed. Please find your official signed Allotment Letter PDF attached.\n\nWarm regards,\nLaxminarayan Group Executive Desk`,
+      html,
+      attachments: [
+        {
+          filename: attachmentFilename,
+          content: pdfBuffer,
+          contentType: "application/pdf"
+        }
+      ]
+    });
+    console.log(`[ALLOTMENT EMAIL SUCCESS] Dispatched to ${booking.customer_email}, MessageId: ${info.messageId}`);
+    return { sent: true, provider: "smtp", messageId: info.messageId };
+  } catch (err) {
+    console.error(`[ALLOTMENT EMAIL ERROR] Failed to send to ${booking.customer_email}:`, err.message);
+    return { sent: false, reason: err.message };
+  }
+}
+
+// ─── AUTOMATED SITE VISIT CONFIRMATION EMAIL ───
+async function sendSiteVisitConfirmationEmail({ name, email, phone, project, preferred_at, notes }) {
+  if (!email) return { sent: false, reason: "No client email" };
+  const transporter = getMailTransporter();
+  if (!transporter) return { sent: false, reason: "SMTP transporter not available" };
+
+  const fromAddress = process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER || "msinfraprojects2021@gmail.com"}>`;
+  const dateFormatted = preferred_at ? new Date(preferred_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "full", timeStyle: "short" }) : "Scheduled Time";
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background:#f8fafc; color:#1e293b; }
+        .wrapper { max-width:600px; margin:30px auto; background:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 20px rgba(0,0,0,0.06); }
+        .header { background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding:32px 28px; text-align:center; color:#fff; }
+        .header h1 { margin:0; font-size:22px; text-transform:uppercase; letter-spacing:1.5px; }
+        .content { padding:32px 28px; }
+        .card { background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:20px; margin:20px 0; }
+        .card table { width:100%; border-collapse:collapse; font-size:14px; }
+        .card td { padding:7px 0; }
+        .label { color:#0369a1; font-weight:600; width:38%; }
+        .val { color:#0f172a; font-weight:700; }
+        .footer { padding:20px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:12px; color:#94a3b8; text-align:center; }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="header">
+          <div style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#bae6fd; margin-bottom:6px;">VIP Experience</div>
+          <h1>Site Visit Confirmed</h1>
+          <p style="margin:4px 0 0; font-size:13px; opacity:0.9;">Laxminarayan Group</p>
+        </div>
+        <div class="content">
+          <h2 style="margin:0 0 10px; font-size:18px; color:#0f172a;">Dear ${name},</h2>
+          <p style="color:#64748b; font-size:14px; line-height:1.6; margin:0 0 18px;">
+            Your private, guided site tour for <strong>${project || "our luxury residences"}</strong> is confirmed. A senior relationship advisor has been reserved exclusively for your visit.
+          </p>
+          <div class="card">
+            <table>
+              <tr><td class="label">Project / Landmark:</td><td class="val">${project || "Laxminarayan Landmark"}</td></tr>
+              <tr><td class="label">Date & Time (IST):</td><td class="val" style="color:#0284c7;">${dateFormatted}</td></tr>
+              <tr><td class="label">Client Name:</td><td class="val">${name}</td></tr>
+              <tr><td class="label">Contact Phone:</td><td class="val">${phone || "On File"}</td></tr>
+              ${notes ? `<tr><td class="label">Preferences:</td><td class="val">${notes}</td></tr>` : ''}
+            </table>
+          </div>
+          <p style="font-size:13px; color:#64748b; line-height:1.5;">
+            📍 <strong>Directions & Arrival:</strong> Our hospitality lounge will welcome you on arrival. Complimentary valet parking and refreshments are provided.
+          </p>
+          <div style="text-align:center; margin-top:24px;">
+            <a href="https://wa.me/916352000017?text=Hello%20Laxminarayan%20Group,%20regarding%20my%20site%20visit%20for%20${encodeURIComponent(project || 'landmark')}" style="background:#25D366; color:#ffffff; padding:12px 26px; border-radius:9999px; text-decoration:none; font-weight:700; font-size:13.5px; display:inline-block;">
+              💬 Connect with Site Advisor on WhatsApp
+            </a>
+          </div>
+        </div>
+        <div class="footer">
+          Laxminarayan Group • Ahmedabad, Gujarat • +91 63520 00017
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      to: email,
+      subject: `Confirmed: Private Site Visit to ${project || "Laxminarayan Group"}`,
+      text: `Hello ${name},\n\nYour site visit to ${project || "Laxminarayan Group"} is confirmed for ${dateFormatted}.\n\nLaxminarayan Group Advisory Desk`,
+      html
+    });
+    console.log(`[SITE VISIT CONFIRMATION EMAIL] Sent to ${email}, MessageId: ${info.messageId}`);
+    return { sent: true, provider: "smtp", messageId: info.messageId };
+  } catch (err) {
+    console.error(`[SITE VISIT EMAIL ERROR] Failed to send to ${email}:`, err.message);
+    return { sent: false, reason: err.message };
+  }
+}
+
+// ─── AUTOMATED CUSTOMER ENQUIRY WELCOME EMAIL ───
+async function sendEnquiryWelcomeEmail({ name, email, project, message }) {
+  if (!email) return { sent: false, reason: "No email" };
+  const transporter = getMailTransporter();
+  if (!transporter) return { sent: false, reason: "SMTP transporter not available" };
+
+  const fromAddress = process.env.SMTP_FROM || `"Laxminarayan Group" <${process.env.SMTP_USER || "msinfraprojects2021@gmail.com"}>`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8">
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; padding:0; background:#f8fafc; color:#1e293b; }
+        .wrapper { max-width:600px; margin:30px auto; background:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 4px 20px rgba(0,0,0,0.06); }
+        .header { background:linear-gradient(135deg, #0a1128 0%, #0369a1 100%); padding:32px 28px; text-align:center; color:#fff; }
+        .header h1 { margin:0; font-size:22px; text-transform:uppercase; letter-spacing:1.5px; }
+        .content { padding:32px 28px; }
+        .footer { padding:20px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:12px; color:#94a3b8; text-align:center; }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper">
+        <div class="header">
+          <div style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#38bdf8; margin-bottom:6px;">Welcome to Architectural Excellence</div>
+          <h1>Laxminarayan Group</h1>
+        </div>
+        <div class="content">
+          <h2 style="margin:0 0 10px; font-size:18px; color:#0f172a;">Hello ${name},</h2>
+          <p style="color:#64748b; font-size:14px; line-height:1.65; margin:0 0 18px;">
+            Thank you for reaching out to <strong>Laxminarayan Group</strong> regarding <strong>${project || "our landmark properties"}</strong>. We have received your inquiry and our senior portfolio consultant is preparing detailed brochures and pricing schedules for you.
+          </p>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:18px; margin:20px 0; font-size:13.5px; color:#334155;">
+            <strong>What to expect next:</strong>
+            <ul style="margin:8px 0 0; padding-left:20px; line-height:1.6; color:#64748b;">
+              <li>A personal call or WhatsApp briefing from your assigned relationship advisor.</li>
+              <li>Official architectural master floor plans & verified unit inventory.</li>
+              <li>Priority invitation for private on-site inspection.</li>
+            </ul>
+          </div>
+          <div style="text-align:center; margin-top:26px;">
+            <a href="https://laxminarayangroup.com/properties.html" style="background:#0284c7; color:#ffffff; padding:12px 28px; border-radius:9999px; text-decoration:none; font-weight:700; font-size:13.5px; display:inline-block;">
+              Explore Full Property Portfolio →
+            </a>
+          </div>
+        </div>
+        <div class="footer">
+          Laxminarayan Group • Ahmedabad, Gujarat • msinfraprojects2021@gmail.com
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      to: email,
+      subject: `Thank you for your interest — Laxminarayan Group (${project || "Landmark Properties"})`,
+      text: `Hello ${name},\n\nThank you for reaching out to Laxminarayan Group regarding ${project || "our properties"}. Our senior advisory team will be in touch shortly.\n\nWarm regards,\nLaxminarayan Group`,
+      html
+    });
+    console.log(`[ENQUIRY WELCOME EMAIL] Sent to ${email}, MessageId: ${info.messageId}`);
+    return { sent: true, provider: "smtp", messageId: info.messageId };
+  } catch (err) {
+    console.error(`[ENQUIRY WELCOME EMAIL ERROR] Failed to send to ${email}:`, err.message);
+    return { sent: false, reason: err.message };
+  }
+}
+
+// ─── META WHATSAPP BUSINESS CLOUD API ENGINE (WITH SMART 1-CLICK FALLBACK) ───
+async function sendWhatsAppCloudMessage({ to, text }) {
+  const cleanPhone = String(to || "").replace(/[^0-9]/g, "");
+  if (!cleanPhone) return { sent: false, reason: "Invalid phone number" };
+
+  const fullPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+
+  const fallbackUrl = `https://wa.me/${fullPhone}?text=${encodeURIComponent(text || '')}`;
+
+  if (!phoneNumberId || !accessToken) {
+    return {
+      sent: false,
+      provider: "fallback_link",
+      reason: "Meta WhatsApp Cloud API credentials not configured; using 1-Click WhatsApp deep link",
+      whatsappUrl: fallbackUrl
+    };
+  }
+
+  return new Promise((resolve) => {
+    const payload = JSON.stringify({
+      messaging_product: "whatsapp",
+      recipient_type: "individual",
+      to: fullPhone,
+      type: "text",
+      text: { preview_url: false, body: text }
+    });
+
+    const options = {
+      hostname: "graph.facebook.com",
+      path: `/v18.0/${phoneNumberId}/messages`,
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(payload)
+      },
+      timeout: 8000
+    };
+
+    const req = https.request(options, (res) => {
+      let data = "";
+      res.on("data", chunk => data += chunk);
+      res.on("end", () => {
+        try {
+          const json = JSON.parse(data);
+          if (res.statusCode >= 200 && res.statusCode < 300 && json.messages) {
+            console.log(`[WHATSAPP CLOUD API SUCCESS] Message dispatched to ${fullPhone}`);
+            resolve({ sent: true, provider: "whatsapp_cloud_api", messageId: json.messages[0]?.id, response: json });
+          } else {
+            console.warn(`[WHATSAPP CLOUD API WARNING] HTTP ${res.statusCode}:`, json.error?.message || data);
+            resolve({ sent: false, provider: "fallback_link", reason: json.error?.message || "Cloud API error", whatsappUrl: fallbackUrl });
+          }
+        } catch (e) {
+          resolve({ sent: false, provider: "fallback_link", reason: "Response parse error", whatsappUrl: fallbackUrl });
+        }
+      });
+    });
+
+    req.on("error", (err) => {
+      console.warn("[WHATSAPP CLOUD API ERROR]", err.message);
+      resolve({ sent: false, provider: "fallback_link", reason: err.message, whatsappUrl: fallbackUrl });
+    });
+
+    req.on("timeout", () => {
+      req.destroy();
+      resolve({ sent: false, provider: "fallback_link", reason: "Request timeout", whatsappUrl: fallbackUrl });
+    });
+
+    req.write(payload);
+    req.end();
+  });
 }
 
 app.post("/api/auth/otp/send", rateLimit(8, 10 * 60 * 1000), async (req, res) => {
@@ -1704,8 +2563,8 @@ app.post("/api/auth/reset-password",rateLimit(8,15*60*1000),(req,res)=>{
       const envPath=path.join(__dirname,".env");
       if(fs.existsSync(envPath)){
         let envContent=fs.readFileSync(envPath,"utf8");
-        if(envContent.includes("ADMIN_PASSWORD=")) envContent=envContent.replace(/^ADMIN_PASSWORD=.*$/m,`ADMIN_PASSWORD=${password}`);
-        else envContent+=`\nADMIN_PASSWORD=${password}\n`;
+        if(envContent.includes("ADMIN_PASSWORD=")) envContent=envContent.replace(/^ADMIN_PASSWORD=.*$/m,`ADMIN_PASSWORD="${password}"`);
+        else envContent+=`\nADMIN_PASSWORD="${password}"\n`;
         fs.writeFileSync(envPath,envContent,"utf8");
       }
     }catch(_e){}
@@ -1751,13 +2610,13 @@ app.get("/api/auth/me",auth,(req,res)=>{
 });
 
 app.get("/api/projects",(req,res)=>{
-  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' ORDER BY id").all();
+  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status FROM projects WHERE status IN ('active','completed','sold_out') ORDER BY CASE WHEN status='active' THEN 0 WHEN status='completed' THEN 1 ELSE 2 END, id ASC").all();
   const countMedia=db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?");
   const countUnits=db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?");
   for(const p of projects){
     const loc=(p.location||'').toLowerCase();
     p.city=loc.includes('vadodara')?'Vadodara':(loc.includes('ahmedabad')?'Ahmedabad':(loc.includes('surat')?'Surat':(loc.includes('gandhinagar')?'Gandhinagar':'Gujarat')));
-    p.badge='UNDER CONSTRUCTION';
+    p.badge=p.status==='completed'?'COMPLETED':(p.status==='sold_out'?'100% SOLD OUT':'UNDER CONSTRUCTION');
     p.media_count=countMedia.get(p.id).c;
     p.units_count=countUnits.get(p.id).c;
     const reraMatch=(p.location||'').match(/RERA:?\s*([^)]+)/i);
@@ -1812,7 +2671,10 @@ app.post("/api/enquiries",rateLimit(10,10*60*1000),(req,res)=>{
   }
  }catch(e){}
  const created=createEnquiry({userId,name,phone,email,message,source});
- const notify=dispatchNotification({type:"enquiry",name,phone,project:null,details:message});
+ const notify=dispatchNotification({type:"enquiry",name,phone,email,project:null,details:message});
+ if (email) {
+   sendEnquiryWelcomeEmail({ name, email, project: "Laxminarayan Group Landmark Developments", message }).catch(e => console.warn("[AUTO ENQUIRY EMAIL ERROR]", e.message));
+ }
  res.status(201).json({success:true,message:"Enquiry submitted successfully",whatsapp_link:notify.whatsappUrl,...created});
 });
 app.post("/api/whatsapp-enquiry",rateLimit(10,10*60*1000),(req,res)=>{
@@ -1964,22 +2826,35 @@ app.patch("/api/admin/enquiries/:id",admin,(req,res)=>{
  db.prepare("UPDATE leads SET status=CASE WHEN ?='closed' THEN 'lost' WHEN ?='contacted' AND status='new' THEN 'contacted' ELSE status END,updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=?").run(status,status,id);
  res.json({success:true,data:updated});
 });
+const VALID_PROJECT_CATEGORIES = ["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL","LUXURY VILLAS","APARTMENTS & SHOPS","VILLAS","PLOTS / LAND","MIXED USE","PENTHOUSES"];
+const VALID_PROJECT_STATUSES = ["active","completed","sold_out","inactive"];
+
 app.get("/api/admin/projects",admin,(req,res)=>{
-  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects ORDER BY CASE WHEN status='active' THEN 0 ELSE 1 END, id ASC").all();
+  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects ORDER BY CASE WHEN status='active' THEN 0 WHEN status='completed' THEN 1 WHEN status='sold_out' THEN 2 ELSE 3 END, id ASC").all();
   const countStmt=db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?");
   const coverStmt=db.prepare("SELECT file_path FROM project_media WHERE project_id=? AND media_type='image' ORDER BY is_cover DESC,id ASC LIMIT 1");
-  for(const x of projects){x.media_count=countStmt.get(x.id).c;const cover=coverStmt.get(x.id);if(cover?.file_path)x.image=cover.file_path;}
+  const unitsStmt=db.prepare("SELECT COUNT(*) total, SUM(CASE WHEN status='available' THEN 1 ELSE 0 END) avail, SUM(CASE WHEN status='blocked' THEN 1 ELSE 0 END) blocked, SUM(CASE WHEN status='sold' THEN 1 ELSE 0 END) sold FROM project_units WHERE project_id=?");
+  for(const x of projects){
+    x.media_count=countStmt.get(x.id).c;
+    const cover=coverStmt.get(x.id);
+    if(cover?.file_path)x.image=cover.file_path;
+    const u=unitsStmt.get(x.id);
+    x.units_total=u?.total||0;
+    x.units_available=u?.avail||0;
+    x.units_blocked=u?.blocked||0;
+    x.units_sold=u?.sold||0;
+  }
   res.json({success:true,data:projects});
 });
 
 app.post("/api/admin/projects",admin,projectUpload.single("image_file"),(req,res)=>{
  try{
-  const name=clean(req.body.name,160), category=clean(req.body.category,40), description=clean(req.body.description,5000), location=clean(req.body.location,300), price=clean(req.body.price,200), amenities=clean(req.body.amenities,2000), status=clean(req.body.status,20)||"active";
+  const name=clean(req.body.name,160), category=clean(req.body.category,40).toUpperCase(), description=clean(req.body.description,5000), location=clean(req.body.location,300), price=clean(req.body.price,200), amenities=clean(req.body.amenities,2000), status=clean(req.body.status,20).toLowerCase()||"active";
   let image=clean(req.body.image,1000);
   if(req.file) image="/uploads/projects/"+req.file.filename;
   if(name.length<2)return res.status(400).json({success:false,error:"Enter a project name"});
-  if(!["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL","LUXURY VILLAS","APARTMENTS & SHOPS","VILLAS"].includes(category.toUpperCase()))return res.status(400).json({success:false,error:"Select a valid category"});
-  if(!["active","inactive"].includes(status))return res.status(400).json({success:false,error:"Invalid status"});
+  if(!VALID_PROJECT_CATEGORIES.includes(category))return res.status(400).json({success:false,error:"Select a valid category"});
+  if(!VALID_PROJECT_STATUSES.includes(status))return res.status(400).json({success:false,error:"Invalid status"});
   const info=db.prepare("INSERT INTO projects(name,category,description,image,location,price,amenities,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?, ?,datetime('now'),datetime('now'))").run(name,category,description,image,location,price,amenities,status);
   audit(req,"create","project",info.lastInsertRowid,name);
   res.json({success:true,data:db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=?").get(info.lastInsertRowid)});
@@ -1992,13 +2867,13 @@ app.put("/api/admin/projects/:id",admin,projectUpload.single("image_file"),(req,
  try{
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM projects WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Project not found"});
-  const name=clean(req.body.name,160), category=clean(req.body.category,40), description=clean(req.body.description,5000), location=clean(req.body.location,300), price=clean(req.body.price,200), amenities=clean(req.body.amenities,2000), status=clean(req.body.status,20)||"active";
+  const name=clean(req.body.name,160), category=clean(req.body.category,40).toUpperCase(), description=clean(req.body.description,5000), location=clean(req.body.location,300), price=clean(req.body.price,200), amenities=clean(req.body.amenities,2000), status=clean(req.body.status,20).toLowerCase()||"active";
   let image=clean(req.body.image,1000);
   if(req.file) image="/uploads/projects/"+req.file.filename;
   else if(!image) image=existing.image||"";
   if(name.length<2)return res.status(400).json({success:false,error:"Enter a project name"});
-  if(!["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL","LUXURY VILLAS","APARTMENTS & SHOPS","VILLAS"].includes(category.toUpperCase()))return res.status(400).json({success:false,error:"Select a valid category"});
-  if(!["active","inactive"].includes(status))return res.status(400).json({success:false,error:"Invalid status"});
+  if(!VALID_PROJECT_CATEGORIES.includes(category))return res.status(400).json({success:false,error:"Select a valid category"});
+  if(!VALID_PROJECT_STATUSES.includes(status))return res.status(400).json({success:false,error:"Invalid status"});
   db.prepare("UPDATE projects SET name=?,category=?,description=?,image=?,location=?,price=?,amenities=?,status=?,updated_at=datetime('now') WHERE id=?").run(name,category,description,image,location,price,amenities,status,id);
   if(req.file && existing.image && existing.image.startsWith("/uploads/projects/")) deleteMediaFile(existing.image);
   audit(req,"update","project",id,name);
@@ -2072,8 +2947,8 @@ app.delete("/api/admin/projects/:projectId/media/:mediaId",admin,(req,res)=>{
 });
 
 app.patch("/api/admin/projects/:id/status",admin,(req,res)=>{
- const id=Number(req.params.id), status=clean(req.body.status,20);
- if(!["active","inactive"].includes(status))return res.status(400).json({success:false,error:"Invalid status"});
+ const id=Number(req.params.id), status=clean(req.body.status,20).toLowerCase();
+ if(!VALID_PROJECT_STATUSES.includes(status))return res.status(400).json({success:false,error:"Invalid status"});
  const info=db.prepare("UPDATE projects SET status=?,updated_at=datetime('now') WHERE id=?").run(status,id);
  if(!info.changes)return res.status(404).json({success:false,error:"Project not found"});
  audit(req,"update","project",id,`Status ${status}`);
@@ -2172,8 +3047,7 @@ const PUBLIC_PAGES = new Map([
   ["/forgot-password.html", "forgot-password.html"],
   ["/project-category.html", "project-category.html"],
   ["/units-demo.html", "units-demo.html"],
-  ["/robots.txt", "robots.txt"],
-  ["/sitemap.xml", "sitemap.xml"]
+  ["/robots.txt", "robots.txt"]
 ]);
 
 for (const [routePath, fileName] of PUBLIC_PAGES) {
@@ -2182,7 +3056,53 @@ for (const [routePath, fileName] of PUBLIC_PAGES) {
   });
 }
 
-// ─── DYNAMIC OPEN GRAPH METADATA INJECTION (WHATSAPP & SOCIAL SHARING) ───
+function getCanonicalBaseUrl() {
+  if (process.env.CANONICAL_DOMAIN && process.env.CANONICAL_DOMAIN.trim()) {
+    return process.env.CANONICAL_DOMAIN.trim().replace(/\/+$/, "");
+  }
+  const rawFrontend = (process.env.FRONTEND_URL || "").split(",")[0].trim();
+  if (!rawFrontend || rawFrontend.includes("localhost") || rawFrontend.includes("127.0.0.1")) {
+    return "https://laxminarayangroup.com";
+  }
+  return rawFrontend.replace(/\/+$/, "");
+}
+
+// ─── DYNAMIC SITEMAP.XML GENERATOR (SEARCH ENGINE DISCOVERY) ───
+app.get("/sitemap.xml", (req, res) => {
+  try {
+    const baseUrl = getCanonicalBaseUrl();
+    const activeProjects = db.prepare("SELECT id, updated_at, created_at FROM projects WHERE status='active' ORDER BY id ASC").all();
+    const today = new Date().toISOString().split("T")[0];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+    // Static core landing pages
+    xml += `  <url>\n    <loc>${baseUrl}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+    xml += `  <url>\n    <loc>${baseUrl}/properties.html</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
+    xml += `  <url>\n    <loc>${baseUrl}/project-category.html</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+
+    // Dynamic property detail pages
+    for (const p of activeProjects) {
+      let modDate = today;
+      if (p.updated_at) {
+        try {
+          const parsed = new Date(p.updated_at);
+          if (!isNaN(parsed.getTime())) modDate = parsed.toISOString().split("T")[0];
+        } catch (_) {}
+      }
+      xml += `  <url>\n    <loc>${baseUrl}/project-detail.html?id=${p.id}</loc>\n    <lastmod>${modDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.85</priority>\n  </url>\n`;
+    }
+
+    xml += `</urlset>\n`;
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    return res.send(xml);
+  } catch (err) {
+    return res.sendFile(path.join(__dirname, "sitemap.xml"));
+  }
+});
+
+// ─── DYNAMIC OPEN GRAPH & SCHEMA METADATA INJECTION (WHATSAPP & SOCIAL SHARING) ───
 app.get("/project-detail.html", (req, res) => {
   if (req.query.token) {
     try {
@@ -2204,19 +3124,57 @@ app.get("/project-detail.html", (req, res) => {
     let html = fs.readFileSync(detailFile, "utf8");
     const safeName = String(project.name || "Luxury Property").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const safeDesc = String(project.description || "Explore luxury architectural spaces and premium developments by Laxminarayan Group.").replace(/"/g, "&quot;");
-    const imgPath = project.image ? (project.image.startsWith("http") ? project.image : FRONTEND_URL + "/" + project.image.replace(/^\//, "")) : FRONTEND_URL + "/assets/hero-villa.png";
+    const baseUrl = getCanonicalBaseUrl();
+    const imgPath = project.image ? (project.image.startsWith("http") ? project.image : baseUrl + "/" + project.image.replace(/^\//, "")) : baseUrl + "/assets/hero-villa.png";
+    const canonicalUrl = `${baseUrl}/project-detail.html?id=${project.id}`;
+    const safeLocation = String(project.location || "Ahmedabad, Gujarat").replace(/"/g, "&quot;");
 
-    const ogTags = `<title>Laxminarayan Group — ${safeName}</title>
+    const schemaData = {
+      "@context": "https://schema.org",
+      "@type": "RealEstateListing",
+      "name": project.name || "Luxury Property",
+      "description": project.description || "Luxury architectural property by Laxminarayan Group.",
+      "url": canonicalUrl,
+      "image": imgPath,
+      "category": project.category || "Residential",
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "INR",
+        "price": project.price || "Price on Request",
+        "availability": "https://schema.org/InStock",
+        "validFrom": "2024-01-01"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": project.location || "Ahmedabad",
+        "addressRegion": "Gujarat",
+        "addressCountry": "IN"
+      },
+      "provider": {
+        "@type": "RealEstateAgent",
+        "name": "Laxminarayan Group",
+        "telephone": "+916352000017",
+        "url": baseUrl
+      }
+    };
+
+    const ogTags = `<title>Laxminarayan Group — ${safeName} | Luxury Living Gujarat</title>
 <meta name="description" content="${safeDesc}">
+<meta name="keywords" content="${safeName}, Laxminarayan Group, luxury properties ${safeLocation}, apartments Gujarat, real estate Ahmedabad">
+<link rel="canonical" href="${canonicalUrl}">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Laxminarayan Group">
 <meta property="og:title" content="Laxminarayan Group | ${safeName}">
 <meta property="og:description" content="${safeDesc}">
 <meta property="og:image" content="${imgPath}">
-<meta property="og:url" content="${FRONTEND_URL}/project-detail.html?id=${project.id}">
+<meta property="og:url" content="${canonicalUrl}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Laxminarayan Group | ${safeName}">
 <meta name="twitter:description" content="${safeDesc}">
-<meta name="twitter:image" content="${imgPath}">`;
+<meta name="twitter:image" content="${imgPath}">
+<script type="application/ld+json">
+${JSON.stringify(schemaData, null, 2)}
+</script>`;
 
     html = html.replace(/<title>[\s\S]*?<\/title>/i, ogTags);
     res.setHeader("Content-Type", "text/html; charset=utf-8");

@@ -130,9 +130,9 @@ async function main() {
       if (fs.existsSync(envPath)) {
         let envContent = fs.readFileSync(envPath, "utf8");
         if (envContent.includes("ADMIN_PASSWORD=")) {
-          envContent = envContent.replace(/^ADMIN_PASSWORD=.*$/m, `ADMIN_PASSWORD=${password}`);
+          envContent = envContent.replace(/^ADMIN_PASSWORD=.*$/m, `ADMIN_PASSWORD="${password}"`);
         } else {
-          envContent += `\nADMIN_PASSWORD=${password}\n`;
+          envContent += `\nADMIN_PASSWORD="${password}"\n`;
         }
         if (envContent.includes("ADMIN_EMAIL=")) {
           envContent = envContent.replace(/^ADMIN_EMAIL=.*$/m, `ADMIN_EMAIL=${email}`);

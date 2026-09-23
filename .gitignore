@@ -14,11 +14,25 @@ uploads/
 # Scratch & Temporary Testing Scripts
 scratch/
 *.log
+scripts/test_*.js
+scripts/verify*.js
+VERIFY_CREDENTIALS.bat
+
+# Temporary Prototype & Demo Pages
+button-animations-demo.html
+luxury-features-demo.html
+hero-showcase-demo.html
+premium-luxury-demo.html
 
 # Test Screenshots & Temporary Proof Images
 live_test_*.png
 assets/live_*.png
 assets/*_orig.*
+assets/*_backup*
+assets/*nocoud*
+assets/*transparent*
+assets/extracted-*.png
+assets/real-cloud-*.png
 *.tmp
 
 # OS & Editor Metadata

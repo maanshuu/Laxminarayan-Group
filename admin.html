@@ -208,8 +208,10 @@ button, input, select, textarea { font-family: inherit; }
   color: var(--ink-muted);
 }
 
-/* ─── BUTTONS ─── */
+/* ─── BUTTONS (TACTILE LUXURY ANIMATIONS) ─── */
 .btn {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -222,13 +224,18 @@ button, input, select, textarea { font-family: inherit; }
   border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
-  transition: all .2s ease;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, background 0.2s ease, border-color 0.2s ease;
   box-shadow: var(--shadow-sm);
 }
 .btn:hover {
   background: var(--bg-subtle);
-  border-color: var(--ink);
-  transform: translateY(-1px);
+  border-color: var(--sky);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+}
+.btn:active {
+  transform: scale(0.95) translateY(1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .btn.primary {
   background: var(--ink);
@@ -236,21 +243,44 @@ button, input, select, textarea { font-family: inherit; }
   border-color: var(--ink);
   box-shadow: 0 2px 8px rgba(8, 11, 15, 0.15);
 }
+.btn.primary::after,
+.btn.gold::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -80%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: rotate(25deg);
+  transition: left 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
 .btn.primary:hover {
   background: #1e293b;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(8, 11, 15, 0.25);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 0 0 3px rgba(8, 11, 15, 0.15), 0 8px 22px rgba(8, 11, 15, 0.28);
+}
+.btn.primary:hover::after,
+.btn.gold:hover::after {
+  left: 140%;
+}
+.btn.primary:active {
+  transform: scale(0.95) translateY(1px);
 }
 .btn.gold {
-  background: var(--sky);
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
   color: #fff;
   border-color: var(--sky);
   box-shadow: 0 2px 8px var(--sky-glow);
 }
 .btn.gold:hover {
-  background: var(--sky-deep);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px var(--sky-glow);
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.22), 0 8px 24px var(--sky-glow);
+}
+.btn.gold:active {
+  transform: scale(0.95) translateY(1px);
 }
 .btn.danger {
   background: var(--red-soft);
@@ -260,7 +290,11 @@ button, input, select, textarea { font-family: inherit; }
 .btn.danger:hover {
   background: #ffe4e6;
   border-color: var(--red);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.18);
+}
+.btn.danger:active {
+  transform: scale(0.95) translateY(1px);
 }
 .btn.smallbtn {
   padding: 5px 11px;
@@ -670,6 +704,188 @@ textarea {
   object-fit: cover;
   border-radius: var(--radius-sm);
   background: var(--bg-subtle);
+}
+
+/* ─── PROJECT MANAGEMENT EXECUTIVE COMMAND CENTER ─── */
+.project-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+.project-kpi-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: all .2s ease;
+}
+.project-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+.project-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.project-kpi-num {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.project-kpi-label {
+  font-size: 11.5px;
+  color: var(--ink-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.projects-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+.proj-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: all .25s ease;
+  display: flex;
+  flex-direction: column;
+}
+.proj-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--line-sky);
+}
+.proj-card-media {
+  position: relative;
+  height: 190px;
+  background: var(--bg-subtle);
+  overflow: hidden;
+}
+.proj-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+.proj-card:hover .proj-card-img {
+  transform: scale(1.04);
+}
+.proj-badge-cat {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+.proj-badge-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.proj-badge-status.active { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.proj-badge-status.completed { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
+.proj-badge-status.sold_out { background: #fff7ed; color: #ea580c; border: 1px solid #fdba74; }
+.proj-badge-status.inactive { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+
+.proj-card-body {
+  padding: 18px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.proj-card-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.proj-card-loc {
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+  line-height: 1.4;
+}
+.proj-card-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--sky-deep);
+}
+.proj-card-desc {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.proj-card-amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.proj-amenity-tag {
+  font-size: 11px;
+  background: var(--bg-subtle);
+  color: var(--ink-secondary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+}
+.proj-units-panel {
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  margin-top: auto;
+}
+.proj-units-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+  display: flex;
+  margin-top: 4px;
+}
+.proj-card-footer {
+  border-top: 1px solid var(--line);
+  padding: 12px 18px;
+  background: #fbfcfd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* ─── CHARTS ─── */
@@ -1363,10 +1579,11 @@ textarea {
       <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
     </div>
     <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
+    <span class="top-status-badge" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
   </div>
   <div class="top-actions-flex">
-    <a href="index.html" class="top-link" target="_blank">Website ↗</a>
-    <a href="properties.html" class="top-link" target="_blank">Portfolio ↗</a>
+    <a href="index.html" class="top-link">← Website</a>
+    <a href="properties.html" class="top-link">Portfolio</a>
     <button onclick="location.href='/api/auth/logout'">LOG OUT</button>
   </div>
 </div>
@@ -1379,6 +1596,7 @@ textarea {
       <p class="muted" style="margin-top:0">Manage enquiries, site visits, team, customers, projects and reporting from one place.</p>
     </div>
     <div class="actions">
+      <button class="btn" onclick="openIntegrationModal()" title="View live SMTP and WhatsApp status or dispatch a test email">⚡ Email & WA Diagnostics</button>
       <button class="btn" onclick="refreshAll()">Refresh</button>
     </div>
   </div>
@@ -1614,6 +1832,7 @@ textarea {
         <input id="leadFilterSearch" oninput="renderKanban(); renderLeadRows();" placeholder="Search name, phone, email..." style="max-width:210px; padding:6px 12px; font-size:12.5px;">
       </div>
       <div class="actions">
+        <button class="btn" onclick="exportLeadsCSV()" title="Export all enquiries to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
         <button class="btn" onclick="openCostSheetModal()" style="font-weight:700; border-color:#0284c7; color:#0284c7; display:inline-flex; align-items:center; gap:6px;">📄 Cost Sheet</button>
         <button class="btn primary" onclick="openLeadModal()">+ Add Enquiry</button>
         <button class="btn" onclick="refreshLeads()">Refresh</button>
@@ -1748,6 +1967,7 @@ textarea {
           <p class="muted" style="margin-bottom:0">Real-time asset availability across all developer projects. Track units available, held on token, or sold.</p>
         </div>
         <div class="actions">
+          <button class="btn" onclick="exportUnitsCSV()" title="Export all units inventory to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
           <button class="btn primary" onclick="openUnitModal()">+ Add New Unit</button>
           <button class="btn" onclick="loadUnits()">Refresh Units</button>
         </div>
@@ -1783,6 +2003,7 @@ textarea {
           <p class="muted" style="margin-bottom:0">Official real estate allotment records, booking tokens, agreement values and payment milestones.</p>
         </div>
         <div class="actions">
+          <button class="btn" onclick="exportBookingsCSV()" title="Export all bookings & closures to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
           <button class="btn primary" onclick="openBookingModal()">+ New Booking</button>
           <button class="btn" onclick="loadBookings()">Refresh Bookings</button>
         </div>
@@ -1841,6 +2062,9 @@ textarea {
         <div>
           <h2 style="margin:0">Saved site visits</h2>
           <p class="muted" style="margin-bottom:0">Saved records stay here after Save and Refresh. Use Edit to load a record into the form above.</p>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="exportVisitsCSV()" title="Export all site visits to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
         </div>
       </div>
       <table>
@@ -1914,64 +2138,115 @@ textarea {
     </div>
   </section>
 
-  <!-- PROJECTS VIEW -->
+  <!-- PROJECTS COMMAND CENTER VIEW -->
   <section id="projectsView" class="view">
     <div class="panel">
-      <div class="toolbar">
+      <!-- Header Toolbar -->
+      <div class="toolbar" style="margin-bottom:20px;">
         <div>
-          <h2 style="margin:0">Project management</h2>
-          <p class="muted" style="margin-bottom:0">Create, edit, activate/deactivate and manage project media.</p>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <h2 style="margin:0;">Project Portfolio & Command Center</h2>
+            <span class="pill" id="projectCountBadge" style="background:var(--sky-light); color:var(--sky-deep); font-weight:700;">2 Projects</span>
+          </div>
+          <p class="muted" style="margin-top:4px; margin-bottom:0;">Full lifecycle management: Add new developments, edit details, track unit inventory, manage photo/video galleries, and archive or delete completed projects.</p>
         </div>
         <div class="actions">
-          <button class="btn primary" onclick="resetProjectForm();window.scrollTo({top:0,behavior:'smooth'})">+ New project</button>
-          <button class="btn" onclick="refreshProjects()">Refresh saved projects</button>
+          <button class="btn primary" onclick="openProjectModal()" style="font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+            <span style="font-size:16px; line-height:1;">+</span> Add New Project
+          </button>
+          <button class="btn" onclick="refreshProjects()" title="Reload projects list">↻ Refresh</button>
         </div>
       </div>
-      <form id="projectForm" class="formgrid">
-        <input id="pId" type="hidden">
-        <input id="pName" required placeholder="Project name">
-        <select id="pCategory" required>
-          <option value="">Category</option>
-          <option>RESIDENTIAL</option>
-          <option>COMMERCIAL</option>
-          <option>DEVELOPMENT</option>
-          <option>INDUSTRIAL</option>
-        </select>
-        <select id="pStatus"><option>active</option><option>inactive</option></select>
-        <input id="pLocation" placeholder="Location / area">
-        <input id="pPrice" placeholder="Price / price range">
-        <input id="pAmenities" class="span2" placeholder="Amenities (comma separated)">
-        <input id="pImage" placeholder="Legacy image path (optional)">
-        <input id="pImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif,image/tiff">
-        <textarea id="pDescription" class="span2" placeholder="Description"></textarea>
-        <div class="span4 actions">
-          <button class="btn primary" type="submit">Save project</button>
-          <button class="btn" type="button" onclick="resetProjectForm()">Clear</button>
-          <span id="projectMsg" class="muted"></span>
+
+      <!-- Real-time KPI Metric Tiles -->
+      <div class="project-kpi-grid">
+        <div class="project-kpi-card">
+          <div class="project-kpi-icon" style="background:#e0f2fe; color:#0284c7;">🏛️</div>
+          <div>
+            <div class="project-kpi-num" id="kpiTotalProjects">2</div>
+            <div class="project-kpi-label">Total Projects</div>
+          </div>
         </div>
-      </form>
-      <div id="mediaManager" style="display:none;margin-top:18px;border:1px solid var(--line);padding:18px;background:var(--bg-subtle);border-radius:var(--radius-md);">
-        <div class="actions">
-          <h3 id="mediaTitle" style="margin:0;flex:1">Project media</h3>
-          <button class="btn" id="closeMedia">Close</button>
+        <div class="project-kpi-card">
+          <div class="project-kpi-icon" style="background:#ecfdf5; color:#059669;">🏗️</div>
+          <div>
+            <div class="project-kpi-num" id="kpiActiveProjects">2</div>
+            <div class="project-kpi-label">Active / Ongoing</div>
+          </div>
         </div>
-        <input id="mediaFiles" type="file" multiple accept="image/*,video/mp4,video/webm,video/quicktime,video/x-m4v,video/ogg,video/x-msvideo" style="margin-top:12px">
-        <button class="btn gold" id="uploadMedia" style="margin-top:8px">Upload selected media</button>
-        <p id="mediaMsg" class="muted small"></p>
-        <div id="mediaGrid" class="media-grid"></div>
+        <div class="project-kpi-card">
+          <div class="project-kpi-icon" style="background:#fef3c7; color:#d97706;">🏆</div>
+          <div>
+            <div class="project-kpi-num" id="kpiCompletedProjects">0</div>
+            <div class="project-kpi-label">Completed & Delivered</div>
+          </div>
+        </div>
+        <div class="project-kpi-card">
+          <div class="project-kpi-icon" style="background:#f1f5f9; color:#475569;">📦</div>
+          <div>
+            <div class="project-kpi-num" id="kpiTotalUnits">23</div>
+            <div class="project-kpi-label">Portfolio Units</div>
+          </div>
+        </div>
       </div>
-      <table style="margin-top:18px">
-        <thead>
-          <tr>
-            <th>Project</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Media</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="projectRows"></tbody>
-      </table>
+
+      <!-- Filter & Controls Toolbar -->
+      <div class="toolbar" style="margin-top:20px; padding:14px 16px; background:var(--bg-subtle); border-radius:var(--radius-md); border:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex:1; min-width:280px;">
+          <input id="projFilterSearch" oninput="filterProjects()" placeholder="🔍 Search by name, location, amenities..." style="max-width:280px; background:#fff;">
+          <select id="projFilterStatus" onchange="filterProjects()" style="max-width:180px; background:#fff;">
+            <option value="">All Statuses</option>
+            <option value="active">Active (Ongoing)</option>
+            <option value="completed">Completed / Delivered</option>
+            <option value="sold_out">100% Sold Out</option>
+            <option value="inactive">Inactive / Draft</option>
+          </select>
+          <select id="projFilterCategory" onchange="filterProjects()" style="max-width:200px; background:#fff;">
+            <option value="">All Categories</option>
+            <option value="APARTMENTS & SHOPS">Apartments & Shops</option>
+            <option value="LUXURY VILLAS">Luxury Villas</option>
+            <option value="RESIDENTIAL">Residential</option>
+            <option value="COMMERCIAL">Commercial</option>
+            <option value="DEVELOPMENT">Development</option>
+            <option value="INDUSTRIAL">Industrial</option>
+            <option value="PLOTS / LAND">Plots / Land</option>
+          </select>
+        </div>
+        <div class="view-switch-btns" style="display:flex; gap:6px;">
+          <button id="projViewBtnGrid" class="view-switch-btn active" onclick="switchProjectView('grid')" title="Visual Cards View">⊞ Cards</button>
+          <button id="projViewBtnTable" class="view-switch-btn" onclick="switchProjectView('table')" title="Dense Data Table">☰ Table</button>
+        </div>
+      </div>
+
+      <!-- Cards Grid View Container -->
+      <div id="projectCardsGrid" class="projects-cards-grid"></div>
+
+      <!-- Table View Container -->
+      <div id="projectTableContainer" style="display:none; margin-top:16px;">
+        <table style="width:100%;">
+          <thead>
+            <tr>
+              <th style="width:80px;">Cover</th>
+              <th>Project Name & Location</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Pricing</th>
+              <th>Inventory Status</th>
+              <th>Media</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="projectTableRows"></tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="projectEmptyState" style="display:none; text-align:center; padding:48px 20px; background:var(--bg-subtle); border-radius:var(--radius-md); margin-top:20px; border:1px dashed var(--line-strong);">
+        <div style="font-size:36px; margin-bottom:8px;">🏢</div>
+        <h3 style="margin:0 0 6px 0;">No Projects Found</h3>
+        <p class="muted" style="margin:0 0 16px 0;">No projects match your current search or filter criteria.</p>
+        <button class="btn primary" onclick="resetProjectFilters()">Reset Filters</button>
+      </div>
     </div>
   </section>
 
@@ -1984,9 +2259,16 @@ textarea {
           <p class="muted" style="margin-bottom:0">Create staff accounts, edit details, reset passwords and activate/deactivate access.</p>
         </div>
         <div class="actions">
+          <button class="btn" onclick="exportTeamCSV()" title="Export all team advisors to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
           <button class="btn primary" onclick="resetTeamForm();document.getElementById('teamForm').scrollIntoView({behavior:'smooth'})">+ New team member</button>
           <button class="btn" onclick="refreshTeam()">Refresh saved team</button>
         </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; margin:10px 0 14px; flex-wrap:wrap;">
+        <span style="font-size:12px; font-weight:600; color:#64748b;">⚡ Quick Role Templates:</span>
+        <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Sales Advisor')">+ Sales Advisor</button>
+        <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Site Relationship Manager')">+ Relationship Manager</button>
+        <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Project Engineer')">+ Project Engineer</button>
       </div>
       <form id="teamForm" class="formgrid">
         <input id="tId" type="hidden">
@@ -2314,6 +2596,203 @@ textarea {
   </div>
 </div>
 
+<!-- PROJECT MODAL (Add / Edit) -->
+<div id="projectModal" class="modal">
+  <div class="modal-card" style="width:min(900px, 98%);">
+    <div class="modal-head">
+      <div>
+        <h2 id="projectModalTitle" style="margin:0;">Add Real Estate Project</h2>
+        <p class="muted small" style="margin:2px 0 0 0;">Fill in property specifications, pricing, amenities, and cover image.</p>
+      </div>
+      <button class="btn" onclick="closeModal('projectModal')">✕ Close</button>
+    </div>
+    <form id="projectModalForm" class="formgrid">
+      <input id="pmId" type="hidden">
+      
+      <label class="span2"><b>Project Name *</b>
+        <input id="pmName" required placeholder="e.g. DS 208 (Developed by Akshar Group)" style="margin-top:4px;">
+      </label>
+      
+      <label><b>Category *</b>
+        <select id="pmCategory" required style="margin-top:4px;">
+          <option value="APARTMENTS & SHOPS">Apartments & Shops</option>
+          <option value="LUXURY VILLAS">Luxury Villas</option>
+          <option value="RESIDENTIAL">Residential</option>
+          <option value="COMMERCIAL">Commercial</option>
+          <option value="DEVELOPMENT">Development</option>
+          <option value="INDUSTRIAL">Industrial</option>
+          <option value="PLOTS / LAND">Plots / Land</option>
+        </select>
+      </label>
+      
+      <label><b>Project Status *</b>
+        <select id="pmStatus" required style="margin-top:4px;">
+          <option value="active">Active (Ongoing Development)</option>
+          <option value="completed">Completed (Delivered Portfolio)</option>
+          <option value="sold_out">100% Sold Out</option>
+          <option value="inactive">Inactive / Draft (Hidden from Public)</option>
+        </select>
+      </label>
+      
+      <label class="span2"><b>Location & Full Address</b>
+        <input id="pmLocation" placeholder="e.g. S.P. Ring Road, Vastral, Ahmedabad - 382415" style="margin-top:4px;">
+      </label>
+      
+      <label class="span2"><b>Price Range / Starting Price</b>
+        <input id="pmPrice" placeholder="e.g. ₹48 Lakh - ₹78 Lakh" style="margin-top:4px;">
+      </label>
+      
+      <label class="span4"><b>Amenities (Comma-separated)</b>
+        <input id="pmAmenities" placeholder="e.g. Clubhouse, Gymnasium, Landscaped Garden, 24/7 Security, Children Play Area" style="margin-top:4px;">
+      </label>
+      
+      <label class="span4"><b>Detailed Description & Project Highlights</b>
+        <textarea id="pmDescription" rows="4" placeholder="Overview of architectural design, towers, location highlights, connectivity..." style="margin-top:4px;"></textarea>
+      </label>
+      
+      <!-- Cover Image Upload Box with Instant Preview -->
+      <div class="span4" style="background:var(--bg-subtle); padding:16px 20px; border-radius:var(--radius-md); border:1px dashed var(--line-strong);">
+        <b style="display:block; margin-bottom:4px;">Project Cover Photo</b>
+        <p class="muted small" style="margin:0 0 10px 0;">This photo will be displayed prominently across the public website, hero cards, and catalogs.</p>
+        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+          <div id="pmImagePreviewBox" style="width:140px; height:90px; border-radius:8px; background:#e2e8f0; overflow:hidden; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); flex-shrink:0;">
+            <img id="pmImagePreview" src="" style="width:100%; height:100%; object-fit:cover; display:none;" alt="Preview">
+            <span id="pmImagePlaceholder" style="font-size:11px; color:var(--ink-muted); text-align:center; padding:8px;">No image selected</span>
+          </div>
+          <div style="flex:1; min-width:220px;">
+            <input id="pmImageFile" type="file" accept="image/jpeg,image/png,image/webp,image/avif" style="font-size:12px; margin-bottom:6px;">
+            <div class="small muted">Supported: JPG, PNG, WebP (Max 250 MB). Optimized automatically.</div>
+            <input id="pmImageUrl" type="hidden">
+          </div>
+        </div>
+      </div>
+      
+      <div class="span4 actions" style="margin-top:10px;">
+        <button class="btn primary" type="submit" id="pmSubmitBtn" style="padding:10px 24px; font-weight:700;">Save Project</button>
+        <button class="btn" type="button" onclick="closeModal('projectModal')">Cancel</button>
+        <span id="pmMsg" class="muted" style="margin-left:12px;"></span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- PROJECT MEDIA STUDIO MODAL -->
+<div id="projectMediaModal" class="modal">
+  <div class="modal-card" style="width:min(960px, 98%);">
+    <div class="modal-head">
+      <div>
+        <h2 id="pmmTitle" style="margin:0;">Project Media Studio</h2>
+        <p id="pmmSubtitle" class="muted small" style="margin:2px 0 0 0;">Upload high-res photos and walkthrough videos, set cover photo, and organize gallery.</p>
+      </div>
+      <button class="btn" onclick="closeModal('projectMediaModal')">✕ Close</button>
+    </div>
+    
+    <!-- Upload Dropzone -->
+    <div style="background:var(--sky-subtle); padding:16px 20px; border-radius:var(--radius-md); border:1px dashed var(--line-sky); margin-bottom:18px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div>
+          <b style="color:var(--sky-deep);">Upload New Photos & Videos</b>
+          <div class="small muted">Select multiple files (JPG, PNG, WebP, MP4, WebM up to 2 GB)</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <input id="pmmFileInput" type="file" multiple accept="image/*,video/mp4,video/webm,video/quicktime" style="font-size:12px; max-width:220px;">
+          <button class="btn gold" id="pmmUploadBtn" onclick="uploadProjectMediaFiles()" style="font-weight:700;">Upload Selected Media</button>
+        </div>
+      </div>
+      <div id="pmmUploadStatus" class="small muted" style="margin-top:6px;"></div>
+    </div>
+    
+    <!-- Media Grid -->
+    <div id="pmmGrid" class="media-grid"></div>
+    
+    <div style="margin-top:20px; text-align:right;">
+      <button class="btn" onclick="closeModal('projectMediaModal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE / ARCHIVE CONFIRMATION MODAL -->
+<div id="deleteProjectModal" class="modal">
+  <div class="modal-card" style="width:min(540px, 95%); text-align:center;">
+    <div style="font-size:44px; margin-bottom:10px;">⚠️</div>
+    <h2 id="delProjTitle" style="margin:0 0 8px 0; font-size:20px; color:var(--ink);">Manage Project Lifecycle</h2>
+    <p id="delProjPrompt" style="color:var(--ink-secondary); font-size:13.5px; margin-bottom:20px;">What would you like to do with this project?</p>
+    
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+      <button class="btn" onclick="executeArchiveProject()" style="padding:12px; font-weight:600; text-align:left; display:flex; align-items:center; gap:12px;">
+        <span style="font-size:20px;">📁</span>
+        <div>
+          <b>Archive / Mark Inactive</b>
+          <div class="small muted">Keeps all unit sales and photos safely, but hides project from public website.</div>
+        </div>
+      </button>
+      <button class="btn danger" onclick="executePermanentDeleteProject()" style="padding:12px; font-weight:600; text-align:left; display:flex; align-items:center; gap:12px; background:#fff1f2; border-color:#fecdd3; color:#e11d48;">
+        <span style="font-size:20px;">🗑️</span>
+        <div>
+          <b style="color:#e11d48;">Permanently Delete Project</b>
+          <div class="small" style="color:#9f1239;">Completely removes this project, its uploaded files, and unit matrix records.</div>
+        </div>
+      </button>
+    </div>
+    
+    <button class="btn" onclick="closeModal('deleteProjectModal')" style="width:100%;">Cancel</button>
+  </div>
+</div>
+
+<!-- INTEGRATIONS & DIAGNOSTICS MODAL -->
+<div id="integrationModal" class="modal">
+  <div class="modal-card" style="width:min(660px, 95%);">
+    <div class="modal-head">
+      <div>
+        <h2 style="margin:0;">⚡ Live Gateways & SMTP Diagnostics</h2>
+        <p class="muted small" style="margin:2px 0 0 0;">Inspect verified Gmail SMTP connection, WhatsApp automation status, and test email delivery.</p>
+      </div>
+      <button class="btn" onclick="closeModal('integrationModal')">✕ Close</button>
+    </div>
+    <div style="padding:16px 0;">
+      <div id="integrationLoading" style="text-align:center; padding:24px; color:#64748b; font-size:14px;">
+        Connecting to live mail server & inspecting gateways...
+      </div>
+      <div id="integrationContent" style="display:none;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+              <b style="font-size:13px; color:#0f172a;">📧 Gmail SMTP</b>
+              <span id="smtpBadge" class="pill" style="background:#ecfdf5; color:#065f46; font-weight:700;">Active</span>
+            </div>
+            <div style="font-size:12px; color:#64748b; line-height:1.6;">
+              <div>Host: <b id="smtpHost" style="color:#334155;">smtp.gmail.com:465</b></div>
+              <div>Sender: <b id="smtpSender" style="color:#334155;">msinfraprojects2021@gmail.com</b></div>
+              <div>Status: <span id="smtpStatusText" style="color:#16a34a; font-weight:700;">Verified & Ready</span></div>
+            </div>
+          </div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+              <b style="font-size:13px; color:#0f172a;">💬 WhatsApp Automation</b>
+              <span id="waBadge" class="pill" style="background:#eff6ff; color:#1d4ed8; font-weight:700;">Active</span>
+            </div>
+            <div style="font-size:12px; color:#64748b; line-height:1.6;">
+              <div>Mode: <b id="waMode" style="color:#334155;">1-Click Direct + Cloud API</b></div>
+              <div>Admin Phone: <b style="color:#334155;">+91 63520 00017</b></div>
+              <div>Status: <span style="color:#2563eb; font-weight:700;">Triggers Operational</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
+          <h3 style="margin:0 0 6px; font-size:14px; color:#0f172a;">✉️ Dispatch Instant Test Verification Email</h3>
+          <p class="muted small" style="margin:0 0 12px;">Send an immediate diagnostic email through the live SMTP server to confirm delivery to your inbox.</p>
+          <div style="display:flex; gap:8px;">
+            <input id="testEmailRecipient" type="email" placeholder="Enter recipient email (e.g. admin@laxminarayangroup.com)" style="flex:1; padding:9px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px;">
+            <button id="testEmailBtn" class="btn gold" onclick="sendTestEmailDiagnostic()" style="white-space:nowrap; font-weight:700;">🚀 Send Test Email</button>
+          </div>
+          <div id="testEmailResult" style="margin-top:10px; font-size:12.5px; font-weight:600;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LEAD 360° SLIDE-OVER DRAWER -->
 <div id="drawerBackdrop" class="drawer-backdrop" onclick="closeLeadDrawer()"></div>
 <div id="leadDrawer" class="lead-drawer">
@@ -2392,7 +2871,11 @@ const state = {
   units: [],
   bookings: [],
   currentDrawerLead: null,
-  leadViewMode: 'kanban'
+  leadViewMode: 'kanban',
+  projectViewMode: 'grid',
+  projectSearch: '',
+  projectFilterStatus: '',
+  projectFilterCategory: ''
 };
 
 function esc(s) {
@@ -2831,7 +3314,7 @@ function renderKanban() {
           <div class="card-footer">
             <span class="card-assignee">${x.employee_name ? ('👤 ' + esc(x.employee_name)) : '⚪ Not Assigned'}</span>
             <div class="card-actions" onclick="event.stopPropagation()">
-              ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greeting from Laxminarayan Group.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp">💬</a>` : ''}
+              ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our projects') + '. I am your dedicated relationship advisor. Would you prefer a digital brochure or a private site visit this week?')}" target="_blank" class="card-icon-btn card-wa" title="⚡ 1-Click Welcome WhatsApp">💬</a>` : ''}
               ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Direct Call">📞</a>` : ''}
             </div>
           </div>
@@ -2880,7 +3363,8 @@ function renderLeadRows() {
       <td>${esc(x.employee_name || 'Not Assigned')}</td>
       <td>${x.follow_up_at ? localDate(x.follow_up_at) : '—'}</td>
       <td>${esc(x.notes || '—')}</td>
-      <td class="actions">
+      <td class="actions" style="white-space:nowrap;">
+        ${(x.phone || '').replace(/[^0-9]/g, '') ? `<a href="https://wa.me/91${(x.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="btn smallbtn" style="text-decoration:none; color:#15803d; border-color:#86efac; background:#f0fdf4; display:inline-flex; align-items:center; gap:3px;" title="⚡ 1-Click Welcome WhatsApp">💬 WA</a>` : ''}
         <button class="btn smallbtn" onclick="openLeadDrawer(${x.id})">360° Drawer</button>
         <button class="btn smallbtn" onclick="editLeadInline(${x.id})">Edit</button>
         <button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button>
@@ -3507,7 +3991,13 @@ async function loadBookings() {
         <td><span style="color:#059669; font-weight:700; font-family:monospace;">${esc(x.token_amount || '—')}</span></td>
         <td><span class="pill" style="background:#ecfdf5; color:#065f46;">${esc(x.payment_status || 'token_received').replace(/_/g, ' ')}</span></td>
         <td><span class="pill" style="background:${x.status === 'confirmed' ? '#ecfdf5' : '#fffbeb'}; color:${x.status === 'confirmed' ? '#065f46' : '#92400e'};">${esc(x.status)}</span></td>
-        <td class="actions">
+        <td class="actions" style="white-space:nowrap;">
+          <a href="/api/admin/bookings/${x.id}/allotment-letter" target="_blank" class="btn smallbtn gold" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-weight:700;" title="Download Official Signed PDF Allotment Letter">
+            📄 Allotment PDF
+          </a>
+          <button class="btn smallbtn" onclick="sendBookingAllotmentEmailAction(${x.id}, '${escAttr(x.customer_email || '')}')" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; display:inline-flex; align-items:center; gap:4px; font-weight:700;" title="Email Official Signed PDF Allotment Letter to Buyer">
+            📧 Email PDF
+          </button>
           <button class="btn smallbtn danger" onclick="deleteBooking(${x.id}, '${escAttr(x.booking_reference)}')">Delete</button>
         </td>
       </tr>
@@ -3588,6 +4078,91 @@ async function deleteBooking(id, ref) {
     await load();
   } catch (e) {
     toast(e.message);
+  }
+}
+
+async function sendBookingAllotmentEmailAction(id, email) {
+  if (!email) {
+    toast('No customer email on this booking record.');
+    return;
+  }
+  if (!confirm(`Send official PDF Allotment Letter to ${email}?`)) return;
+  try {
+    toast('Dispatching official allotment email with PDF attachment via SMTP...');
+    const res = await send(`/api/admin/bookings/${id}/send-email`, { method: 'POST' });
+    toast(res.message || 'Allotment Letter emailed successfully!');
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+// ─── INTEGRATIONS & SMTP / WHATSAPP DIAGNOSTICS ───
+async function openIntegrationModal() {
+  openModal('integrationModal');
+  $('integrationLoading').style.display = 'block';
+  $('integrationContent').style.display = 'none';
+  $('testEmailResult').innerHTML = '';
+  if ($('testEmailRecipient')) {
+    $('testEmailRecipient').value = (state.profile && state.profile.email) || 'msinfraprojects2021@gmail.com';
+  }
+
+  try {
+    const data = await get('/api/admin/integrations/status');
+    $('integrationLoading').style.display = 'none';
+    $('integrationContent').style.display = 'block';
+
+    // SMTP status
+    if (data.smtp && data.smtp.connected) {
+      $('smtpBadge').textContent = 'Live & Connected';
+      $('smtpBadge').style.background = '#ecfdf5';
+      $('smtpBadge').style.color = '#065f46';
+      $('smtpStatusText').textContent = 'Verified Handshake · Port 465 SSL';
+      $('smtpStatusText').style.color = '#16a34a';
+    } else {
+      $('smtpBadge').textContent = 'Configured';
+      $('smtpBadge').style.background = '#eff6ff';
+      $('smtpBadge').style.color = '#1d4ed8';
+      $('smtpStatusText').textContent = data.smtp?.error || 'Ready';
+      $('smtpStatusText').style.color = '#2563eb';
+    }
+    if ($('smtpHost') && data.smtp) $('smtpHost').textContent = data.smtp.host + ':465 (SSL)';
+    if ($('smtpSender') && data.smtp) $('smtpSender').textContent = data.smtp.user;
+
+    // WhatsApp status
+    if ($('waMode') && data.whatsapp) {
+      $('waMode').textContent = data.whatsapp.mode;
+    }
+  } catch (e) {
+    $('integrationLoading').textContent = 'Error connecting: ' + e.message;
+  }
+}
+
+async function sendTestEmailDiagnostic() {
+  const recipient = ($('testEmailRecipient').value || '').trim();
+  if (!recipient) {
+    toast('Please enter a recipient email.');
+    return;
+  }
+  const btn = $('testEmailBtn');
+  const resultDiv = $('testEmailResult');
+  btn.disabled = true;
+  btn.textContent = '⏳ Dispatching...';
+  resultDiv.innerHTML = '<span style="color:#64748b;">Connecting to SMTP server and sending test email...</span>';
+
+  try {
+    const res = await send('/api/admin/integrations/test-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: recipient })
+    });
+    resultDiv.innerHTML = `<span style="color:#16a34a;">✅ SUCCESS: Test email delivered to ${recipient}! (Message ID: ${res.messageId || 'OK'})</span>`;
+    toast('Test email sent successfully!');
+  } catch (err) {
+    resultDiv.innerHTML = `<span style="color:#dc2626;">❌ ERROR: ${err.message}</span>`;
+    toast(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Send Test Email';
   }
 }
 
@@ -3715,167 +4290,464 @@ async function refreshVisits() {
   toast('Saved site visits refreshed; form cleared');
 }
 
-// ─── PROJECTS ───
+// ─── PROJECTS COMMAND CENTER ───
+let activeMediaProjectId = null;
+let deletingProjectId = null;
+
 async function loadProjects() {
   try {
     const d = await get('/api/admin/projects');
-    state.projects = d.data;
-    $('projectRows').innerHTML = d.data.map(x => `<tr><td><b>${esc(x.name)}</b><br><span class="small">${esc(x.description)}</span></td><td>${esc(x.category)}</td><td><span class="pill">${esc(x.status)}</span></td><td>${x.media_count || 0} file(s)</td><td class="actions"><button class="btn smallbtn" onclick="editProject(${x.id})">Edit</button><button class="btn smallbtn" onclick="openMedia(${x.id})">Media</button><button class="btn smallbtn" onclick="toggleProject(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteProject(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('');
+    state.projects = d.data || [];
+
+    // Calculate real-time KPI metrics
+    const total = state.projects.length;
+    const active = state.projects.filter(p => p.status === 'active').length;
+    const completed = state.projects.filter(p => p.status === 'completed').length;
+    const totalUnits = state.projects.reduce((acc, p) => acc + (p.units_total || 0), 0);
+
+    if ($('kpiTotalProjects')) $('kpiTotalProjects').textContent = total;
+    if ($('kpiActiveProjects')) $('kpiActiveProjects').textContent = active;
+    if ($('kpiCompletedProjects')) $('kpiCompletedProjects').textContent = completed;
+    if ($('kpiTotalUnits')) $('kpiTotalUnits').textContent = totalUnits;
+    if ($('projectCountBadge')) $('projectCountBadge').textContent = `${total} Projects`;
+
+    renderProjects();
   } catch (e) {
     toast(e.message);
   }
 }
 
-function resetProjectForm() {
-  $('pId').value = '';
-  $('pName').value = '';
-  $('pCategory').value = '';
-  $('pStatus').value = 'active';
-  $('pLocation').value = '';
-  $('pPrice').value = '';
-  $('pAmenities').value = '';
-  $('pImage').value = '';
-  $('pDescription').value = '';
-  $('pImageFile').value = '';
-  $('projectMsg').textContent = '';
+function switchProjectView(mode) {
+  state.projectViewMode = mode;
+  if ($('projViewBtnGrid')) $('projViewBtnGrid').classList.toggle('active', mode === 'grid');
+  if ($('projViewBtnTable')) $('projViewBtnTable').classList.toggle('active', mode === 'table');
+  renderProjects();
 }
 
-function editProject(id) {
-  const x = state.projects.find(p => Number(p.id) === Number(id));
-  if (!x) return;
-  showView('projectsView');
-  $('pId').value = x.id;
-  $('pName').value = x.name;
-  $('pCategory').value = x.category;
-  $('pStatus').value = x.status;
-  $('pLocation').value = x.location || '';
-  $('pPrice').value = x.price || '';
-  $('pAmenities').value = x.amenities || '';
-  $('pImage').value = x.image || '';
-  $('pDescription').value = x.description || '';
+function filterProjects() {
+  state.projectSearch = ($('projFilterSearch')?.value || '').trim().toLowerCase();
+  state.projectFilterStatus = ($('projFilterStatus')?.value || '').toLowerCase();
+  state.projectFilterCategory = ($('projFilterCategory')?.value || '').toUpperCase();
+  renderProjects();
+}
+
+function resetProjectFilters() {
+  if ($('projFilterSearch')) $('projFilterSearch').value = '';
+  if ($('projFilterStatus')) $('projFilterStatus').value = '';
+  if ($('projFilterCategory')) $('projFilterCategory').value = '';
+  state.projectSearch = '';
+  state.projectFilterStatus = '';
+  state.projectFilterCategory = '';
+  renderProjects();
+}
+
+function renderProjects() {
+  const q = state.projectSearch || '';
+  const statusFilter = state.projectFilterStatus || '';
+  const catFilter = state.projectFilterCategory || '';
+
+  const filtered = (state.projects || []).filter(p => {
+    if (statusFilter && (p.status || 'active').toLowerCase() !== statusFilter) return false;
+    if (catFilter && (p.category || '').toUpperCase() !== catFilter) return false;
+    if (q) {
+      const matchName = (p.name || '').toLowerCase().includes(q);
+      const matchLoc = (p.location || '').toLowerCase().includes(q);
+      const matchAmenities = (p.amenities || '').toLowerCase().includes(q);
+      const matchDesc = (p.description || '').toLowerCase().includes(q);
+      if (!matchName && !matchLoc && !matchAmenities && !matchDesc) return false;
+    }
+    return true;
+  });
+
+  const emptyEl = $('projectEmptyState');
+  const gridEl = $('projectCardsGrid');
+  const tableContainer = $('projectTableContainer');
+
+  if (filtered.length === 0) {
+    if (emptyEl) emptyEl.style.display = 'block';
+    if (gridEl) gridEl.style.display = 'none';
+    if (tableContainer) tableContainer.style.display = 'none';
+    return;
+  }
+
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  if (state.projectViewMode === 'table') {
+    if (gridEl) gridEl.style.display = 'none';
+    if (tableContainer) tableContainer.style.display = 'block';
+    renderProjectTable(filtered);
+  } else {
+    if (tableContainer) tableContainer.style.display = 'none';
+    if (gridEl) {
+      gridEl.style.display = 'grid';
+      renderProjectGrid(filtered);
+    }
+  }
+}
+
+function renderProjectGrid(list) {
+  const grid = $('projectCardsGrid');
+  if (!grid) return;
+
+  grid.innerHTML = list.map(p => {
+    const status = (p.status || 'active').toLowerCase();
+    const statusLabel = status === 'active' ? '🟢 ACTIVE' : (status === 'completed' ? '🏆 COMPLETED' : (status === 'sold_out' ? '🟠 SOLD OUT' : '⚪ INACTIVE'));
+    const statusClass = status === 'active' ? 'active' : (status === 'completed' ? 'completed' : (status === 'sold_out' ? 'sold_out' : 'inactive'));
+    const coverImg = p.image || 'assets/hero-villa.png';
+    const amenities = (p.amenities || '').split(',').map(s => s.trim()).filter(Boolean);
+    const totalU = p.units_total || 0;
+    const availU = p.units_available || 0;
+    const soldU = p.units_sold || 0;
+    const blockedU = p.units_blocked || 0;
+
+    const availPct = totalU > 0 ? (availU / totalU * 100) : 100;
+    const blockedPct = totalU > 0 ? (blockedU / totalU * 100) : 0;
+    const soldPct = totalU > 0 ? (soldU / totalU * 100) : 0;
+
+    return `
+      <div class="proj-card">
+        <div class="proj-card-media">
+          <img class="proj-card-img" src="${escAttr(coverImg)}" alt="${escAttr(p.name)}" loading="lazy" onerror="this.src='assets/hero-villa.png'">
+          <span class="proj-badge-cat">${esc(p.category || 'RESIDENTIAL')}</span>
+          <span class="proj-badge-status ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="proj-card-body">
+          <div class="proj-card-title">${esc(p.name)}</div>
+          <div class="proj-card-loc">📍 ${esc(p.location || 'Location details not specified')}</div>
+          <div class="proj-card-price">${esc(p.price || 'Price on Application')}</div>
+          <div class="proj-card-desc">${esc(p.description || 'No description provided.')}</div>
+          
+          ${amenities.length > 0 ? `
+            <div class="proj-card-amenities">
+              ${amenities.slice(0, 4).map(a => `<span class="proj-amenity-tag">${esc(a)}</span>`).join('')}
+              ${amenities.length > 4 ? `<span class="proj-amenity-tag" style="background:#e0f2fe; color:#0369a1; font-weight:700;">+${amenities.length - 4} more</span>` : ''}
+            </div>
+          ` : ''}
+
+          <div class="proj-units-panel">
+            <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:600;">
+              <span>Units: <b>${totalU} Total</b></span>
+              <span style="color:#059669;">${availU} Available</span>
+              <span style="color:#475569;">${soldU} Sold</span>
+            </div>
+            <div class="proj-units-bar" title="Available: ${availU} | Held: ${blockedU} | Sold: ${soldU}">
+              <div style="width:${availPct}%; background:#10b981;"></div>
+              <div style="width:${blockedPct}%; background:#f59e0b;"></div>
+              <div style="width:${soldPct}%; background:#64748b;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="proj-card-footer">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn smallbtn" onclick="openProjectModal(${p.id})" style="font-weight:600;">✏️ Edit</button>
+            <button class="btn smallbtn" onclick="openProjectMediaModal(${p.id})">📸 Media (${p.media_count || 0})</button>
+            <button class="btn smallbtn" onclick="viewProjectUnits(${p.id})">📦 Units (${totalU})</button>
+            <button class="btn smallbtn" onclick="previewProjectLive(${p.id})" title="View public page in new tab">🌐 Live ↗</button>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button class="btn smallbtn danger" onclick="openDeleteProjectModal(${p.id})" title="Delete or Archive Project">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderProjectTable(list) {
+  const tbody = $('projectTableRows');
+  if (!tbody) return;
+
+  tbody.innerHTML = list.map(p => {
+    const status = (p.status || 'active').toLowerCase();
+    const statusLabel = status === 'active' ? '🟢 Active' : (status === 'completed' ? '🏆 Completed' : (status === 'sold_out' ? '🟠 Sold Out' : '⚪ Inactive'));
+    const statusClass = status === 'active' ? 'active' : (status === 'completed' ? 'completed' : (status === 'sold_out' ? 'sold_out' : 'inactive'));
+    const coverImg = p.image || 'assets/hero-villa.png';
+
+    return `
+      <tr>
+        <td>
+          <img src="${escAttr(coverImg)}" style="width:65px; height:45px; object-fit:cover; border-radius:6px; border:1px solid var(--line);" onerror="this.src='assets/hero-villa.png'">
+        </td>
+        <td>
+          <b style="font-size:14px;">${esc(p.name)}</b>
+          <div class="small muted">📍 ${esc(p.location || 'No address')}</div>
+        </td>
+        <td><span class="pill" style="font-size:11px;">${esc(p.category || 'RESIDENTIAL')}</span></td>
+        <td><span class="proj-badge-status ${statusClass}" style="position:static; padding:3px 8px; font-size:11px;">${statusLabel}</span></td>
+        <td><b>${esc(p.price || 'N/A')}</b></td>
+        <td>
+          <span style="font-weight:700;">${p.units_total || 0} Units</span>
+          <div class="small muted">${p.units_available || 0} Avail · ${p.units_sold || 0} Sold</div>
+        </td>
+        <td><button class="btn smallbtn" onclick="openProjectMediaModal(${p.id})">📸 ${p.media_count || 0} files</button></td>
+        <td style="text-align:right;">
+          <div class="actions" style="justify-content:flex-end;">
+            <button class="btn smallbtn" onclick="openProjectModal(${p.id})">Edit</button>
+            <button class="btn smallbtn" onclick="viewProjectUnits(${p.id})">Units</button>
+            <button class="btn smallbtn" onclick="previewProjectLive(${p.id})">Live ↗</button>
+            <button class="btn smallbtn danger" onclick="openDeleteProjectModal(${p.id})">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ─── ADD / EDIT PROJECT MODAL ───
+function openProjectModal(id = null) {
+  const p = id ? state.projects.find(x => Number(x.id) === Number(id)) : null;
+
+  $('pmId').value = p ? p.id : '';
+  $('pmName').value = p ? p.name : '';
+  $('pmCategory').value = p ? p.category : 'APARTMENTS & SHOPS';
+  $('pmStatus').value = p ? (p.status || 'active') : 'active';
+  $('pmLocation').value = p ? (p.location || '') : '';
+  $('pmPrice').value = p ? (p.price || '') : '';
+  $('pmAmenities').value = p ? (p.amenities || '') : '';
+  $('pmDescription').value = p ? (p.description || '') : '';
+  $('pmImageUrl').value = p ? (p.image || '') : '';
+  $('pmImageFile').value = '';
+  $('pmMsg').textContent = '';
+
+  $('projectModalTitle').textContent = p ? `Edit Project — ${p.name}` : 'Add New Real Estate Project';
+
+  const preview = $('pmImagePreview');
+  const placeholder = $('pmImagePlaceholder');
+
+  if (p && p.image) {
+    preview.src = p.image;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+    placeholder.style.display = 'block';
+  }
+
+  openModal('projectModal');
+}
+
+// Attach image live preview handler
+if ($('pmImageFile')) {
+  $('pmImageFile').onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      $('pmImagePreview').src = url;
+      $('pmImagePreview').style.display = 'block';
+      $('pmImagePlaceholder').style.display = 'none';
+    }
+  };
+}
+
+if ($('projectModalForm')) {
+  $('projectModalForm').onsubmit = async e => {
+    e.preventDefault();
+    const btn = $('pmSubmitBtn');
+    btn.disabled = true;
+    $('pmMsg').textContent = 'Saving project...';
+
+    const fd = new FormData();
+    fd.append('name', $('pmName').value.trim());
+    fd.append('category', $('pmCategory').value);
+    fd.append('status', $('pmStatus').value);
+    fd.append('location', $('pmLocation').value.trim());
+    fd.append('price', $('pmPrice').value.trim());
+    fd.append('amenities', $('pmAmenities').value.trim());
+    fd.append('description', $('pmDescription').value.trim());
+    fd.append('image', $('pmImageUrl').value.trim());
+
+    if ($('pmImageFile').files[0]) {
+      fd.append('image_file', $('pmImageFile').files[0]);
+    }
+
+    const id = $('pmId').value;
+    try {
+      await send(id ? `/api/admin/projects/${id}` : '/api/admin/projects', {
+        method: id ? 'PUT' : 'POST',
+        body: fd
+      });
+      toast(id ? 'Project updated successfully!' : 'Project created successfully!');
+      closeModal('projectModal');
+      await loadProjects();
+    } catch (err) {
+      $('pmMsg').textContent = err.message;
+      toast(err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  };
+}
+
+// ─── MEDIA STUDIO MODAL ───
+function openProjectMediaModal(id) {
+  activeMediaProjectId = id;
+  const p = state.projects.find(x => Number(x.id) === Number(id));
+  $('pmmTitle').textContent = `Media Studio — ${p?.name || 'Project'}`;
+  $('pmmSubtitle').textContent = `Photos & Videos for ${p?.name || 'Project'}`;
+  $('pmmFileInput').value = '';
+  $('pmmUploadStatus').textContent = '';
+  openModal('projectMediaModal');
+  loadProjectMedia();
+}
+
+async function loadProjectMedia() {
+  if (!activeMediaProjectId) return;
+  try {
+    const d = await get(`/api/admin/projects/${activeMediaProjectId}/media`);
+    const grid = $('pmmGrid');
+    if (!grid) return;
+
+    if (!d.data || d.data.length === 0) {
+      grid.innerHTML = '<p class="muted" style="grid-column:1/-1; padding:20px 0; text-align:center;">No photos or videos uploaded yet. Choose files above to upload.</p>';
+      return;
+    }
+
+    grid.innerHTML = d.data.map(x => `
+      <div class="media-card">
+        ${x.is_cover ? '<b style="display:block;margin-bottom:6px;color:var(--sky);font-size:11px;">⭐ Primary Cover Photo</b>' : ''}
+        ${x.media_type === 'video' ? `<video controls src="${escAttr(x.file_path)}"></video>` : `<img src="${escAttr(x.file_path)}" loading="lazy">`}
+        <div class="small" style="margin-top:6px; color:var(--ink-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${esc(x.original_name)}</div>
+        <div class="small muted">${Math.round(x.file_size / 1024 / 1024 * 10) / 10} MB · ${x.media_type.toUpperCase()}</div>
+        <div class="actions" style="margin-top:8px;">
+          ${x.media_type === 'image' && !x.is_cover ? `<button class="btn smallbtn" onclick="setMediaAsCover(${x.id})">Set cover</button>` : ''}
+          <button class="btn smallbtn danger" onclick="deleteProjectMedia(${x.id})">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function uploadProjectMediaFiles() {
+  const files = [...($('pmmFileInput')?.files || [])];
+  if (!activeMediaProjectId || !files.length) return toast('Select at least one photo or video to upload.');
+
+  const fd = new FormData();
+  files.forEach(f => fd.append('media', f));
+
+  const btn = $('pmmUploadBtn');
+  btn.disabled = true;
+  $('pmmUploadStatus').textContent = `Uploading ${files.length} file(s)...`;
+
+  try {
+    await send(`/api/admin/projects/${activeMediaProjectId}/media`, { method: 'POST', body: fd });
+    $('pmmFileInput').value = '';
+    $('pmmUploadStatus').textContent = 'Upload complete!';
+    toast('Media uploaded successfully');
+    await loadProjectMedia();
+    loadProjects();
+  } catch (e) {
+    $('pmmUploadStatus').textContent = `Upload failed: ${e.message}`;
+    toast(e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function setMediaAsCover(mediaId) {
+  try {
+    await send(`/api/admin/projects/${activeMediaProjectId}/media/${mediaId}/cover`, { method: 'PATCH' });
+    toast('Cover photo updated successfully');
+    await loadProjectMedia();
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteProjectMedia(mediaId) {
+  if (!confirm('Permanently delete this photo/video?')) return;
+  try {
+    await send(`/api/admin/projects/${activeMediaProjectId}/media/${mediaId}`, { method: 'DELETE' });
+    toast('Media deleted');
+    await loadProjectMedia();
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+// ─── SAFE DELETE & ARCHIVE MODAL ───
+function openDeleteProjectModal(id) {
+  deletingProjectId = id;
+  const p = state.projects.find(x => Number(x.id) === Number(id));
+  if (!p) return;
+
+  $('delProjTitle').textContent = `Project Actions: ${p.name}`;
+  $('delProjPrompt').innerHTML = `Select lifecycle action for <b>${esc(p.name)}</b> (${esc(p.category)}):`;
+  openModal('deleteProjectModal');
+}
+
+async function executeArchiveProject() {
+  if (!deletingProjectId) return;
+  try {
+    await send(`/api/admin/projects/${deletingProjectId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'inactive' })
+    });
+    toast('Project archived (marked inactive)');
+    closeModal('deleteProjectModal');
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function executePermanentDeleteProject() {
+  if (!deletingProjectId) return;
+  const p = state.projects.find(x => Number(x.id) === Number(deletingProjectId));
+  if (!confirm(`FINAL CONFIRMATION: Are you 100% sure you want to permanently delete "${p?.name || 'this project'}"?\n\nThis removes all linked media files and unit matrix records permanently.`)) return;
+
+  try {
+    await send(`/api/admin/projects/${deletingProjectId}`, { method: 'DELETE' });
+    toast('Project permanently deleted');
+    closeModal('deleteProjectModal');
+    loadProjects();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+// ─── CROSS-MODULE SHORTCUTS ───
+function viewProjectUnits(id) {
+  showView('unitsView');
+  if ($('unitFilterProject')) {
+    $('unitFilterProject').value = String(id);
+    renderUnits();
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-if ($('projectForm')) {
-  $('projectForm').onsubmit = async e => {
-    e.preventDefault();
-    const fd = new FormData();
-    [['pName', 'name'], ['pCategory', 'category'], ['pStatus', 'status'], ['pLocation', 'location'], ['pPrice', 'price'], ['pAmenities', 'amenities'], ['pImage', 'image'], ['pDescription', 'description']].forEach(([id, k]) => fd.append(k, $(id).value));
-    if ($('pImageFile').files[0]) fd.append('image_file', $('pImageFile').files[0]);
-    const id = $('pId').value;
-    try {
-      await send(id ? '/api/admin/projects/' + id : '/api/admin/projects', { method: id ? 'PUT' : 'POST', body: fd });
-      toast(id ? 'Project updated' : 'Project created');
-      resetProjectForm();
-      loadProjects();
-    } catch (err) {
-      toast(err.message);
-    }
-  };
+function previewProjectLive(id) {
+  window.open(`project-detail.html?id=${id}`, '_blank');
 }
 
-async function toggleProject(id, status) {
+// ─── BACKWARD COMPATIBILITY HELPERS ───
+function editProject(id) { openProjectModal(id); }
+function openMedia(id) { openProjectMediaModal(id); }
+function deleteProject(id, name) { openDeleteProjectModal(id); }
+async function toggleProject(id, currentStatus) {
+  const nextStatus = currentStatus === 'active' ? 'inactive' : 'active';
   try {
-    await send('/api/admin/projects/' + id + '/status', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: status === 'active' ? 'inactive' : 'active' }) });
-    toast('Project status updated');
+    await send(`/api/admin/projects/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: nextStatus })
+    });
+    toast(`Project ${nextStatus === 'active' ? 'activated' : 'deactivated'}`);
     loadProjects();
   } catch (e) {
     toast(e.message);
   }
 }
-
-async function deleteProject(id, name) {
-  if (!confirm(`Permanently delete ${name}?`)) return;
-  if (!confirm('This also removes its media and cannot be undone. Continue?')) return;
-  try {
-    await send('/api/admin/projects/' + id, { method: 'DELETE' });
-    toast('Project deleted');
-    loadProjects();
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
-let mediaProject = null;
-async function openMedia(id) {
-  mediaProject = id;
-  const p = state.projects.find(x => Number(x.id) === Number(id));
-  $('mediaManager').style.display = 'block';
-  $('mediaTitle').textContent = 'Media — ' + (p?.name || 'Project');
-  await loadMedia();
-  $('mediaManager').scrollIntoView({ behavior: 'smooth' });
-}
-
-if ($('closeMedia')) {
-  $('closeMedia').onclick = () => {
-    $('mediaManager').style.display = 'none';
-    mediaProject = null;
-    $('mediaGrid').innerHTML = '';
-  };
-}
-
-async function loadMedia() {
-  try {
-    const d = await get('/api/admin/projects/' + mediaProject + '/media');
-    $('mediaGrid').innerHTML = d.data.map(x => `<div class="media-card">${x.is_cover ? '<b style="display:block;margin-bottom:4px;color:var(--sky);">Cover image</b>' : ''}${x.media_type === 'video' ? `<video controls src="${escAttr(x.file_path)}"></video>` : `<img src="${escAttr(x.file_path)}" loading="lazy">`}<div class="small" style="margin-top:6px;">${esc(x.original_name)} · ${Math.round(x.file_size / 1024 / 1024 * 10) / 10} MB</div><div class="actions" style="margin-top:8px;">${x.media_type === 'image' && !x.is_cover ? `<button class="btn smallbtn" onclick="setCover(${x.id})">Set cover</button>` : ''}<button class="btn smallbtn danger" onclick="deleteMedia(${x.id})">Delete</button></div></div>`).join('') || '<p class="muted">No media.</p>';
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
-if ($('uploadMedia')) {
-  $('uploadMedia').onclick = async () => {
-    const files = [...$('mediaFiles').files];
-    if (!mediaProject || !files.length) return toast('Choose media first');
-    const fd = new FormData();
-    files.forEach(f => fd.append('media', f));
-    $('uploadMedia').disabled = true;
-    try {
-      await send('/api/admin/projects/' + mediaProject + '/media', { method: 'POST', body: fd });
-      $('mediaFiles').value = '';
-      toast('Media uploaded');
-      await loadMedia();
-      loadProjects();
-    } catch (e) {
-      toast(e.message);
-    } finally {
-      $('uploadMedia').disabled = false;
-    }
-  };
-}
-
-async function setCover(id) {
-  try {
-    await send(`/api/admin/projects/${mediaProject}/media/${id}/cover`, { method: 'PATCH' });
-    toast('Cover updated');
-    loadMedia();
-    loadProjects();
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
-async function deleteMedia(id) {
-  if (!confirm('Delete this media?')) return;
-  try {
-    await send(`/api/admin/projects/${mediaProject}/media/${id}`, { method: 'DELETE' });
-    toast('Media deleted');
-    loadMedia();
-    loadProjects();
-  } catch (e) {
-    toast(e.message);
-  }
-}
-
 function refreshProjects() {
-  resetProjectForm();
-  if ($('mediaManager')) {
-    $('mediaManager').style.display = 'none';
-    mediaProject = null;
-    $('mediaGrid').innerHTML = '';
-  }
+  resetProjectFilters();
   loadProjects();
-  toast('Saved projects refreshed; form cleared');
+  toast('Projects refreshed');
 }
 
 // ─── TEAM & EMPLOYEES ───
@@ -4222,6 +5094,151 @@ async function refreshAll() {
   } catch (e) {
     toast(e.message);
   }
+}
+
+// ─── UNIVERSAL CSV EXPORT ENGINE (EXCEL COMPLIANT WITH UTF-8 BOM) ───
+function downloadCSV(filename, headers, rows) {
+  if (!rows || !rows.length) {
+    toast('No records available to export.');
+    return;
+  }
+  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const headerLine = headers.map(h => esc(h.label)).join(',');
+  const rowLines = rows.map(r => headers.map(h => esc(h.key ? r[h.key] : (h.fn ? h.fn(r) : ''))).join(','));
+  const csvContent = '\uFEFF' + [headerLine, ...rowLines].join('\r\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename.endsWith('.csv') ? filename : filename + '.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  toast(`Exported ${rows.length} records to ${filename}`);
+}
+
+function exportLeadsCSV() {
+  const list = state.leads || [];
+  const headers = [
+    { label: 'Lead ID', key: 'id' },
+    { label: 'Customer Name', key: 'name' },
+    { label: 'Phone', key: 'phone' },
+    { label: 'Email', key: 'email' },
+    { label: 'Project', key: 'project_name' },
+    { label: 'Unit', fn: r => r.unit_number ? ('Unit ' + r.unit_number) : '' },
+    { label: 'Priority', fn: r => r.sentiment || 'warm' },
+    { label: 'Status', key: 'status' },
+    { label: 'Source', key: 'source' },
+    { label: 'Budget', key: 'budget' },
+    { label: 'Assigned Advisor', fn: r => r.employee_name || 'Unassigned' },
+    { label: 'Follow-Up Date', key: 'follow_up_at' },
+    { label: 'Notes', key: 'notes' },
+    { label: 'Created At', key: 'created_at' }
+  ];
+  downloadCSV(`Laxminarayan_Leads_${new Date().toISOString().split('T')[0]}`, headers, list);
+}
+
+function exportUnitsCSV() {
+  const list = state.units || [];
+  const headers = [
+    { label: 'Unit ID', key: 'id' },
+    { label: 'Project Name', key: 'project_name' },
+    { label: 'Unit Number', key: 'unit_number' },
+    { label: 'Unit Type', key: 'unit_type' },
+    { label: 'Status', key: 'status' },
+    { label: 'Floor', key: 'floor' },
+    { label: 'Carpet Area (SqFt)', key: 'carpet_area' },
+    { label: 'Super Built-Up (SqFt)', key: 'super_built_up' },
+    { label: 'Base Price', key: 'base_price' },
+    { label: 'Buyer Name', key: 'buyer_name' },
+    { label: 'Buyer Phone', key: 'buyer_phone' },
+    { label: 'Booking Ref', key: 'booking_reference' },
+    { label: 'Last Updated', key: 'updated_at' }
+  ];
+  downloadCSV(`Laxminarayan_Units_Inventory_${new Date().toISOString().split('T')[0]}`, headers, list);
+}
+
+async function exportVisitsCSV() {
+  let list = state.visits || [];
+  if (!list.length) {
+    try {
+      const d = await get('/api/admin/site-visits');
+      list = d.data || [];
+    } catch(e) {}
+  }
+  const headers = [
+    { label: 'Visit ID', key: 'id' },
+    { label: 'Customer Name', key: 'name' },
+    { label: 'Phone', key: 'phone' },
+    { label: 'Email', key: 'email' },
+    { label: 'Project', key: 'project_name' },
+    { label: 'Scheduled Time', key: 'preferred_time' },
+    { label: 'Status', key: 'status' },
+    { label: 'Customer Notes', key: 'notes' },
+    { label: 'Admin Notes', key: 'admin_notes' },
+    { label: 'Created At', key: 'created_at' }
+  ];
+  downloadCSV(`Laxminarayan_Site_Visits_${new Date().toISOString().split('T')[0]}`, headers, list);
+}
+
+async function exportBookingsCSV() {
+  let list = state.bookings || [];
+  if (!list.length) {
+    try {
+      const d = await get('/api/admin/bookings');
+      list = d.data || [];
+    } catch(e) {}
+  }
+  const headers = [
+    { label: 'Booking ID', key: 'id' },
+    { label: 'Booking Reference', key: 'booking_reference' },
+    { label: 'Customer Name', key: 'customer_name' },
+    { label: 'Phone', key: 'customer_phone' },
+    { label: 'Email', key: 'customer_email' },
+    { label: 'Project', key: 'project_name' },
+    { label: 'Unit Allotted', fn: r => r.unit_number || r.allotted_unit || '' },
+    { label: 'Unit Type', key: 'unit_type' },
+    { label: 'Agreement Value', key: 'agreement_value' },
+    { label: 'Token Amount', key: 'token_amount' },
+    { label: 'Payment Status', key: 'payment_status' },
+    { label: 'Deal Status', key: 'status' },
+    { label: 'Notes', key: 'notes' },
+    { label: 'Booking Date', key: 'created_at' }
+  ];
+  downloadCSV(`Laxminarayan_Bookings_${new Date().toISOString().split('T')[0]}`, headers, list);
+}
+
+function exportTeamCSV() {
+  const list = state.employees || [];
+  const headers = [
+    { label: 'Employee ID', key: 'id' },
+    { label: 'Employee Code', key: 'employee_code' },
+    { label: 'Full Name', key: 'name' },
+    { label: 'Email', key: 'email' },
+    { label: 'Phone', key: 'phone' },
+    { label: 'Department', key: 'department' },
+    { label: 'Designation', key: 'designation' },
+    { label: 'Status', key: 'status' }
+  ];
+  downloadCSV(`Laxminarayan_Team_${new Date().toISOString().split('T')[0]}`, headers, list);
+}
+
+function prefillAdvisorRole(roleName) {
+  resetTeamForm();
+  if (roleName === 'Sales Advisor') {
+    $('tDepartment').value = 'Sales & CRM';
+    $('tDesignation').value = 'Senior Sales Advisor';
+  } else if (roleName === 'Site Relationship Manager') {
+    $('tDepartment').value = 'Site Operations';
+    $('tDesignation').value = 'Relationship Manager';
+  } else if (roleName === 'Project Engineer') {
+    $('tDepartment').value = 'Site Engineering';
+    $('tDesignation').value = 'Project Quality Engineer';
+  }
+  $('tName').focus();
 }
 
 load().then(() => {

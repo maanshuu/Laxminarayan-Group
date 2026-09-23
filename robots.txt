@@ -1,8 +1,16 @@
 User-agent: *
 Allow: /
+Allow: /properties.html
+Allow: /project-detail.html
+Allow: /project-category.html
+Allow: /assets/
+Allow: /uploads/
 Disallow: /admin.html
 Disallow: /dashboard.html
+Disallow: /advisor.html
 Disallow: /login.html
 Disallow: /signup.html
-Disallow: /project-detail.html
-Sitemap: /sitemap.xml
+Disallow: /forgot-password.html
+Disallow: /api/
+
+Sitemap: https://laxminarayangroup.com/sitemap.xml

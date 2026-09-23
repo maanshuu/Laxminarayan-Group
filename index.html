@@ -5,39 +5,61 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Laxminarayan Group | Construction • Development • Trust</title>
 <meta name="description" content="Laxminarayan Group creates thoughtfully designed homes in premium locations, crafted to match modern lifestyles with comfort, elegance, and long-term value.">
-<meta name="keywords" content="Laxminarayan Group, luxury homes, residential properties, commercial spaces, construction Gujarat, architecture, site visit booking">
+<meta name="keywords" content="Laxminarayan Group, luxury homes Gujarat, residential properties Ahmedabad, commercial retail shops, RERA approved projects, luxury apartments, real estate developer">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#cce3f0">
+<link rel="canonical" href="https://laxminarayangroup.com/">
 <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
 <link rel="apple-touch-icon" href="assets/favicon.jpg">
 
-<!-- Open Graph / Facebook -->
+<!-- Open Graph / Facebook / WhatsApp -->
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="Laxminarayan Group">
 <meta property="og:url" content="https://laxminarayangroup.com/">
 <meta property="og:title" content="Laxminarayan Group | Construction • Development • Trust">
-<meta property="og:description" content="Explore thoughtfully designed homes in premium locations, crafted to match modern lifestyles with comfort, elegance, and long-term value.">
-<meta property="og:image" content="assets/hero-villa.png">
+<meta property="og:description" content="Explore thoughtfully designed luxury homes and landmark commercial developments across Gujarat by Laxminarayan Group. RERA verified and crafted for long-term value.">
+<meta property="og:image" content="https://laxminarayangroup.com/assets/hero-villa.png">
+<meta property="og:image:alt" content="Laxminarayan Group Architectural Showcase">
+<meta property="og:locale" content="en_IN">
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://laxminarayangroup.com/">
 <meta property="twitter:title" content="Laxminarayan Group | Construction • Development • Trust">
-<meta property="twitter:description" content="Explore thoughtfully designed homes in premium locations, crafted to match modern lifestyles with comfort, elegance, and long-term value.">
-<meta property="twitter:image" content="assets/hero-villa.png">
+<meta property="twitter:description" content="Explore thoughtfully designed luxury homes and landmark commercial developments across Gujarat by Laxminarayan Group.">
+<meta property="twitter:image" content="https://laxminarayangroup.com/assets/hero-villa.png">
 
-<!-- Structured Data (JSON-LD) for SEO -->
+<!-- Structured Data (JSON-LD) for Google Rich Snippets -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
   "name": "Laxminarayan Group",
-  "image": "assets/hero-villa.png",
-  "description": "Premier construction and real estate development company creating residential and commercial landmarks.",
+  "alternateName": "Laxminarayan Infrastructure",
+  "url": "https://laxminarayangroup.com/",
+  "logo": "https://laxminarayangroup.com/assets/favicon.jpg",
+  "image": "https://laxminarayangroup.com/assets/hero-villa.png",
+  "description": "Premier construction and real estate development company in Gujarat creating iconic residential communities and high-street commercial landmarks.",
   "telephone": "+916352000017",
   "email": "msinfraprojects2021@gmail.com",
+  "priceRange": "₹₹₹₹",
+  "currenciesAccepted": "INR",
+  "paymentAccepted": "Bank Transfer, Cheque, Home Loan",
+  "areaServed": [
+    { "@type": "City", "name": "Ahmedabad" },
+    { "@type": "City", "name": "Vadodara" },
+    { "@type": "AdministrativeArea", "name": "Gujarat" }
+  ],
   "address": {
     "@type": "PostalAddress",
-    "addressCountry": "IN",
-    "addressRegion": "Gujarat"
+    "addressLocality": "Ahmedabad",
+    "addressRegion": "Gujarat",
+    "addressCountry": "IN"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "23.0225",
+    "longitude": "72.5714"
   },
   "openingHoursSpecification": {
     "@type": "OpeningHoursSpecification",
@@ -189,6 +211,8 @@ header.scrolled {
 }
 
 .btn-contact {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -198,11 +222,31 @@ header.scrolled {
   border-radius: var(--radius-pill);
   font-size: 13.5px;
   font-weight: 600;
-  transition: all .25s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background 0.2s ease;
+  box-shadow: 0 4px 14px rgba(8, 11, 15, 0.18);
+}
+.btn-contact::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -80%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: rotate(25deg);
+  transition: left 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 .btn-contact:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(8, 11, 15, 0.25);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2), 0 8px 22px rgba(8, 11, 15, 0.28);
+}
+.btn-contact:hover::after {
+  left: 140%;
+}
+.btn-contact:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: 0 2px 6px rgba(8, 11, 15, 0.15);
 }
 .btn-contact .arrow {
   display: inline-flex;
@@ -213,12 +257,12 @@ header.scrolled {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
   font-size: 12px;
-  transition: transform .2s ease;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease;
 }
 .btn-contact:hover .arrow {
-  transform: translateX(2px);
-  background: #fff;
-  color: var(--ink-primary);
+  transform: translateX(3px) scale(1.1);
+  background: #38bdf8;
+  color: #fff;
 }
 
 .menu-btn {
@@ -330,6 +374,8 @@ header.scrolled {
   flex-wrap: wrap;
 }
 .btn-pill-dark {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -340,11 +386,30 @@ header.scrolled {
   font-size: 14.5px;
   font-weight: 600;
   box-shadow: 0 4px 16px rgba(8, 11, 15, 0.18);
-  transition: all .25s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background 0.2s ease;
+}
+.btn-pill-dark::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -80%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: rotate(25deg);
+  transition: left 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 .btn-pill-dark:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(8, 11, 15, 0.28);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2), 0 10px 28px rgba(8, 11, 15, 0.32);
+}
+.btn-pill-dark:hover::after {
+  left: 140%;
+}
+.btn-pill-dark:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: 0 2px 8px rgba(8, 11, 15, 0.2);
 }
 .btn-pill-dark .circle-arrow {
   display: inline-flex;
@@ -356,13 +421,18 @@ header.scrolled {
   background: #fff;
   color: var(--ink-primary);
   font-size: 13px;
-  transition: transform .2s ease;
+  font-weight: 800;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease;
 }
 .btn-pill-dark:hover .circle-arrow {
-  transform: translateX(2px);
+  transform: translateX(4px) scale(1.1);
+  background: #38bdf8;
+  color: #fff;
 }
 
 .btn-pill-glass {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -374,13 +444,18 @@ header.scrolled {
   border-radius: var(--radius-pill);
   font-size: 14.5px;
   font-weight: 600;
-  transition: all .25s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease, background 0.2s ease;
 }
 .btn-pill-glass:hover {
   background: #ffffff;
-  border-color: var(--ink-primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  border-color: #0284c7;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15), 0 8px 24px rgba(8, 11, 15, 0.12);
+}
+.btn-pill-glass:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
 /* Iconic Hero Villa Showcase */
@@ -410,14 +485,15 @@ header.scrolled {
 /* ─── DYNAMIC VOLUMETRIC CLOUDS & FOG SYSTEM ─── */
 .hero-cloud-canvas {
   position: absolute;
-  bottom: -15px;
+  bottom: -20px;
   left: 0;
   width: 100%;
   height: 280px;
   pointer-events: none;
-  z-index: 4;
-  mix-blend-mode: screen;
-  filter: blur(5px);
+  z-index: 6;
+  filter: blur(0.5px);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+  mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
   will-change: transform;
 }
 
@@ -426,10 +502,10 @@ header.scrolled {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 240px;
+  height: 180px;
   pointer-events: none;
   overflow: hidden;
-  z-index: 5;
+  z-index: 4;
 }
 
 .hero-fog-layer {
@@ -443,37 +519,37 @@ header.scrolled {
   will-change: transform;
 }
 
-/* Layer 1: Background slow rolling clouds */
+/* Layer 1: Background rolling clouds (Continuous dynamic flow) */
 .fog-layer-back {
-  background-image: radial-gradient(ellipse 450px 140px at 250px 100%, rgba(255, 255, 255, 0.8) 0%, rgba(240, 248, 255, 0.5) 50%, rgba(255, 255, 255, 0) 100%),
-                    radial-gradient(ellipse 550px 160px at 750px 100%, rgba(255, 255, 255, 0.85) 0%, rgba(240, 248, 255, 0.45) 55%, rgba(255, 255, 255, 0) 100%),
-                    radial-gradient(ellipse 500px 150px at 1250px 100%, rgba(255, 255, 255, 0.8) 0%, rgba(240, 248, 255, 0.45) 50%, rgba(255, 255, 255, 0) 100%);
+  background-image: radial-gradient(ellipse 480px 140px at 250px 100%, rgba(255, 255, 255, 0.6) 0%, rgba(240, 248, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 580px 160px at 750px 100%, rgba(255, 255, 255, 0.65) 0%, rgba(240, 248, 255, 0.28) 55%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 520px 150px at 1250px 100%, rgba(255, 255, 255, 0.6) 0%, rgba(240, 248, 255, 0.28) 50%, rgba(255, 255, 255, 0) 100%);
   background-size: 1500px 220px;
-  opacity: 0.85;
-  filter: blur(8px);
-  animation: driftCloudsBack 48s linear infinite;
+  opacity: 0.55;
+  filter: blur(4px);
+  animation: driftCloudsBack 14s linear infinite;
 }
 
-/* Layer 2: Midground billowing mist */
+/* Layer 2: Midground billowing mist (Reverse opposing current) */
 .fog-layer-mid {
-  background-image: radial-gradient(ellipse 400px 130px at 200px 100%, rgba(255, 255, 255, 0.88) 0%, rgba(240, 249, 255, 0.55) 55%, rgba(255, 255, 255, 0) 100%),
-                    radial-gradient(ellipse 460px 140px at 700px 100%, rgba(255, 255, 255, 0.92) 0%, rgba(240, 249, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%),
-                    radial-gradient(ellipse 420px 130px at 1200px 100%, rgba(255, 255, 255, 0.88) 0%, rgba(240, 249, 255, 0.55) 55%, rgba(255, 255, 255, 0) 100%);
+  background-image: radial-gradient(ellipse 420px 130px at 200px 100%, rgba(255, 255, 255, 0.65) 0%, rgba(240, 249, 255, 0.35) 55%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 480px 140px at 700px 100%, rgba(255, 255, 255, 0.7) 0%, rgba(240, 249, 255, 0.35) 50%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 440px 130px at 1200px 100%, rgba(255, 255, 255, 0.65) 0%, rgba(240, 249, 255, 0.35) 55%, rgba(255, 255, 255, 0) 100%);
   background-size: 1400px 200px;
-  opacity: 0.75;
-  filter: blur(5px);
-  animation: driftCloudsMid 34s linear infinite reverse;
+  opacity: 0.45;
+  filter: blur(2px);
+  animation: driftCloudsMid 9s linear infinite reverse;
 }
 
-/* Layer 3: Foreground soft floating wisps */
+/* Layer 3: Foreground fast swirling wisps (Active surface turbulence) */
 .fog-layer-front {
-  background-image: radial-gradient(ellipse 360px 110px at 150px 100%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%),
-                    radial-gradient(ellipse 420px 120px at 650px 100%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%),
-                    radial-gradient(ellipse 380px 115px at 1150px 100%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0) 100%);
+  background-image: radial-gradient(ellipse 380px 110px at 150px 100%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.35) 60%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 440px 120px at 650px 100%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.35) 60%, rgba(255, 255, 255, 0) 100%),
+                    radial-gradient(ellipse 400px 115px at 1150px 100%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.35) 60%, rgba(255, 255, 255, 0) 100%);
   background-size: 1300px 180px;
-  opacity: 0.7;
-  filter: blur(3px);
-  animation: driftCloudsFront 24s ease-in-out infinite alternate;
+  opacity: 0.38;
+  filter: blur(1.2px);
+  animation: driftCloudsFront 5.5s ease-in-out infinite alternate;
 }
 
 /* Seamless feather blend into the section below */
@@ -482,28 +558,28 @@ header.scrolled {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 90px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 60%, #ffffff 100%);
+  height: 60px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, #ffffff 100%);
   pointer-events: none;
-  z-index: 6;
+  z-index: 7;
 }
 
 @keyframes driftCloudsBack {
   0% { transform: translateX(0) translateY(0); }
-  50% { transform: translateX(-500px) translateY(-6px); }
+  50% { transform: translateX(-750px) translateY(-12px); }
   100% { transform: translateX(-1500px) translateY(0); }
 }
 
 @keyframes driftCloudsMid {
   0% { transform: translateX(-1400px) translateY(0); }
-  50% { transform: translateX(-700px) translateY(-8px); }
+  50% { transform: translateX(-700px) translateY(-16px); }
   100% { transform: translateX(0) translateY(0); }
 }
 
 @keyframes driftCloudsFront {
-  0% { transform: translateX(-150px) translateY(0) scale(1); }
-  50% { transform: translateX(100px) translateY(-5px) scale(1.03); }
-  100% { transform: translateX(-150px) translateY(0) scale(1); }
+  0% { transform: translateX(-300px) translateY(0) scale(1); }
+  50% { transform: translateX(250px) translateY(-12px) scale(1.08); }
+  100% { transform: translateX(-300px) translateY(0) scale(1); }
 }
 
 
@@ -2165,47 +2241,107 @@ loadSiteData();
   resize();
   window.addEventListener("resize", resize, { passive: true });
 
-  // Pre-render a single high-fidelity cloud puff texture off-screen once (zero garbage collection)
-  const puffCanvas = document.createElement("canvas");
-  const puffSize = 256;
-  puffCanvas.width = puffSize;
-  puffCanvas.height = puffSize;
-  const pctx = puffCanvas.getContext("2d");
-  const baseGrad = pctx.createRadialGradient(puffSize/2, puffSize/2, 0, puffSize/2, puffSize/2, puffSize/2);
-  baseGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-  baseGrad.addColorStop(0.35, "rgba(240, 248, 255, 0.65)");
-  baseGrad.addColorStop(0.70, "rgba(255, 255, 255, 0.20)");
-  baseGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-  pctx.fillStyle = baseGrad;
-  pctx.beginPath();
-  pctx.arc(puffSize/2, puffSize/2, puffSize/2, 0, Math.PI * 2);
-  pctx.fill();
+  // Load High-Resolution Photorealistic 3D Volumetric Cloud Textures
+  const puffImg = new Image();
+  puffImg.src = "assets/cloud-puff-real.png";
+  const ribbonImg = new Image();
+  ribbonImg.src = "assets/cloud-ribbon-real.png";
 
-  // Generate organic floating volumetric cloud puffs (optimized count)
-  const particleCount = 18;
+  let texturesReady = false;
+  let loadedCount = 0;
+  function onImgLoad() {
+    loadedCount++;
+    if (loadedCount >= 2) {
+      texturesReady = true;
+    }
+  }
+  puffImg.onload = onImgLoad;
+  ribbonImg.onload = onImgLoad;
+
+  // Fallback programmatic puff if images take a moment to decode
+  const fallbackCanvas = document.createElement("canvas");
+  fallbackCanvas.width = 256;
+  fallbackCanvas.height = 256;
+  const fctx = fallbackCanvas.getContext("2d");
+  const fg = fctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  fg.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+  fg.addColorStop(0.5, "rgba(245, 250, 255, 0.55)");
+  fg.addColorStop(1, "rgba(255, 255, 255, 0)");
+  fctx.fillStyle = fg;
+  fctx.beginPath();
+  fctx.arc(128, 128, 128, 0, Math.PI * 2);
+  fctx.fill();
+
+  // Create 34 dynamic volumetric cloud particles across 3 motion tiers
+  const particleCount = 34;
   const particles = [];
   for (let i = 0; i < particleCount; i++) {
+    const tier = i % 3;
+    let speedX, radiusX, radiusY, alpha, imgType, rotSpeed;
+
+    if (tier === 1) {
+      // Main Volumetric Cumulus Billows (Substantial, fluffy, living cloud bank)
+      speedX = 1.6 + Math.random() * 1.5; // 1.6 to 3.1 px/frame (~95 - 185 px/sec)
+      radiusX = 160 + Math.random() * 100; // 320px to 520px wide
+      radiusY = 65 + Math.random() * 35;
+      alpha = 0.70 + Math.random() * 0.22; // High opacity - crisp, dense cloud body
+      rotSpeed = (Math.random() > 0.5 ? 1 : -1) * (0.0012 + Math.random() * 0.0018);
+      imgType = "puff";
+    } else if (tier === 2) {
+      // Fast High-Wind Mist Ribbons (Long aerodynamic streams skimming across the water)
+      speedX = 3.2 + Math.random() * 2.2; // 3.2 to 5.4 px/frame (~190 - 320 px/sec)
+      radiusX = 220 + Math.random() * 120; // 440px to 680px wide ribbon
+      radiusY = 35 + Math.random() * 20;
+      alpha = 0.40 + Math.random() * 0.25;
+      rotSpeed = (Math.random() - 0.5) * 0.0015;
+      imgType = "ribbon";
+    } else {
+      // Deep Atmospheric Foundation Mist (Large, slow rolling ambient cloud)
+      speedX = 1.0 + Math.random() * 0.8; // 1.0 to 1.8 px/frame (~60 - 110 px/sec)
+      radiusX = 240 + Math.random() * 120;
+      radiusY = 75 + Math.random() * 40;
+      alpha = 0.38 + Math.random() * 0.22;
+      rotSpeed = (Math.random() - 0.5) * 0.001;
+      imgType = "puff";
+    }
+
     particles.push({
-      x: Math.random() * (width + 400) - 200,
-      y: height * 0.35 + Math.random() * (height * 0.65),
-      radiusX: 110 + Math.random() * 120,
-      radiusY: 55 + Math.random() * 65,
-      speedX: 0.18 + Math.random() * 0.32,
-      bobSpeed: 0.0010 + Math.random() * 0.0016,
+      x: Math.random() * (width + 600) - 300,
+      y: height * 0.58 + Math.random() * (height * 0.38),
+      radiusX,
+      radiusY,
+      speedX,
+      angle: Math.random() * Math.PI * 2,
+      rotSpeed,
+      bobSpeed: 0.0022 + Math.random() * 0.0026,
       bobPhase: Math.random() * Math.PI * 2,
-      bobAmp: 6 + Math.random() * 10,
-      alpha: 0.25 + Math.random() * 0.35,
-      pulseSpeed: 0.0012 + Math.random() * 0.0018
+      bobAmp: 5 + Math.random() * 8,
+      scaleSpeed: 0.0018 + Math.random() * 0.0022,
+      scalePhase: Math.random() * Math.PI * 2,
+      scaleAmp: 0.06 + Math.random() * 0.06,
+      alpha,
+      pulseSpeed: 0.0018 + Math.random() * 0.0022,
+      imgType
     });
   }
 
-  function drawCloudPuff(p, time) {
+  function drawCloud(p, time) {
     const y = p.y + Math.sin(time * p.bobSpeed + p.bobPhase) * p.bobAmp;
-    const currentAlpha = Math.max(0.06, Math.min(0.65, p.alpha + Math.sin(time * p.pulseSpeed + p.bobPhase) * 0.08));
-    
+    const scale = 1 + Math.sin(time * p.scaleSpeed + p.scalePhase) * p.scaleAmp;
+    const currentAlpha = Math.max(0.12, Math.min(0.96, p.alpha + Math.sin(time * p.pulseSpeed + p.bobPhase) * 0.10));
+
+    let img = fallbackCanvas;
+    if (texturesReady) {
+      img = (p.imgType === "ribbon") ? ribbonImg : puffImg;
+    }
+
     ctx.save();
+    ctx.translate(p.x, y);
+    ctx.rotate(p.angle);
     ctx.globalAlpha = currentAlpha;
-    ctx.drawImage(puffCanvas, p.x - p.radiusX, y - p.radiusY, p.radiusX * 2, p.radiusY * 2);
+    const rx = p.radiusX * scale;
+    const ry = p.radiusY * scale;
+    ctx.drawImage(img, -rx, -ry, rx * 2, ry * 2);
     ctx.restore();
   }
 
@@ -2221,13 +2357,16 @@ loadSiteData();
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       p.x += p.speedX;
+      p.angle += p.rotSpeed;
 
-      if (p.x - p.radiusX > width + 120) {
-        p.x = -p.radiusX - 120;
-        p.y = height * 0.35 + Math.random() * (height * 0.65);
+      // Wrap around continuously across screen width
+      if (p.x - p.radiusX > width + 200) {
+        p.x = -p.radiusX - 200;
+        p.y = height * 0.58 + Math.random() * (height * 0.38);
+        p.angle = Math.random() * Math.PI * 2;
       }
 
-      drawCloudPuff(p, now);
+      drawCloud(p, now);
     }
 
     animId = requestAnimationFrame(loop);
@@ -2247,12 +2386,12 @@ loadSiteData();
     animId = requestAnimationFrame(loop);
   }
 
-  // Parallax on mouse move
+  // Interactive parallax & wind gust on mouse hover
   if (container) {
     container.addEventListener("mousemove", e => {
       const rect = container.getBoundingClientRect();
       const relX = (e.clientX - rect.left) / rect.width - 0.5;
-      canvas.style.transform = `translateX(${relX * 22}px)`;
+      canvas.style.transform = `translateX(${relX * 26}px)`;
     }, { passive: true });
     container.addEventListener("mouseleave", () => {
       canvas.style.transform = "translateX(0px)";

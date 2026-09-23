@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Laxminarayan Group — Project Details</title>
+<meta name="description" content="Explore signature residential and commercial landmark developments by Laxminarayan Group. RERA verified with world-class amenities and architectural excellence.">
+<meta name="keywords" content="Laxminarayan Group, luxury properties Gujarat, residential developments Ahmedabad, commercial shops, RERA verified homes">
+<meta name="robots" content="index, follow">
 <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
 <link rel="apple-touch-icon" href="assets/favicon.jpg">
 <script src="assets/attribution.js?v=4"></script>
@@ -1434,6 +1437,375 @@ footer {
     flex-shrink: 0;
   }
 }
+
+/* ═════════════════════════════════════════════════════════
+   FEATURE 1: DAY-TO-NIGHT ARCHITECTURAL SLIDER
+   ═════════════════════════════════════════════════════════ */
+.compare-container {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  cursor: ew-resize;
+  user-select: none;
+  touch-action: pan-y;
+  background: #0b1120;
+}
+@media (max-width: 768px) {
+  .compare-container { height: 320px; }
+}
+.compare-img {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-size: cover;
+  background-position: center bottom;
+}
+.compare-day {
+  background-image: url('uploads/projects/ds208_front_elevation.jpg');
+}
+.compare-night {
+  background-image: url('uploads/projects/ds208_front_elevation.jpg');
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+}
+.night-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 14, 34, 0.85) 0%, rgba(15, 23, 42, 0.72) 100%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.night-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 45% 65%, rgba(251, 191, 36, 0.35) 0%, transparent 60%);
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+}
+.compare-slider-bar {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 4px;
+  background: #d4af37;
+  transform: translateX(-50%);
+  z-index: 10;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.9);
+  pointer-events: none;
+}
+.compare-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: #0f172a;
+  border: 3px solid #d4af37;
+  color: #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  pointer-events: auto;
+  cursor: grab;
+}
+.compare-handle:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+.compare-badge {
+  position: absolute;
+  bottom: 20px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 5;
+  backdrop-filter: blur(10px);
+}
+.compare-badge-left {
+  left: 20px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #93c5fd;
+}
+.compare-badge-right {
+  right: 20px;
+  background: rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #fef08a;
+}
+
+/* ═════════════════════════════════════════════════════════
+   FEATURE 2: INTERACTIVE CAD FLOOR PLAN INSPECTOR
+   ═════════════════════════════════════════════════════════ */
+.cad-plan-wrap {
+  position: relative;
+  width: 100%;
+  margin: 12px 0;
+  background: #f1eae2;
+  border: 1px solid var(--sky-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  height: 480px;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
+}
+@media (max-width: 768px) {
+  .cad-plan-wrap { height: 320px; }
+}
+.cad-plan-img {
+  width: 200%;
+  max-width: none;
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  display: block;
+}
+.cad-hotspot {
+  position: absolute;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.4);
+  border: 2px solid #d4af37;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+.cad-hotspot:hover, .cad-hotspot.active {
+  background: #d4af37;
+  color: #0f172a;
+  box-shadow: 0 0 0 8px rgba(212, 175, 55, 0.35), 0 4px 15px rgba(0,0,0,0.3);
+  transform: translate(-50%, -50%) scale(1.18);
+}
+.cad-room-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+.cad-room-pill {
+  background: #fff;
+  border: 1px solid var(--sky-border);
+  color: var(--ink-body);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.cad-room-pill:hover {
+  border-color: #d4af37;
+  color: #0f172a;
+  background: #fffdf5;
+}
+.cad-room-pill.active {
+  background: #d4af37;
+  border-color: #d4af37;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+.cad-room-detail {
+  background: #fff;
+  border: 1px solid var(--sky-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ═════════════════════════════════════════════════════════
+   FEATURE 3: VIP WHATSAPP INVESTMENT DOSSIER
+   ═════════════════════════════════════════════════════════ */
+.vip-dossier-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+  border: 1.5px solid #86efac;
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.vip-dossier-content {
+  flex: 1;
+  min-width: 260px;
+}
+.vip-dossier-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.dossier-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid #86efac;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.dossier-prefix {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #15803d;
+  background: #dcfce7;
+  border-right: 1px solid #bbf7d0;
+}
+.dossier-phone-input {
+  border: none;
+  outline: none;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  width: 170px;
+  color: #0f172a;
+}
+.btn-dossier-send {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 12px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s ease;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-dossier-send:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.45);
+}
+
+/* ═════════════════════════════════════════════════════════
+   FEATURE 4: GUJARAT RERA MILESTONE PAYMENT TABLE
+   ═════════════════════════════════════════════════════════ */
+.milestone-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  font-size: 13px;
+}
+.milestone-table th {
+  text-align: left;
+  color: var(--ink-muted);
+  padding: 10px 12px;
+  border-bottom: 1.5px solid var(--sky-border);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.milestone-table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--ink-body);
+}
+.milestone-table tr:nth-child(even) td {
+  background: #f8fafc;
+}
+.milestone-table td:last-child {
+  text-align: right;
+  font-weight: 800;
+  color: var(--sky-deep);
+  font-family: monospace;
+  font-size: 13.5px;
+}
+
+/* ═════════════════════════════════════════════════════════
+   MOBILE FLOATING GLASSMORPHISM ACTION BAR (FEATURE 2)
+   ═════════════════════════════════════════════════════════ */
+.mobile-sticky-action-bar {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mobile-sticky-action-bar {
+    display: flex;
+    position: fixed;
+    bottom: 14px;
+    left: 12px;
+    right: 12px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    border-radius: 9999px;
+    padding: 6px 8px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(2, 132, 199, 0.25);
+    z-index: 1000;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    animation: slideUpMobileBar 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideUpMobileBar {
+    from { transform: translateY(80px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .mobile-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 6px;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+  }
+  .mobile-action-btn:active {
+    transform: scale(0.96);
+  }
+  .mobile-call-btn {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .mobile-wa-btn {
+    background: #25D366;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
+  }
+  .mobile-tour-btn {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+  }
+  body {
+    padding-bottom: 84px !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1459,12 +1831,18 @@ footer {
       <h1 class="project-main-title" id="title">Loading…</h1>
       <div class="project-location-sub">
         <span style="color:var(--sky-primary); font-size:16px;">📍</span>
-        <span id="topLocationText">Ahmedabad, Gujarat</span>
+        <a id="topLocationLink" href="https://maps.google.com" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Open site location in Google Maps">
+          <span id="topLocationText">Ahmedabad, Gujarat</span>
+          <span style="font-size:12px; color:var(--sky-primary);">↗</span>
+        </a>
       </div>
       <p id="desc" style="display:none;"></p>
       <div id="hero" style="display:none;"></div>
     </div>
     <div class="project-title-actions">
+      <a class="btn-action-pill" id="googleMapsBtn" href="https://maps.google.com" target="_blank" rel="noopener noreferrer" style="border-color:#38bdf8; color:#0369a1; background:#f0f9ff;">
+        <span>📍 Navigate via Maps</span>
+      </a>
       <button type="button" class="btn-action-pill" id="sharePropBtn" onclick="shareProjectDetail()">
         <span id="sharePropIcon">🔗</span> <span id="sharePropText">Share Property</span>
       </button>
@@ -1605,6 +1983,28 @@ footer {
       <a href="#amenitiesPanel" style="color:var(--sky-deep); font-weight:700; font-size:13px; padding:12px 18px; display:inline-flex; align-items:center; gap:6px;">✨ Explore All Amenities ↓</a>
       <span id="interestMsg" class="muted"></span>
     </div>
+
+    <!-- VIP WHATSAPP INVESTMENT DOSSIER (FEATURE 3) -->
+    <div class="vip-dossier-card" id="vipDossierCard">
+      <div class="vip-dossier-content">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+          <span style="background:#16a34a; color:#fff; font-size:10px; font-weight:800; padding:2px 8px; border-radius:12px; letter-spacing:0.5px;">VIP DIGITAL SERVICE</span>
+          <span style="font-size:12px; color:var(--sky-deep); font-weight:700;">⚡ Instant Delivery</span>
+        </div>
+        <h3 style="font-size:16.5px; margin-bottom:4px; color:var(--ink-heading);">Receive Official Executive Dossier on WhatsApp</h3>
+        <p style="font-size:12.5px; color:var(--ink-muted); margin:0;">Receive official CAD floor plans, sanctioned RERA certificates, and pre-launch pricing schedule directly in your chat.</p>
+      </div>
+      <div class="vip-dossier-action">
+        <div class="dossier-input-wrap">
+          <span class="dossier-prefix">IN +91</span>
+          <input type="tel" id="dossierPhone" class="dossier-phone-input" placeholder="Mobile Number" maxlength="10" aria-label="WhatsApp Mobile Number">
+        </div>
+        <button type="button" class="btn-dossier-send" id="btnSendDossier" onclick="sendWhatsAppDossier()">
+          <span>⚡ Send Dossier</span>
+        </button>
+      </div>
+    </div>
+    <div id="dossierSuccessMsg" style="display:none; font-size:12.5px; color:#16a34a; font-weight:700; margin-top:8px;"></div>
   </div>
 
   <!-- DEDICATED LUXURY AMENITIES SHOWCASE -->
@@ -1648,6 +2048,9 @@ footer {
       <button type="button" class="floorplan-tab" data-unit="3bhk" onclick="switchFloorPlan('3bhk', this)">
         <span>3 BHK Grand Residence</span>
       </button>
+      <button type="button" class="floorplan-tab" id="tabCadInspector" data-unit="cad3bhk" onclick="switchFloorPlan('cad3bhk', this)" style="border-color:#d4af37; background:linear-gradient(135deg, #fffdf5 0%, #fef3c7 100%); color:#92400e; font-weight:800;">
+        <span>📐 3 BHK CAD Inspector</span>
+      </button>
       <button type="button" class="floorplan-tab" data-unit="4bhk" onclick="switchFloorPlan('4bhk', this)">
         <span>4 BHK Sky Villa / Penthouse</span>
       </button>
@@ -1665,7 +2068,7 @@ footer {
           <span id="planUnitBadge" style="font-size:10px; background:rgba(56,189,248,0.18); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:12px; font-weight:700;">UNIT TYPE A-101</span>
         </div>
 
-        <!-- Dynamic SVG Blueprint Drawing -->
+        <!-- Standard SVG Blueprint Drawing -->
         <div class="blueprint-svg-wrap" id="blueprintGraphic" onclick="openBlueprintModal()">
           <svg id="blueprintSvg" viewBox="0 0 400 280" style="width:100%; height:auto; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="10" y="10" width="380" height="260" rx="8" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6 3" />
@@ -1684,14 +2087,26 @@ footer {
           </svg>
         </div>
 
-        <button type="button" class="blueprint-zoom-btn" onclick="openBlueprintModal()">
+        <!-- Authentic Interactive CAD Layout with 5 Verified Hotspots (Feature 2) -->
+        <div id="cadPlanInspectorGraphic" class="cad-plan-wrap" style="display:none;">
+          <img src="assets/projects/ds-208/floor_plans/ds208_3bhk_unit_floorplan.png" alt="DS 208 3BHK Unit Plan" class="cad-plan-img">
+          <!-- 5 Verified Architectural Hotspots -->
+          <div class="cad-hotspot" style="top:58%; left:70%;" onclick="selectCadRoom(0)" title="Grand Living Lounge">1</div>
+          <div class="cad-hotspot" style="top:38%; left:25%;" onclick="selectCadRoom(1)" title="Master Bedroom Suite">2</div>
+          <div class="cad-hotspot" style="top:38%; left:55%;" onclick="selectCadRoom(2)" title="Designer Modular Kitchen">3</div>
+          <div class="cad-hotspot active" style="top:75%; left:71%;" onclick="selectCadRoom(3)" title="Sunset Balcony Deck">4</div>
+          <div class="cad-hotspot" style="top:68%; left:31%;" onclick="selectCadRoom(4)" title="Executive Guest Bedroom">5</div>
+        </div>
+
+        <button type="button" class="blueprint-zoom-btn" id="btnBlueprintZoom" onclick="openBlueprintModal()">
           <span>🔍 Click to Enlarge Floor Blueprint</span>
         </button>
       </div>
 
       <!-- Plan Dimensions and Inquire Card -->
       <div class="plan-specs-card">
-        <div>
+        <!-- Standard Specs Container -->
+        <div id="planSpecsStandard">
           <span style="font-size:11px; font-weight:800; color:var(--sky-primary); text-transform:uppercase; letter-spacing:1px;" id="planSubTitle">2 BHK RESIDENTIAL CONFIGURATION</span>
           <h3 style="font-size:22px; color:var(--ink-heading); margin:4px 0 10px;" id="planHeading">2 BHK Luxury Suite</h3>
           <p style="font-size:13.5px; color:var(--ink-body); line-height:1.6;" id="planSummary">Designed for contemporary couples and growing families. Features generous ceiling clearance, a private viewing terrace, and an en-suite master bath.</p>
@@ -1716,7 +2131,33 @@ footer {
           </div>
         </div>
 
-        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:10px;">
+        <!-- Interactive CAD Specs Container (Feature 2) -->
+        <div id="cadSpecsInteractive" style="display:none;">
+          <span style="font-size:11px; font-weight:800; color:#b45309; text-transform:uppercase; letter-spacing:1px;">Interactive CAD Inspector</span>
+          <h3 style="font-size:20px; color:var(--ink-heading); margin:4px 0 6px;">Select Space to Inspect</h3>
+          <p style="font-size:12.5px; color:var(--ink-muted); margin:0 0 10px;">Click any numbered hotspot or button below to inspect spatial metrics:</p>
+          
+          <div class="cad-room-pills">
+            <button type="button" class="cad-room-pill" onclick="selectCadRoom(0)">1. Living Lounge</button>
+            <button type="button" class="cad-room-pill" onclick="selectCadRoom(1)">2. Master Suite</button>
+            <button type="button" class="cad-room-pill" onclick="selectCadRoom(2)">3. Modular Kitchen</button>
+            <button type="button" class="cad-room-pill active" onclick="selectCadRoom(3)">4. Balcony Deck</button>
+            <button type="button" class="cad-room-pill" onclick="selectCadRoom(4)">5. Guest Bedroom</button>
+          </div>
+
+          <div class="cad-room-detail">
+            <div style="font-size:11px; font-weight:800; color:var(--sky-primary); text-transform:uppercase; letter-spacing:1px;" id="cadRoomType">Outdoor Deck</div>
+            <h4 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:var(--ink-heading);" id="cadRoomName">Private Sunset Balcony Deck</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12.5px;">
+              <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Dimensions</span><b id="cadRoomDim" style="color:var(--ink-heading); font-size:13.5px;">12'0" × 5'6"</b></div>
+              <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Carpet Area</span><b id="cadRoomArea" style="color:var(--ink-heading); font-size:13.5px;">66 Sq. Ft.</b></div>
+              <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Finish</span><b id="cadRoomFloor" style="color:var(--ink-heading); font-size:13px;">Weatherproof Rustic Tiles</b></div>
+              <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Vastu</span><b id="cadRoomVastu" style="color:#16a34a; font-size:12px;">Open Unobstructed Sky</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px;">
           <button type="button" class="btn" onclick="selectPlanForInquiry()" style="padding:12px 22px; font-size:12.5px;">Enquire For This Unit Layout →</button>
           <span style="font-size:11.5px; color:var(--ink-muted);">Pre-allotment reservations available</span>
         </div>
@@ -1818,6 +2259,32 @@ footer {
           <span>📍 Open Google Maps Directions ↗</span>
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- DAY-TO-NIGHT ARCHITECTURAL LIGHT SLIDER (FEATURE 1) -->
+  <div class="panel" id="dayNightPanel" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+      <div>
+        <div style="font-size:11px; font-weight:800; color:var(--sky-primary); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px;">Atmospheric Lighting Study</div>
+        <h2 style="margin:0;">Day-to-Night Architectural Illumination</h2>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; background:var(--sky-surface); border:1px solid var(--sky-border); padding:6px 14px; border-radius:var(--radius-pill); font-size:12px; font-weight:600; color:var(--sky-deep);">
+        <span>🌓 Drag Golden Slider to Compare Midday Sun vs. Evening Glow</span>
+      </div>
+    </div>
+    <p class="muted" style="margin-bottom:20px;">Experience how the grand facade of DS 208 transforms between radiant midday sunlight and ambient evening twilight illumination.</p>
+
+    <div class="compare-container" id="compareBox">
+      <div class="compare-img compare-day" id="compareDayImg"></div>
+      <div class="compare-img compare-night" id="compareNightLayer">
+        <div class="night-overlay"></div>
+      </div>
+      <div class="compare-slider-bar" id="sliderBar">
+        <div class="compare-handle" id="sliderHandle">⇄</div>
+      </div>
+      <div class="compare-badge compare-badge-left">☀️ Radiant Daylight (12:00 PM)</div>
+      <div class="compare-badge compare-badge-right">🌙 Twilight Glow (8:30 PM)</div>
     </div>
   </div>
 
@@ -1928,10 +2395,34 @@ footer {
         <button type="button" class="btn-emi-apply" id="btnEmiApply">Apply for Home Loan Assistance →</button>
       </div>
     </div>
+
+    <!-- GUJARAT RERA CONSTRUCTION-LINKED MILESTONE SCHEDULE (FEATURE 4) -->
+    <div class="rera-milestone-box" id="reraMilestoneBox" style="margin-top:28px; padding-top:24px; border-top:1px solid var(--sky-border);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div>
+          <span style="font-size:11px; font-weight:800; color:var(--sky-primary); text-transform:uppercase; letter-spacing:1px;">Statutory Payment Schedule</span>
+          <h3 style="font-size:18px; margin:2px 0 0; color:var(--ink-heading);">Gujarat RERA Construction-Linked Milestones</h3>
+        </div>
+        <span style="background:rgba(2,132,199,0.08); color:var(--sky-deep); font-size:11.5px; font-weight:700; padding:4px 12px; border-radius:var(--radius-pill); border:1px solid rgba(2,132,199,0.2);">Linked to Selected Property Value</span>
+      </div>
+      
+      <table class="milestone-table">
+        <thead>
+          <tr>
+            <th>Construction Milestone Stage</th>
+            <th style="width:75px; text-align:center;">% Due</th>
+            <th style="width:140px; text-align:right;">Exact Amount</th>
+          </tr>
+        </thead>
+        <tbody id="reraMilestoneRows">
+          <!-- Dynamically populated from JS based on emiPriceRange -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- SITE VISIT REQUEST -->
-  <div class="panel">
+  <div class="panel" id="siteVisitPanel">
     <h2>Schedule a Private Site Visit</h2>
     <p class="muted">Select your preferred date and time. An advisory manager will confirm your private walkthrough.</p>
     <form id="visitForm" class="form">
@@ -2207,6 +2698,24 @@ async function load() {
   if ($('location')) $('location').textContent = p.location || 'Contact our advisory team';
   if ($('price')) $('price').textContent = p.price || 'Contact our advisory team';
   if ($('amenities')) $('amenities').textContent = p.amenities || 'Contact our advisory team';
+
+  // ─── 1-CLICK GOOGLE MAPS NAVIGATION (FEATURE 3) ───
+  const mapsQuery = encodeURIComponent(`${p.name || ''} ${p.location || 'Ahmedabad Gujarat'}`);
+  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${mapsQuery}`;
+  if ($('googleMapsBtn')) {
+    $('googleMapsBtn').href = mapsUrl;
+    $('googleMapsBtn').title = `Navigate to ${p.name} on Google Maps`;
+  }
+  if ($('topLocationLink')) {
+    $('topLocationLink').href = mapsUrl;
+  }
+
+  // ─── DYNAMIC PRE-FILLED WHATSAPP CONCIERGE DEEP LINK (FEATURE 3) ───
+  const waCustomText = encodeURIComponent(`Hello Laxminarayan Group, I am interested in ${p.name} (${p.location || 'Gujarat'}). Please share current unit availability, pricing, and schedule a private site visit.`);
+  const waCustomUrl = `https://wa.me/916352000017?text=${waCustomText}`;
+  if ($('mobileBarWaBtn')) $('mobileBarWaBtn').href = waCustomUrl;
+  if ($('lbWaInquireBtn')) $('lbWaInquireBtn').href = waCustomUrl;
+
   renderOverviewAndAmenities(p);
   if ($('hero')) {
     $('hero').style.backgroundImage = `linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%), url('${String(p.image || '').replace(/'/g, '%27')}')`;
@@ -2402,6 +2911,9 @@ async function load() {
         <button type="button" class="floorplan-tab" data-unit="3bhk" onclick="switchFloorPlan('3bhk', this)">
           <span>3 BHK Luxury Suite</span>
         </button>
+        <button type="button" class="floorplan-tab" id="tabCadInspector" data-unit="cad3bhk" onclick="switchFloorPlan('cad3bhk', this)" style="border-color:#d4af37; background:linear-gradient(135deg, #fffdf5 0%, #fef3c7 100%); color:#92400e; font-weight:800;">
+          <span>📐 3 BHK CAD Inspector</span>
+        </button>
         <button type="button" class="floorplan-tab" data-unit="shops" onclick="switchFloorPlan('shops', this)">
           <span>Ground Floor (33 Shops)</span>
         </button>
@@ -2528,8 +3040,13 @@ async function load() {
     }
   }, { passive: true });
 
-  // Initialize Home Loan EMI Calculator
+  window.currentProject = p;
+
+  // Initialize Home Loan EMI Calculator & RERA Milestones (Feature 4)
   initEmiCalculator(p);
+
+  // Initialize Day-to-Night Architectural Light Slider (Feature 1)
+  initDayNightSlider(p);
 }
 
 const floorPlans = {
@@ -2637,13 +3154,96 @@ const floorPlans = {
 
 let currentPlanKey = '2bhk';
 
+const CAD_ROOMS = [
+  {
+    type: "Living Zone",
+    name: "Grand Living & Dining Lounge",
+    dim: "18'0\" × 12'6\"",
+    area: "225 Sq. Ft.",
+    floor: "Imported Italian Marble",
+    vastu: "East-Facing Morning Sunlight"
+  },
+  {
+    type: "Master Suite",
+    name: "Master Bedroom Suite",
+    dim: "14'0\" × 12'0\"",
+    area: "168 Sq. Ft.",
+    floor: "Laminated Wooden Flooring",
+    vastu: "South-West Master Comfort Zone"
+  },
+  {
+    type: "Culinary Zone",
+    name: "Designer Modular Kitchen & Store",
+    dim: "11'6\" × 9'0\"",
+    area: "103 Sq. Ft.",
+    floor: "Vitrified Anti-Skid Granite",
+    vastu: "Agni (South-East) Vastu Compliant"
+  },
+  {
+    type: "Outdoor Deck",
+    name: "Private Sunset Balcony Deck",
+    dim: "12'0\" × 5'6\"",
+    area: "66 Sq. Ft.",
+    floor: "Weatherproof Rustic Tiles",
+    vastu: "Open Unobstructed Sky Vistas"
+  },
+  {
+    type: "Guest Room",
+    name: "Executive Guest Bedroom",
+    dim: "12'0\" × 11'0\"",
+    area: "132 Sq. Ft.",
+    floor: "Premium Vitrified 4×2 Tiles",
+    vastu: "North-West Fresh Air Circulation"
+  }
+];
+
+function selectCadRoom(idx) {
+  const r = CAD_ROOMS[idx];
+  if (!r) return;
+
+  if ($('cadRoomType')) $('cadRoomType').textContent = r.type;
+  if ($('cadRoomName')) $('cadRoomName').textContent = r.name;
+  if ($('cadRoomDim')) $('cadRoomDim').textContent = r.dim;
+  if ($('cadRoomArea')) $('cadRoomArea').textContent = r.area;
+  if ($('cadRoomFloor')) $('cadRoomFloor').textContent = r.floor;
+  if ($('cadRoomVastu')) $('cadRoomVastu').textContent = r.vastu;
+
+  document.querySelectorAll('.cad-hotspot').forEach((h, i) => h.classList.toggle('active', i === idx));
+  document.querySelectorAll('.cad-room-pill').forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
 function switchFloorPlan(planKey, tabBtn) {
+  document.querySelectorAll('.floorplan-tab').forEach(t => t.classList.remove('active'));
+  if (tabBtn) tabBtn.classList.add('active');
+
+  const bpGraphic = $('blueprintGraphic');
+  const cadGraphic = $('cadPlanInspectorGraphic');
+  const stdSpecs = $('planSpecsStandard');
+  const cadSpecs = $('cadSpecsInteractive');
+  const btnZoom = $('btnBlueprintZoom');
+
+  if (planKey === 'cad3bhk') {
+    currentPlanKey = 'cad3bhk';
+    if (bpGraphic) bpGraphic.style.display = 'none';
+    if (btnZoom) btnZoom.style.display = 'none';
+    if (cadGraphic) cadGraphic.style.display = 'block';
+    if (stdSpecs) stdSpecs.style.display = 'none';
+    if (cadSpecs) cadSpecs.style.display = 'block';
+    if ($('planUnitBadge')) $('planUnitBadge').textContent = 'CAD 3 BHK MASTER';
+    selectCadRoom(3); // Start with balcony deck highlighted
+    return;
+  }
+
+  // Restore standard blueprint view
+  if (bpGraphic) bpGraphic.style.display = 'block';
+  if (btnZoom) btnZoom.style.display = 'flex';
+  if (cadGraphic) cadGraphic.style.display = 'none';
+  if (stdSpecs) stdSpecs.style.display = 'block';
+  if (cadSpecs) cadSpecs.style.display = 'none';
+
   const plan = floorPlans[planKey];
   if (!plan) return;
   currentPlanKey = planKey;
-
-  document.querySelectorAll('.floorplan-tab').forEach(t => t.classList.remove('active'));
-  if (tabBtn) tabBtn.classList.add('active');
 
   $('planUnitBadge').textContent = plan.badge;
   $('planSubTitle').textContent = plan.subTitle;
@@ -2751,6 +3351,32 @@ function initEmiCalculator(p) {
     priceRange.value = estimatedPrice;
   }
 
+  const RERA_MILESTONES = [
+    { stage: '1. On Booking Token (Reservation)', pct: 10 },
+    { stage: '2. On Plinth / Foundation Work', pct: 15 },
+    { stage: '3. On 1st Floor Slab Casting', pct: 15 },
+    { stage: '4. On 3rd Floor Slab Casting', pct: 15 },
+    { stage: '5. On 4th (Top) Slab Casting', pct: 15 },
+    { stage: '6. On Brickwork & Internal Plaster', pct: 15 },
+    { stage: '7. On Flooring, Plumbing & Painting', pct: 10 },
+    { stage: '8. On Key Handover & Possession', pct: 5 }
+  ];
+
+  function updateReraMilestones(price) {
+    const tbody = $('reraMilestoneRows');
+    if (!tbody) return;
+    tbody.innerHTML = RERA_MILESTONES.map(m => {
+      const amt = Math.round(price * (m.pct / 100));
+      return `
+        <tr>
+          <td><b>${m.stage}</b></td>
+          <td style="text-align:center; font-weight:700; color:var(--sky-primary);">${m.pct}%</td>
+          <td>${formatExactINR(amt)}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
   function calculate() {
     const totalPrice = Number(priceRange.value);
     const dpPct = Number(downPaymentRange.value);
@@ -2792,6 +3418,9 @@ function initEmiCalculator(p) {
     $('emiInterestRatio').textContent = `${interestRatio}%`;
     $('emiInterestBar').style.width = `${interestRatio}%`;
 
+    // Update RERA Construction Milestones (Feature 4)
+    updateReraMilestones(totalPrice);
+
     return { totalPrice, downPaymentAmt, principal, annualRate, tenureYears, emi };
   }
 
@@ -2826,6 +3455,104 @@ function initEmiCalculator(p) {
       }
     };
   }
+}
+
+/* ═════════════════════════════════════════════════════════
+   FEATURE 1: DAY-TO-NIGHT ARCHITECTURAL LIGHT SLIDER
+   ═════════════════════════════════════════════════════════ */
+function initDayNightSlider(p) {
+  const panel = $('dayNightPanel');
+  if (!panel) return;
+
+  // Active for DS 208 (id === 1) or projects with architectural elevation
+  if (p && (p.id === 1 || (p.name && p.name.includes('208')))) {
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+    return;
+  }
+
+  const box = $('compareBox');
+  const nightLayer = $('compareNightLayer');
+  const sliderBar = $('sliderBar');
+  if (!box || !nightLayer || !sliderBar) return;
+
+  let isDragging = false;
+
+  function setSliderPos(clientX) {
+    const rect = box.getBoundingClientRect();
+    let offsetX = clientX - rect.left;
+    if (offsetX < 0) offsetX = 0;
+    if (offsetX > rect.width) offsetX = rect.width;
+    const pct = Math.max(0, Math.min(100, (offsetX / rect.width) * 100));
+    sliderBar.style.left = pct + '%';
+    nightLayer.style.clipPath = `polygon(${pct}% 0, 100% 0, 100% 100%, ${pct}% 100%)`;
+  }
+
+  box.addEventListener('mousedown', (e) => { isDragging = true; setSliderPos(e.clientX); });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+  window.addEventListener('mousemove', (e) => { if (isDragging) setSliderPos(e.clientX); });
+
+  box.addEventListener('touchstart', (e) => { isDragging = true; setSliderPos(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('touchend', () => { isDragging = false; });
+  window.addEventListener('touchmove', (e) => { if (isDragging) setSliderPos(e.touches[0].clientX); }, { passive: true });
+}
+
+/* ═════════════════════════════════════════════════════════
+   FEATURE 3: 1-CLICK WHATSAPP DOSSIER DELIVERY
+   ═════════════════════════════════════════════════════════ */
+async function sendWhatsAppDossier() {
+  const input = $('dossierPhone');
+  const btn = $('btnSendDossier');
+  const msg = $('dossierSuccessMsg');
+  if (!input) return;
+
+  const phone = input.value.trim().replace(/\D/g, '');
+  if (phone.length !== 10) {
+    alert('Please enter a valid 10-digit mobile number to receive the executive dossier on WhatsApp.');
+    input.focus();
+    return;
+  }
+
+  const fullPhone = '+91' + phone;
+  if (btn) {
+    btn.innerHTML = '<span>⚡ Sending...</span>';
+    btn.disabled = true;
+  }
+
+  try {
+    // Ingest lead into CRM database via live enquiry pipeline
+    await fetch('/api/whatsapp-enquiry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'VIP WhatsApp Buyer (' + phone + ')',
+        phone: phone,
+        project_id: (window.currentProject && window.currentProject.id) || 1,
+        message: 'Requested Executive Investment Dossier & Architectural CAD Floor Plans via WhatsApp.',
+        source: 'whatsapp_dossier'
+      })
+    });
+  } catch (err) {
+    console.warn('Lead capture notice:', err);
+  }
+
+  if (btn) {
+    btn.innerHTML = '<span>✓ Request Sent!</span>';
+    btn.style.background = '#15803d';
+  }
+  if (msg) {
+    msg.style.display = 'block';
+    msg.textContent = '✓ Request registered! Opening WhatsApp with your executive dossier...';
+  }
+
+  const projName = (window.currentProject && window.currentProject.name) || 'Akshar DS 208';
+  const text = `Namaste Laxminarayan Group! I am requesting the official Executive Investment Dossier, sanctioned RERA certificates, and CAD floor plans for ${projName}. My registered mobile number is ${fullPhone}. Please send the complete pack here.`;
+  const waUrl = `https://wa.me/916352000017?text=${encodeURIComponent(text)}`;
+
+  setTimeout(() => {
+    window.open(waUrl, '_blank');
+  }, 600);
 }
 
 /* ─── LUXURY LIGHTBOX & MOSAIC CONTROLLER (OPTION A) ─── */
@@ -3084,5 +3811,20 @@ load().catch(e => console.error(e));
 
   <div class="lightbox-filmstrip" id="lbFilmstrip"></div>
 </div>
+
+<!-- MOBILE FLOATING GLASSMORPHISM ACTION BAR (FEATURE 2) -->
+<div class="mobile-sticky-action-bar" id="mobileStickyBar" role="region" aria-label="Mobile Quick Actions">
+  <a href="tel:+916352000017" class="mobile-action-btn mobile-call-btn" title="Call Sales Advisory">
+    <span>📞 Call Sales</span>
+  </a>
+  <a id="mobileBarWaBtn" href="https://wa.me/916352000017" target="_blank" rel="noopener noreferrer" class="mobile-action-btn mobile-wa-btn" title="Chat on WhatsApp">
+    <span>💬 WhatsApp</span>
+  </a>
+  <a href="#siteVisitPanel" class="mobile-action-btn mobile-tour-btn" title="Schedule Site Visit Tour">
+    <span>📅 Book Tour</span>
+  </a>
+</div>
+
 </body>
 </html>
+

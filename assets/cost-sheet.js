@@ -91,7 +91,7 @@
               <div>
                 <div style="font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; font-family:'Playfair Display',serif;">LAXMINARAYAN GROUP</div>
                 <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; color:#0284c7; text-transform:uppercase; margin-top:2px;">Architectural Excellence & Luxury Development</div>
-                <div style="font-size:12px; color:#64748b; margin-top:4px;">Registered Office: Prime Corporate Avenue, Vadodara, Gujarat</div>
+                <div style="font-size:12px; color:#64748b; margin-top:4px;">Registered Office: 5, Ground floor, Madhav Evenue, odhav circle, Ahmedabad</div>
               </div>
               <div style="text-align:right;">
                 <span style="display:inline-block; background:#e0f2fe; color:#0369a1; padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">OFFICIAL QUOTATION</span>

@@ -23,10 +23,11 @@ async function runForgotPasswordTests() {
   console.log('TESTING FORGOT PASSWORD & RESET PASSWORD FEATURE');
   console.log('====================================================\n');
 
+  require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
   let rawToken = '';
-  const testEmail = 'admin@laxminarayangroup.com';
+  const testEmail = process.env.ADMIN_EMAIL || 'admin@laxminarayangroup.com';
   const temporaryPassword = 'TemporaryNewPass@2026';
-  const defaultAdminPassword = 'Admin@123';
+  const defaultAdminPassword = process.env.ADMIN_PASSWORD || 'LaxmiGroup#2026$Secure!';
 
   // STEP 1: Request Password Reset Link
   try {
@@ -154,14 +155,14 @@ async function runForgotPasswordTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: cleanToken, password: defaultAdminPassword })
     });
-    assert('7.1 Restored standard admin credentials (Admin@123)', restoreRes.status === 200);
+    assert(`7.1 Restored standard admin credentials (${defaultAdminPassword})`, restoreRes.status === 200);
 
     const finalLogin = await fetch(`${BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier: testEmail, password: defaultAdminPassword })
     });
-    assert('7.2 Confirmed Admin@123 works for admin login', finalLogin.status === 200);
+    assert(`7.2 Confirmed ${defaultAdminPassword} works for admin login`, finalLogin.status === 200);
   } catch (err) {
     assert('7. Restore standard credentials', false, err.message);
   }
