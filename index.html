@@ -42,7 +42,6 @@
   "description": "Premier construction and real estate development company in Gujarat creating iconic residential communities and high-street commercial landmarks.",
   "telephone": "+916352000017",
   "email": "msinfraprojects2021@gmail.com",
-  "priceRange": "₹₹₹₹",
   "currenciesAccepted": "INR",
   "paymentAccepted": "Bank Transfer, Cheque, Home Loan",
   "areaServed": [
@@ -1031,9 +1030,11 @@ section {
 .about-seal-badge .seal-emblem {
   width: 58px;
   height: 58px;
-  border-radius: 50%;
-  border: 2px solid #d4af37;
-  object-fit: cover;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 4px;
+  border: 1.5px solid #d4af37;
+  object-fit: contain;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
@@ -1310,11 +1311,13 @@ footer {
   letter-spacing: -0.5px;
 }
 .footer-seal-img {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 2px solid #d4af37;
-  object-fit: cover;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 4px;
+  border: 1.5px solid #d4af37;
+  object-fit: contain;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   flex-shrink: 0;
   transition: transform 0.25s ease;
@@ -1516,9 +1519,7 @@ footer {
 <header id="header">
   <div class="container nav-wrap">
     <a class="brand-logo" href="index.html">
-      <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
-      </svg>
+      <img src="assets/logo-mark.png" alt="Laxminarayan Group Logo" style="height:38px; width:auto; object-fit:contain; flex-shrink:0;">
       <div>
         LAXMINARAYAN GROUP
       </div>
@@ -1713,7 +1714,7 @@ footer {
       <div class="about-image-card">
         <img class="about-main-img" src="assets/about.jpg" alt="Laxminarayan architectural courtyard with natural daylight">
         <div class="about-seal-badge">
-          <img src="assets/laxminarayan-seal-logo.jpg" alt="Official Laxminarayan Group Seal" class="seal-emblem">
+          <img src="assets/logo-mark.png?v=2" alt="Official Laxminarayan Group Seal" class="seal-emblem">
           <div class="seal-meta">
             <strong>Official Seal of Trust</strong>
             <span>Building Trust, Delivering Dreams</span>
@@ -1920,7 +1921,7 @@ footer {
   <div class="container">
     <div class="footer-wrap">
       <div class="footer-brand">
-        <img src="assets/laxminarayan-seal-logo.jpg" alt="Laxminarayan Emblem" class="footer-seal-img">
+        <img src="assets/logo-mark.png?v=2" alt="Laxminarayan Emblem" class="footer-seal-img">
         <div>
           LAXMINARAYAN GROUP
           <span style="color:rgba(255,255,255,0.6);">CONSTRUCTION • DEVELOPMENT • TRUST</span>
@@ -2131,7 +2132,6 @@ function projectCard(p) {
         <span class="homy-card-tag">${esc(category)}</span>
         <span class="homy-card-micro-badge">${esc(badge)}</span>
       </div>
-      <span class="homy-card-price">${esc(price)}</span>
     </div>
     <div class="homy-card-bottom">
       <div class="homy-card-location">

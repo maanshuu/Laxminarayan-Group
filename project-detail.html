@@ -1811,9 +1811,12 @@ footer {
 <body>
 <header>
   <div class="container nav">
-    <a class="logo" href="index.html">
-      LAXMINARAYAN GROUP
-      <span>CONSTRUCTION • DEVELOPMENT</span>
+    <a href="index.html" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+      <img src="assets/logo-mark.png" alt="Laxminarayan Group" style="height:36px; width:auto; object-fit:contain; flex-shrink:0;">
+      <div class="logo">
+        LAXMINARAYAN GROUP
+        <span>CONSTRUCTION • DEVELOPMENT</span>
+      </div>
     </a>
     <a class="back-btn" href="properties.html">← Back to Portfolio</a>
   </div>
@@ -1940,11 +1943,11 @@ footer {
 
       <div class="overview-metric-card">
         <div class="overview-card-header">
-          <div class="overview-card-icon">💎</div>
-          <span class="overview-card-label">Pricing & Typology</span>
+          <div class="overview-card-icon">🏗️</div>
+          <span class="overview-card-label">Status & Typology</span>
         </div>
         <div class="overview-card-value" id="overviewPriceText">—</div>
-        <div class="overview-card-sub" id="overviewPriceSub">Tailored Payment Plans</div>
+        <div class="overview-card-sub" id="overviewPriceSub">RERA Approved Enclave</div>
       </div>
 
       <div class="overview-metric-card">
@@ -1992,7 +1995,7 @@ footer {
           <span style="font-size:12px; color:var(--sky-deep); font-weight:700;">⚡ Instant Delivery</span>
         </div>
         <h3 style="font-size:16.5px; margin-bottom:4px; color:var(--ink-heading);">Receive Official Executive Dossier on WhatsApp</h3>
-        <p style="font-size:12.5px; color:var(--ink-muted); margin:0;">Receive official CAD floor plans, sanctioned RERA certificates, and pre-launch pricing schedule directly in your chat.</p>
+        <p style="font-size:12.5px; color:var(--ink-muted); margin:0;">Receive official CAD floor plans, sanctioned RERA certificates, and master layout schedules directly in your chat.</p>
       </div>
       <div class="vip-dossier-action">
         <div class="dossier-input-wrap">
@@ -2113,20 +2116,20 @@ footer {
 
           <div class="plan-specs-grid">
             <div class="plan-spec-item">
-              <span>Carpet Area</span>
-              <strong id="planCarpet">1,180 sq.ft</strong>
-            </div>
-            <div class="plan-spec-item">
-              <span>Super Built-up Area</span>
-              <strong id="planSuperBuilt">1,650 sq.ft</strong>
-            </div>
-            <div class="plan-spec-item">
               <span>Vaastu Alignment</span>
-              <strong id="planFacing">East Facing</strong>
+              <strong id="planFacing">East / North-East (100% Vaastu)</strong>
             </div>
             <div class="plan-spec-item">
-              <span>Balconies & Baths</span>
-              <strong id="planBaths">2 Terraces • 2 Baths</strong>
+              <span>Balconies & Spaces</span>
+              <strong id="planBaths">Private Viewing Balcony • 2 Baths • Wash Yard</strong>
+            </div>
+            <div class="plan-spec-item">
+              <span>Cross Ventilation</span>
+              <strong>100% Natural Daylight & Airflow</strong>
+            </div>
+            <div class="plan-spec-item">
+              <span>Engineering Standard</span>
+              <strong>Earthquake Resistant RCC Frame</strong>
             </div>
           </div>
         </div>
@@ -2150,7 +2153,7 @@ footer {
             <h4 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:var(--ink-heading);" id="cadRoomName">Private Sunset Balcony Deck</h4>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:12.5px;">
               <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Dimensions</span><b id="cadRoomDim" style="color:var(--ink-heading); font-size:13.5px;">12'0" × 5'6"</b></div>
-              <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Carpet Area</span><b id="cadRoomArea" style="color:var(--ink-heading); font-size:13.5px;">66 Sq. Ft.</b></div>
+              <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Ambience</span><b id="cadRoomArea" style="color:var(--ink-heading); font-size:13.5px;">Natural Sunlight</b></div>
               <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Finish</span><b id="cadRoomFloor" style="color:var(--ink-heading); font-size:13px;">Weatherproof Rustic Tiles</b></div>
               <div><span style="color:var(--ink-muted); display:block; font-size:10.5px; text-transform:uppercase; font-weight:700;">Vastu</span><b id="cadRoomVastu" style="color:#16a34a; font-size:12px;">Open Unobstructed Sky</b></div>
             </div>
@@ -2482,7 +2485,7 @@ footer {
   <div style="background:#09121d; border:1px solid rgba(56,189,248,0.3); border-radius:20px; max-width:760px; width:100%; padding:32px; box-shadow:0 25px 60px rgba(0,0,0,0.5); position:relative; color:#fff;">
     <button type="button" onclick="closeBlueprintModal()" style="position:absolute; top:18px; right:18px; background:rgba(255,255,255,0.1); border:none; width:36px; height:36px; border-radius:50%; font-size:18px; color:#94a3b8; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
     <div style="font-size:11px; font-weight:800; color:#38bdf8; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px;">Architectural Blueprint Layout</div>
-    <h3 style="font-size:24px; font-family:var(--font-serif); margin-bottom:14px;" id="modalBlueprintTitle">2 BHK Luxury Suite (1,180 sq.ft)</h3>
+    <h3 style="font-size:24px; font-family:var(--font-serif); margin-bottom:14px;" id="modalBlueprintTitle">2 BHK Luxury Suite</h3>
     <div style="background:#050c14; border-radius:12px; padding:20px; border:1px solid rgba(56,189,248,0.15); margin-bottom:20px;" id="modalBlueprintSvg"></div>
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
       <span style="font-size:12px; color:#94a3b8;">*Dimensions are tentative architectural estimates compliant with statutory building codes.</span>
@@ -2494,8 +2497,8 @@ footer {
 <!-- MOBILE STICKY BOTTOM ACTION BAR (OPTION C) -->
 <div id="mobileStickyBar" class="mobile-sticky-bar">
   <div class="mobile-sticky-price">
-    <span>Starting From</span>
-    <strong id="stickyPriceText">Contact Team</strong>
+    <span>Project Status</span>
+    <strong id="stickyPriceText">Under Construction</strong>
   </div>
   <div class="mobile-sticky-actions">
     <a href="#visitForm" class="btn-sticky-visit" onclick="document.getElementById('visitForm').scrollIntoView({behavior:'smooth'}); return false;">Book Visit ↗</a>
@@ -2586,7 +2589,7 @@ function renderOverviewAndAmenities(p) {
 
   if ($('overviewLocationText')) $('overviewLocationText').textContent = mainLoc;
   if ($('overviewLocationSub')) $('overviewLocationSub').textContent = `${subLoc} • AUDA Approved`;
-  if ($('overviewPriceText')) $('overviewPriceText').textContent = p.price || 'Price on Request';
+  if ($('overviewPriceText')) $('overviewPriceText').textContent = p.badge || 'UNDER CONSTRUCTION';
   if ($('overviewPriceSub')) $('overviewPriceSub').textContent = p.category ? `${p.category} Typology` : 'Master Layout';
   if ($('overviewReraText')) $('overviewReraText').textContent = rera;
   if ($('overviewReraSub')) $('overviewReraSub').textContent = '✓ Approved & Bank Loan Eligible';
@@ -2883,7 +2886,7 @@ async function load() {
       badge: 'GROUND FLOOR HIGH-STREET',
       subTitle: 'COMMERCIAL RETAIL PROMENADE',
       heading: 'Ground Floor High-Street (33 Retail Shops)',
-      summary: '33 prime road-facing commercial shops ranging from 365 to 450 sq.ft along 18-meter and 24-meter wide access roads. Features grand double-height frontage with dedicated customer parking and separate commercial restrooms.',
+      summary: '33 prime road-facing commercial shops along 18-meter and 24-meter wide access roads. Features grand double-height frontage with dedicated customer parking and separate commercial restrooms.',
       carpet: '365 - 450 sq.ft',
       superBuilt: 'Up to 520 sq.ft',
       facing: 'Main 18m & 24m Wide Road Facing',
@@ -3020,7 +3023,7 @@ async function load() {
   // Configure Mobile Sticky Bar
   const stickyPrice = $('stickyPriceText');
   if (stickyPrice) {
-    stickyPrice.textContent = p.price || 'Contact Team';
+    stickyPrice.textContent = p.badge || 'Under Construction';
   }
   const stickyWa = $('stickyWaBtn');
   if (stickyWa && waWidget) {
@@ -3204,7 +3207,7 @@ function selectCadRoom(idx) {
   if ($('cadRoomType')) $('cadRoomType').textContent = r.type;
   if ($('cadRoomName')) $('cadRoomName').textContent = r.name;
   if ($('cadRoomDim')) $('cadRoomDim').textContent = r.dim;
-  if ($('cadRoomArea')) $('cadRoomArea').textContent = r.area;
+  if ($('cadRoomArea')) $('cadRoomArea').textContent = r.type;
   if ($('cadRoomFloor')) $('cadRoomFloor').textContent = r.floor;
   if ($('cadRoomVastu')) $('cadRoomVastu').textContent = r.vastu;
 
@@ -3249,8 +3252,8 @@ function switchFloorPlan(planKey, tabBtn) {
   $('planSubTitle').textContent = plan.subTitle;
   $('planHeading').textContent = plan.heading;
   $('planSummary').textContent = plan.summary;
-  $('planCarpet').textContent = plan.carpet;
-  $('planSuperBuilt').textContent = plan.superBuilt;
+  if ($('planCarpet')) $('planCarpet').textContent = plan.carpet;
+  if ($('planSuperBuilt')) $('planSuperBuilt').textContent = plan.superBuilt;
   $('planFacing').textContent = plan.facing;
   $('planBaths').textContent = plan.baths;
   if (plan.img) {
@@ -3270,7 +3273,7 @@ function switchFloorPlan(planKey, tabBtn) {
 function openBlueprintModal() {
   const plan = floorPlans[currentPlanKey];
   if (!plan) return;
-  $('modalBlueprintTitle').textContent = `${plan.heading} (${plan.carpet} Carpet / ${plan.superBuilt} Built-up)`;
+  $('modalBlueprintTitle').textContent = `${plan.heading}`;
   if (plan.img) {
     $('modalBlueprintSvg').innerHTML = `
       <div style="text-align:center; padding:12px; background:#0f172a; border-radius:10px;">
@@ -3295,7 +3298,7 @@ function selectPlanForInquiry() {
   const visitAt = $('visitAt');
   const visitMsg = $('visitMsg');
   if (notesField) {
-    notesField.value = `[Floor Plan Layout Reservation Enquiry]\nLayout: ${plan.heading}\nCarpet Area: ${plan.carpet} (Super Built-up: ${plan.superBuilt})\nFacing: ${plan.facing}\nConfiguration: ${plan.baths}\nPlease verify available inventory and allotment for this configuration.`;
+    notesField.value = `[Floor Plan Layout Reservation Enquiry]\nLayout: ${plan.heading}\nFacing: ${plan.facing}\nConfiguration: ${plan.baths}\nPlease verify available inventory and allotment for this configuration.`;
     notesField.style.borderColor = 'var(--sky-primary)';
     notesField.style.background = '#f0f9ff';
     setTimeout(() => {
@@ -3352,14 +3355,8 @@ function initEmiCalculator(p) {
   }
 
   const RERA_MILESTONES = [
-    { stage: '1. On Booking Token (Reservation)', pct: 10 },
-    { stage: '2. On Plinth / Foundation Work', pct: 15 },
-    { stage: '3. On 1st Floor Slab Casting', pct: 15 },
-    { stage: '4. On 3rd Floor Slab Casting', pct: 15 },
-    { stage: '5. On 4th (Top) Slab Casting', pct: 15 },
-    { stage: '6. On Brickwork & Internal Plaster', pct: 15 },
-    { stage: '7. On Flooring, Plumbing & Painting', pct: 10 },
-    { stage: '8. On Key Handover & Possession', pct: 5 }
+    { stage: '1. Booking Token / Earnest Advance', pct: 10 },
+    { stage: '2. On Agreement & Plinth Completion', pct: 20 }
   ];
 
   function updateReraMilestones(price) {

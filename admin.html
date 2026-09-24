@@ -10,7 +10,7 @@
 <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
 <link rel="apple-touch-icon" href="assets/favicon.jpg">
 <script src="assets/attribution.js?v=4"></script>
-<script src="assets/cost-sheet.js"></script>
+<script src="assets/cost-sheet.js?v=4"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -1573,7 +1573,7 @@ textarea {
 <!-- EXECUTIVE TOP NAVIGATION -->
 <div class="top">
   <div class="top-brand-flex">
-    <div class="top-monogram">LG</div>
+    <img src="assets/logo-mark.png" alt="Laxminarayan Logo" style="height:34px; width:auto; object-fit:contain; background:#ffffff; padding:3px 6px; border-radius:8px; border:1px solid rgba(212,175,55,0.4); box-shadow:0 2px 8px rgba(0,0,0,0.2); flex-shrink:0;">
     <div class="top-title-wrap">
       <b>LAXMINARAYAN GROUP</b>
       <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
@@ -1974,7 +1974,10 @@ textarea {
       </div>
       <div class="toolbar" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line);">
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-          <select id="unitFilterProject" onchange="renderUnits()" style="max-width:240px;"><option value="">All Projects</option></select>
+          <select id="unitFilterProject" onchange="onUnitProjectChange()" style="max-width:240px;"><option value="">All Projects</option></select>
+          <select id="unitFilterType" onchange="renderUnits()" style="max-width:180px;">
+            <option value="">All Configurations</option>
+          </select>
           <select id="unitFilterStatus" onchange="renderUnits()" style="max-width:180px;">
             <option value="">All Statuses</option>
             <option value="available">Available (Open for sale)</option>
@@ -2507,7 +2510,7 @@ textarea {
       <label><b>Floor Number</b>
         <input id="unitFloor" type="number" value="1" style="margin-top:4px;">
       </label>
-      <label><b>Area (Super Built-up sq.ft.)</b>
+      <label><b>Area (sq.ft.)</b>
         <input id="unitArea" type="number" value="1850" style="margin-top:4px;">
       </label>
       <label class="span2"><b>Price / Agreement Base</b>
@@ -3708,7 +3711,10 @@ async function loadUnits() {
     const pFilter = $('unitFilterProject');
     if (pFilter) {
       const activeProjects = (state.projects || []).filter(p => p.status === 'active');
+      const prevPid = pFilter.value;
       pFilter.innerHTML = '<option value="">All Projects</option>' + activeProjects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+      if (prevPid) pFilter.value = prevPid;
+      updateUnitTypeDropdown();
     }
 
     const total = state.units.length;
@@ -3731,13 +3737,97 @@ async function loadUnits() {
   }
 }
 
+function onUnitProjectChange() {
+  updateUnitTypeDropdown();
+  renderUnits();
+}
+
+function updateUnitTypeDropdown() {
+  const pFilter = $('unitFilterProject');
+  const typeFilter = $('unitFilterType');
+  if (!typeFilter) return;
+
+  const pid = pFilter?.value || '';
+  const prevVal = typeFilter.value;
+
+  const project = (state.projects || []).find(p => String(p.id) === String(pid));
+  const pName = (project ? project.name : (pFilter?.selectedOptions[0]?.text || '')).toLowerCase();
+
+  let html = '<option value="">All Configurations</option>';
+
+  if (pName.includes('ds 208') || pName.includes('ds208') || String(pid) === '1') {
+    html += `
+      <option value="2bhk">2 BHK</option>
+      <option value="3bhk">3 BHK</option>
+      <option value="shops">Shops</option>
+    `;
+  } else if (pName.includes('nilkanth') || String(pid) === '2') {
+    html += `
+      <option value="type_a">Type A</option>
+      <option value="type_b">Type B</option>
+      <option value="type_c">Type C</option>
+    `;
+  } else if (!pid) {
+    // All Projects selected: show unified options
+    html += `
+      <option value="2bhk">2 BHK</option>
+      <option value="3bhk">3 BHK</option>
+      <option value="shops">Shops</option>
+      <option value="type_a">Type A</option>
+      <option value="type_b">Type B</option>
+      <option value="type_c">Type C</option>
+    `;
+  } else {
+    // Dynamic fallback for any other projects
+    const pUnits = (state.units || []).filter(u => String(u.project_id) === String(pid));
+    const uniqueTypes = [...new Set(pUnits.map(u => u.unit_type).filter(Boolean))];
+    uniqueTypes.forEach(t => {
+      html += `<option value="${escAttr(t)}">${esc(t)}</option>`;
+    });
+  }
+
+  typeFilter.innerHTML = html;
+  const hasPrev = Array.from(typeFilter.options).some(o => o.value === prevVal);
+  typeFilter.value = hasPrev ? prevVal : '';
+}
+
+function matchesUnitType(u, typeVal) {
+  if (!typeVal) return true;
+  const ut = (u.unit_type || '').toLowerCase();
+  const un = (u.unit_number || '').toLowerCase();
+  const notes = (u.notes || '').toLowerCase();
+  const combined = `${ut} ${un} ${notes}`;
+
+  if (typeVal === '2bhk') {
+    return combined.includes('2 bhk') || combined.includes('2bhk');
+  }
+  if (typeVal === '3bhk') {
+    return combined.includes('3 bhk') || combined.includes('3bhk');
+  }
+  if (typeVal === 'shops') {
+    return combined.includes('shop') || combined.includes('retail') || combined.includes('commercial');
+  }
+  if (typeVal === 'type_a') {
+    return combined.includes('type a') || combined.includes('type-a') || ut.includes('4 bhk luxury');
+  }
+  if (typeVal === 'type_b') {
+    return combined.includes('type b') || combined.includes('type-b') || ut.includes('corner villa') || ut.includes('presidential');
+  }
+  if (typeVal === 'type_c') {
+    return combined.includes('type c') || combined.includes('type-c') || ut.includes('grand estate');
+  }
+  return combined.includes(typeVal.toLowerCase()) || ut === typeVal.toLowerCase();
+}
+
 function renderUnits() {
   const pid = $('unitFilterProject')?.value;
+  const typeVal = $('unitFilterType')?.value;
   const st = $('unitFilterStatus')?.value;
   const q = ($('unitFilterSearch')?.value || '').toLowerCase().trim();
 
   let list = state.units || [];
   if (pid) list = list.filter(u => Number(u.project_id) === Number(pid));
+  if (typeVal) list = list.filter(u => matchesUnitType(u, typeVal));
   if (st) list = list.filter(u => u.status === st);
   if (q) list = list.filter(u =>
     (u.unit_number && u.unit_number.toLowerCase().includes(q)) ||
@@ -3813,7 +3903,7 @@ function renderUnits() {
 
           <div class="unit-spec-grid">
             <div class="unit-spec-box">
-              <div class="unit-spec-lbl">Carpet Area</div>
+              <div class="unit-spec-lbl">Area (Sq. Ft.)</div>
               <div class="unit-spec-val">${u.area_sqft ? (u.area_sqft + ' sq.ft') : '—'}</div>
             </div>
             <div class="unit-spec-box">
@@ -4717,6 +4807,7 @@ function viewProjectUnits(id) {
   showView('unitsView');
   if ($('unitFilterProject')) {
     $('unitFilterProject').value = String(id);
+    updateUnitTypeDropdown();
     renderUnits();
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -5150,8 +5241,8 @@ function exportUnitsCSV() {
     { label: 'Unit Type', key: 'unit_type' },
     { label: 'Status', key: 'status' },
     { label: 'Floor', key: 'floor' },
-    { label: 'Carpet Area (SqFt)', key: 'carpet_area' },
-    { label: 'Super Built-Up (SqFt)', key: 'super_built_up' },
+    { label: 'Area (SqFt)', key: 'carpet_area' },
+    { label: 'Total Area (SqFt)', key: 'super_built_up' },
     { label: 'Base Price', key: 'base_price' },
     { label: 'Buyer Name', key: 'buyer_name' },
     { label: 'Buyer Phone', key: 'buyer_phone' },

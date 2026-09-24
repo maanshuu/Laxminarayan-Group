@@ -48,12 +48,7 @@
 
   const STAGES = [
     { label: 'Booking Token / Earnest Advance', pct: 10 },
-    { label: 'On Agreement & Plinth Completion', pct: 20 },
-    { label: 'On 1st Floor Slab Casting', pct: 15 },
-    { label: 'On Structure & RCC Completion', pct: 25 },
-    { label: 'On Brickwork & Internal Plaster', pct: 15 },
-    { label: 'On Flooring, Plumbing & Exterior Finish', pct: 10 },
-    { label: 'On Possession & Key Handover', pct: 5 }
+    { label: 'On Agreement & Plinth Completion', pct: 20 }
   ];
 
   function ensureModalDOM() {
@@ -66,6 +61,7 @@
           <!-- MODAL TOOLBAR (Hidden in Print) -->
           <div class="cs-no-print" style="padding:14px 24px; background:#0f172a; color:#fff; display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:10px;">
+              <img src="assets/logo-mark.png" alt="LG" style="height:22px; width:auto; object-fit:contain;">
               <span style="font-weight:800; letter-spacing:1px; font-size:13px; color:#38bdf8;">LAXMINARAYAN GROUP</span>
               <span style="color:#64748b;">•</span>
               <span style="font-size:13px; font-weight:600; color:#f8fafc;">Official Buyer Cost Sheet & Quotation</span>
@@ -88,10 +84,13 @@
             
             <!-- HEADER -->
             <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #0284c7; padding-bottom:18px; margin-bottom:24px;">
-              <div>
-                <div style="font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; font-family:'Playfair Display',serif;">LAXMINARAYAN GROUP</div>
-                <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; color:#0284c7; text-transform:uppercase; margin-top:2px;">Architectural Excellence & Luxury Development</div>
-                <div style="font-size:12px; color:#64748b; margin-top:4px;">Registered Office: 5, Ground floor, Madhav Evenue, odhav circle, Ahmedabad</div>
+              <div style="display:flex; align-items:center; gap:16px;">
+                <img src="assets/logo-mark.png" alt="Laxminarayan Logo" style="height:54px; width:auto; object-fit:contain;">
+                <div>
+                  <div style="font-size:24px; font-weight:800; color:#0f172a; letter-spacing:-0.5px; font-family:'Playfair Display',serif;">LAXMINARAYAN GROUP</div>
+                  <div style="font-size:11px; font-weight:700; letter-spacing:1.5px; color:#0284c7; text-transform:uppercase; margin-top:2px;">Architectural Excellence & Luxury Development</div>
+                  <div style="font-size:12px; color:#64748b; margin-top:4px;">Registered Office: 5, Ground floor, Madhav Evenue, odhav circle, Ahmedabad</div>
+                </div>
               </div>
               <div style="text-align:right;">
                 <span style="display:inline-block; background:#e0f2fe; color:#0369a1; padding:4px 12px; border-radius:9999px; font-size:11px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase;">OFFICIAL QUOTATION</span>
@@ -123,7 +122,7 @@
                   <input id="csUnitNumber" class="cs-input" placeholder="e.g. Tower A - 402" value="Tower A - 402" style="width:100%; font-size:13px; font-weight:700; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
                 </div>
                 <div>
-                  <label style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; display:block; margin-bottom:4px;">Super Built-Up Area (Sq. Ft.)</label>
+                  <label style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; display:block; margin-bottom:4px;">Area (Sq. Ft.)</label>
                   <input id="csAreaSqft" type="number" class="cs-input" value="1450" style="width:100%; font-size:13px; font-weight:700; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
                 </div>
                 <div>
@@ -133,70 +132,19 @@
               </div>
             </div>
 
-            <!-- COST BREAKDOWN SECTION -->
-            <div style="margin-bottom:24px;">
-              <div style="font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#0284c7; margin-bottom:10px;">Part A: Investment & Cost Breakdown</div>
+            <!-- PAYMENT SCHEDULE SECTION (FORMERLY PART B, NOW PART A) -->
+            <div style="margin-bottom:28px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#0284c7;">Part A: Construction-Linked Payment (CLP) Schedule</div>
+                <div style="font-size:12px; color:#64748b;">Basic Cost: <b id="csValAgreement" style="color:#0f172a; font-size:13px;">₹ 0</b> <span id="csBasisAgreement" style="font-size:11px; color:#94a3b8;"></span></div>
+              </div>
               <table style="width:100%; border-collapse:collapse; font-size:12.5px;">
                 <thead>
                   <tr style="background:#f1f5f9; border-bottom:1px solid #cbd5e1;">
-                    <th style="padding:10px 14px; text-align:left; font-weight:700; color:#475569;">Component Description</th>
-                    <th style="padding:10px 14px; text-align:left; font-weight:700; color:#475569;">Basis of Calculation</th>
-                    <th style="padding:10px 14px; text-align:right; font-weight:700; color:#475569;">Amount (₹)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:10px 14px; font-weight:700; color:#0f172a;">Agreement / Basic Cost</td>
-                    <td style="padding:10px 14px; color:#64748b;"><span id="csBasisAgreement">1,450 sq.ft @ ₹4,200/sq.ft</span></td>
-                    <td style="padding:10px 14px; text-align:right; font-weight:700; color:#0f172a;" id="csValAgreement">₹ 60,90,000</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:10px 14px; font-weight:600; color:#0f172a;">Clubhouse & Amenities Lifetime Membership</td>
-                    <td style="padding:10px 14px; color:#64748b;">Fixed Developer Amenity Allotment</td>
-                    <td style="padding:10px 14px; text-align:right; font-weight:600;" id="csValClubhouse">₹ 1,50,000</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:10px 14px; font-weight:600; color:#0f172a;">Electrification, Transformer & Legal Documentation</td>
-                    <td style="padding:10px 14px; color:#64748b;">Infrastructure & Society Formation</td>
-                    <td style="padding:10px 14px; text-align:right; font-weight:600;" id="csValInfra">₹ 1,25,000</td>
-                  </tr>
-                  <tr style="border-bottom:2px solid #0284c7; background:#fafafa;">
-                    <td style="padding:10px 14px; font-weight:800; color:#0369a1;">Sub-Total (Basic + Amenities)</td>
-                    <td style="padding:10px 14px; color:#64748b;">Base Sale Consideration</td>
-                    <td style="padding:10px 14px; text-align:right; font-weight:800; color:#0369a1;" id="csValSubTotal">₹ 63,65,000</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:10px 14px; font-weight:600; color:#0f172a;">GST (Goods & Services Tax)</td>
-                    <td style="padding:10px 14px; color:#64748b;">Government Mandated 5% on Basic Value</td>
-                    <td style="padding:10px 14px; text-align:right; font-weight:600;" id="csValGst">₹ 3,04,500</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid #e2e8f0;">
-                    <td style="padding:10px 14px; font-weight:600; color:#0f172a;">Stamp Duty & Registration (Estimated)</td>
-                    <td style="padding:10px 14px; color:#64748b;">Standard Gujarat State Rates (4.9% + 1%)</td>
-                    <td style="padding:10px 14px; text-align:right; font-weight:600;" id="csValStamp">₹ 3,59,310</td>
-                  </tr>
-                  <tr style="background:#f0fdf4; border-bottom:2px solid #16a34a;">
-                    <td style="padding:14px; font-size:14px; font-weight:800; color:#15803d;">TOTAL ALL-INCLUSIVE ESTIMATE</td>
-                    <td style="padding:14px; font-size:12px; color:#166534; font-weight:600;">Net Payable (Turnkey Possession)</td>
-                    <td style="padding:14px; text-align:right; font-size:16px; font-weight:800; color:#15803d;" id="csValGrandTotal">₹ 70,28,810</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div style="font-size:11px; color:#64748b; font-style:italic; margin-top:6px;" id="csWordsTotal">
-                Amount in Words: Seventy Lakh Twenty-Eight Thousand Eight Hundred and Ten Rupees Only
-              </div>
-            </div>
-
-            <!-- PAYMENT SCHEDULE SECTION -->
-            <div style="margin-bottom:28px;">
-              <div style="font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#0284c7; margin-bottom:10px;">Part B: Construction-Linked Payment (CLP) Schedule</div>
-              <table style="width:100%; border-collapse:collapse; font-size:12px;">
-                <thead>
-                  <tr style="background:#f1f5f9; border-bottom:1px solid #cbd5e1;">
-                    <th style="padding:8px 12px; text-align:left; font-weight:700; color:#475569;">#</th>
-                    <th style="padding:8px 12px; text-align:left; font-weight:700; color:#475569;">Construction Milestone</th>
-                    <th style="padding:8px 12px; text-align:center; font-weight:700; color:#475569;">Installment (%)</th>
-                    <th style="padding:8px 12px; text-align:right; font-weight:700; color:#475569;">Stage Amount (₹)</th>
+                    <th style="padding:10px 14px; text-align:left; font-weight:700; color:#475569;">#</th>
+                    <th style="padding:10px 14px; text-align:left; font-weight:700; color:#475569;">Construction Milestone</th>
+                    <th style="padding:10px 14px; text-align:center; font-weight:700; color:#475569;">Installment (%)</th>
+                    <th style="padding:10px 14px; text-align:right; font-weight:700; color:#475569;">Stage Amount (₹)</th>
                   </tr>
                 </thead>
                 <tbody id="csScheduleRows"></tbody>
@@ -239,62 +187,54 @@
   }
 
   function recalcCostSheet() {
-    const area = Number(document.getElementById('csAreaSqft').value) || 0;
-    const rate = Number(document.getElementById('csBaseRate').value) || 0;
-
+    const area = Number(document.getElementById('csAreaSqft')?.value) || 0;
+    const rate = Number(document.getElementById('csBaseRate')?.value) || 0;
     const agreementVal = area * rate;
-    const clubhouse = 150000;
-    const infra = 125000;
-    const subTotal = agreementVal + clubhouse + infra;
-    const gst = Math.round(agreementVal * 0.05);
-    const stamp = Math.round(agreementVal * 0.059); // 4.9% + 1%
-    const grandTotal = subTotal + gst + stamp;
 
-    document.getElementById('csBasisAgreement').textContent = `${area.toLocaleString('en-IN')} sq.ft @ ₹${rate.toLocaleString('en-IN')}/sq.ft`;
-    document.getElementById('csValAgreement').textContent = formatINR(agreementVal);
-    document.getElementById('csValClubhouse').textContent = formatINR(clubhouse);
-    document.getElementById('csValInfra').textContent = formatINR(infra);
-    document.getElementById('csValSubTotal').textContent = formatINR(subTotal);
-    document.getElementById('csValGst').textContent = formatINR(gst);
-    document.getElementById('csValStamp').textContent = formatINR(stamp);
-    document.getElementById('csValGrandTotal').textContent = formatINR(grandTotal);
+    const basisEl = document.getElementById('csBasisAgreement');
+    if (basisEl) basisEl.textContent = `(${area.toLocaleString('en-IN')} sq.ft @ ₹${rate.toLocaleString('en-IN')}/sq.ft)`;
+    const valEl = document.getElementById('csValAgreement');
+    if (valEl) valEl.textContent = formatINR(agreementVal);
 
-    const words = numberToWordsINR(grandTotal);
-    document.getElementById('csWordsTotal').textContent = 'Amount in Words: ' + words;
-
-    // Milestones
+    // Milestones (Part A with 1 and 2)
     const rows = STAGES.map((s, idx) => {
-      const stageAmt = Math.round((subTotal * s.pct) / 100);
+      const stageAmt = Math.round((agreementVal * s.pct) / 100);
       return `
         <tr style="border-bottom:1px solid #f1f5f9;">
-          <td style="padding:6px 12px; font-weight:700; color:#64748b;">${idx + 1}</td>
-          <td style="padding:6px 12px; font-weight:600; color:#0f172a;">${s.label}</td>
-          <td style="padding:6px 12px; text-align:center; font-weight:700; color:#0284c7;">${s.pct}%</td>
-          <td style="padding:6px 12px; text-align:right; font-weight:700; color:#0f172a;">${formatINR(stageAmt)}</td>
+          <td style="padding:10px 14px; font-weight:700; color:#64748b;">${idx + 1}</td>
+          <td style="padding:10px 14px; font-weight:600; color:#0f172a;">${s.label}</td>
+          <td style="padding:10px 14px; text-align:center; font-weight:700; color:#0284c7;">${s.pct}%</td>
+          <td style="padding:10px 14px; text-align:right; font-weight:700; color:#0f172a;">${formatINR(stageAmt)}</td>
         </tr>
       `;
     }).join('');
 
-    document.getElementById('csScheduleRows').innerHTML = rows;
+    const tbody = document.getElementById('csScheduleRows');
+    if (tbody) tbody.innerHTML = rows;
   }
 
   function shareCostSheetWhatsApp() {
-    const clientName = document.getElementById('csClientName').value || 'Sir/Madam';
-    const clientPhone = (document.getElementById('csClientPhone').value || '').replace(/[^0-9]/g, '');
-    const project = document.getElementById('csProjectSelect').value;
-    const unit = document.getElementById('csUnitNumber').value;
-    const area = document.getElementById('csAreaSqft').value;
-    const grandTotal = document.getElementById('csValGrandTotal').textContent;
+    const clientName = document.getElementById('csClientName')?.value || 'Sir/Madam';
+    const clientPhone = (document.getElementById('csClientPhone')?.value || '').replace(/[^0-9]/g, '');
+    const project = document.getElementById('csProjectSelect')?.value || '';
+    const unit = document.getElementById('csUnitNumber')?.value || '';
+    const area = Number(document.getElementById('csAreaSqft')?.value) || 0;
+    const rate = Number(document.getElementById('csBaseRate')?.value) || 0;
+    const agreementVal = area * rate;
+
+    const stage1Amt = formatINR(Math.round((agreementVal * 10) / 100));
+    const stage2Amt = formatINR(Math.round((agreementVal * 20) / 100));
 
     const text = `Greetings ${clientName} from *Laxminarayan Group*,\n\nHere is your official requested quotation for *${project}*:\n` +
       `🏢 *Unit:* ${unit} (${area} Sq. Ft.)\n` +
-      `💰 *All-Inclusive Investment:* ${grandTotal}\n` +
-      `📅 *Payment Schedule:* Flexible 7-Stage Construction Linked Plan (Starting at 10% on Booking Token)\n\n` +
+      `💰 *Basic Consideration:* ${formatINR(agreementVal)}\n\n` +
+      `📅 *Part A: Construction-Linked Payment (CLP) Schedule:*\n` +
+      `1. Booking Token / Earnest Advance (10%): ${stage1Amt}\n` +
+      `2. On Agreement & Plinth Completion (20%): ${stage2Amt}\n\n` +
       `Would you like to schedule a personal site visit to view the sample unit this week?`;
 
     const clean = clientPhone.length >= 10 ? clientPhone.slice(-10) : '';
     const url = clean ? `https://wa.me/91${clean}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
   }
 
   window.openCostSheetModal = function(opts = {}) {

@@ -608,9 +608,11 @@
     .footer-seal-img {
       width: 48px;
       height: 48px;
-      border-radius: 50%;
-      border: 2px solid var(--gold-accent);
-      object-fit: cover;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 4px;
+      border: 1.5px solid var(--gold-accent);
+      object-fit: contain;
     }
     .footer-bottom {
       padding-top: 30px;
@@ -845,9 +847,7 @@
   <header>
     <div class="container nav-wrap">
       <a class="brand-logo" href="index.html">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
-        </svg>
+        <img src="assets/logo-mark.png" alt="Laxminarayan Group Logo" style="height:38px; width:auto; object-fit:contain; flex-shrink:0;">
         <div>LAXMINARAYAN GROUP</div>
       </a>
 
@@ -905,8 +905,6 @@
 
         <select class="select-dropdown" id="sortSelect" onchange="applyFilters()">
           <option value="featured">Featured First</option>
-          <option value="price_asc">Price: Low to High</option>
-          <option value="price_desc">Price: High to Low</option>
         </select>
       </div>
     </div>
@@ -955,7 +953,7 @@
     <div class="container">
       <div class="footer-wrap">
         <div class="footer-brand">
-          <img src="assets/laxminarayan-seal-logo.jpg" alt="Laxminarayan Emblem" class="footer-seal-img">
+          <img src="assets/logo-mark.png?v=2" alt="Laxminarayan Emblem" class="footer-seal-img">
           <div>
             LAXMINARAYAN GROUP
             <div style="color:rgba(255,255,255,0.5); font-size:11px; font-weight:500; margin-top:2px;">CONSTRUCTION • DEVELOPMENT • TRUST</div>
@@ -1156,7 +1154,6 @@
                 <span class="tag-category">${esc(category)}</span>
                 <span class="tag-status">${esc(badge)}</span>
               </div>
-              <div class="price-badge-floating">${esc(price)}</div>
             </div>
 
             <div class="prop-card-body">
