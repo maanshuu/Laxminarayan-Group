@@ -10,7 +10,10 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "build": "node scripts/audit_whole_website.js"
+    "test": "node --check server.js && node scripts/sqlite-compat.js",
+    "build": "node scripts/audit_whole_website.js",
+    "backup": "node scripts/backup-database.js",
+    "clean-slate": "node scripts/prepare_for_friends_testing.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

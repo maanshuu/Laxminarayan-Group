@@ -1,0 +1,53 @@
+# ==============================================================================
+# GITHUB ACTIONS CI/CD TEMPLATE — LAXMINARAYAN GROUP
+# ==============================================================================
+# To activate this automated pipeline on GitHub:
+# In your GitHub repository:
+# 1. Click "Actions" tab -> "New workflow" -> "Set up a workflow yourself"
+# 2. Paste the contents of this file and save as `.github/workflows/ci.yml`.
+# ==============================================================================
+
+name: CI - Code Integrity & Build Verification
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify Environment Example Integrity
+        run: |
+          test -f .env.example || { echo "Missing .env.example template!"; exit 1; }
+          grep -q "PORT=" .env.example
+          grep -q "JWT_SECRET=" .env.example
+          grep -q "ADMIN_EMAIL=" .env.example
+
+      - name: Verify JavaScript Syntax (No Parsing Errors)
+        run: |
+          node --check server.js
+          node --check scripts/sqlite-compat.js
+          node --check ecosystem.config.js
+
+      - name: Run Platform Tests & Integrity Check
+        run: npm test
