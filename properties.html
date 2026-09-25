@@ -1248,6 +1248,17 @@
       } finally {
         btn.disabled = false;
       }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        closeVisitModal();
+      }
+    });
+
+    const vm = document.getElementById("visitModal");
+    if (vm) {
+      vm.addEventListener('click', (e) => {
+        if (e.target === vm) closeVisitModal();
+      });
     }
 
     checkUserAuth();

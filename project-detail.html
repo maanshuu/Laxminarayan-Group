@@ -3408,21 +3408,30 @@ function openBlueprintModal() {
   const plan = floorPlans[currentPlanKey];
   if (!plan) return;
   $('modalBlueprintTitle').textContent = `${plan.heading}`;
+  const projTag = currentProjectName || 'Laxminarayan Group';
   if (plan.img) {
     $('modalBlueprintSvg').innerHTML = `
       <div style="text-align:center; padding:12px; background:#0f172a; border-radius:10px;">
         <img src="${plan.img}" alt="${plan.heading}" style="max-width:100%; max-height:80vh; object-fit:contain; border-radius:8px; display:block; margin:auto; background:#ffffff; padding:12px; box-shadow:0 12px 36px rgba(0,0,0,0.6);">
-        <div style="margin-top:14px; font-size:12px; color:#38bdf8; font-weight:700;">Official Architectural Drawing • Akshar DS 208 (RERA Approved)</div>
+        <div style="margin-top:14px; font-size:12px; color:#38bdf8; font-weight:700;">Official Architectural Drawing • ${esc(projTag)} (RERA Approved)</div>
       </div>
     `;
   } else {
     $('modalBlueprintSvg').innerHTML = plan.svg;
   }
-  $('blueprintModal').style.display = 'flex';
+  const bm = $('blueprintModal');
+  if (bm) {
+    bm.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
 }
 
 function closeBlueprintModal() {
-  $('blueprintModal').style.display = 'none';
+  const bm = $('blueprintModal');
+  if (bm) {
+    bm.style.display = 'none';
+    document.body.style.overflow = '';
+  }
 }
 
 function selectPlanForInquiry() {
@@ -3880,16 +3889,59 @@ function updateLightboxDisplay() {
 }
 
 window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    // 1. Close Blueprint Modal if open
+    const bm = $('blueprintModal');
+    if (bm && (bm.style.display === 'flex' || bm.style.display === 'block')) {
+      closeBlueprintModal();
+      return;
+    }
+    // 2. Close Luxury Lightbox if open
+    const lb = $('luxuryLightbox');
+    if (lb && (lb.style.display === 'flex' || lb.style.display === 'block')) {
+      closeLightbox();
+      return;
+    }
+    // 3. Close Brochure Modal if open
+    const brm = $('brochureModal');
+    if (brm && (brm.style.display === 'flex' || brm.style.display === 'block')) {
+      brm.style.display = 'none';
+      return;
+    }
+  }
+
+  // Lightbox arrow navigation
   const lb = $('luxuryLightbox');
-  if (!lb || lb.style.display !== 'flex') return;
-  if (e.key === 'ArrowRight') {
-    nextLightboxSlide();
-  } else if (e.key === 'ArrowLeft') {
-    prevLightboxSlide();
-  } else if (e.key === 'Escape') {
-    closeLightbox();
+  if (lb && lb.style.display === 'flex') {
+    if (e.key === 'ArrowRight') {
+      nextLightboxSlide();
+    } else if (e.key === 'ArrowLeft') {
+      prevLightboxSlide();
+    }
   }
 });
+
+// Setup click-outside backdrop dismissal for all overlay modals
+(function setupModalBackdropDismiss() {
+  const bm = $('blueprintModal');
+  if (bm) {
+    bm.addEventListener('click', (e) => {
+      if (e.target === bm) closeBlueprintModal();
+    });
+  }
+  const brm = $('brochureModal');
+  if (brm) {
+    brm.addEventListener('click', (e) => {
+      if (e.target === brm) brm.style.display = 'none';
+    });
+  }
+  const lb = $('luxuryLightbox');
+  if (lb) {
+    lb.addEventListener('click', (e) => {
+      if (e.target === lb || e.target.classList.contains('lightbox-stage')) closeLightbox();
+    });
+  }
+})();
 
 function shareProjectDetail() {
   const url = window.location.href;

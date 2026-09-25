@@ -1990,8 +1990,24 @@ function openVisitModal() {
   }
 }
 function closeVisitModal() {
-  document.getElementById('visitModal').classList.remove('open');
+  const vm = document.getElementById('visitModal');
+  if (vm) vm.classList.remove('open');
 }
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    closeVisitModal();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const vm = document.getElementById('visitModal');
+  if (vm) {
+    vm.addEventListener('click', (e) => {
+      if (e.target === vm) closeVisitModal();
+    });
+  }
+});
 
 const API = "/api";
 
