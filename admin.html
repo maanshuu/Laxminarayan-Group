@@ -1608,10 +1608,10 @@ textarea {
     <div class="stat"><strong id="leads">0</strong>Total Enquiries</div>
     <div class="stat"><strong id="openLeads">0</strong>Open enquiries</div>
     <div class="stat"><strong id="visits">0</strong>Site visits</div>
-    <div class="stat"><strong id="statUnits">38</strong>Total units</div>
-    <div class="stat"><strong id="statAvailable">21</strong>Available units</div>
-    <div class="stat"><strong id="statSold">8</strong>Sold / Booked</div>
-    <div class="stat"><strong id="statBookings">1</strong>Bookings</div>
+    <div class="stat"><strong id="statUnits">23</strong>Total units</div>
+    <div class="stat"><strong id="statAvailable">23</strong>Available units</div>
+    <div class="stat"><strong id="statSold">0</strong>Sold / Booked</div>
+    <div class="stat"><strong id="statBookings">0</strong>Bookings</div>
     <div class="stat"><strong id="employees">0</strong>Team active</div>
     <div class="stat"><strong id="projects">0</strong>Active projects</div>
     <div class="stat"><strong id="new">0</strong>New today</div>
@@ -3755,35 +3755,96 @@ function updateUnitTypeDropdown() {
 
   let html = '<option value="">All Configurations</option>';
 
+  // Target units: either for this project or all units
+  const targetUnits = pid 
+    ? (state.units || []).filter(u => String(u.project_id) === String(pid))
+    : (state.units || []);
+
   if (pName.includes('ds 208') || pName.includes('ds208') || String(pid) === '1') {
     html += `
       <option value="2bhk">2 BHK</option>
       <option value="3bhk">3 BHK</option>
       <option value="shops">Shops</option>
     `;
+    // Auto-include any newly added custom types for DS 208 (e.g. 4 BHK, Penthouse)
+    const customTypes = [...new Set(targetUnits.map(u => (u.unit_type || '').trim()).filter(Boolean))].filter(t => {
+      const lt = t.toLowerCase();
+      return !lt.includes('2 bhk') && !lt.includes('3 bhk') && !lt.includes('shop') && !lt.includes('retail');
+    });
+    customTypes.forEach(t => {
+      html += `<option value="${escAttr(t)}">${esc(t)}</option>`;
+    });
+
   } else if (pName.includes('nilkanth') || String(pid) === '2') {
     html += `
       <option value="type_a">Type A</option>
       <option value="type_b">Type B</option>
       <option value="type_c">Type C</option>
     `;
-  } else if (!pid) {
-    // All Projects selected: show unified options
-    html += `
-      <option value="2bhk">2 BHK</option>
-      <option value="3bhk">3 BHK</option>
-      <option value="shops">Shops</option>
-      <option value="type_a">Type A</option>
-      <option value="type_b">Type B</option>
-      <option value="type_c">Type C</option>
-    `;
-  } else {
-    // Dynamic fallback for any other projects
-    const pUnits = (state.units || []).filter(u => String(u.project_id) === String(pid));
-    const uniqueTypes = [...new Set(pUnits.map(u => u.unit_type).filter(Boolean))];
-    uniqueTypes.forEach(t => {
+    // Auto-include any newly added custom types for Nilkanth Villa (e.g. Type D, Type E)
+    const customTypes = [...new Set(targetUnits.map(u => (u.unit_type || '').trim()).filter(Boolean))].filter(t => {
+      const lt = t.toLowerCase();
+      return !lt.includes('type a') && !lt.includes('type b') && !lt.includes('type c') && !lt.includes('4 bhk') && !lt.includes('5 bhk');
+    });
+    customTypes.forEach(t => {
       html += `<option value="${escAttr(t)}">${esc(t)}</option>`;
     });
+
+  } else {
+    // AUTOMATIC SMART DISCOVERY FOR ANY FUTURE PROJECTS (OR ALL PROJECTS):
+    // Scans all units and dynamically builds the exact filter options!
+    const discovered = new Map();
+
+    targetUnits.forEach(u => {
+      const raw = (u.unit_type || '').trim();
+      if (!raw) return;
+      const lower = raw.toLowerCase();
+
+      if (lower.includes('1 bhk') || lower.includes('1bhk')) {
+        discovered.set('1bhk', '1 BHK');
+      } else if (lower.includes('2 bhk') || lower.includes('2bhk')) {
+        discovered.set('2bhk', '2 BHK');
+      } else if (lower.includes('3 bhk') || lower.includes('3bhk')) {
+        discovered.set('3bhk', '3 BHK');
+      } else if (lower.includes('4 bhk') || lower.includes('4bhk')) {
+        discovered.set('4bhk', '4 BHK');
+      } else if (lower.includes('5 bhk') || lower.includes('5bhk')) {
+        discovered.set('5bhk', '5 BHK');
+      } else if (lower.includes('shop') || lower.includes('retail') || lower.includes('commercial')) {
+        discovered.set('shops', 'Shops / Commercial');
+      } else if (lower.includes('type a') || lower.includes('type-a')) {
+        discovered.set('type_a', 'Type A');
+      } else if (lower.includes('type b') || lower.includes('type-b')) {
+        discovered.set('type_b', 'Type B');
+      } else if (lower.includes('type c') || lower.includes('type-c')) {
+        discovered.set('type_c', 'Type C');
+      } else if (lower.includes('type d') || lower.includes('type-d')) {
+        discovered.set('type_d', 'Type D');
+      } else if (lower.includes('type e') || lower.includes('type-e')) {
+        discovered.set('type_e', 'Type E');
+      } else {
+        // Any custom label entered by admin (e.g., "Penthouse", "Studio", "Office", "Duplex")
+        discovered.set(raw, raw);
+      }
+    });
+
+    if (discovered.size > 0) {
+      discovered.forEach((label, val) => {
+        html += `<option value="${escAttr(val)}">${esc(label)}</option>`;
+      });
+    } else {
+      // Default common fallback for freshly created project with no units yet
+      html += `
+        <option value="2bhk">2 BHK</option>
+        <option value="3bhk">3 BHK</option>
+        <option value="4bhk">4 BHK</option>
+        <option value="shops">Shops</option>
+        <option value="type_a">Type A</option>
+        <option value="type_b">Type B</option>
+        <option value="type_c">Type C</option>
+        <option value="type_d">Type D</option>
+      `;
+    }
   }
 
   typeFilter.innerHTML = html;
@@ -3798,24 +3859,19 @@ function matchesUnitType(u, typeVal) {
   const notes = (u.notes || '').toLowerCase();
   const combined = `${ut} ${un} ${notes}`;
 
-  if (typeVal === '2bhk') {
-    return combined.includes('2 bhk') || combined.includes('2bhk');
-  }
-  if (typeVal === '3bhk') {
-    return combined.includes('3 bhk') || combined.includes('3bhk');
-  }
-  if (typeVal === 'shops') {
-    return combined.includes('shop') || combined.includes('retail') || combined.includes('commercial');
-  }
-  if (typeVal === 'type_a') {
-    return combined.includes('type a') || combined.includes('type-a') || ut.includes('4 bhk luxury');
-  }
-  if (typeVal === 'type_b') {
-    return combined.includes('type b') || combined.includes('type-b') || ut.includes('corner villa') || ut.includes('presidential');
-  }
-  if (typeVal === 'type_c') {
-    return combined.includes('type c') || combined.includes('type-c') || ut.includes('grand estate');
-  }
+  if (typeVal === '1bhk') return combined.includes('1 bhk') || combined.includes('1bhk');
+  if (typeVal === '2bhk') return combined.includes('2 bhk') || combined.includes('2bhk');
+  if (typeVal === '3bhk') return combined.includes('3 bhk') || combined.includes('3bhk');
+  if (typeVal === '4bhk') return combined.includes('4 bhk') || combined.includes('4bhk');
+  if (typeVal === '5bhk') return combined.includes('5 bhk') || combined.includes('5bhk');
+  if (typeVal === 'shops') return combined.includes('shop') || combined.includes('retail') || combined.includes('commercial');
+  if (typeVal === 'type_a') return combined.includes('type a') || combined.includes('type-a') || ut.includes('4 bhk luxury');
+  if (typeVal === 'type_b') return combined.includes('type b') || combined.includes('type-b') || ut.includes('corner villa') || ut.includes('presidential');
+  if (typeVal === 'type_c') return combined.includes('type c') || combined.includes('type-c') || ut.includes('grand estate');
+  if (typeVal === 'type_d') return combined.includes('type d') || combined.includes('type-d');
+  if (typeVal === 'type_e') return combined.includes('type e') || combined.includes('type-e');
+
+  // Exact or substring match for custom configurations
   return combined.includes(typeVal.toLowerCase()) || ut === typeVal.toLowerCase();
 }
 
