@@ -908,9 +908,16 @@ app.post("/api/projects/:id/brochure",rateLimit(15,10*60*1000),(req,res)=>{
   audit(req,"brochure_download","project",project.id,`Brochure downloaded by ${name} (${cleanPhone})`);
 
   let pdfBuffer;
-  const staticPdf = path.join(__dirname, "assets", "projects", "ds-208", "Akshar_DS_208_Official_Brochure.pdf");
-  if (projectId === 1 && fs.existsSync(staticPdf)) {
-    pdfBuffer = fs.readFileSync(staticPdf);
+  const ds208UploadPdf = path.join(__dirname, "uploads", "ds208", "Akshar DS 208 Brochure.pdf");
+  const ds208AssetPdf = path.join(__dirname, "assets", "projects", "ds-208", "Akshar_DS_208_Official_Brochure.pdf");
+  const nilkanthUploadPdf = path.join(__dirname, "uploads", "nilkanth_villa", "Plot Plan.pdf");
+
+  if (projectId === 1 && fs.existsSync(ds208UploadPdf)) {
+    pdfBuffer = fs.readFileSync(ds208UploadPdf);
+  } else if (projectId === 1 && fs.existsSync(ds208AssetPdf)) {
+    pdfBuffer = fs.readFileSync(ds208AssetPdf);
+  } else if (projectId === 2 && fs.existsSync(nilkanthUploadPdf)) {
+    pdfBuffer = fs.readFileSync(nilkanthUploadPdf);
   } else {
     pdfBuffer = buildPdf(project);
   }

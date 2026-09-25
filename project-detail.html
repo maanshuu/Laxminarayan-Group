@@ -2931,50 +2931,50 @@ async function load() {
   // Configure Nilkanth Villa specific authentic luxury villa plans
   if (p.id === 2) {
     floorPlans['villa4bhk'] = {
-      badge: '4 BHK LUXURY VILLA (TYPE A)',
-      subTitle: '4 BHK CONTEMPORARY VILLA',
-      heading: '4 BHK Luxury Villa (Ground + First Floor)',
-      summary: 'Spacious independent villa featuring double-height foyer, expansive living room opening to private lawn, designer modular kitchen with utility yard, ground floor guest suite, and 3 grand master suites with ensuite dressing rooms on first floor.',
-      carpet: '2,850 sq.ft',
-      superBuilt: '3,200 sq.ft',
-      facing: 'East / North Facing (100% Vaastu)',
-      baths: 'Private Garden • 4 Ensuite Baths • Powder Room • 2 Car Park',
-      img: ''
+      badge: '4 BHK LUXURY VILLA (TYPE A - UNITS 23, 25, 27)',
+      subTitle: 'GROUND + FIRST + SECOND FLOOR PLAN',
+      heading: 'Type A Luxury Bungalow (Plot 118 Sq.Yds • Built-up 211 Sq.Yds)',
+      summary: 'Architectural G+2 layout featuring private car parking (8\'6" x 12\'3"), front garden & verandah, drawing room (12\'0" x 17\'7"), dining & kitchen with store and backyard, ground floor bedroom, first floor 2 master suites with private viewing balcony (12\'5" x 4\'3"), second floor bedroom, and two massive open sundeck terraces (12\'9" x 22\'2" & 9\'0" x 8\'5").',
+      carpet: 'Plot: 118 Sq.Yds (1,062 sq.ft)',
+      superBuilt: 'Built-up: 211 Sq.Yds (1,899 sq.ft)',
+      facing: 'East / North Facing (100% Vaastu Compliant)',
+      baths: 'Private Parking • 4 Bedrooms • 4 Toilets • Dual Sundeck Terraces',
+      img: 'assets/projects/nilkanth/floor_plans/nilkanth_villa_type_a_floorplan.png'
     };
     floorPlans['villa5bhk'] = {
-      badge: '5 BHK PRESIDENTIAL ESTATE',
-      subTitle: '5 BHK GRAND ESTATE VILLA',
-      heading: '5 BHK Presidential Estate Villa (G + 2 Floors)',
-      summary: 'Bespoke grand estate villa with private plunge pool, personal elevator shaft, double-height grand family lounge, 5 king suites with private sundecks, home theatre / lounge on terrace floor, and 3 covered car ports.',
-      carpet: '3,650 sq.ft',
-      superBuilt: '4,200 sq.ft',
-      facing: 'North-East Corner (100% Vaastu)',
-      baths: 'Private Plunge Pool • 5 Master Baths • Sundecks • 3 Car Parks',
-      img: ''
+      badge: '4 BHK CORNER VILLA (TYPE B - UNIT 09)',
+      subTitle: 'GROUND + FIRST + SECOND FLOOR PLAN',
+      heading: 'Type B Corner Villa (Plot 108 Sq.Yds • Built-up 201 Sq.Yds)',
+      summary: 'Architectural G+2 corner layout featuring private parking (8\'6" x 13\'3"), drawing room (12\'0" x 17\'3"), modern kitchen with pantry and rear backyard (14\'0" x 9\'6"), ground floor guest bedroom, first floor dual master bedrooms with private balcony and designer dressing toilets, second floor bedroom with expansive double open sky terraces (12\'9" x 17\'7" & 9\'0" x 8\'5").',
+      carpet: 'Plot: 108 Sq.Yds (972 sq.ft)',
+      superBuilt: 'Built-up: 201 Sq.Yds (1,809 sq.ft)',
+      facing: 'North-East Corner (100% Vaastu Compliant)',
+      baths: 'Covered Parking • 4 Luxury Bedrooms • 4 Toilets • Double Sky Terraces',
+      img: 'assets/projects/nilkanth/floor_plans/nilkanth_villa_type_b_floorplan.png'
     };
     floorPlans['enclave'] = {
-      badge: 'NILKANTH VILLA MASTER ENCLAVE',
-      subTitle: 'EXCLUSIVE GATED ENCLAVE',
-      heading: 'Nilkanth Villa Master Layout & Amenities',
-      summary: 'Private gated community featuring wide internal concrete avenues, lush landscaped central gardens, clubhouse with indoor recreation, underground cabling, 24/7 boom barrier security, and dedicated visitor parking.',
-      carpet: 'Entire Enclave',
-      superBuilt: 'Gated Villa Society',
-      facing: 'All Directions with Central Green Vista',
-      baths: 'Exclusive Clubhouse • 24/7 Security • Landscaped Central Park',
-      img: ''
+      badge: 'NILKANTH VILLA MASTER ENCLAVE PLAN',
+      subTitle: 'ARCHITECTURAL LAYOUT & PLOT ROAD MATRIX',
+      heading: 'Master Township Enclave (Plots 01 to 29 • 602 Sq.Yds Common Park)',
+      summary: 'Official master layout approved by Akshat Architects. Features 30-meter wide arterial road frontage, 12-meter wide southern boulevard, 6-meter internal private roads, central landscaped recreation park (602 sq.yds), senior citizen gazebo, and 29 exclusive bungalow plots.',
+      carpet: 'Total Area: 4,856 Sq.Yds',
+      superBuilt: '29 Exclusive Villa Plots',
+      facing: '30.00 Mt. & 12.00 Mt. Wide Road Corridors',
+      baths: 'Central Park • Gazebo • 24/7 Security Gate • Concrete Avenues',
+      img: 'assets/projects/nilkanth/floor_plans/nilkanth_master_layout_plan.png'
     };
 
     const tabsContainer = $('planTabs');
     if (tabsContainer) {
       tabsContainer.innerHTML = `
         <button type="button" class="floorplan-tab active" data-unit="villa4bhk" onclick="switchFloorPlan('villa4bhk', this)">
-          <span>4 BHK Luxury Villa</span>
+          <span>Type A (Unit 23, 25, 27)</span>
         </button>
         <button type="button" class="floorplan-tab" data-unit="villa5bhk" onclick="switchFloorPlan('villa5bhk', this)">
-          <span>5 BHK Presidential Estate</span>
+          <span>Type B Corner (Unit 09)</span>
         </button>
         <button type="button" class="floorplan-tab" data-unit="enclave" onclick="switchFloorPlan('enclave', this)">
-          <span>Master Enclave Plan</span>
+          <span>Master Layout Plan (29 Plots)</span>
         </button>
       `;
       switchFloorPlan('villa4bhk', tabsContainer.children[0]);
