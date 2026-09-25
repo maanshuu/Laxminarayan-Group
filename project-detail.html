@@ -2182,7 +2182,7 @@ footer {
     <p class="muted">Positioned strategically at the center of rapid transit networks, business districts, and esteemed educational institutes.</p>
 
     <!-- Radar Cards Grid -->
-    <div class="proximity-grid">
+    <div class="proximity-grid" id="proximityGrid">
       <div class="proximity-card">
         <div>
           <div class="proximity-top">
@@ -2668,6 +2668,139 @@ window.filterAmenityCategory = function(cat, btn) {
   });
 };
 
+function renderLocationRadar(p) {
+  const grid = $('proximityGrid');
+  if (!grid) return;
+
+  if (p.id === 1) {
+    grid.innerHTML = `
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🛣️</div>
+            <span class="proximity-time">🚗 0 Mins</span>
+          </div>
+          <div class="proximity-title">S.P. Ring Road Arterial</div>
+          <div class="proximity-desc">Immediate signal-free frontage along S.P. Ring Road at Vastral junction. Direct access to all Ahmedabad corridors (0.0 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🚇</div>
+            <span class="proximity-time">🚗 4 Mins</span>
+          </div>
+          <div class="proximity-title">Vastral Gam Metro Station</div>
+          <div class="proximity-desc">Ahmedabad East-West Metro connecting directly to Kalupur Railway Station, Gandhigram & Thaltej (1.8 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">✈️</div>
+            <span class="proximity-time">🚗 20 Mins</span>
+          </div>
+          <div class="proximity-title">SVP International Airport</div>
+          <div class="proximity-desc">Direct signal-free ring road expressway route to Ahmedabad International Airport (14.5 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🏥</div>
+            <span class="proximity-time">🚗 5 Mins</span>
+          </div>
+          <div class="proximity-title">Multi-Speciality Healthcare</div>
+          <div class="proximity-desc">Immediate emergency and specialist medical care at Shalby Hospital & Life Care Hospital Vastral (2.2 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🎓</div>
+            <span class="proximity-time">🚗 6 Mins</span>
+          </div>
+          <div class="proximity-title">Top Academic Institutes</div>
+          <div class="proximity-desc">Renowned institutes including Podar International School, St. Kabir School, and Divine Child Academy (2.8 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🛍️</div>
+            <span class="proximity-time">🚗 8 Mins</span>
+          </div>
+          <div class="proximity-title">Commercial & Entertainment</div>
+          <div class="proximity-desc">High-street retail, Reliance Smart Superstore, Palm Cinema, and Nikol Commercial Promenade (3.6 km).</div>
+        </div>
+      </div>
+    `;
+  } else if (p.id === 2) {
+    grid.innerHTML = `
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🛣️</div>
+            <span class="proximity-time">🚗 10 Mins</span>
+          </div>
+          <div class="proximity-title">S.P. Ring Road / Nikol Expressway</div>
+          <div class="proximity-desc">Fast 4-lane arterial road connection linking Kanbha directly to Ahmedabad City and Nikol-Naroda corridor.</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">✈️</div>
+            <span class="proximity-time">🚗 22 Mins</span>
+          </div>
+          <div class="proximity-title">SVP International Airport</div>
+          <div class="proximity-desc">Convenient expressway drive to Sardar Vallabhbhai Patel International Airport via Ring Road (18.0 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🛍️</div>
+            <span class="proximity-time">🚗 8 Mins</span>
+          </div>
+          <div class="proximity-title">Nikol & Raspan High-Street</div>
+          <div class="proximity-desc">Premier commercial shopping hub, Kunj Mall, D-Mart, retail outlets, and multi-cuisine dining (5.2 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🏥</div>
+            <span class="proximity-time">🚗 7 Mins</span>
+          </div>
+          <div class="proximity-title">Healthcare Facilities</div>
+          <div class="proximity-desc">Multi-speciality medical attention at Dhiraj Multi-Speciality Hospital and regional medical clinics (4.5 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🎓</div>
+            <span class="proximity-time">🚗 9 Mins</span>
+          </div>
+          <div class="proximity-title">Leading Schools & Universities</div>
+          <div class="proximity-desc">Swaminarayan International School, Nobel University Campus, and higher educational academies (6.0 km).</div>
+        </div>
+      </div>
+      <div class="proximity-card">
+        <div>
+          <div class="proximity-top">
+            <div class="proximity-icon">🌿</div>
+            <span class="proximity-time">🚗 0 Mins</span>
+          </div>
+          <div class="proximity-title">Private Green Sanctuary</div>
+          <div class="proximity-desc">100% serene, noise-free gated living with 602 Sq.Yds central landscaped park and senior citizen gazebo.</div>
+        </div>
+      </div>
+    `;
+  }
+}
+
 async function load() {
   if (!Number.isInteger(id) || id < 1) {
     location.replace('properties.html');
@@ -2720,6 +2853,7 @@ async function load() {
   if ($('lbWaInquireBtn')) $('lbWaInquireBtn').href = waCustomUrl;
 
   renderOverviewAndAmenities(p);
+  renderLocationRadar(p);
   if ($('hero')) {
     $('hero').style.backgroundImage = `linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%), url('${String(p.image || '').replace(/'/g, '%27')}')`;
   }

@@ -14,11 +14,11 @@ A high-performance, full-stack digital web portal and enterprise CRM designed sp
 
 The platform features two flagship real estate developments:
 1. **DS 208 (Developed by Akshar Group)**:
-   - Location: GIDC Road, Kathwada, Ahmedabad, Gujarat.
+   - Location: Opp. Shreedhar Sparsh, S.P. Ring Road, Vastral, Ahmedabad, Gujarat (RERA: `PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/MAA11899/030623`).
    - Configurations: **2 BHK**, **3 BHK**, and **Ground Floor Commercial Shops**.
    - Floor Matrix: 10 floors, 14 residential units + 2 commercial shops (16 total units).
 2. **Nilkanth Villa**:
-   - Location: Kudasan / Raysan Corridor, Gandhinagar, Gujarat.
+   - Location: Near Kunj Mall / Raspan Corridor, Kanbha, Ahmedabad, Gujarat.
    - Configurations: **Type A (Luxury 4 BHK)**, **Type B (Corner 4 BHK)**, and **Type C (Presidential 5 BHK)**.
    - Floor Matrix: 7 exclusive private bungalow units.
 
