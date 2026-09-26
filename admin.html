@@ -3165,10 +3165,23 @@ async function loadEnquiries() {
           <td class="actions">
             <button class="btn smallbtn" onclick="editEnquiry(${x.id})">Edit</button>
             <button class="btn smallbtn gold" onclick="convertEnquiryToLead(${x.id})">Convert to Lead →</button>
+            <button class="btn smallbtn" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;" onclick="deleteEnquiry(${x.id}, '${esc(x.name)}')">Delete</button>
           </td>
         </tr>
       `;
     }).join('') : '<tr><td colspan="9" class="empty">No saved enquiries yet. Use the form above or let customers submit one from the website.</td></tr>';
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteEnquiry(id, name) {
+  if (!confirm(`Are you sure you want to delete enquiry from "${name || 'this contact'}"?`)) return;
+  try {
+    const res = await send(`/api/admin/enquiries/${id}`, { method: 'DELETE' });
+    toast(res.message || 'Enquiry deleted successfully');
+    await loadEnquiries();
+    await load();
   } catch (e) {
     toast(e.message);
   }

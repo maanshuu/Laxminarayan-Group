@@ -2971,6 +2971,18 @@ app.patch("/api/admin/enquiries/:id",admin,(req,res)=>{
  db.prepare("UPDATE leads SET status=CASE WHEN ?='closed' THEN 'lost' WHEN ?='contacted' AND status='new' THEN 'contacted' ELSE status END,updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=?").run(status,status,id);
  res.json({success:true,data:updated});
 });
+
+app.delete("/api/admin/enquiries/:id",admin,(req,res)=>{
+  const id=Number(req.params.id);
+  if(!Number.isInteger(id)||id<1) return res.status(400).json({success:false,error:"Invalid enquiry id"});
+  const existing=db.prepare("SELECT * FROM enquiries WHERE id=?").get(id);
+  if(!existing) return res.status(404).json({success:false,error:"Enquiry not found"});
+  db.prepare("DELETE FROM leads WHERE enquiry_id=?").run(id);
+  db.prepare("DELETE FROM enquiries WHERE id=?").run(id);
+  audit(req,"delete","enquiry",id,`Deleted ${existing.enquiry_reference||'ENQ-'+id} (${existing.name})`);
+  res.json({success:true,message:"Enquiry deleted successfully"});
+});
+
 const VALID_PROJECT_CATEGORIES = ["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL","LUXURY VILLAS","APARTMENTS & SHOPS","VILLAS","PLOTS / LAND","MIXED USE","PENTHOUSES"];
 const VALID_PROJECT_STATUSES = ["active","completed","sold_out","inactive"];
 
