@@ -802,33 +802,171 @@ function currentUser(id){return db.prepare("SELECT id,name,email,phone,role,stat
 function rndRef(){return Math.floor(100+Math.random()*900)}
 
 function seed(){
- const projects=[
-  ["DS 208 (Developed by Akshar Group)","APARTMENTS & SHOPS","Premier residential & commercial landmark situated on S.P. Ring Road, Vastral, Ahmedabad. Developed by Akshar Group. Features 4 grand mid-rise residential towers (Blocks A, B, C, D), ground-level high street retail promenade with 33 shops, thoughtfully crafted 2 & 3 BHK luxury residences, and 20+ world-class lifestyle amenities.","/uploads/projects/ds208_bird_eye_view.jpg"],
-  ["Nilkanth Villa","LUXURY VILLAS","Exclusive private luxury villa estate crafted with expansive landscaped private gardens, contemporary architecture, generous multi-level layouts, gated community security, and private clubhouse.","/assets/hero-villa.png"]
- ];
- const ins=db.prepare("INSERT INTO projects(name,category,description,image,status) VALUES(?,?,?,?, 'active')");
- const addMany=db.transaction(items=>{for(const x of items){if(!db.prepare("SELECT id FROM projects WHERE name=?").get(x[0])) ins.run(...x)}});
- addMany(projects);
- try {
-   db.prepare("DELETE FROM project_units WHERE project_id NOT IN (SELECT id FROM projects WHERE name IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa'))").run();
-   db.prepare("DELETE FROM projects WHERE name NOT IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa')").run();
- } catch (_) {}
- if(db.prepare("SELECT COUNT(*) c FROM leaders").get().c===0){
-  const ins=db.prepare("INSERT INTO leaders(name,designation,initials,image) VALUES(?,?,?,?)");
-  [["Roshan Sabhaya","FOUNDER & DIRECTOR","RS",""],["Mehul Mistry","FOUNDER & DIRECTOR","MM",""],["Swaraj Jikadara","FOUNDER & DIRECTOR","SJ",""]].forEach(x=>ins.run(...x));
- }
- const email=clean(process.env.ADMIN_EMAIL,160).toLowerCase(), password=process.env.ADMIN_PASSWORD;
- if(email && password && passwordOk(password)){
-  const existing = db.prepare("SELECT id, password_hash, role FROM users WHERE email=?").get(email);
-  if(!existing){
-   const hash=bcrypt.hashSync(password,12);
-   db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run("Laxminarayan Admin",email,"",hash,"admin","active");
-  } else if(existing.role==="admin" && !bcrypt.compareSync(password, existing.password_hash)){
-   const hash=bcrypt.hashSync(password,12);
-   db.prepare("UPDATE users SET password_hash=?, session_version=session_version+1, status='active', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(hash, existing.id);
-   console.log(`[AUTH] Admin password synchronized from .env for ${email}`);
+  // 1. Projects Base Records
+  const p1 = db.prepare("SELECT id FROM projects WHERE id=1 OR name LIKE '%DS 208%'").get();
+  if(!p1) {
+    db.prepare("INSERT INTO projects(id,name,category,description,image,location,price,amenities,status) VALUES(1,?,?,?,?,?,?,?,'active')").run(
+      "DS 208 (Developed by Akshar Group)",
+      "APARTMENTS & SHOPS",
+      "Premier residential & commercial landmark situated on S.P. Ring Road, Vastral, Ahmedabad. Developed by Akshar Group. Features 4 grand mid-rise residential towers (Blocks A, B, C, D), ground-level high street retail promenade with 33 shops, thoughtfully crafted 2 & 3 BHK luxury residences, and 20+ world-class lifestyle amenities.",
+      "/uploads/projects/ds208_bird_eye_view.jpg",
+      "Opp. Shreedhar Sparsh, Near Royal Restaurant, S.P. Ring Road, Vastral, Ahmedabad, Gujarat - 382415 (RERA: PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/MAA11899/030623)",
+      "₹48 Lakh - ₹78 Lakh",
+      "Clubhouse, Landscaped Garden, Children Play Area, Indoor Games, Gymnasium, 33 High-Street Retail Shops, Senior Citizen Sit-Outs, Jogging Track with Yoga Deck, 24/7 CCTV & Security Cabin, Automatic Elevators, Vastu Compliant Entry, Solar Power System, Rainwater Harvesting, Fire Hydrant System"
+    );
+  } else {
+    db.prepare(`
+      UPDATE projects SET
+        name = 'DS 208 (Developed by Akshar Group)',
+        category = 'APARTMENTS & SHOPS',
+        description = 'Premier residential & commercial landmark situated on S.P. Ring Road, Vastral, Ahmedabad. Developed by Akshar Group. Features 4 grand mid-rise residential towers (Blocks A, B, C, D), ground-level high street retail promenade with 33 shops, thoughtfully crafted 2 & 3 BHK luxury residences, and 20+ world-class lifestyle amenities.',
+        image = '/uploads/projects/ds208_bird_eye_view.jpg',
+        location = 'Opp. Shreedhar Sparsh, Near Royal Restaurant, S.P. Ring Road, Vastral, Ahmedabad, Gujarat - 382415 (RERA: PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/MAA11899/030623)',
+        price = '₹48 Lakh - ₹78 Lakh',
+        amenities = 'Clubhouse, Landscaped Garden, Children Play Area, Indoor Games, Gymnasium, 33 High-Street Retail Shops, Senior Citizen Sit-Outs, Jogging Track with Yoga Deck, 24/7 CCTV & Security Cabin, Automatic Elevators, Vastu Compliant Entry, Solar Power System, Rainwater Harvesting, Fire Hydrant System',
+        status = 'active',
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(p1.id);
   }
- }
+
+  const p2 = db.prepare("SELECT id FROM projects WHERE id=2 OR name LIKE '%Nilkanth%'").get();
+  if(!p2) {
+    db.prepare("INSERT INTO projects(id,name,category,description,image,location,price,amenities,status) VALUES(2,?,?,?,?,?,?,?,'active')").run(
+      "Nilkanth Villa",
+      "LUXURY VILLAS",
+      "Exclusive private luxury villa estate crafted with expansive landscaped private gardens, contemporary architecture, generous multi-level layouts, gated community security, and private clubhouse.",
+      "/uploads/projects/nilkanth_front_elevation.jpg",
+      "Near Kunj Mall / Raspan Corridor, Kanbha, Ahmedabad, Gujarat - 382430",
+      "₹1.20 Cr - ₹2.25 Cr",
+      "Private Landscaped Garden, Gated Community with 24/7 Security, Exclusive Residents Clubhouse, 3 Covered Car Parks, Vastu Compliant Architecture, Children Play Area, Senior Citizen Sit-Out, Underground Cabling"
+    );
+  } else {
+    db.prepare(`
+      UPDATE projects SET
+        name = 'Nilkanth Villa',
+        category = 'LUXURY VILLAS',
+        description = 'Exclusive private luxury villa estate crafted with expansive landscaped private gardens, contemporary architecture, generous multi-level layouts, gated community security, and private clubhouse.',
+        image = '/uploads/projects/nilkanth_front_elevation.jpg',
+        location = 'Near Kunj Mall / Raspan Corridor, Kanbha, Ahmedabad, Gujarat - 382430',
+        price = '₹1.20 Cr - ₹2.25 Cr',
+        amenities = 'Private Landscaped Garden, Gated Community with 24/7 Security, Exclusive Residents Clubhouse, 3 Covered Car Parks, Vastu Compliant Architecture, Children Play Area, Senior Citizen Sit-Out, Underground Cabling',
+        status = 'active',
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(p2.id);
+  }
+
+  try {
+    db.prepare("DELETE FROM project_units WHERE project_id NOT IN (SELECT id FROM projects WHERE name IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa'))").run();
+    db.prepare("DELETE FROM projects WHERE name NOT IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa')").run();
+  } catch (_) {}
+
+  // 2. Seed Units for DS 208 (16 units)
+  const p1Id = (db.prepare("SELECT id FROM projects WHERE name LIKE '%DS 208%'").get() || {}).id || 1;
+  const p1UnitCount = db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?").get(p1Id).c;
+  if(p1UnitCount === 0) {
+    const dsUnits = [
+      { u: 'Shop G-01', t: 'Commercial High-Street Retail', f: 0, a: 365, p: '₹35 Lakh', s: 'available' },
+      { u: 'Shop G-02', t: 'Commercial High-Street Retail', f: 0, a: 450, p: '₹42 Lakh', s: 'available' },
+      { u: 'Shop G-03', t: 'Commercial High-Street Retail', f: 0, a: 390, p: '₹38 Lakh', s: 'available' },
+      { u: 'Shop G-10', t: 'Commercial Corner Retail', f: 0, a: 410, p: '₹44 Lakh', s: 'available' },
+      { u: 'Block A - 101', t: '2 BHK (Type A)', f: 1, a: 1180, p: '₹48 Lakh', s: 'available' },
+      { u: 'Block A - 102', t: '2 BHK (Type B)', f: 1, a: 1220, p: '₹49.5 Lakh', s: 'available' },
+      { u: 'Block A - 201', t: '2 BHK (Type A)', f: 2, a: 1180, p: '₹48.5 Lakh', s: 'available' },
+      { u: 'Block A - 302', t: '2 BHK (Type B)', f: 3, a: 1220, p: '₹50 Lakh', s: 'available' },
+      { u: 'Block B - 101', t: '3 BHK Luxury Suite', f: 1, a: 1550, p: '₹65 Lakh', s: 'available' },
+      { u: 'Block B - 102', t: '3 BHK Luxury Suite', f: 1, a: 1550, p: '₹65 Lakh', s: 'available' },
+      { u: 'Block B - 201', t: '3 BHK Luxury Suite', f: 2, a: 1550, p: '₹66 Lakh', s: 'available' },
+      { u: 'Block B - 402', t: '3 BHK Luxury Suite', f: 4, a: 1550, p: '₹67 Lakh', s: 'available' },
+      { u: 'Block C - 101', t: '3 BHK Luxury Suite', f: 1, a: 1550, p: '₹65 Lakh', s: 'available' },
+      { u: 'Block C - 202', t: '3 BHK Luxury Suite', f: 2, a: 1550, p: '₹66 Lakh', s: 'available' },
+      { u: 'Block D - 101', t: '2 BHK (Type A)', f: 1, a: 1180, p: '₹48 Lakh', s: 'available' },
+      { u: 'Block D - 301', t: '2 BHK (Type A)', f: 3, a: 1180, p: '₹49.5 Lakh', s: 'available' }
+    ];
+    const insU = db.prepare("INSERT INTO project_units (project_id, unit_number, unit_type, floor_number, area_sqft, price, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    for(const u of dsUnits) insU.run(p1Id, u.u, u.t, u.f, u.a, u.p, u.s, `DS 208 Official Unit (${u.t})`);
+  }
+
+  // 3. Seed Units for Nilkanth Villa (7 units)
+  const p2Id = (db.prepare("SELECT id FROM projects WHERE name LIKE '%Nilkanth%'").get() || {}).id || 2;
+  const p2UnitCount = db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?").get(p2Id).c;
+  if(p2UnitCount === 0) {
+    const villaUnits = [
+      { u: 'Villa 01', t: '4 BHK Luxury Villa', f: 0, a: 2850, p: '₹1.25 Cr', s: 'available' },
+      { u: 'Villa 02', t: '4 BHK Luxury Villa', f: 0, a: 2850, p: '₹1.25 Cr', s: 'available' },
+      { u: 'Villa 03', t: '4 BHK Corner Villa', f: 0, a: 3100, p: '₹1.45 Cr', s: 'available' },
+      { u: 'Villa 05', t: '5 BHK Presidential Villa', f: 0, a: 3650, p: '₹1.85 Cr', s: 'available' },
+      { u: 'Villa 07', t: '5 BHK Presidential Villa', f: 0, a: 3650, p: '₹1.95 Cr', s: 'available' },
+      { u: 'Villa 08', t: '4 BHK Luxury Villa', f: 0, a: 2850, p: '₹1.30 Cr', s: 'available' },
+      { u: 'Villa 10', t: '5 BHK Grand Estate Villa', f: 0, a: 4200, p: '₹2.25 Cr', s: 'available' }
+    ];
+    const insU = db.prepare("INSERT INTO project_units (project_id, unit_number, unit_type, floor_number, area_sqft, price, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    for(const v of villaUnits) insU.run(p2Id, v.u, v.t, v.f, v.a, v.p, v.s, `Nilkanth Villa Official Residence (${v.t})`);
+  }
+
+  // 4. Seed Media for DS 208 (17 media records)
+  const p1MediaCount = db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?").get(p1Id).c;
+  if(p1MediaCount === 0) {
+    const dsMedia = [
+      { name: 'Master Aerial Bird Eye View', path: '/uploads/projects/ds208_bird_eye_view.jpg', cover: 1 },
+      { name: 'Front Elevation with High-Street Retail', path: '/uploads/projects/ds208_front_elevation.jpg', cover: 0 },
+      { name: 'Grand Project Entrance Gate & Security', path: '/uploads/projects/ds208_entrance_view.jpg', cover: 0 },
+      { name: 'Private Luxury Balcony & Garden View', path: '/uploads/projects/ds208_balcony_view.jpg', cover: 0 },
+      { name: 'Children Sandpit & Play Recreation Zone', path: '/uploads/projects/ds208_children_play_area_view.jpg', cover: 0 },
+      { name: 'Kids Toddler Play Park', path: '/uploads/projects/ds208_children_play_area.jpg', cover: 0 },
+      { name: 'Air-Conditioned Community Clubhouse', path: '/uploads/projects/ds208_corner_view_of_club_house.jpg', cover: 0 },
+      { name: 'Central Landscaped Leisure Garden', path: '/uploads/projects/ds208_corner_view_of_garden.jpg', cover: 0 },
+      { name: 'Common Plot & Senior Citizen Gazebo', path: '/uploads/projects/ds208_corner_view_of_common_plot.jpg', cover: 0 },
+      { name: 'Architectural Tower Corner Perspective', path: '/uploads/projects/ds208_corner_view_1.jpg', cover: 0 },
+      { name: 'Podium & Covered Parking Promenade', path: '/uploads/projects/ds208_corner_view_2.jpg', cover: 0 },
+      { name: 'Clubhouse Facade & Landscaped Pathway', path: '/uploads/projects/ds208_side_view_of_club_house.jpg', cover: 0 },
+      { name: 'Elevated Common Recreation Plot View', path: '/uploads/projects/ds208_top_view_of_common_plot.jpg', cover: 0 },
+      { name: 'Sunlit Balcony Skyline View', path: '/uploads/projects/ds208_view_from_balcony.jpg', cover: 0 },
+      { name: 'Sample Flat - Grand Living & Dining Pavilion', path: '/uploads/projects/ds208_sample_hall.png', cover: 0 },
+      { name: 'Sample Flat - Master Suite Bedroom', path: '/uploads/projects/ds208_sample_bedroom.png', cover: 0 },
+      { name: 'Sample Flat - Designer Modular Kitchen', path: '/uploads/projects/ds208_sample_kitchen.png', cover: 0 }
+    ];
+    const insM = db.prepare("INSERT INTO project_media (project_id, media_type, mime_type, original_name, file_path, file_size, is_cover) VALUES (?, 'image', 'image/jpeg', ?, ?, 250000, ?)");
+    for(const m of dsMedia) insM.run(p1Id, m.name, m.path, m.cover);
+  }
+
+  // 5. Seed Media for Nilkanth Villa (8 media records)
+  const p2MediaCount = db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?").get(p2Id).c;
+  if(p2MediaCount === 0) {
+    const nilkanthMedia = [
+      { name: 'Master Front Architectural Elevation', path: '/uploads/projects/nilkanth_front_elevation.jpg', cover: 1 },
+      { name: 'Aerial Master Planning Perspective', path: '/uploads/projects/nilkanth_bird_eye_view.jpg', cover: 0 },
+      { name: 'Grand Residential Entrance Gatehouse', path: '/uploads/projects/nilkanth_entrance_gate_day.jpg', cover: 0 },
+      { name: 'Internal Boulevard & Paved Streetscape', path: '/uploads/projects/nilkanth_street_view.jpg', cover: 0 },
+      { name: 'Corner Bungalow Façade & Landscaping', path: '/uploads/projects/nilkanth_corner_view_day.jpg', cover: 0 },
+      { name: 'Evening Ambient Illumination of Entry Gate', path: '/uploads/projects/nilkanth_entrance_gate_night.jpg', cover: 0 },
+      { name: 'Designer Leisure Gazebo & Senior Citizen Sitting', path: '/uploads/projects/nilkanth_gazebo_pavilion.jpg', cover: 0 },
+      { name: 'Lush Green Central Park & Recreation Lawn', path: '/uploads/projects/nilkanth_central_garden.jpg', cover: 0 }
+    ];
+    const insM = db.prepare("INSERT INTO project_media (project_id, media_type, mime_type, original_name, file_path, file_size, is_cover) VALUES (?, 'image', 'image/jpeg', ?, ?, 800000, ?)");
+    for(const m of nilkanthMedia) insM.run(p2Id, m.name, m.path, m.cover);
+  }
+
+  // 6. Seed Leaders
+  if(db.prepare("SELECT COUNT(*) c FROM leaders").get().c===0){
+    const insL=db.prepare("INSERT INTO leaders(name,designation,initials,image) VALUES(?,?,?,?)");
+    [["Roshan Sabhaya","FOUNDER & DIRECTOR","RS",""],["Mehul Mistry","FOUNDER & DIRECTOR","MM",""],["Swaraj Jikadara","FOUNDER & DIRECTOR","SJ",""]].forEach(x=>insL.run(...x));
+  }
+
+  // 7. Seed Admin User
+  const email=clean(process.env.ADMIN_EMAIL,160).toLowerCase(), password=process.env.ADMIN_PASSWORD;
+  if(email && password && passwordOk(password)){
+    const existing = db.prepare("SELECT id, password_hash, role FROM users WHERE email=?").get(email);
+    if(!existing){
+      const hash=bcrypt.hashSync(password,12);
+      db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run("Laxminarayan Admin",email,"",hash,"admin","active");
+    } else if(existing.role==="admin" && !bcrypt.compareSync(password, existing.password_hash)){
+      const hash=bcrypt.hashSync(password,12);
+      db.prepare("UPDATE users SET password_hash=?, session_version=session_version+1, status='active', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(hash, existing.id);
+      console.log(`[AUTH] Admin password synchronized from .env for ${email}`);
+    }
+  }
 }
 seed();
 
@@ -3197,7 +3335,8 @@ app.get("/favicon.ico", (req, res) => {
 
 // ─── PUBLIC ASSETS & UPLOADED MEDIA (7-DAY BROWSER CACHE + GZIP) ───
 app.use("/assets", express.static(path.join(__dirname, "assets"), { maxAge: "7d", etag: true, dotfiles: "ignore", index: false }));
-app.use("/uploads/projects", express.static(PROJECT_UPLOAD_DIR, { maxAge: "7d", etag: true, fallthrough: false, dotfiles: "ignore", index: false }));
+app.use("/uploads/projects", express.static(PROJECT_UPLOAD_DIR, { maxAge: "7d", etag: true, fallthrough: true, dotfiles: "ignore", index: false }));
+app.use("/uploads/projects", express.static(LEGACY_UPLOAD_DIR, { maxAge: "7d", etag: true, fallthrough: true, dotfiles: "ignore", index: false }));
 
 // ─── 404 CATCH-ALL (Prevents Internal Path Discovery) ───
 app.use((req, res, next) => {
