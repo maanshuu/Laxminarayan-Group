@@ -1137,12 +1137,68 @@ app.post("/api/admin/leads",admin,(req,res)=>{
   audit(req,"create","lead",r.lastInsertRowid,`${name} · ${source}`);
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(r.lastInsertRowid)});
 });
-app.delete("/api/admin/leads/:id",admin,(req,res)=>{
-  const id=Number(req.params.id), existing=db.prepare("SELECT * FROM leads WHERE id=?").get(id);
-  if(!existing)return res.status(404).json({success:false,error:"Lead not found"});
-  db.prepare("DELETE FROM leads WHERE id=?").run(id);
-  audit(req,"delete","lead",id,`Lead archived/deleted: ${existing.name}`);
-  res.json({success:true});
+// Duplicate lead checking helper
+function findDuplicateLead(rawPhone, rawEmail, excludeId = 0) {
+  const cleanDigits = rawPhone ? String(rawPhone).replace(/[^0-9]/g, '') : '';
+  const cleanPhone = cleanDigits.length >= 10 ? cleanDigits.slice(-10) : '';
+  const email = clean(rawEmail, 160).toLowerCase();
+
+  let match = null;
+  if (cleanPhone && cleanPhone.length === 10) {
+    match = db.prepare(`
+      SELECT l.id, l.name, l.phone, l.email, l.status, l.sentiment, l.source, l.created_at,
+             p.name AS project_name, eu.name AS employee_name
+      FROM leads l
+      LEFT JOIN projects p ON p.id = l.project_id
+      LEFT JOIN employees e ON e.id = l.assigned_employee_id
+      LEFT JOIN users eu ON eu.id = e.user_id
+      WHERE (REPLACE(REPLACE(REPLACE(REPLACE(l.phone, ' ', ''), '-', ''), '+91', ''), '(', '') LIKE ?
+             OR l.phone LIKE ?)
+      AND l.id != ?
+      ORDER BY l.id DESC LIMIT 1
+    `).get(`%${cleanPhone}`, `%${cleanPhone}`, excludeId);
+  }
+
+  if (!match && email && email.includes('@')) {
+    match = db.prepare(`
+      SELECT l.id, l.name, l.phone, l.email, l.status, l.sentiment, l.source, l.created_at,
+             p.name AS project_name, eu.name AS employee_name
+      FROM leads l
+      LEFT JOIN projects p ON p.id = l.project_id
+      LEFT JOIN employees e ON e.id = l.assigned_employee_id
+      LEFT JOIN users eu ON eu.id = e.user_id
+      WHERE LOWER(l.email) = ? AND l.id != ?
+      ORDER BY l.id DESC LIMIT 1
+    `).get(email, excludeId);
+  }
+
+  return match || null;
+}
+
+app.get("/api/admin/leads/check-duplicate", employeeOrAdmin, (req, res) => {
+  const duplicate = findDuplicateLead(req.query.phone, req.query.email, Number(req.query.excludeId) || 0);
+  res.json({ success: true, duplicate });
+});
+
+app.get("/api/employee/leads/check-duplicate", employeeOrAdmin, (req, res) => {
+  const duplicate = findDuplicateLead(req.query.phone, req.query.email, Number(req.query.excludeId) || 0);
+  res.json({ success: true, duplicate });
+});
+
+app.delete("/api/admin/leads/:id", admin, (req, res) => {
+  const id = Number(req.params.id);
+  const existing = db.prepare("SELECT * FROM leads WHERE id=?").get(id);
+  if (!existing) return res.status(404).json({ success: false, error: "Enquiry not found" });
+
+  const tx = db.transaction(() => {
+    db.prepare("UPDATE bookings SET lead_id=NULL WHERE lead_id=?").run(id);
+    db.prepare("UPDATE site_visits SET enquiry_id=NULL WHERE enquiry_id=?").run(id);
+    db.prepare("DELETE FROM leads WHERE id=?").run(id);
+  });
+  tx();
+
+  audit(req, "delete", "lead", id, `Enquiry deleted: #${id} ${existing.name} (${existing.phone || 'no phone'})`);
+  res.json({ success: true, message: `Enquiry #${id} deleted successfully` });
 });
 app.get("/api/admin/site-visits",admin,(req,res)=>{
   const status=clean(req.query.status,30);

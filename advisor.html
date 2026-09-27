@@ -538,7 +538,7 @@ tr:hover td { background: #fdfdfe; }
             <label for="walkInFollowUp">Next Follow-Up Date & Time (IST)</label>
             <input type="datetime-local" id="walkInFollowUp">
           </div>
-        </div>
+        <div id="walkInDuplicateWarning" style="display:none; margin-bottom:12px;"></div>
         <div class="field-group">
           <label for="walkInNotes">Site Discussion & Requirements Notes</label>
           <textarea id="walkInNotes" rows="3" placeholder="Sample flat visited, floor preference, pricing discussion, family requirement..."></textarea>
@@ -826,6 +826,8 @@ function autoSelectProject() {
 
 function openWalkInModal() {
   $('walkInForm').reset();
+  const warn = $('walkInDuplicateWarning');
+  if (warn) { warn.style.display = 'none'; warn.innerHTML = ''; }
   if (!state.projects || state.projects.length === 0) {
     loadProjects().then(autoSelectProject);
   } else {
@@ -833,6 +835,51 @@ function openWalkInModal() {
   }
   $('walkInModal').classList.add('open');
 }
+
+let walkInCheckTimer = null;
+function checkWalkInDuplicate() {
+  clearTimeout(walkInCheckTimer);
+  walkInCheckTimer = setTimeout(async () => {
+    const phone = $('walkInPhone')?.value?.trim() || '';
+    const email = $('walkInEmail')?.value?.trim() || '';
+    const warnEl = $('walkInDuplicateWarning');
+    if (!warnEl) return;
+
+    const digits = phone.replace(/[^0-9]/g, '');
+    if (digits.length < 10 && (!email || !email.includes('@'))) {
+      warnEl.style.display = 'none';
+      return;
+    }
+
+    try {
+      const q = new URLSearchParams({ phone, email }).toString();
+      const res = await (await fetch('/api/employee/leads/check-duplicate?' + q, { credentials: 'include' })).json();
+      if (res && res.duplicate) {
+        const d = res.duplicate;
+        warnEl.style.display = 'block';
+        warnEl.innerHTML = `
+          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px;">
+            <span style="font-size:16px;">⚠️</span>
+            <div style="font-size:12px; color:#92400e; flex:1; line-height:1.4;">
+              <strong>Existing Customer Found in CRM:</strong><br>
+              Customer <b>${esc(d.name)}</b> (${esc(d.phone)}) is already registered in CRM under <b>${esc(d.project_name || 'General')}</b> (Lead #${d.id}, Stage: <b>${esc(d.status)}</b>) by advisor <b>${esc(d.employee_name || 'Admin')}</b>.
+              <div style="margin-top:5px; font-size:11px; color:#78350f;">
+                💡 <em>If this visitor is following up, you can still save this walk-in to log their visit, but please note their existing record.</em>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        warnEl.style.display = 'none';
+      }
+    } catch (_) {
+      warnEl.style.display = 'none';
+    }
+  }, 250);
+}
+
+if ($('walkInPhone')) $('walkInPhone').addEventListener('input', checkWalkInDuplicate);
+if ($('walkInEmail')) $('walkInEmail').addEventListener('input', checkWalkInDuplicate);
 
 function closeWalkInModal() {
   $('walkInModal').classList.remove('open');

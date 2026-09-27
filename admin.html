@@ -2451,10 +2451,13 @@ textarea {
       <select id="leadEmployee"><option value="">Not Assigned</option></select>
       <input id="leadFollow" type="datetime-local" placeholder="Follow-up">
       <textarea id="leadNotes" class="span2" placeholder="Notes"></textarea>
-      <textarea id="leadLost" class="span2" placeholder="Lost reason (optional)"></textarea>
-      <div class="span4 actions">
-        <button class="btn primary" type="submit">Save enquiry</button>
-        <button class="btn" type="button" onclick="closeModal('leadModal')">Cancel</button>
+      <div id="leadModalDuplicateWarning" class="span4" style="display:none; margin-bottom:8px;"></div>
+      <div class="span4 actions" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <button class="btn" type="button" id="leadModalDeleteBtn" style="display:none; background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-weight:700;" onclick="deleteLeadFromModal()">🗑️ Delete Enquiry</button>
+        <div style="display:flex; gap:8px; margin-left:auto;">
+          <button class="btn primary" type="submit" id="leadModalSubmit">Save enquiry</button>
+          <button class="btn" type="button" onclick="closeModal('leadModal')">Cancel</button>
+        </div>
       </div>
     </form>
   </div>
@@ -2853,10 +2856,13 @@ textarea {
         <input id="drawerLostReason" placeholder="e.g. Budget mismatch, bought in another project" style="margin-top:4px;">
       </label>
     </form>
-  <div class="drawer-footer">
-    <button class="btn primary" onclick="saveLeadFromDrawer()">Save Changes</button>
-    <button class="btn gold" onclick="createBookingFromDrawer()">Convert to Booking →</button>
-    <button class="btn" onclick="closeLeadDrawer()">Close</button>
+  <div class="drawer-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+    <button type="button" class="btn" style="background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; font-weight:700;" onclick="deleteLeadFromDrawer()">🗑️ Delete Enquiry</button>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="btn primary" onclick="saveLeadFromDrawer()">Save Changes</button>
+      <button class="btn gold" onclick="createBookingFromDrawer()">Convert to Booking →</button>
+      <button class="btn" onclick="closeLeadDrawer()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -3331,6 +3337,7 @@ function renderKanban() {
             <div class="card-actions" onclick="event.stopPropagation()">
               ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our projects') + '. I am your dedicated relationship advisor. Would you prefer a digital brochure or a private site visit this week?')}" target="_blank" class="card-icon-btn card-wa" title="⚡ 1-Click Welcome WhatsApp">💬</a>` : ''}
               ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Direct Call">📞</a>` : ''}
+              <button type="button" class="card-icon-btn" onclick="deleteLeadCard(${x.id}, event)" title="Delete Enquiry" style="border:none; background:#fee2e2; color:#b91c1c; font-size:12px; cursor:pointer; width:28px; height:28px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;">🗑️</button>
             </div>
           </div>
         </div>
@@ -3560,6 +3567,9 @@ function openLeadModal(x = null) {
   $('leadForm').reset();
   $('leadId').value = '';
   $('leadSource').value = 'admin';
+  const warn = $('leadModalDuplicateWarning');
+  if (warn) { warn.style.display = 'none'; warn.innerHTML = ''; }
+  const delBtn = $('leadModalDeleteBtn');
   if (x) {
     $('leadModalTitle').textContent = 'Edit enquiry';
     $('leadId').value = x.id;
@@ -3574,11 +3584,59 @@ function openLeadModal(x = null) {
     $('leadFollow').value = toDatetimeLocalIST(x.follow_up_at);
     $('leadNotes').value = x.notes || '';
     $('leadLost').value = x.lost_reason || '';
+    if (delBtn) delBtn.style.display = 'inline-block';
   } else {
     $('leadModalTitle').textContent = 'Register New Enquiry';
+    if (delBtn) delBtn.style.display = 'none';
   }
   openModal('leadModal');
 }
+
+let leadCheckTimer = null;
+function checkAdminLeadDuplicate() {
+  clearTimeout(leadCheckTimer);
+  leadCheckTimer = setTimeout(async () => {
+    const phone = $('leadPhone')?.value?.trim() || '';
+    const email = $('leadEmail')?.value?.trim() || '';
+    const excludeId = $('leadId')?.value || '';
+    const warnEl = $('leadModalDuplicateWarning');
+    if (!warnEl) return;
+
+    const digits = phone.replace(/[^0-9]/g, '');
+    if (digits.length < 10 && (!email || !email.includes('@'))) {
+      warnEl.style.display = 'none';
+      return;
+    }
+
+    try {
+      const q = new URLSearchParams({ phone, email, excludeId }).toString();
+      const res = await get('/api/admin/leads/check-duplicate?' + q);
+      if (res && res.duplicate) {
+        const d = res.duplicate;
+        warnEl.style.display = 'block';
+        warnEl.innerHTML = `
+          <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px;">
+            <span style="font-size:16px;">⚠️</span>
+            <div style="font-size:12px; color:#92400e; flex:1; line-height:1.4;">
+              <strong>Possible Duplicate Enquiry:</strong><br>
+              Customer <b>${esc(d.name)}</b> (${esc(d.phone)}) is already registered on <b>${localDate(d.created_at)}</b> for <b>${esc(d.project_name || 'General')}</b> by advisor <b>${esc(d.employee_name || 'Admin')}</b> (Status: <b>${esc(d.status)}</b>).
+              <div style="margin-top:6px;">
+                <button type="button" class="btn smallbtn" onclick="closeModal('leadModal'); openLeadDrawer(${d.id});" style="background:#fef3c7; color:#78350f; font-weight:700; font-size:11px; padding:3px 8px;">👉 Open Existing Enquiry #${d.id}</button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        warnEl.style.display = 'none';
+      }
+    } catch (_) {
+      warnEl.style.display = 'none';
+    }
+  }, 250);
+}
+
+if ($('leadPhone')) $('leadPhone').addEventListener('input', checkAdminLeadDuplicate);
+if ($('leadEmail')) $('leadEmail').addEventListener('input', checkAdminLeadDuplicate);
 
 if ($('leadForm')) {
   $('leadForm').onsubmit = async e => {
@@ -3697,15 +3755,44 @@ if ($('leadFormInline')) {
 }
 
 async function deleteLead(id) {
-  if (!confirm('Delete this enquiry? This cannot be undone.')) return;
+  const lead = (state.leads || []).find(l => Number(l.id) === Number(id));
+  const leadName = lead ? `"${lead.name}" (#${id})` : `#${id}`;
+  if (!confirm(`Delete enquiry for ${leadName}?\n\nThis cannot be undone. If this is an accidental or duplicate walk-in, click OK to remove it.`)) return;
   try {
     await send('/api/admin/leads/' + id, { method: 'DELETE' });
-    toast('Enquiry deleted');
+    toast(`Enquiry ${leadName} deleted successfully`);
     await loadLeads();
     await load();
   } catch (e) {
     toast(e.message);
   }
+}
+
+async function deleteLeadFromDrawer() {
+  if (!state.currentDrawerLead) return;
+  const lead = state.currentDrawerLead;
+  if (!confirm(`Delete enquiry for "${lead.name || 'Customer'}" (#${lead.id})?\n\nThis cannot be undone. If this is an accidental or duplicate walk-in, click OK to remove it.`)) return;
+  try {
+    await send('/api/admin/leads/' + lead.id, { method: 'DELETE' });
+    closeLeadDrawer();
+    toast('Enquiry #' + lead.id + ' deleted successfully');
+    await loadLeads();
+    await load();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteLeadFromModal() {
+  const id = $('leadId')?.value;
+  if (!id) return;
+  closeModal('leadModal');
+  await deleteLead(id);
+}
+
+async function deleteLeadCard(id, evt) {
+  if (evt) evt.stopPropagation();
+  await deleteLead(id);
 }
 
 async function refreshLeads() {
