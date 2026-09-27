@@ -318,6 +318,20 @@ function migrateProductionSchema(){
   CREATE INDEX IF NOT EXISTS idx_attendance_date ON employee_attendance(attendance_date);
   CREATE INDEX IF NOT EXISTS idx_attendance_employee ON employee_attendance(employee_id);`);
 
+  c=cols("employee_attendance");
+  if(!c.has("check_in_lat")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_in_lat REAL");
+  if(!c.has("check_in_lng")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_in_lng REAL");
+  if(!c.has("check_in_accuracy")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_in_accuracy REAL");
+  if(!c.has("check_in_site")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_in_site TEXT DEFAULT ''");
+  if(!c.has("check_in_distance_m")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_in_distance_m INTEGER");
+  if(!c.has("check_in_status")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_in_status TEXT DEFAULT ''");
+  if(!c.has("check_out_lat")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_lat REAL");
+  if(!c.has("check_out_lng")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_lng REAL");
+  if(!c.has("check_out_accuracy")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_accuracy REAL");
+  if(!c.has("check_out_site")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_site TEXT DEFAULT ''");
+  if(!c.has("check_out_distance_m")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_distance_m INTEGER");
+  if(!c.has("check_out_status")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_status TEXT DEFAULT ''");
+
   c=cols("audit_logs");
   if(!c.has("user_id")) db.exec("ALTER TABLE audit_logs ADD COLUMN user_id INTEGER");
   if(!c.has("action")) db.exec("ALTER TABLE audit_logs ADD COLUMN action TEXT NOT NULL DEFAULT 'unknown'");
@@ -1735,13 +1749,117 @@ app.patch("/api/admin/employees/:id/status",admin,(req,res)=>{
   db.transaction(()=>{db.prepare("UPDATE employees SET status=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(status,id);db.prepare("UPDATE users SET status=?,session_version=session_version+1,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(status==="active"?"active":"suspended",e.user_id)})(); audit(req,"update","employee",id,`Status ${status}`); res.json({success:true});
 });
 
+// Enterprise Geofenced Construction & Office Sites
+const AUTHORIZED_SITES = [
+  {
+    id: "head_office",
+    name: "Head Office (Odhav Circle)",
+    address: "5, Ground floor, Madhav Evenue, odhav circle, Ahmedabad, Gujarat, 382415",
+    lat: 23.0247,
+    lng: 72.6728,
+    radius_m: 500,
+    type: "office"
+  },
+  {
+    id: "ds_208",
+    name: "DS 208 (Adinath Nagar, Odhav)",
+    address: "Adinath Nagar, odhav, ahmedabad, Gujarat, 382415",
+    lat: 23.0256,
+    lng: 72.6660,
+    radius_m: 650,
+    type: "site"
+  },
+  {
+    id: "nilkanth_villa",
+    name: "Nilkanth Villa (Kanbha)",
+    address: "Nilkanth villa, near Shikhapatri Bunglows, kanbha, gujarat, 382430",
+    lat: 23.0122,
+    lng: 72.7260,
+    radius_m: 800,
+    type: "site"
+  }
+];
+
+function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return Math.round(R * c);
+}
+
+function evaluateAttendanceLocation(lat, lng, accuracy = 0) {
+  const numLat = Number(lat);
+  const numLng = Number(lng);
+  const numAcc = Number(accuracy) || 0;
+
+  if (!Number.isFinite(numLat) || !Number.isFinite(numLng)) {
+    return {
+      status: "no_gps",
+      site_name: "No GPS Provided",
+      distance_m: null,
+      is_on_site: false,
+      notes: "Location coordinates not captured by device"
+    };
+  }
+
+  let nearestSite = null;
+  let minDistance = Infinity;
+
+  for (const site of AUTHORIZED_SITES) {
+    const dist = getDistanceFromLatLonInMeters(numLat, numLng, site.lat, site.lng);
+    if (dist < minDistance) {
+      minDistance = dist;
+      nearestSite = site;
+    }
+  }
+
+  // Allow up to +150m mobile GPS drift tolerance
+  const allowedRadius = nearestSite.radius_m + Math.min(150, Math.max(0, numAcc));
+  const isWithin = minDistance <= allowedRadius;
+
+  if (isWithin) {
+    return {
+      status: nearestSite.type === "office" ? "office" : "on_site",
+      site_id: nearestSite.id,
+      site_name: nearestSite.name,
+      distance_m: minDistance,
+      is_on_site: true,
+      lat: numLat,
+      lng: numLng,
+      accuracy: numAcc,
+      notes: `Verified at ${nearestSite.name} (~${minDistance}m)`
+    };
+  }
+
+  const distKm = (minDistance / 1000).toFixed(1);
+  return {
+    status: "off_site",
+    site_id: null,
+    site_name: `Off-Site (${distKm} km from ${nearestSite.name})`,
+    distance_m: minDistance,
+    is_on_site: false,
+    lat: numLat,
+    lng: numLng,
+    accuracy: numAcc,
+    nearest_site: nearestSite.name,
+    notes: `Off-site punch: ~${distKm} km from ${nearestSite.name}`
+  };
+}
+
 app.get("/api/admin/attendance",admin,(req,res)=>{
  const date=clean(req.query.date,10)||todayIST();
  const rows=db.prepare(`SELECT e.id,e.employee_code,e.department,e.designation,e.status AS employee_status,u.name,u.email,u.phone,
-   a.id attendance_id,a.attendance_date,a.status attendance_status,a.check_in,a.check_out,a.notes
+   a.id attendance_id,a.attendance_date,a.status attendance_status,a.check_in,a.check_out,a.notes,
+   a.check_in_lat,a.check_in_lng,a.check_in_accuracy,a.check_in_site,a.check_in_distance_m,a.check_in_status,
+   a.check_out_lat,a.check_out_lng,a.check_out_accuracy,a.check_out_site,a.check_out_distance_m,a.check_out_status
    FROM employees e JOIN users u ON u.id=e.user_id LEFT JOIN employee_attendance a ON a.employee_id=e.id AND a.attendance_date=?
    ORDER BY CASE WHEN e.status='active' THEN 0 ELSE 1 END,e.id DESC`).all(date);
- res.json({success:true,data:rows,date});
+ res.json({success:true,data:rows,date,authorized_sites:AUTHORIZED_SITES});
 });
 app.post("/api/admin/attendance",admin,(req,res)=>{
  const employeeId=Number(req.body.employee_id),date=clean(req.body.attendance_date,10),status=clean(req.body.status,20),checkIn=clean(req.body.check_in,30)||null,checkOut=clean(req.body.check_out,30)||null,notes=clean(req.body.notes,1000);
@@ -1759,7 +1877,24 @@ app.get("/api/admin/attendance/summary",admin,(req,res)=>{
  const total=db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c;
  const counts=db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(date);
  const map=Object.fromEntries(counts.map(x=>[x.status,Number(x.c)]));
- res.json({success:true,data:{date,total,recorded:counts.reduce((n,x)=>n+Number(x.c),0),present:map.present||0,absent:map.absent||0,leave:map.leave||0,half_day:map.half_day||0}});
+ const locCounts=db.prepare("SELECT check_in_status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? AND check_in_status IS NOT NULL AND check_in_status<>'' GROUP BY check_in_status").all(date);
+ const locMap=Object.fromEntries(locCounts.map(x=>[x.check_in_status,Number(x.c)]));
+ res.json({
+   success:true,
+   data:{
+     date,
+     total,
+     recorded:counts.reduce((n,x)=>n+Number(x.c),0),
+     present:map.present||0,
+     absent:map.absent||0,
+     leave:map.leave||0,
+     half_day:map.half_day||0,
+     on_site:locMap.on_site||0,
+     office:locMap.office||0,
+     off_site:locMap.off_site||0,
+     no_gps:locMap.no_gps||0
+   }
+ });
 });
 
 app.get("/api/admin/audit-logs",admin,(req,res)=>{
@@ -1994,22 +2129,59 @@ app.post("/api/employee/walk-in",employeeOrAdmin,(req,res)=>{
   });
 });
 
+app.get("/api/employee/attendance/sites",employeeOrAdmin,(req,res)=>{
+  res.json({success:true,sites:AUTHORIZED_SITES});
+});
+
 app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
   const emp=currentEmployee(req.user.id);
   if(!emp)return res.status(400).json({success:false,error:"Employee record not found"});
   const today=todayIST();
   const timeNow=nowIST().slice(11);
-  const existing=db.prepare("SELECT id, status, check_in, check_out FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(emp.id,today);
+  const existing=db.prepare("SELECT * FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(emp.id,today);
+
+  const lat = req.body && req.body.lat !== undefined ? Number(req.body.lat) : null;
+  const lng = req.body && req.body.lng !== undefined ? Number(req.body.lng) : null;
+  const accuracy = req.body && req.body.accuracy !== undefined ? Number(req.body.accuracy) : null;
+  const loc = evaluateAttendanceLocation(lat, lng, accuracy);
 
   if(existing){
     const checkOut=existing.check_in?timeNow:null;
-    db.prepare("UPDATE employee_attendance SET check_out=?, updated_at=CURRENT_TIMESTAMP WHERE id=?").run(checkOut,existing.id);
-    audit(req,"update","attendance",existing.id,`Check-out: ${timeNow}`);
-    return res.json({success:true,message:`Checked out at ${timeNow}`,record:{...existing,check_out:checkOut}});
+    db.prepare(`UPDATE employee_attendance SET 
+      check_out=?, 
+      check_out_lat=?, check_out_lng=?, check_out_accuracy=?, 
+      check_out_site=?, check_out_distance_m=?, check_out_status=?,
+      updated_at=CURRENT_TIMESTAMP 
+      WHERE id=?`).run(
+      checkOut,
+      loc.lat || null, loc.lng || null, loc.accuracy || null,
+      loc.site_name || '', loc.distance_m ?? null, loc.status || '',
+      existing.id
+    );
+    audit(req,"update","attendance",existing.id,`Check-out: ${timeNow} · ${loc.site_name}`);
+    const updated = db.prepare("SELECT * FROM employee_attendance WHERE id=?").get(existing.id);
+    return res.json({
+      success:true,
+      message:`Checked out at ${timeNow}${loc.is_on_site ? ` (Verified at ${loc.site_name})` : loc.status === 'off_site' ? ` (${loc.site_name})` : ''}`,
+      record:updated
+    });
   }else{
-    const r=db.prepare("INSERT INTO employee_attendance(employee_id, attendance_date, status, check_in) VALUES(?, ?, 'present', ?)").run(emp.id,today,timeNow);
-    audit(req,"create","attendance",r.lastInsertRowid,`Check-in: ${timeNow}`);
-    return res.json({success:true,message:`Checked in at ${timeNow}`,id:Number(r.lastInsertRowid),record:{id:Number(r.lastInsertRowid),status:'present',check_in:timeNow}});
+    const r=db.prepare(`INSERT INTO employee_attendance (
+      employee_id, attendance_date, status, check_in,
+      check_in_lat, check_in_lng, check_in_accuracy, check_in_site, check_in_distance_m, check_in_status
+    ) VALUES (?, ?, 'present', ?, ?, ?, ?, ?, ?, ?)`).run(
+      emp.id, today, timeNow,
+      loc.lat || null, loc.lng || null, loc.accuracy || null,
+      loc.site_name || '', loc.distance_m ?? null, loc.status || ''
+    );
+    audit(req,"create","attendance",r.lastInsertRowid,`Check-in: ${timeNow} · ${loc.site_name}`);
+    const created = db.prepare("SELECT * FROM employee_attendance WHERE id=?").get(r.lastInsertRowid);
+    return res.json({
+      success:true,
+      message:`Checked in at ${timeNow}${loc.is_on_site ? ` (Verified at ${loc.site_name})` : loc.status === 'off_site' ? ` (${loc.site_name})` : ''}`,
+      id:Number(r.lastInsertRowid),
+      record:created
+    });
   }
 });
 

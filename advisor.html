@@ -684,13 +684,35 @@ async function loadPortal() {
 
     const att = data.data.todayAttendance;
     if (att && att.check_in) {
-      $('attendanceStatusText').textContent = `Checked in at ${att.check_in}`;
+      let locBadge = '';
+      if (att.check_in_site) {
+        if (att.check_in_status === 'on_site') locBadge = ` · <span style="color:#15803d; font-weight:700;">🟢 On-Site (${esc(att.check_in_site)})</span>`;
+        else if (att.check_in_status === 'office') locBadge = ` · <span style="color:#0369a1; font-weight:700;">🏢 Office (${esc(att.check_in_site)})</span>`;
+        else if (att.check_in_status === 'off_site') locBadge = ` · <span style="color:#b91c1c; font-weight:700;">⚠️ Off-Site (${esc(att.check_in_site)})</span>`;
+        else locBadge = ` · <span style="color:var(--ink-muted);">${esc(att.check_in_site)}</span>`;
+      }
+      let statusHtml = `Checked in at <b>${att.check_in}</b>${locBadge}`;
+      if (att.check_out) {
+        let outLocBadge = '';
+        if (att.check_out_site) {
+          outLocBadge = ` (${esc(att.check_out_site)})`;
+        }
+        statusHtml += `<div style="font-size:12px; margin-top:4px; color:var(--ink-muted);">Checked out at <b>${att.check_out}</b>${outLocBadge}</div>`;
+      }
+      $('attendanceStatusText').innerHTML = statusHtml;
       $('attendanceBtn').textContent = att.check_out ? `Checked out (${att.check_out})` : 'CHECK OUT';
-      if (att.check_out) $('attendanceBtn').disabled = true;
+      if (att.check_out) {
+        $('attendanceBtn').disabled = true;
+        $('attendanceBtn').style.opacity = '0.7';
+      } else {
+        $('attendanceBtn').disabled = false;
+        $('attendanceBtn').style.opacity = '1';
+      }
     } else {
-      $('attendanceStatusText').textContent = 'Not marked today';
+      $('attendanceStatusText').innerHTML = 'Not marked today <span style="font-size:11px; color:var(--ink-muted); display:block; margin-top:2px;">📍 GPS auto-verifies site arrival (DS 208 / Nilkanth Villa / Office)</span>';
       $('attendanceBtn').textContent = 'MARK CHECK-IN';
       $('attendanceBtn').disabled = false;
+      $('attendanceBtn').style.opacity = '1';
     }
 
     await loadProjects();
@@ -751,11 +773,40 @@ async function loadLeads() {
 $('attendanceBtn').onclick = async () => {
   const b = $('attendanceBtn');
   b.disabled = true;
+  const originalText = b.textContent;
+  b.textContent = '📍 Verifying GPS...';
+
+  let geoData = null;
+  if ('geolocation' in navigator) {
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        });
+      });
+      geoData = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        accuracy: pos.coords.accuracy
+      };
+    } catch (geoErr) {
+      console.warn('Geolocation capture:', geoErr);
+      if (geoErr.code === 1) {
+        toast('⚠️ Location access was denied. Punching without GPS site verification.');
+      } else if (geoErr.code === 3) {
+        toast('⚠️ Location request timed out. Punching without GPS verification.');
+      }
+    }
+  }
+
   try {
     const r = await fetch('/api/employee/attendance/check-in', {
       method: 'POST',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(geoData || {})
     });
     const d = await r.json();
     if (!r.ok || !d.success) throw new Error(d.error || 'Failed to record attendance');
@@ -764,6 +815,7 @@ $('attendanceBtn').onclick = async () => {
   } catch (err) {
     toast(err.message);
     b.disabled = false;
+    b.textContent = originalText;
   }
 };
 
