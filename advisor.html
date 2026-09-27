@@ -538,6 +538,7 @@ tr:hover td { background: #fdfdfe; }
             <label for="walkInFollowUp">Next Follow-Up Date & Time (IST)</label>
             <input type="datetime-local" id="walkInFollowUp">
           </div>
+        </div>
         <div id="walkInDuplicateWarning" style="display:none; margin-bottom:12px;"></div>
         <div class="field-group">
           <label for="walkInNotes">Site Discussion & Requirements Notes</label>
@@ -820,6 +821,7 @@ $('attendanceBtn').onclick = async () => {
 };
 
 function openEditModal(leadId) {
+  closeWalkInModal();
   const lead = state.leads.find(l => Number(l.id) === Number(leadId));
   if (!lead) return;
   $('editLeadId').value = lead.id;
@@ -833,6 +835,12 @@ function openEditModal(leadId) {
 
 function closeEditModal() {
   $('editModal').classList.remove('open');
+}
+
+if ($('editModal')) {
+  $('editModal').addEventListener('click', e => {
+    if (e.target === $('editModal')) closeEditModal();
+  });
 }
 
 $('leadEditForm').onsubmit = async e => {
@@ -877,6 +885,7 @@ function autoSelectProject() {
 }
 
 function openWalkInModal() {
+  closeEditModal();
   $('walkInForm').reset();
   const warn = $('walkInDuplicateWarning');
   if (warn) { warn.style.display = 'none'; warn.innerHTML = ''; }
@@ -936,6 +945,19 @@ if ($('walkInEmail')) $('walkInEmail').addEventListener('input', checkWalkInDupl
 function closeWalkInModal() {
   $('walkInModal').classList.remove('open');
 }
+
+if ($('walkInModal')) {
+  $('walkInModal').addEventListener('click', e => {
+    if (e.target === $('walkInModal')) closeWalkInModal();
+  });
+}
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeWalkInModal();
+    closeEditModal();
+  }
+});
 
 $('walkInForm').onsubmit = async e => {
   e.preventDefault();
