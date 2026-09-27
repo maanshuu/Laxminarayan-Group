@@ -331,6 +331,10 @@ function migrateProductionSchema(){
   if(!c.has("check_out_site")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_site TEXT DEFAULT ''");
   if(!c.has("check_out_distance_m")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_distance_m INTEGER");
   if(!c.has("check_out_status")) db.exec("ALTER TABLE employee_attendance ADD COLUMN check_out_status TEXT DEFAULT ''");
+  if(!c.has("eod_summary")) db.exec("ALTER TABLE employee_attendance ADD COLUMN eod_summary TEXT DEFAULT ''");
+  if(!c.has("walkins_count")) db.exec("ALTER TABLE employee_attendance ADD COLUMN walkins_count INTEGER DEFAULT 0");
+  if(!c.has("followups_count")) db.exec("ALTER TABLE employee_attendance ADD COLUMN followups_count INTEGER DEFAULT 0");
+  if(!c.has("work_duration")) db.exec("ALTER TABLE employee_attendance ADD COLUMN work_duration TEXT DEFAULT ''");
 
   c=cols("audit_logs");
   if(!c.has("user_id")) db.exec("ALTER TABLE audit_logs ADD COLUMN user_id INTEGER");
@@ -1851,12 +1855,30 @@ function evaluateAttendanceLocation(lat, lng, accuracy = 0) {
   };
 }
 
+function calculateShiftDuration(checkInStr, checkOutStr) {
+  if (!checkInStr || !checkOutStr) return "";
+  try {
+    const [h1, m1, s1] = checkInStr.split(":").map(Number);
+    const [h2, m2, s2] = checkOutStr.split(":").map(Number);
+    let diffSec = (h2 * 3600 + m2 * 60 + (s2 || 0)) - (h1 * 3600 + m1 * 60 + (s1 || 0));
+    if (diffSec < 0) diffSec += 24 * 3600;
+    const hours = Math.floor(diffSec / 3600);
+    const mins = Math.floor((diffSec % 3600) / 60);
+    if (hours === 0 && mins === 0) return `${diffSec}s`;
+    if (hours === 0) return `${mins}m`;
+    return `${hours}h ${mins}m`;
+  } catch (e) {
+    return "";
+  }
+}
+
 app.get("/api/admin/attendance",admin,(req,res)=>{
  const date=clean(req.query.date,10)||todayIST();
  const rows=db.prepare(`SELECT e.id,e.employee_code,e.department,e.designation,e.status AS employee_status,u.name,u.email,u.phone,
    a.id attendance_id,a.attendance_date,a.status attendance_status,a.check_in,a.check_out,a.notes,
    a.check_in_lat,a.check_in_lng,a.check_in_accuracy,a.check_in_site,a.check_in_distance_m,a.check_in_status,
-   a.check_out_lat,a.check_out_lng,a.check_out_accuracy,a.check_out_site,a.check_out_distance_m,a.check_out_status
+   a.check_out_lat,a.check_out_lng,a.check_out_accuracy,a.check_out_site,a.check_out_distance_m,a.check_out_status,
+   a.eod_summary,a.walkins_count,a.followups_count,a.work_duration
    FROM employees e JOIN users u ON u.id=e.user_id LEFT JOIN employee_attendance a ON a.employee_id=e.id AND a.attendance_date=?
    ORDER BY CASE WHEN e.status='active' THEN 0 ELSE 1 END,e.id DESC`).all(date);
  res.json({success:true,data:rows,date,authorized_sites:AUTHORIZED_SITES});
@@ -1866,9 +1888,10 @@ app.post("/api/admin/attendance",admin,(req,res)=>{
  if(!Number.isInteger(employeeId)||!db.prepare("SELECT id FROM employees WHERE id=?").get(employeeId))return res.status(400).json({success:false,error:"Valid employee is required"});
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return res.status(400).json({success:false,error:"Valid attendance date is required"});
  if(!["present","absent","leave","half_day"].includes(status))return res.status(400).json({success:false,error:"Invalid attendance status"});
- const existing=db.prepare("SELECT id FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(employeeId,date);
- if(existing){db.prepare("UPDATE employee_attendance SET status=?,check_in=?,check_out=?,notes=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(status,checkIn,checkOut,notes,existing.id);audit(req,"update","attendance",existing.id,`${date} · ${status}`);return res.json({success:true,id:existing.id});}
- const r=db.prepare("INSERT INTO employee_attendance(employee_id,attendance_date,status,check_in,check_out,notes) VALUES(?,?,?,?,?,?)").run(employeeId,date,status,checkIn,checkOut,notes);
+ const existing=db.prepare("SELECT id,check_in,check_out,work_duration FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(employeeId,date);
+ const duration = (checkIn && checkOut) ? calculateShiftDuration(checkIn, checkOut) : (existing?.work_duration || '');
+ if(existing){db.prepare("UPDATE employee_attendance SET status=?,check_in=?,check_out=?,notes=?,work_duration=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(status,checkIn,checkOut,notes,duration,existing.id);audit(req,"update","attendance",existing.id,`${date} · ${status}`);return res.json({success:true,id:existing.id});}
+ const r=db.prepare("INSERT INTO employee_attendance(employee_id,attendance_date,status,check_in,check_out,notes,work_duration) VALUES(?,?,?,?,?,?,?)").run(employeeId,date,status,checkIn,checkOut,notes,duration);
  audit(req,"create","attendance",r.lastInsertRowid,`${date} · ${status}`);res.status(201).json({success:true,id:Number(r.lastInsertRowid)});
 });
 app.delete("/api/admin/attendance/:id",admin,(req,res)=>{const id=Number(req.params.id);if(!db.prepare("SELECT id FROM employee_attendance WHERE id=?").get(id))return res.status(404).json({success:false,error:"Attendance record not found"});db.prepare("DELETE FROM employee_attendance WHERE id=?").run(id);audit(req,"delete","attendance",id,"Attendance record deleted");res.json({success:true});});
@@ -2040,6 +2063,14 @@ app.get("/api/employee/dashboard",employeeOrAdmin,(req,res)=>{
     ? db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=? AND date(follow_up_at)<? AND status NOT IN ('won','lost')").get(empId,today).c
     : db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost')").get(today).c;
 
+  const walkinsToday=empId
+    ? db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=? AND date(created_at)=? AND source='walk-in'").get(empId,today).c
+    : db.prepare("SELECT COUNT(*) c FROM leads WHERE date(created_at)=? AND source='walk-in'").get(today).c;
+
+  const followupsDoneToday=empId
+    ? db.prepare("SELECT COUNT(*) c FROM audit_logs WHERE user_id=? AND entity_type='lead' AND action='update' AND date(created_at)=?").get(req.user.id,today).c
+    : 0;
+
   const attendance=empId
     ? db.prepare("SELECT * FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(empId,today)
     : null;
@@ -2052,6 +2083,8 @@ app.get("/api/employee/dashboard",employeeOrAdmin,(req,res)=>{
       activeLeads,
       followUpsToday,
       overdueLeads,
+      walkinsToday,
+      followupsDoneToday,
       todayAttendance:attendance||{status:"not_marked"}
     }
   });
@@ -2147,22 +2180,29 @@ app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
 
   if(existing){
     const checkOut=existing.check_in?timeNow:null;
+    const eod_summary = req.body && req.body.eod_summary ? clean(req.body.eod_summary, 5000) : (existing.eod_summary || '');
+    const walkins_count = req.body && req.body.walkins_count !== undefined ? Math.max(0, parseInt(req.body.walkins_count, 10) || 0) : (existing.walkins_count || 0);
+    const followups_count = req.body && req.body.followups_count !== undefined ? Math.max(0, parseInt(req.body.followups_count, 10) || 0) : (existing.followups_count || 0);
+    const duration = calculateShiftDuration(existing.check_in, timeNow);
+
     db.prepare(`UPDATE employee_attendance SET 
       check_out=?, 
       check_out_lat=?, check_out_lng=?, check_out_accuracy=?, 
       check_out_site=?, check_out_distance_m=?, check_out_status=?,
+      eod_summary=?, walkins_count=?, followups_count=?, work_duration=?,
       updated_at=CURRENT_TIMESTAMP 
       WHERE id=?`).run(
       checkOut,
       loc.lat || null, loc.lng || null, loc.accuracy || null,
       loc.site_name || '', loc.distance_m ?? null, loc.status || '',
+      eod_summary, walkins_count, followups_count, duration,
       existing.id
     );
-    audit(req,"update","attendance",existing.id,`Check-out: ${timeNow} · ${loc.site_name}`);
+    audit(req,"update","attendance",existing.id,`Check-out: ${timeNow} · ${loc.site_name} · Shift: ${duration}`);
     const updated = db.prepare("SELECT * FROM employee_attendance WHERE id=?").get(existing.id);
     return res.json({
       success:true,
-      message:`Checked out at ${timeNow}${loc.is_on_site ? ` (Verified at ${loc.site_name})` : loc.status === 'off_site' ? ` (${loc.site_name})` : ''}`,
+      message:`Checked out successfully at ${timeNow}${loc.is_on_site ? ` (Verified at ${loc.site_name})` : loc.status === 'off_site' ? ` (${loc.site_name})` : ''} · Shift Duration: ${duration}`,
       record:updated
     });
   }else{

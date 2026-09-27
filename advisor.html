@@ -600,6 +600,60 @@ tr:hover td { background: #fdfdfe; }
   </div>
 </div>
 
+<!-- EOD WORK SUMMARY & CHECKOUT MODAL -->
+<div id="eodModal" class="modal-backdrop">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-head">
+      <div>
+        <h3 style="margin:0; font-size:17px; font-weight:700; color:var(--ink-heading);">📝 End-of-Day Work Summary & Check-Out</h3>
+        <p style="margin:4px 0 0; font-size:12px; color:var(--ink-muted);">Review today's activity, enter your key accomplishments, and verify your checkout location.</p>
+      </div>
+      <button class="modal-close" onclick="closeEodModal()">✕</button>
+    </div>
+    <form id="eodForm">
+      <div class="modal-body">
+        <!-- Shift Activity Badges -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; margin-bottom:14px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700; letter-spacing:0.5px;">Check-In Time</div>
+            <div id="eodCheckInDisplay" style="font-size:15px; font-weight:700; color:#0f172a; margin-top:2px;">—</div>
+          </div>
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700; letter-spacing:0.5px;">Shift Duration</div>
+            <div id="eodShiftDurationDisplay" style="font-size:15px; font-weight:700; color:#0284c7; margin-top:2px;">Calculating...</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+          <div class="field-group">
+            <label for="eodWalkIns">🚶‍♂️ Walk-Ins Attended</label>
+            <input type="number" id="eodWalkIns" min="0" max="99" value="0" required>
+            <span style="font-size:11px; color:#64748b;">Logged automatically from walk-ins today</span>
+          </div>
+          <div class="field-group">
+            <label for="eodFollowUps">📞 Follow-Up Calls Logged</label>
+            <input type="number" id="eodFollowUps" min="0" max="99" value="0" required>
+            <span style="font-size:11px; color:#64748b;">Logged updates across assigned leads</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="eodSummaryText">📋 Daily Work Accomplishments & Site Notes <span style="color:#ef4444;">*</span></label>
+          <textarea id="eodSummaryText" rows="4" required placeholder="E.g. Conducted 3 sample flat tours at DS 208, follow-up call with buyer Rajeshbhai for 3 BHK unit #402 token discussion, site review at Nilkanth Villa..."></textarea>
+        </div>
+
+        <div id="eodGeoStatus" style="font-size:12px; color:#0284c7; font-weight:600; padding:9px 12px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; display:flex; align-items:center; gap:6px;">
+          📍 GPS location will be auto-verified against construction sites upon submit.
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn-cancel" onclick="closeEodModal()">Cancel</button>
+        <button type="submit" class="btn-save" id="eodSubmitBtn" style="background:#0284c7; font-weight:700;">📍 Submit EOD & Check Out</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -610,7 +664,10 @@ const escAttr = s => String(s ?? '').replace(/'/g, '&#039;').replace(/"/g, '&quo
 let state = {
   employee: null,
   leads: [],
-  projects: []
+  projects: [],
+  todayAttendance: null,
+  walkinsToday: 0,
+  followupsDoneToday: 0
 };
 
 async function loadProjects() {
@@ -676,6 +733,10 @@ async function loadPortal() {
     if (!data.success) throw new Error(data.error);
 
     state.employee = data.data.employee;
+    state.todayAttendance = data.data.todayAttendance || null;
+    state.walkinsToday = data.data.walkinsToday || 0;
+    state.followupsDoneToday = data.data.followupsDoneToday || 0;
+
     $('advisorCode').textContent = state.employee.employee_code || 'ADVISOR';
     $('advisorName').textContent = state.employee.name || 'Sales Advisor';
     $('welcomeTitle').textContent = `Welcome back, ${state.employee.name || 'Advisor'}`;
@@ -698,14 +759,24 @@ async function loadPortal() {
         if (att.check_out_site) {
           outLocBadge = ` (${esc(att.check_out_site)})`;
         }
-        statusHtml += `<div style="font-size:12px; margin-top:4px; color:var(--ink-muted);">Checked out at <b>${att.check_out}</b>${outLocBadge}</div>`;
-      }
-      $('attendanceStatusText').innerHTML = statusHtml;
-      $('attendanceBtn').textContent = att.check_out ? `Checked out (${att.check_out})` : 'CHECK OUT';
-      if (att.check_out) {
+        statusHtml += `<div style="font-size:12px; margin-top:4px; color:var(--ink-muted);">Checked out at <b>${att.check_out}</b>${outLocBadge}${att.work_duration ? ` · <span style="color:#0284c7; font-weight:700;">Shift: ${esc(att.work_duration)}</span>` : ''}</div>`;
+        if (att.eod_summary || att.walkins_count > 0 || att.followups_count > 0) {
+          statusHtml += `<div style="margin-top:6px; font-size:11px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+            <span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-weight:700;">🚶‍♂️ ${att.walkins_count || 0} Walk-ins</span>
+            <span style="background:#f1f5f9; color:#334155; padding:2px 8px; border-radius:12px; font-weight:700;">📞 ${att.followups_count || 0} Follow-ups</span>
+          </div>`;
+        }
+        if (att.eod_summary) {
+          statusHtml += `<div style="font-size:11px; margin-top:5px; color:#475569; background:#f8fafc; padding:6px 8px; border-radius:6px; border:1px solid #e2e8f0; line-height:1.4; max-height:60px; overflow-y:auto;" title="Today's Work Summary"><b>EOD:</b> ${esc(att.eod_summary)}</div>`;
+        }
+        $('attendanceStatusText').innerHTML = statusHtml;
+        $('attendanceBtn').textContent = `Checked out (${att.check_out})`;
         $('attendanceBtn').disabled = true;
         $('attendanceBtn').style.opacity = '0.7';
       } else {
+        statusHtml += `<div style="font-size:11px; margin-top:4px; color:#15803d; font-weight:600;">Shift Active · Submit EOD report when checking out</div>`;
+        $('attendanceStatusText').innerHTML = statusHtml;
+        $('attendanceBtn').textContent = 'CHECK OUT & EOD REPORT';
         $('attendanceBtn').disabled = false;
         $('attendanceBtn').style.opacity = '1';
       }
@@ -775,36 +846,39 @@ async function loadLeads() {
   }).join('');
 }
 
-$('attendanceBtn').onclick = async () => {
+async function captureGeolocation() {
+  if (!('geolocation' in navigator)) return null;
+  try {
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      });
+    });
+    return {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude,
+      accuracy: pos.coords.accuracy
+    };
+  } catch (geoErr) {
+    console.warn('Geolocation capture:', geoErr);
+    if (geoErr.code === 1) {
+      toast('⚠️ Location access was denied. Punching without GPS site verification.');
+    } else if (geoErr.code === 3) {
+      toast('⚠️ Location request timed out. Punching without GPS verification.');
+    }
+    return null;
+  }
+}
+
+async function performAttendanceCheckIn() {
   const b = $('attendanceBtn');
   b.disabled = true;
   const originalText = b.textContent;
   b.textContent = '📍 Verifying GPS...';
 
-  let geoData = null;
-  if ('geolocation' in navigator) {
-    try {
-      const pos = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        });
-      });
-      geoData = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        accuracy: pos.coords.accuracy
-      };
-    } catch (geoErr) {
-      console.warn('Geolocation capture:', geoErr);
-      if (geoErr.code === 1) {
-        toast('⚠️ Location access was denied. Punching without GPS site verification.');
-      } else if (geoErr.code === 3) {
-        toast('⚠️ Location request timed out. Punching without GPS verification.');
-      }
-    }
-  }
+  const geoData = await captureGeolocation();
 
   try {
     const r = await fetch('/api/employee/attendance/check-in', {
@@ -821,6 +895,93 @@ $('attendanceBtn').onclick = async () => {
     toast(err.message);
     b.disabled = false;
     b.textContent = originalText;
+  }
+}
+
+$('attendanceBtn').onclick = async () => {
+  const att = state.todayAttendance;
+  if (att && att.check_in && !att.check_out) {
+    openEodModal();
+  } else {
+    await performAttendanceCheckIn();
+  }
+};
+
+function openEodModal() {
+  closeWalkInModal();
+  closeEditModal();
+  const att = state.todayAttendance;
+  $('eodCheckInDisplay').textContent = (att && att.check_in) ? att.check_in : '—';
+  
+  if (att && att.check_in) {
+    const nowTime = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+    const [h1, m1] = att.check_in.split(':').map(Number);
+    const [h2, m2] = nowTime.split(':').map(Number);
+    let diffMins = (h2 * 60 + m2) - (h1 * 60 + m1);
+    if (diffMins < 0) diffMins += 24 * 60;
+    const hrs = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    $('eodShiftDurationDisplay').textContent = hrs > 0 ? `~${hrs}h ${mins}m` : `~${mins}m`;
+  } else {
+    $('eodShiftDurationDisplay').textContent = '—';
+  }
+
+  $('eodWalkIns').value = state.walkinsToday ?? 0;
+  $('eodFollowUps').value = state.followupsDoneToday ?? 0;
+  $('eodSummaryText').value = (att && att.eod_summary) ? att.eod_summary : '';
+  $('eodModal').classList.add('open');
+}
+
+function closeEodModal() {
+  $('eodModal').classList.remove('open');
+}
+
+if ($('eodModal')) {
+  $('eodModal').addEventListener('click', e => {
+    if (e.target === $('eodModal')) closeEodModal();
+  });
+}
+
+$('eodForm').onsubmit = async e => {
+  e.preventDefault();
+  const submitBtn = $('eodSubmitBtn');
+  submitBtn.disabled = true;
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = '📍 Verifying GPS & Saving...';
+
+  const summary = $('eodSummaryText').value.trim();
+  if (!summary) {
+    toast('Please enter a brief work summary before checking out');
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    return;
+  }
+
+  const geoData = await captureGeolocation();
+
+  try {
+    const payload = {
+      ...(geoData || {}),
+      eod_summary: summary,
+      walkins_count: parseInt($('eodWalkIns').value, 10) || 0,
+      followups_count: parseInt($('eodFollowUps').value, 10) || 0
+    };
+
+    const r = await fetch('/api/employee/attendance/check-in', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (!r.ok || !d.success) throw new Error(d.error || 'Failed to submit EOD & check out');
+    toast(d.message);
+    closeEodModal();
+    await loadPortal();
+  } catch (err) {
+    toast(err.message);
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
   }
 };
 

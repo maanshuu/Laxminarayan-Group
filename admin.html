@@ -2147,7 +2147,8 @@ textarea {
             <th>Department</th>
             <th>Status</th>
             <th>Check in</th>
-            <th>Check out</th>
+            <th>Check out & Shift</th>
+            <th>EOD Work Report</th>
             <th>Notes</th>
             <th>Actions</th>
           </tr>
@@ -2508,6 +2509,72 @@ textarea {
         <button class="btn primary" type="submit">Reset password</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- EOD REVIEW MODAL -->
+<div id="adminEodModal" class="modal">
+  <div class="modal-card" style="max-width:620px;">
+    <div class="modal-head">
+      <div>
+        <h2 style="margin:0; font-size:18px;">📋 End-of-Day Work Report</h2>
+        <p class="muted" style="margin:4px 0 0; font-size:12px;">Submitted by employee upon shift check-out</p>
+      </div>
+      <button class="btn" onclick="closeModal('adminEodModal')">✕ Close</button>
+    </div>
+    <div style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+      <!-- Employee & Shift Meta Header -->
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <div style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700;">Employee</div>
+          <div id="adminEodEmpName" style="font-size:15px; font-weight:700; color:#0f172a; margin-top:2px;">—</div>
+          <div id="adminEodEmpMeta" style="font-size:12px; color:#64748b;">—</div>
+        </div>
+        <div>
+          <div style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700;">Date & Shift Duration</div>
+          <div id="adminEodDate" style="font-size:14px; font-weight:700; color:#0284c7; margin-top:2px;">—</div>
+          <div id="adminEodShiftTimes" style="font-size:12px; color:#475569;">—</div>
+        </div>
+      </div>
+
+      <!-- Verified GPS Locations -->
+      <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:12px 14px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <div style="font-size:11px; text-transform:uppercase; color:#0369a1; font-weight:700;">Check-In Location</div>
+          <div id="adminEodCheckInLoc" style="font-size:12px; font-weight:600; margin-top:2px;">—</div>
+        </div>
+        <div>
+          <div style="font-size:11px; text-transform:uppercase; color:#0369a1; font-weight:700;">Check-Out Location</div>
+          <div id="adminEodCheckOutLoc" style="font-size:12px; font-weight:600; margin-top:2px;">—</div>
+        </div>
+      </div>
+
+      <!-- KPI Summary Pills -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:10px; padding:12px 16px; text-align:center;">
+          <div id="adminEodWalkinsCount" style="font-size:24px; font-weight:800; color:#059669;">0</div>
+          <div style="font-size:12px; font-weight:700; color:#047857; margin-top:2px;">🚶‍♂️ Site Walk-Ins Attended</div>
+        </div>
+        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px 16px; text-align:center;">
+          <div id="adminEodFollowupsCount" style="font-size:24px; font-weight:800; color:#334155;">0</div>
+          <div style="font-size:12px; font-weight:700; color:#475569; margin-top:2px;">📞 Follow-Up Calls Logged</div>
+        </div>
+      </div>
+
+      <!-- Employee Work Accomplishments -->
+      <div>
+        <div style="font-size:12px; text-transform:uppercase; color:#475569; font-weight:700; margin-bottom:6px;">📝 Daily Accomplishments & Notes</div>
+        <div id="adminEodNotes" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:14px; font-size:13px; line-height:1.6; color:#1e293b; white-space:pre-wrap; min-height:80px; max-height:200px; overflow-y:auto;">—</div>
+      </div>
+
+      <!-- Actions Toolbar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e2e8f0; padding-top:14px; margin-top:4px;">
+        <a id="adminEodWaBtn" href="#" target="_blank" rel="noopener" class="btn" style="background:#25d366; color:#fff; border:none; font-weight:700; display:inline-flex; align-items:center; gap:6px; text-decoration:none;">
+          💬 Send WhatsApp Acknowledgement
+        </a>
+        <button class="btn" onclick="closeModal('adminEodModal')">Close</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -5174,10 +5241,69 @@ function renderPunchLocation(time, site, status, dist, lat, lng) {
   return `<b>${esc(time)}</b>${badge}`;
 }
 
+function renderEodCell(x) {
+  if (!x.check_in) return '<span class="muted">—</span>';
+  if (!x.eod_summary && !x.walkins_count && !x.followups_count) {
+    return x.check_out ? '<span class="muted" style="font-size:11px;">No EOD report</span>' : '<span style="color:#d97706; font-size:11px; font-weight:600;">⏳ Shift ongoing</span>';
+  }
+  const walkins = x.walkins_count || 0;
+  const followups = x.followups_count || 0;
+  return `
+    <div>
+      <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+        <span class="pill" style="background:#dcfce7; color:#15803d; font-size:11px; font-weight:700;" title="Walk-Ins Attended">🚶‍♂️ ${walkins}</span>
+        <span class="pill" style="background:#f1f5f9; color:#334155; font-size:11px; font-weight:700;" title="Follow-Ups Logged">📞 ${followups}</span>
+      </div>
+      <button class="btn smallbtn" style="background:#0284c7; color:#fff; border:none; font-weight:700; padding:3px 8px; font-size:11px; border-radius:4px; cursor:pointer;" onclick="openAdminEodModal(${x.id})">📝 Review EOD</button>
+    </div>
+  `;
+}
+
+function openAdminEodModal(employeeId) {
+  const row = (state.attendanceData || []).find(x => Number(x.id) === Number(employeeId));
+  if (!row) return;
+
+  $('adminEodEmpName').textContent = row.name || 'Employee';
+  $('adminEodEmpMeta').textContent = `${row.employee_code || ''} · ${row.department || ''} (${row.designation || 'Staff'})`;
+  $('adminEodDate').textContent = `${$('attendanceDate').value || todayLocal()}${row.work_duration ? ` · Shift: ${row.work_duration}` : ''}`;
+  $('adminEodShiftTimes').textContent = `In: ${row.check_in || '—'}  |  Out: ${row.check_out || '—'}`;
+
+  // Check in location
+  let inLoc = row.check_in_site || (row.check_in ? 'Recorded' : 'Not recorded');
+  if (row.check_in_lat && row.check_in_lng) {
+    inLoc += ` (<a href="https://www.google.com/maps?q=${row.check_in_lat},${row.check_in_lng}" target="_blank" rel="noopener" style="color:#0284c7; font-weight:700;">Map</a>)`;
+  }
+  $('adminEodCheckInLoc').innerHTML = inLoc;
+
+  // Check out location
+  let outLoc = row.check_out_site || (row.check_out ? 'Recorded' : 'Not recorded');
+  if (row.check_out_lat && row.check_out_lng) {
+    outLoc += ` (<a href="https://www.google.com/maps?q=${row.check_out_lat},${row.check_out_lng}" target="_blank" rel="noopener" style="color:#0284c7; font-weight:700;">Map</a>)`;
+  }
+  $('adminEodCheckOutLoc').innerHTML = outLoc;
+
+  $('adminEodWalkinsCount').textContent = row.walkins_count || 0;
+  $('adminEodFollowupsCount').textContent = row.followups_count || 0;
+  $('adminEodNotes').textContent = row.eod_summary || row.notes || 'No work summary submitted.';
+
+  // WhatsApp acknowledgement link
+  const cleanPhone = (row.phone || '').replace(/[^0-9]/g, '');
+  if (cleanPhone) {
+    const waMsg = `Hi ${row.name}, received your EOD report for ${$('attendanceDate').value || 'today'}. Great work on the ${row.walkins_count || 0} walk-ins and ${row.followups_count || 0} follow-up calls logged today (Shift: ${row.work_duration || 'Completed'}). Keep it up! — Laxminarayan Group Admin`;
+    $('adminEodWaBtn').href = `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(waMsg)}`;
+    $('adminEodWaBtn').style.display = 'inline-flex';
+  } else {
+    $('adminEodWaBtn').style.display = 'none';
+  }
+
+  openModal('adminEodModal');
+}
+
 async function loadAttendance() {
   try {
     if (!$('attendanceDate').value) $('attendanceDate').value = todayLocal();
     const d = await get('/api/admin/attendance?date=' + encodeURIComponent($('attendanceDate').value));
+    state.attendanceData = d.data || [];
     $('attendanceRows').innerHTML = d.data.map(x => `
       <tr>
         <td><b>${esc(x.name)}</b><br><span class="small">${esc(x.email || '')}</span></td>
@@ -5185,13 +5311,17 @@ async function loadAttendance() {
         <td>${esc(x.department || '')}</td>
         <td><span class="pill">${esc(x.attendance_status || 'not recorded')}</span></td>
         <td>${renderPunchLocation(x.check_in, x.check_in_site, x.check_in_status, x.check_in_distance_m, x.check_in_lat, x.check_in_lng)}</td>
-        <td>${renderPunchLocation(x.check_out, x.check_out_site, x.check_out_status, x.check_out_distance_m, x.check_out_lat, x.check_out_lng)}</td>
+        <td>
+          ${renderPunchLocation(x.check_out, x.check_out_site, x.check_out_status, x.check_out_distance_m, x.check_out_lat, x.check_out_lng)}
+          ${x.work_duration ? `<div style="margin-top:3px;"><span class="pill" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:11px;">⏱ ${esc(x.work_duration)}</span></div>` : ''}
+        </td>
+        <td>${renderEodCell(x)}</td>
         <td>${esc(x.notes || '—')}</td>
         <td class="actions">
           ${x.attendance_id ? `<button class="btn smallbtn" onclick="editAttendance(${x.id},'${escAttr(x.attendance_status || 'present')}','${escAttr(x.check_in || '')}','${escAttr(x.check_out || '')}','${escAttr(x.notes || '')}')">Edit</button><button class="btn smallbtn danger" onclick="deleteAttendance(${x.attendance_id})">Delete</button>` : '<span class="muted">Not recorded</span>'}
         </td>
       </tr>
-    `).join('') || '<tr><td colspan="8" class="empty">No employees yet.</td></tr>';
+    `).join('') || '<tr><td colspan="9" class="empty">No employees yet.</td></tr>';
 
     const total = d.data.filter(x => x.employee_status === 'active').length;
     const recorded = d.data.filter(x => x.attendance_id).length;
