@@ -2510,7 +2510,7 @@ textarea {
       <label><b>Floor Number</b>
         <input id="unitFloor" type="number" value="1" style="margin-top:4px;">
       </label>
-      <label><b>Area (sq.ft.)</b>
+      <label><b>Area (Sq. yd.)</b>
         <input id="unitArea" type="number" value="1850" style="margin-top:4px;">
       </label>
       <label class="span2"><b>Price / Agreement Base</b>
@@ -2574,9 +2574,8 @@ textarea {
       </label>
       <label><b>Payment Milestone Status</b>
         <select id="bookingPaymentStatus" style="margin-top:4px;">
-          <option value="token_received">Token Received</option>
-          <option value="agreement_signed">Agreement Signed (20% Paid)</option>
-          <option value="plinth_slab_paid">Plinth / Slab Milestone Paid</option>
+          <option value="token_received">Token Received (30% Advance)</option>
+          <option value="agreement_signed">Agreement Signed (70% Paid)</option>
           <option value="completed">100% Fully Paid (Ready for Possession)</option>
         </select>
       </label>
@@ -3923,7 +3922,7 @@ function renderUnits() {
     else if (clean.includes('lakh') || clean.includes('lac') || val < 500) val = val * 100000;
     if (val > 10000) {
       const rate = Math.round(val / areaSqft);
-      return '₹ ' + rate.toLocaleString('en-IN') + ' / sq.ft';
+      return '₹ ' + rate.toLocaleString('en-IN') + ' / sq.yd';
     }
     return '';
   }
@@ -3972,8 +3971,8 @@ function renderUnits() {
 
           <div class="unit-spec-grid">
             <div class="unit-spec-box">
-              <div class="unit-spec-lbl">Area (Sq. Ft.)</div>
-              <div class="unit-spec-val">${u.area_sqft ? (u.area_sqft + ' sq.ft') : '—'}</div>
+              <div class="unit-spec-lbl">Area (Sq. yd.)</div>
+              <div class="unit-spec-val">${u.area_sqft ? (u.area_sqft + ' sq.yd') : '—'}</div>
             </div>
             <div class="unit-spec-box">
               <div class="unit-spec-lbl">Configuration</div>

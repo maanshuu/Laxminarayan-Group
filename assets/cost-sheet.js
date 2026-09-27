@@ -47,8 +47,8 @@
   }
 
   const STAGES = [
-    { label: 'Booking Token / Earnest Advance', pct: 10 },
-    { label: 'On Agreement & Plinth Completion', pct: 20 }
+    { label: 'Booking Token / Earnest Advance', pct: 30 },
+    { label: 'On Agreement', pct: 70 }
   ];
 
   function ensureModalDOM() {
@@ -122,11 +122,11 @@
                   <input id="csUnitNumber" class="cs-input" placeholder="e.g. Tower A - 402" value="Tower A - 402" style="width:100%; font-size:13px; font-weight:700; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
                 </div>
                 <div>
-                  <label style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; display:block; margin-bottom:4px;">Area (Sq. Ft.)</label>
+                  <label style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; display:block; margin-bottom:4px;">Area (Sq. yd.)</label>
                   <input id="csAreaSqft" type="number" class="cs-input" value="1450" style="width:100%; font-size:13px; font-weight:700; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
                 </div>
                 <div>
-                  <label style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; display:block; margin-bottom:4px;">Base Rate (₹ / Sq. Ft.)</label>
+                  <label style="font-size:10px; font-weight:800; color:#64748b; text-transform:uppercase; display:block; margin-bottom:4px;">Base Rate (₹ / Sq. yd.)</label>
                   <input id="csBaseRate" type="number" class="cs-input" value="4200" style="width:100%; font-size:13px; font-weight:700; padding:6px 10px; border:1px solid #cbd5e1; border-radius:6px; box-sizing:border-box;">
                 </div>
               </div>
@@ -180,6 +180,22 @@
     document.getElementById('csBtnPrint').onclick = () => window.print();
     document.getElementById('csBtnWhatsApp').onclick = shareCostSheetWhatsApp;
 
+    // Close on backdrop click
+    const modalEl = document.getElementById('costSheetModal');
+    if (modalEl) {
+      modalEl.addEventListener('click', (e) => {
+        if (e.target.id === 'costSheetModal') closeCostSheetModal();
+      });
+    }
+
+    // Close on ESC key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const m = document.getElementById('costSheetModal');
+        if (m && m.style.display !== 'none') closeCostSheetModal();
+      }
+    });
+
     ['csClientName', 'csClientPhone', 'csUnitNumber', 'csAreaSqft', 'csBaseRate', 'csProjectSelect'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('input', recalcCostSheet);
@@ -192,7 +208,7 @@
     const agreementVal = area * rate;
 
     const basisEl = document.getElementById('csBasisAgreement');
-    if (basisEl) basisEl.textContent = `(${area.toLocaleString('en-IN')} sq.ft @ ₹${rate.toLocaleString('en-IN')}/sq.ft)`;
+    if (basisEl) basisEl.textContent = `(${area.toLocaleString('en-IN')} sq.yd @ ₹${rate.toLocaleString('en-IN')}/sq.yd)`;
     const valEl = document.getElementById('csValAgreement');
     if (valEl) valEl.textContent = formatINR(agreementVal);
 
@@ -222,19 +238,20 @@
     const rate = Number(document.getElementById('csBaseRate')?.value) || 0;
     const agreementVal = area * rate;
 
-    const stage1Amt = formatINR(Math.round((agreementVal * 10) / 100));
-    const stage2Amt = formatINR(Math.round((agreementVal * 20) / 100));
+    const stage1Amt = formatINR(Math.round((agreementVal * 30) / 100));
+    const stage2Amt = formatINR(Math.round((agreementVal * 70) / 100));
 
     const text = `Greetings ${clientName} from *Laxminarayan Group*,\n\nHere is your official requested quotation for *${project}*:\n` +
-      `🏢 *Unit:* ${unit} (${area} Sq. Ft.)\n` +
+      `🏢 *Unit:* ${unit} (${area} Sq. yd.)\n` +
       `💰 *Basic Consideration:* ${formatINR(agreementVal)}\n\n` +
       `📅 *Part A: Construction-Linked Payment (CLP) Schedule:*\n` +
-      `1. Booking Token / Earnest Advance (10%): ${stage1Amt}\n` +
-      `2. On Agreement & Plinth Completion (20%): ${stage2Amt}\n\n` +
+      `1. Booking Token / Earnest Advance (30%): ${stage1Amt}\n` +
+      `2. On Agreement (70%): ${stage2Amt}\n\n` +
       `Would you like to schedule a personal site visit to view the sample unit this week?`;
 
     const clean = clientPhone.length >= 10 ? clientPhone.slice(-10) : '';
     const url = clean ? `https://wa.me/91${clean}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
   }
 
   window.openCostSheetModal = function(opts = {}) {
@@ -243,7 +260,8 @@
     if (opts.clientName) document.getElementById('csClientName').value = opts.clientName;
     if (opts.clientPhone) document.getElementById('csClientPhone').value = opts.clientPhone;
     if (opts.unitNumber) document.getElementById('csUnitNumber').value = opts.unitNumber;
-    if (opts.areaSqft) document.getElementById('csAreaSqft').value = opts.areaSqft;
+    if (opts.areaSqyd) document.getElementById('csAreaSqft').value = opts.areaSqyd;
+    else if (opts.areaSqft) document.getElementById('csAreaSqft').value = opts.areaSqft;
     if (opts.baseRate) document.getElementById('csBaseRate').value = opts.baseRate;
     if (opts.projectName) {
       const sel = document.getElementById('csProjectSelect');
