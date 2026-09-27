@@ -2327,20 +2327,23 @@ textarea {
     <div class="panel">
       <div class="toolbar">
         <div>
-          <h2 style="margin:0">Customers</h2>
-          <p class="muted" style="margin-bottom:0">Edit profiles, activate/suspend accounts, or open the customer's complete CRM history.</p>
+          <h2 style="margin:0">Registered Customers</h2>
+          <p class="muted" style="margin-bottom:0">View registered client accounts, buyer activity history, or manage portal access.</p>
         </div>
-        <button class="btn" onclick="refreshCustomers()">Refresh saved customers</button>
+        <div class="actions" style="display:flex; align-items:center; gap:8px;">
+          <input id="customerSearch" oninput="filterCustomerRows()" placeholder="🔍 Search customers..." style="padding:7px 12px; font-size:12px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); max-width:220px;">
+          <span class="pill" id="customerCountBadge" style="background:var(--sky-light); color:var(--sky-deep); font-weight:700;">0 Customers</span>
+          <button class="btn" onclick="refreshCustomers()">↻ Refresh</button>
+        </div>
       </div>
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Joined</th>
+            <th>Customer Name</th>
+            <th>Email Address</th>
+            <th>Phone Number</th>
+            <th>Account Status</th>
+            <th>Registered Date</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -5259,14 +5262,56 @@ async function refreshAttendance() {
 }
 
 // ─── CUSTOMERS ───
+let rawCustomersList = [];
+
 async function loadCustomers() {
   try {
-    const d = await get('/api/admin/users');
-    state.customers = d.data;
-    $('urows').innerHTML = d.data.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}</td><td>${esc(x.phone)}</td><td><span class="pill">${esc(x.role)}</span></td><td><span class="pill">${esc(x.status)}</span></td><td>${localDate(x.created_at)}</td><td class="actions">${x.role === 'customer' ? `<button class="btn smallbtn" onclick="openCustomer(${x.id})">View</button><button class="btn smallbtn" onclick="editCustomer(${x.id})">Edit</button><button class="btn smallbtn" onclick="toggleUser(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Suspend' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteCustomer(${x.id},'${escAttr(x.name)}')">Delete</button>` : '—'}</td></tr>`).join('') || '<tr><td colspan="7" class="empty">No customers yet.</td></tr>';
+    const d = await get('/api/admin/users?role=customer');
+    rawCustomersList = (d.data || []).filter(x => x.role === 'customer');
+    state.customers = rawCustomersList;
+    if ($('customerCountBadge')) {
+      $('customerCountBadge').textContent = `${rawCustomersList.length} Customer${rawCustomersList.length === 1 ? '' : 's'}`;
+    }
+    renderCustomerRows(rawCustomersList);
   } catch (e) {
     toast(e.message);
   }
+}
+
+function renderCustomerRows(list) {
+  if (!list || list.length === 0) {
+    $('urows').innerHTML = '<tr><td colspan="6" class="empty" style="padding:32px; text-align:center; color:var(--ink-muted);">No registered customer accounts found.</td></tr>';
+    return;
+  }
+  $('urows').innerHTML = list.map(x => `
+    <tr>
+      <td><b>${esc(x.name)}</b></td>
+      <td>${esc(x.email || '—')}</td>
+      <td>${esc(x.phone || '—')}</td>
+      <td><span class="pill" style="${x.status === 'active' ? 'background:#dcfce7; color:#15803d; font-weight:700;' : 'background:#fee2e2; color:#b91c1c; font-weight:700;'}">${esc(x.status)}</span></td>
+      <td>${localDate(x.created_at)}</td>
+      <td class="actions">
+        <button class="btn smallbtn" onclick="openCustomer(${x.id})">View 360°</button>
+        <button class="btn smallbtn" onclick="editCustomer(${x.id})">Edit</button>
+        <button class="btn smallbtn" onclick="toggleUser(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Suspend' : 'Activate'}</button>
+        <button class="btn smallbtn danger" onclick="deleteCustomer(${x.id},'${escAttr(x.name)}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterCustomerRows() {
+  const q = ($('customerSearch')?.value || '').toLowerCase().trim();
+  if (!q) {
+    renderCustomerRows(rawCustomersList);
+    return;
+  }
+  const filtered = rawCustomersList.filter(x => 
+    (x.name || '').toLowerCase().includes(q) ||
+    (x.email || '').toLowerCase().includes(q) ||
+    (x.phone || '').includes(q)
+  );
+  renderCustomerRows(filtered);
 }
 
 function editCustomer(id) {

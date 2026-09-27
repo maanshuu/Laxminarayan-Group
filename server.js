@@ -3112,7 +3112,14 @@ app.get("/api/admin/dashboard",admin,(req,res)=>{
  recent
 }});
 });
-app.get("/api/admin/users",admin,(req,res)=>res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users ORDER BY id DESC").all()}));
+app.get("/api/admin/users",admin,(req,res)=>{
+  const role=clean(req.query.role,30);
+  if(role==="all"){
+    return res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users ORDER BY id DESC").all()});
+  }
+  const targetRole=role||"customer";
+  res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users WHERE role=? ORDER BY id DESC").all(targetRole)});
+});
 app.get("/api/admin/users/:id",admin,(req,res)=>{
   const id=Number(req.params.id), user=db.prepare("SELECT id,name,email,phone,role,status,created_at,updated_at FROM users WHERE id=?").get(id);
   if(!user)return res.status(404).json({success:false,error:"Customer not found"});
