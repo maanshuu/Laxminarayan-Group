@@ -738,7 +738,11 @@ async function loadLeads() {
 
   $('leadsBody').innerHTML = state.leads.map(x => {
     const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
-    const waLink = cleanPhone ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greeting from Laxminarayan Group.')}` : '#';
+    const clientName = (x.name || 'Valued Buyer').trim();
+    const projName = x.project_name || 'our luxury residences';
+    const advisorIntro = state.employee?.name ? `I am ${state.employee.name}, your dedicated sales advisor.` : `I am your dedicated relationship manager.`;
+    const waText = `Hello ${clientName}, greetings from Laxminarayan Group! Thank you for expressing interest in ${projName}. ${advisorIntro} Would you like to schedule a private site visit this week?`;
+    const waLink = cleanPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(waText)}` : '#';
     const telLink = cleanPhone ? `tel:${cleanPhone}` : '#';
     const sentClass = x.sentiment === 'hot' ? 'pill-hot' : (x.sentiment === 'cold' ? 'pill-cold' : 'pill-warm');
 

@@ -3175,7 +3175,7 @@ async function loadEnquiries() {
           <td>
             ${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
             <div style="display:flex; gap:6px; margin-top:4px;">
-              ${p ? `<a href="https://wa.me/91${p}?text=${encodeURIComponent('Hello ' + x.name + ', greeting from Laxminarayan Group.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp">💬</a>` : ''}
+              ${p ? `<a href="https://wa.me/91${p}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp Welcome">💬</a>` : ''}
               ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Call">📞</a>` : ''}
             </div>
           </td>
