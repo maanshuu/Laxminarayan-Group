@@ -44,9 +44,10 @@ const FRONTEND_URL=process.env.FRONTEND_URL||"http://localhost:5000";
 // SQLite database or lose project media. A relative DB_FILE in .env is treated as
 // the legacy location and is migrated automatically on first run. An absolute
 // DB_FILE remains respected for advanced deployments.
-const APP_DATA_ROOT=path.join(process.env.APPDATA||path.join(os.homedir(),"AppData","Roaming"),"LaxminarayanGroup");
-const PERSISTENT_DATA_DIR=path.join(APP_DATA_ROOT,"data");
-const PERSISTENT_UPLOAD_DIR=path.join(APP_DATA_ROOT,"uploads","projects");
+const RAILWAY_VOLUME_DIR = process.env.DATA_DIR || (fs.existsSync('/data') && !process.env.APPDATA ? '/data' : null);
+const APP_DATA_ROOT = RAILWAY_VOLUME_DIR || path.join(process.env.APPDATA||path.join(os.homedir(),"AppData","Roaming"),"LaxminarayanGroup");
+const PERSISTENT_DATA_DIR = RAILWAY_VOLUME_DIR ? path.join(RAILWAY_VOLUME_DIR, "data") : path.join(APP_DATA_ROOT,"data");
+const PERSISTENT_UPLOAD_DIR = process.env.UPLOAD_DIR || (RAILWAY_VOLUME_DIR ? path.join(RAILWAY_VOLUME_DIR, "uploads") : path.join(APP_DATA_ROOT,"uploads","projects"));
 const CERTS_DIR=path.join(APP_DATA_ROOT,"certs");
 const CERT_FILE=process.env.SSL_CERT||path.join(CERTS_DIR,"cert.pem");
 const KEY_FILE=process.env.SSL_KEY||path.join(CERTS_DIR,"key.pem");
@@ -84,7 +85,7 @@ async function getOrGenerateCertificates(){
   fs.writeFileSync(KEY_FILE,pems.private,"utf8");
   return { cert: pems.cert, key: pems.private };
 }
-const CONFIGURED_DB=process.env.DB_FILE||"./data/laxminarayan.db";
+const CONFIGURED_DB=process.env.DB_FILE||(RAILWAY_VOLUME_DIR ? path.join(RAILWAY_VOLUME_DIR,"data","laxminarayan.db") : "./data/laxminarayan.db");
 const LEGACY_DB_FILE=path.resolve(__dirname,CONFIGURED_DB);
 const DB_FILE=path.isAbsolute(CONFIGURED_DB) ? CONFIGURED_DB : path.join(PERSISTENT_DATA_DIR,"laxminarayan.db");
 const LEGACY_UPLOAD_DIR=path.join(__dirname,"uploads","projects");
@@ -114,6 +115,7 @@ function findNewestLegacyDb(){
   return candidates[0]?.path||null;
 }
 function initializePersistentStorage(){
+  fs.mkdirSync(path.dirname(DB_FILE),{recursive:true});
   fs.mkdirSync(PERSISTENT_DATA_DIR,{recursive:true});
   fs.mkdirSync(PERSISTENT_UPLOAD_DIR,{recursive:true});
   // First prefer a database/media folder in this project. If this ZIP was
