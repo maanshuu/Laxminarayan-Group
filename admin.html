@@ -1592,8 +1592,8 @@ textarea {
   <!-- HEAD ROW -->
   <div class="headrow">
     <div>
-      <h1 style="margin-bottom:5px">Business Dashboard</h1>
-      <p class="muted" style="margin-top:0">Manage enquiries, site visits, team, customers, projects and reporting from one place.</p>
+      <h1 id="pageTitle" style="margin-bottom:5px">Executive Command Center</h1>
+      <p id="pageSubtitle" class="muted" style="margin-top:0">High-level pulse of projects, sales pipeline, and site operations.</p>
     </div>
     <div class="actions">
       <button class="btn" onclick="openIntegrationModal()" title="View live SMTP and WhatsApp status or dispatch a test email">⚡ Email & WA Diagnostics</button>
@@ -3043,11 +3043,65 @@ async function send(url, opt = {}) {
   return d;
 }
 
+const VIEW_METADATA = {
+  overview: {
+    title: 'Executive Command Center',
+    subtitle: 'High-level pulse of projects, sales pipeline, and site operations.'
+  },
+  leadsView: {
+    title: 'Lead & Enquiry Pipeline',
+    subtitle: 'Track incoming buyer enquiries, source channels, and speed-to-response.'
+  },
+  unitsView: {
+    title: 'Project Inventory & Unit Allocation',
+    subtitle: 'Live unit availability, floor plans, pricing tiers, and hold statuses.'
+  },
+  bookingsView: {
+    title: 'Bookings & Financial Closures',
+    subtitle: 'Track token advances, sale agreements, and unit registrations.'
+  },
+  visitsView: {
+    title: 'Site Visit Schedules & Logs',
+    subtitle: 'Client site inspections, scheduled tours, and advisor feedback logs.'
+  },
+  projectsView: {
+    title: 'Development Projects',
+    subtitle: 'Manage DS 208, Nilkanth Villa, project specifications, and collateral.'
+  },
+  teamView: {
+    title: 'Team & Advisor Management',
+    subtitle: 'Manage sales advisors, portal credentials, and departmental roles.'
+  },
+  attendanceView: {
+    title: 'Team Attendance & Geofence Verification',
+    subtitle: 'Real-time GPS attendance for DS 208, Nilkanth Villa, and Head Office.'
+  },
+  customersView: {
+    title: 'Customer & Investor Directory',
+    subtitle: 'Verified buyer records, unit ownership, and communication logs.'
+  },
+  reportsView: {
+    title: 'Executive Analytics & Reports',
+    subtitle: 'Conversion rates, enquiry sources, project velocity, and sales metrics.'
+  },
+  auditView: {
+    title: 'Activity History & Audit Trail',
+    subtitle: 'Comprehensive immutable log of administrative actions and status updates.'
+  }
+};
+
 function showView(id) {
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === id));
   const view = $(id);
   if (view) view.classList.add('active');
+
+  const meta = VIEW_METADATA[id] || VIEW_METADATA.overview;
+  const titleEl = $('pageTitle');
+  const subEl = $('pageSubtitle');
+  if (titleEl) titleEl.textContent = meta.title;
+  if (subEl) subEl.textContent = meta.subtitle;
+  document.title = `${meta.title} — Laxminarayan Group CRM`;
 }
 
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
