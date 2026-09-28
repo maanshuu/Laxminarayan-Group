@@ -2216,6 +2216,22 @@ app.get("/api/admin/reports/bookings.csv", coordinatorOrAdmin, (req, res) => {
   res.send(formatCsvOutput(headers, rows));
 });
 
+app.get("/api/admin/backup/download", admin, (req, res) => {
+  try {
+    // Flush all pending WAL journal transactions into primary database file
+    db.pragma("wal_checkpoint(TRUNCATE)");
+    if (!fs.existsSync(DB_FILE)) {
+      return res.status(404).json({ success: false, error: "Database file not found on disk" });
+    }
+    const filename = `laxminarayan-crm-backup-${todayIST()}.db`;
+    audit(req, "backup_download", "system", 0, `Admin downloaded live database backup: ${filename}`);
+    res.download(DB_FILE, filename);
+  } catch (err) {
+    console.error("[BACKUP DOWNLOAD ERROR]", err);
+    res.status(500).json({ success: false, error: "Failed to create database backup: " + err.message });
+  }
+});
+
 app.get("/api/admin/report",coordinatorOrAdmin,(req,res)=>{
  const start=clean(req.query.start,10),end=clean(req.query.end,10);
  const where=start&&end?"WHERE date(created_at) BETWEEN ? AND ?":start?"WHERE date(created_at)>=?":end?"WHERE date(created_at)<=?":"";

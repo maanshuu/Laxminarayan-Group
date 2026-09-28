@@ -1597,6 +1597,7 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
       <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
     </div>
     <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
+    <a href="/api/admin/backup/download" data-admin-only="true" class="top-status-badge" style="text-decoration:none; cursor:pointer; background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3); font-weight:700;" title="Download complete portable database backup (.db)"><span class="top-status-dot" style="background:#0284c7;"></span> 📥 BACKUP DB</a>
     <span class="top-status-badge" data-admin-only="true" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
   </div>
   <div class="top-actions-flex">
@@ -2393,6 +2394,7 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
           <button class="btn" onclick="clearReportFilters()">Clear filters</button>
           <button class="btn" onclick="refreshReports()">Refresh</button>
           <a class="btn" href="/api/admin/reports.csv">Export enquiries CSV</a>
+          <a class="btn" data-admin-only="true" href="/api/admin/backup/download" style="background:var(--sky-light, #e0f2fe); color:var(--sky-deep, #0369a1); border-color:#bae6fd; font-weight:700;" title="Download complete portable database backup (.db)">📥 Download Database (.db)</a>
         </div>
       </div>
       <div class="charts">
@@ -2893,6 +2895,19 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
               <div>Status: <span style="color:#2563eb; font-weight:700;">Triggers Operational</span></div>
             </div>
           </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <b style="font-size:13px; color:#0f172a;">💾 Portable SQLite Database</b>
+              <span class="pill" style="background:#ecfdf5; color:#065f46; font-weight:700;">100% Portable</span>
+            </div>
+            <div style="font-size:12px; color:#64748b; margin-top:4px;">
+              Single-file database storing all customers, enquiries, leads, attendance records & units. Free to download & migrate anytime.
+            </div>
+          </div>
+          <a class="btn" href="/api/admin/backup/download" style="background:var(--sky-deep, #0284c7); color:#fff; border:none; font-weight:700; text-decoration:none; padding:8px 14px; border-radius:6px; font-size:12.5px;">📥 Download .db Backup</a>
         </div>
 
         <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
