@@ -1858,8 +1858,11 @@ function evaluateAttendanceLocation(lat, lng, accuracy = 0) {
 function calculateShiftDuration(checkInStr, checkOutStr) {
   if (!checkInStr || !checkOutStr) return "";
   try {
-    const [h1, m1, s1] = checkInStr.split(":").map(Number);
-    const [h2, m2, s2] = checkOutStr.split(":").map(Number);
+    const cleanIn = String(checkInStr).replace(/[^0-9:]/g, '');
+    const cleanOut = String(checkOutStr).replace(/[^0-9:]/g, '');
+    const [h1, m1, s1] = cleanIn.split(":").map(Number);
+    const [h2, m2, s2] = cleanOut.split(":").map(Number);
+    if (isNaN(h1) || isNaN(m1) || isNaN(h2) || isNaN(m2)) return "";
     let diffSec = (h2 * 3600 + m2 * 60 + (s2 || 0)) - (h1 * 3600 + m1 * 60 + (s1 || 0));
     if (diffSec < 0) diffSec += 24 * 3600;
     const hours = Math.floor(diffSec / 3600);
@@ -2179,19 +2182,22 @@ app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
   const loc = evaluateAttendanceLocation(lat, lng, accuracy);
 
   if(existing){
-    const checkOut=existing.check_in?timeNow:null;
+    const checkOut=timeNow;
+    const checkInTime=existing.check_in||timeNow;
     const eod_summary = req.body && req.body.eod_summary ? clean(req.body.eod_summary, 5000) : (existing.eod_summary || '');
     const walkins_count = req.body && req.body.walkins_count !== undefined ? Math.max(0, parseInt(req.body.walkins_count, 10) || 0) : (existing.walkins_count || 0);
     const followups_count = req.body && req.body.followups_count !== undefined ? Math.max(0, parseInt(req.body.followups_count, 10) || 0) : (existing.followups_count || 0);
-    const duration = calculateShiftDuration(existing.check_in, timeNow);
+    const duration = calculateShiftDuration(checkInTime, checkOut);
 
     db.prepare(`UPDATE employee_attendance SET 
+      check_in=?,
       check_out=?, 
       check_out_lat=?, check_out_lng=?, check_out_accuracy=?, 
       check_out_site=?, check_out_distance_m=?, check_out_status=?,
       eod_summary=?, walkins_count=?, followups_count=?, work_duration=?,
       updated_at=CURRENT_TIMESTAMP 
       WHERE id=?`).run(
+      checkInTime,
       checkOut,
       loc.lat || null, loc.lng || null, loc.accuracy || null,
       loc.site_name || '', loc.distance_m ?? null, loc.status || '',
