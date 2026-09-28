@@ -1622,8 +1622,8 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
   <!-- STATS KPI STRIP -->
   <div class="stats">
     <div class="stat"><strong id="users">0</strong>Customers</div>
-    <div class="stat"><strong id="enq">0</strong>Enquiries</div>
     <div class="stat"><strong id="leads">0</strong>Total Enquiries</div>
+    <div class="stat"><strong id="new">0</strong>New Inquiries</div>
     <div class="stat"><strong id="openLeads">0</strong>Open enquiries</div>
     <div class="stat"><strong id="visits">0</strong>Site visits</div>
     <div class="stat"><strong id="statUnits">23</strong>Total units</div>
@@ -1632,7 +1632,7 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
     <div class="stat"><strong id="statBookings">0</strong>Bookings</div>
     <div class="stat" data-admin-only="true"><strong id="employees">0</strong>Team active</div>
     <div class="stat"><strong id="projects">0</strong>Active projects</div>
-    <div class="stat"><strong id="new">0</strong>New today</div>
+    <div class="stat"><strong id="todayFollowUps">0</strong>Today's Visits</div>
   </div>
 
   <!-- SPEED-TO-LEAD ACTION PULSE BANNER -->
@@ -3201,17 +3201,17 @@ async function load() {
   const isCoordinator = state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager');
 
   if ($('users')) $('users').textContent = d.stats.users;
-  if ($('enq')) $('enq').textContent = d.stats.enquiries;
-  if ($('new')) $('new').textContent = d.stats.newEnquiries;
   if ($('leads')) $('leads').textContent = d.stats.leads;
+  if ($('new')) $('new').textContent = d.stats.newEnquiries || 0;
   if ($('openLeads')) $('openLeads').textContent = d.stats.openLeads;
   if ($('visits')) $('visits').textContent = d.stats.visits;
   if ($('employees')) $('employees').textContent = d.stats.employees;
   if ($('projects')) $('projects').textContent = d.stats.projects;
-  if ($('statUnits')) $('statUnits').textContent = d.stats.units ? d.stats.units.total : 38;
-  if ($('statAvailable')) $('statAvailable').textContent = d.stats.units ? d.stats.units.available : 21;
-  if ($('statSold')) $('statSold').textContent = d.stats.units ? d.stats.units.sold : 8;
+  if ($('statUnits')) $('statUnits').textContent = d.stats.units ? d.stats.units.total : 23;
+  if ($('statAvailable')) $('statAvailable').textContent = d.stats.units ? d.stats.units.available : 23;
+  if ($('statSold')) $('statSold').textContent = d.stats.units ? d.stats.units.sold : 0;
   if ($('statBookings')) $('statBookings').textContent = d.stats.bookings || 0;
+  if ($('todayFollowUps')) $('todayFollowUps').textContent = d.stats.followUpsToday || 0;
   if ($('heroOpenLeads')) $('heroOpenLeads').textContent = d.stats.openLeads;
   if ($('heroNewEnquiries')) $('heroNewEnquiries').textContent = d.stats.newEnquiries;
   if (!isCoordinator) {

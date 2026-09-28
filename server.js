@@ -461,6 +461,105 @@ function backfillEnquiryLeads(){
 backfillEnquiryLeads();
 db.exec("CREATE INDEX IF NOT EXISTS idx_leads_enquiry_id ON leads(enquiry_id)");
 
+// ---------------- Site Visit & Customer Auto-Synchronization ----------------
+function syncLeadToSiteVisit(leadId) {
+  if (!leadId) return;
+  try {
+    const lead = db.prepare("SELECT * FROM leads WHERE id=?").get(Number(leadId));
+    if (!lead || lead.status !== 'site_visit') return;
+
+    let existing = null;
+    if (lead.id) {
+      existing = db.prepare("SELECT * FROM site_visits WHERE enquiry_id=?").get(lead.id);
+    }
+    if (!existing && lead.phone) {
+      existing = db.prepare("SELECT * FROM site_visits WHERE phone <> '' AND phone=?").get(lead.phone);
+    }
+
+    const preferred = lead.follow_up_at || lead.created_at || new Date().toISOString();
+    let dt = new Date(preferred);
+    if (Number.isNaN(dt.getTime())) dt = new Date();
+    const safePreferred = dt.toISOString();
+
+    if (!existing) {
+      db.prepare(`
+        INSERT INTO site_visits(user_id, project_id, enquiry_id, name, phone, email, preferred_at, status, notes, admin_notes, created_at, updated_at)
+        VALUES(?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `).run(
+        lead.user_id || null,
+        lead.project_id || null,
+        lead.id,
+        lead.name || 'Site Visitor',
+        lead.phone || '',
+        lead.email || '',
+        safePreferred,
+        lead.notes || 'Pipeline Site Visit',
+        `Active CRM Site Visit (Enquiry #${lead.id})`
+      );
+    } else {
+      db.prepare(`
+        UPDATE site_visits
+        SET name=?, phone=?, email=?, project_id=?, preferred_at=?, notes=?, updated_at=CURRENT_TIMESTAMP
+        WHERE id=?
+      `).run(
+        lead.name || existing.name,
+        lead.phone || existing.phone,
+        lead.email || existing.email,
+        lead.project_id || existing.project_id,
+        safePreferred,
+        lead.notes || existing.notes,
+        existing.id
+      );
+    }
+  } catch (err) {
+    console.error("[Sync Site Visit Error]", err.message);
+  }
+}
+
+function syncAllExistingSiteVisits() {
+  try {
+    const leadsInVisit = db.prepare("SELECT * FROM leads WHERE status='site_visit'").all();
+    for (const lead of leadsInVisit) {
+      syncLeadToSiteVisit(lead.id);
+    }
+    const count = db.prepare("SELECT COUNT(*) c FROM site_visits").get().c;
+    console.log(`[Sync] Active site visits synced. Total in site_visits table: ${count}`);
+  } catch (err) {
+    console.error("[Sync Error] Failed syncing site visits:", err.message);
+  }
+}
+syncAllExistingSiteVisits();
+
+function syncCustomersFromLeads() {
+  try {
+    const uniqueLeads = db.prepare("SELECT DISTINCT name, phone, email, created_at FROM leads WHERE name <> ''").all();
+    for (const l of uniqueLeads) {
+      const cleanPhone = l.phone ? String(l.phone).trim() : '';
+      const cleanEmail = l.email ? String(l.email).toLowerCase().trim() : '';
+      let existing = null;
+      if (cleanEmail) {
+        existing = db.prepare("SELECT id FROM users WHERE email=?").get(cleanEmail);
+      }
+      if (!existing && cleanPhone) {
+        existing = db.prepare("SELECT id FROM users WHERE phone=?").get(cleanPhone);
+      }
+      if (!existing) {
+        const dummyPass = bcrypt.hashSync(crypto.randomBytes(16).toString("hex"), 10);
+        const r = db.prepare(`
+          INSERT INTO users(name, email, phone, password_hash, role, status, created_at, updated_at)
+          VALUES(?, ?, ?, ?, 'customer', 'active', ?, ?)
+        `).run(l.name, cleanEmail, cleanPhone, dummyPass, l.created_at || new Date().toISOString(), l.created_at || new Date().toISOString());
+        db.prepare("UPDATE leads SET user_id=? WHERE ((phone <> '' AND phone=?) OR (email <> '' AND lower(email)=?)) AND user_id IS NULL").run(r.lastInsertRowid, cleanPhone, cleanEmail);
+      } else {
+        db.prepare("UPDATE leads SET user_id=? WHERE ((phone <> '' AND phone=?) OR (email <> '' AND lower(email)=?)) AND user_id IS NULL").run(existing.id, cleanPhone, cleanEmail);
+      }
+    }
+  } catch (err) {
+    console.error("[Customer Sync Error]", err.message);
+  }
+}
+syncCustomersFromLeads();
+
 db.exec(`CREATE TABLE IF NOT EXISTS project_media (
  id INTEGER PRIMARY KEY AUTOINCREMENT, project_id INTEGER NOT NULL, media_type TEXT NOT NULL CHECK(media_type IN ('image','video')), mime_type TEXT NOT NULL DEFAULT '', original_name TEXT NOT NULL, file_path TEXT NOT NULL, file_size INTEGER NOT NULL DEFAULT 0, is_cover INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT (datetime('now')), FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
 ); CREATE INDEX IF NOT EXISTS idx_project_media_project_id ON project_media(project_id);`);
@@ -1192,8 +1291,12 @@ app.post("/api/admin/leads",coordinatorOrAdmin,(req,res)=>{
   const sentiment=clean(req.body.sentiment,20)||"warm";
   const unitId=req.body.unit_id?Number(req.body.unit_id):null;
   const r=db.prepare(`INSERT INTO leads(user_id,name,phone,email,source,status,notes,project_id,assigned_employee_id,follow_up_at,budget,sentiment,unit_id) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(userId,name,phone,email,source,status,notes,projectId,employeeId,follow,budget,sentiment,unitId);
-  audit(req,"create","lead",r.lastInsertRowid,`${name} · ${source}`);
-  res.status(201).json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(r.lastInsertRowid)});
+  const newLeadId=Number(r.lastInsertRowid);
+  if(status==='site_visit'){
+    syncLeadToSiteVisit(newLeadId);
+  }
+  audit(req,"create","lead",newLeadId,`${name} · ${source}`);
+  res.status(201).json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(newLeadId)});
 });
 // Duplicate lead checking helper
 function findDuplicateLead(rawPhone, rawEmail, excludeId = 0) {
@@ -1250,7 +1353,7 @@ app.delete("/api/admin/leads/:id", admin, (req, res) => {
 
   const tx = db.transaction(() => {
     db.prepare("UPDATE bookings SET lead_id=NULL WHERE lead_id=?").run(id);
-    db.prepare("UPDATE site_visits SET enquiry_id=NULL WHERE enquiry_id=?").run(id);
+    db.prepare("DELETE FROM site_visits WHERE enquiry_id=?").run(id);
     db.prepare("DELETE FROM leads WHERE id=?").run(id);
   });
   tx();
@@ -1259,6 +1362,7 @@ app.delete("/api/admin/leads/:id", admin, (req, res) => {
   res.json({ success: true, message: `Enquiry #${id} deleted successfully` });
 });
 app.get("/api/admin/site-visits",coordinatorOrAdmin,(req,res)=>{
+  syncAllExistingSiteVisits();
   const status=clean(req.query.status,30);
   const sql=`SELECT v.*,p.name AS project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id ${status?"WHERE v.status=?":""} ORDER BY datetime(v.preferred_at) ASC`;
   res.json({success:true,data:(status?db.prepare(sql).all(status):db.prepare(sql).all())});
@@ -1332,6 +1436,11 @@ app.patch("/api/admin/leads/:id",coordinatorOrAdmin,(req,res)=>{
   const projectId=Object.prototype.hasOwnProperty.call(req.body,"project_id")?(req.body.project_id===null||req.body.project_id===""?null:Number(req.body.project_id)):existing.project_id;
   db.prepare("UPDATE leads SET status=?,assigned_employee_id=?,follow_up_at=?,notes=?,lost_reason=?,budget=?,sentiment=?,unit_id=?,name=?,phone=?,email=?,project_id=?,updated_at=CURRENT_TIMESTAMP WHERE id=?")
     .run(status,employeeId,follow||null,notes,lost,budget,sentiment,unitId,name,phone,email,projectId,id);
+  if(status==='site_visit'){
+    syncLeadToSiteVisit(id);
+  } else if(['negotiation','won'].includes(status)){
+    db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=?").run(id);
+  }
   audit(req,"update","lead",id,`Status ${status} · Sentiment: ${sentiment}`);
   res.json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(id)});
 });
@@ -2195,6 +2304,11 @@ app.patch("/api/employee/leads/:id",employeeOrAdmin,(req,res)=>{
   const follow_up_at=req.body.follow_up_at!==undefined?clean(req.body.follow_up_at,40)||null:lead.follow_up_at;
 
   db.prepare(`UPDATE leads SET status=?, sentiment=?, notes=?, follow_up_at=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`).run(status,sentiment,notes,follow_up_at,id);
+  if(status==='site_visit'){
+    syncLeadToSiteVisit(id);
+  } else if(['negotiation','won'].includes(status)){
+    db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=?").run(id);
+  }
   audit(req,"update","lead",id,`Updated by advisor: ${status} · ${sentiment}`);
   res.json({success:true,message:"Lead updated"});
 });
@@ -3220,20 +3334,39 @@ app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
  const bookingCount=db.prepare("SELECT COUNT(*) c FROM bookings").get().c;
  const followUpsToday=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=? AND status NOT IN ('won','lost')").get(today).c;
  const overdueLeads=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost')").get(today).c;
+
+ // Real-time active site visits across scheduled visits and CRM pipeline stages
+ const totalVisits = db.prepare(`
+   SELECT COUNT(DISTINCT uid) c FROM (
+     SELECT coalesce(nullif(phone,''), 'sv_' || id) AS uid FROM site_visits WHERE status <> 'cancelled'
+     UNION
+     SELECT coalesce(nullif(phone,''), 'ld_' || id) AS uid FROM leads WHERE status = 'site_visit'
+   )
+ `).get().c;
+
+ // Real-time total distinct client relationships
+ const totalCustomers = db.prepare(`
+   SELECT COUNT(DISTINCT uid) c FROM (
+     SELECT id AS uid FROM users WHERE role='customer'
+     UNION
+     SELECT coalesce(nullif(phone,''), email, name) AS uid FROM leads WHERE name <> ''
+   )
+ `).get().c;
+
  res.json({success:true,
    currentUser: { id: req.user.id, name: req.user.name, email: req.user.email, role: req.user.role },
    stats:{
-     users:db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c,
-     enquiries:db.prepare("SELECT COUNT(*) c FROM enquiries").get().c,
-     newEnquiries:db.prepare("SELECT COUNT(*) c FROM enquiries WHERE status='new'").get().c,
-     projects:db.prepare("SELECT COUNT(*) c FROM projects WHERE status='active'").get().c,
-     leads:db.prepare("SELECT COUNT(*) c FROM leads").get().c,
-     openLeads:db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c,
-     visits:db.prepare("SELECT COUNT(*) c FROM site_visits").get().c,
-     employees:isCoordinator ? 0 : db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
-     attendance:isCoordinator ? {total:0,present:0,absent:0,leave:0,half_day:0} : {total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
-     units:{total:totalUnits,available:umap.available||0,blocked:umap.blocked||0,sold:umap.sold||0},
-     bookings:bookingCount,
+     users: totalCustomers,
+     enquiries: db.prepare("SELECT COUNT(*) c FROM enquiries").get().c,
+     newEnquiries: db.prepare("SELECT COUNT(*) c FROM leads WHERE status='new'").get().c,
+     projects: db.prepare("SELECT COUNT(*) c FROM projects WHERE status='active'").get().c,
+     leads: db.prepare("SELECT COUNT(*) c FROM leads").get().c,
+     openLeads: db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c,
+     visits: totalVisits,
+     employees: isCoordinator ? 0 : db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
+     attendance: isCoordinator ? {total:0,present:0,absent:0,leave:0,half_day:0} : {total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
+     units: {total:totalUnits,available:umap.available||0,blocked:umap.blocked||0,sold:umap.sold||0},
+     bookings: bookingCount,
      followUpsToday,
      overdueLeads,
      recent
@@ -3246,6 +3379,9 @@ app.get("/api/admin/users",coordinatorOrAdmin,(req,res)=>{
     return res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users ORDER BY id DESC").all()});
   }
   const targetRole=role||"customer";
+  if(targetRole==="customer"){
+    syncCustomersFromLeads();
+  }
   res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users WHERE role=? ORDER BY id DESC").all(targetRole)});
 });
 app.get("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
