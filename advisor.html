@@ -869,11 +869,11 @@ function captureGeolocation() {
     const safetyTimer = setTimeout(() => {
       if (!finished) {
         finished = true;
-        console.warn('Geolocation safety timeout fired (4s limit)');
-        toast('⚠️ Location took longer than expected. Proceeding with punch...');
+        console.warn('Geolocation safety timeout fired (5s limit)');
+        toast('⚠️ GPS taking longer than usual. Proceeding with punch...');
         resolve(null);
       }
-    }, 4000);
+    }, 5000);
 
     try {
       navigator.geolocation.getCurrentPosition(
@@ -894,17 +894,20 @@ function captureGeolocation() {
             clearTimeout(safetyTimer);
             console.warn('Geolocation capture:', err);
             if (err.code === 1) {
-              toast('⚠️ Location access was denied. Punching without GPS site verification.');
+              toast('⚠️ Location access was denied in browser. Punching without GPS.');
+              alert('📍 Location Permission is Blocked:\n\nTo verify on-site attendance at DS 208 or Nilkanth Villa, please tap the lock/tune icon at the top of your browser (next to the website URL), set Location to "Allow", and ensure phone GPS is ON.');
+            } else if (err.code === 2) {
+              toast('⚠️ Phone GPS is unavailable. Please check device location settings.');
             } else {
-              toast('⚠️ Location unavailable. Punching without GPS verification.');
+              toast('⚠️ Location request timed out. Proceeding...');
             }
             resolve(null);
           }
         },
         {
           enableHighAccuracy: true,
-          timeout: 3500,
-          maximumAge: 60000
+          timeout: 4500,
+          maximumAge: 300000
         }
       );
     } catch (e) {

@@ -5220,19 +5220,25 @@ function resetAttendanceForm() {
 function renderPunchLocation(time, site, status, dist, lat, lng) {
   if (!time) return '<span class="muted">—</span>';
   let badge = '';
+  const isZeroCoord = (!lat && !lng) || (Math.abs(Number(lat)) < 0.001 && Math.abs(Number(lng)) < 0.001);
+  const isNoGps = status === 'no_gps' || (isZeroCoord && dist > 500000) || (!site && !lat && !lng);
+
+  if (isNoGps) {
+    badge = `<div style="margin-top:4px;"><span class="pill" style="background:#f1f5f9; color:#64748b; font-size:11px; font-weight:700;">⚠️ No GPS (Device Location Off)</span></div>`;
+    return `<b>${esc(time)}</b>${badge}`;
+  }
+
   if (status === 'on_site') {
     badge = `<div style="margin-top:4px;"><span class="pill" style="background:#dcfce7; color:#15803d; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">🟢 ${esc(site || 'On-Site')}${dist != null ? ` (${dist}m)` : ''}</span>`;
   } else if (status === 'office') {
     badge = `<div style="margin-top:4px;"><span class="pill" style="background:#e0f2fe; color:#0369a1; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">🏢 ${esc(site || 'Office')}${dist != null ? ` (${dist}m)` : ''}</span>`;
   } else if (status === 'off_site') {
     badge = `<div style="margin-top:4px;"><span class="pill" style="background:#fee2e2; color:#b91c1c; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">⚠️ ${esc(site || 'Off-Site')}</span>`;
-  } else if (status === 'no_gps') {
-    badge = `<div style="margin-top:4px;"><span class="pill" style="background:#f1f5f9; color:#64748b; font-size:11px;">⚠️ No GPS</span>`;
   } else if (site) {
     badge = `<div style="margin-top:4px;"><span class="pill" style="font-size:11px;">📍 ${esc(site)}</span>`;
   }
 
-  if (lat && lng) {
+  if (lat && lng && !isZeroCoord) {
     badge += ` <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" rel="noopener" style="font-size:11px; margin-left:4px; text-decoration:none; font-weight:700; color:#0284c7; white-space:nowrap;" title="View exact GPS pin on Google Maps">📍 Map</a></div>`;
   } else if (badge) {
     badge += `</div>`;
@@ -5327,7 +5333,8 @@ async function loadAttendance() {
     const recorded = d.data.filter(x => x.attendance_id).length;
     const onSite = d.data.filter(x => x.check_in_status === 'on_site').length;
     const office = d.data.filter(x => x.check_in_status === 'office').length;
-    const offSite = d.data.filter(x => x.check_in_status === 'off_site').length;
+    const noGps = d.data.filter(x => x.attendance_id && (x.check_in_status === 'no_gps' || (x.check_in_distance_m > 500000))).length;
+    const offSite = d.data.filter(x => x.check_in_status === 'off_site' && x.check_in_distance_m <= 500000).length;
 
     if ($('attendanceSummary')) {
       let sumHtml = `${recorded}/${total} active recorded`;
@@ -5335,6 +5342,9 @@ async function loadAttendance() {
         sumHtml += ` &nbsp;•&nbsp; <span style="color:#15803d; font-weight:700;">🟢 ${onSite} On-Site</span> &nbsp;•&nbsp; <span style="color:#0369a1; font-weight:700;">🏢 ${office} Office</span>`;
         if (offSite > 0) {
           sumHtml += ` &nbsp;•&nbsp; <span style="color:#b91c1c; font-weight:700;">⚠️ ${offSite} Off-Site</span>`;
+        }
+        if (noGps > 0) {
+          sumHtml += ` &nbsp;•&nbsp; <span style="color:#64748b; font-weight:700;">⚠️ ${noGps} No GPS (Location Off)</span>`;
         }
       }
       $('attendanceSummary').innerHTML = sumHtml;

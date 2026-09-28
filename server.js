@@ -1797,14 +1797,24 @@ function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
 }
 
 function evaluateAttendanceLocation(lat, lng, accuracy = 0) {
+  if (lat == null || lng == null || lat === "" || lng === "") {
+    return {
+      status: "no_gps",
+      site_name: "No GPS Signal / Permission Off",
+      distance_m: null,
+      is_on_site: false,
+      notes: "Location coordinates not captured by device"
+    };
+  }
+
   const numLat = Number(lat);
   const numLng = Number(lng);
   const numAcc = Number(accuracy) || 0;
 
-  if (!Number.isFinite(numLat) || !Number.isFinite(numLng)) {
+  if (!Number.isFinite(numLat) || !Number.isFinite(numLng) || (numLat === 0 && numLng === 0)) {
     return {
       status: "no_gps",
-      site_name: "No GPS Provided",
+      site_name: "No GPS Signal / Permission Off",
       distance_m: null,
       is_on_site: false,
       notes: "Location coordinates not captured by device"
