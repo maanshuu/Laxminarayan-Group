@@ -3344,14 +3344,8 @@ app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
    )
  `).get().c;
 
- // Real-time total distinct client relationships
- const totalCustomers = db.prepare(`
-   SELECT COUNT(DISTINCT uid) c FROM (
-     SELECT id AS uid FROM users WHERE role='customer'
-     UNION
-     SELECT coalesce(nullif(phone,''), email, name) AS uid FROM leads WHERE name <> ''
-   )
- `).get().c;
+ // Real-time verified customer accounts
+ const totalCustomers = db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c;
 
  res.json({success:true,
    currentUser: { id: req.user.id, name: req.user.name, email: req.user.email, role: req.user.role },
