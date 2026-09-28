@@ -2355,7 +2355,8 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
           <p class="muted" style="margin-bottom:0">View registered client accounts, buyer activity history, or manage portal access.</p>
         </div>
         <div class="actions" style="display:flex; align-items:center; gap:8px;">
-          <input id="customerSearch" oninput="filterCustomerRows()" placeholder="🔍 Search customers..." style="padding:7px 12px; font-size:12px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); max-width:220px;">
+          <input id="customerSearch" oninput="filterCustomerRows()" placeholder="🔍 Search customers..." style="padding:7px 12px; font-size:12px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); max-width:200px;">
+          <button class="btn" id="filterRepeatBtn" onclick="toggleRepeatFilter()" title="Filter customers with multiple enquiries" style="font-size:12px;">⚡ Repeat Enquirers (>1)</button>
           <span class="pill" id="customerCountBadge" style="background:var(--sky-light); color:var(--sky-deep); font-weight:700;">0 Customers</span>
           <button class="btn" onclick="refreshCustomers()">↻ Refresh</button>
         </div>
@@ -2367,6 +2368,7 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
             <th>Email Address</th>
             <th>Phone Number</th>
             <th>Account Status</th>
+            <th>Enquiries</th>
             <th>Registered Date</th>
             <th>Actions</th>
           </tr>
@@ -3364,8 +3366,19 @@ if ($('enquiryFormInline')) {
 async function loadEnquiries() {
   try {
     const d = await get('/api/admin/enquiries');
+    const phoneCounts = {}, emailCounts = {};
+    for (const e of (d.data || [])) {
+      const p = (e.phone || '').replace(/[^0-9]/g, '').slice(-10);
+      const em = (e.email || '').toLowerCase().trim();
+      if (p) phoneCounts[p] = (phoneCounts[p] || 0) + 1;
+      if (em) emailCounts[em] = (emailCounts[em] || 0) + 1;
+    }
     $('rows').innerHTML = d.data.length ? d.data.map(x => {
       const p = (x.phone || '').replace(/[^0-9]/g, '');
+      const lp = p.slice(-10);
+      const em = (x.email || '').toLowerCase().trim();
+      const isRepeat = (lp && phoneCounts[lp] > 1) || (em && emailCounts[em] > 1);
+      const repeatTag = isRepeat ? `<div style="margin-top:4px;"><span class="pill" style="background:#fef3c7; color:#92400e; font-size:10px; font-weight:700; border:1px solid #fde68a;">🔥 Repeat Enquirer (${Math.max(phoneCounts[lp] || 0, emailCounts[em] || 0)})</span></div>` : '';
       return `
         <tr>
           <td>
@@ -3373,7 +3386,10 @@ async function loadEnquiries() {
             <div style="margin-top:4px;">${window.renderSourceBadge ? window.renderSourceBadge(x.source) : ''}</div>
           </td>
           <td>${localDate(x.created_at)}</td>
-          <td><b>${esc(x.name)}</b></td>
+          <td>
+            <b>${esc(x.name)}</b>
+            ${repeatTag}
+          </td>
           <td>
             ${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
             <div style="display:flex; gap:6px; margin-top:4px;">
@@ -3542,6 +3558,14 @@ function renderKanban() {
   const stages = ['new', 'contacted', 'qualified', 'site_visit', 'negotiation', 'won', 'lost'];
   const now = new Date();
 
+  const leadPhoneCounts = {}, leadEmailCounts = {};
+  (state.leads || []).forEach(l => {
+    const p = (l.phone || '').replace(/[^0-9]/g, '').slice(-10);
+    const e = (l.email || '').toLowerCase().trim();
+    if (p) leadPhoneCounts[p] = (leadPhoneCounts[p] || 0) + 1;
+    if (e) leadEmailCounts[e] = (leadEmailCounts[e] || 0) + 1;
+  });
+
   stages.forEach(st => {
     const stageCards = list.filter(l => (l.status || 'new') === st);
     const badge = $('badge-' + st);
@@ -3559,6 +3583,9 @@ function renderKanban() {
       const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
       const isOverdue = x.follow_up_at && new Date(x.follow_up_at) < now && !['won', 'lost'].includes(x.status);
       const sentiment = x.sentiment || 'warm';
+      const lp = cleanPhone.slice(-10);
+      const le = (x.email || '').toLowerCase().trim();
+      const isRepeatLead = (lp && leadPhoneCounts[lp] > 1) || (le && leadEmailCounts[le] > 1);
 
       return `
         <div class="kanban-card priority-${sentiment}" onclick="openLeadDrawer(${x.id})">
@@ -3570,6 +3597,7 @@ function renderKanban() {
           ${x.budget ? `<div style="font-size:12px; font-weight:700; color:#0f766e; margin-bottom:4px;">💰 ${esc(x.budget)}</div>` : ''}
           <div class="card-tags">
             <span class="tag-priority tag-${sentiment}">${sentiment === 'hot' ? '🔥 Hot' : (sentiment === 'cold' ? '❄️ Cold' : '⚡ Warm')}</span>
+            ${isRepeatLead ? `<span class="tag-priority" style="background:#fef3c7; color:#92400e; font-weight:700; border:1px solid #fde68a;">🔥 Repeat (${Math.max(leadPhoneCounts[lp] || 0, leadEmailCounts[le] || 0)})</span>` : ''}
             ${isOverdue ? '<span class="tag-overdue">⚠️ Overdue</span>' : ''}
             ${window.renderSourceBadge ? window.renderSourceBadge(x.source) : `<span class="card-tag" style="background:#f1f5f9; color:#475569;">${esc(x.source || 'web')}</span>`}
           </div>
@@ -3599,7 +3627,22 @@ function renderLeadRows() {
     countBadge.textContent = list.length === totalCount ? `${list.length} Enquiries` : `${list.length} of ${totalCount} filtered`;
   }
 
-  tbody.innerHTML = list.length ? list.map(x => `
+  const leadPhoneCounts = {}, leadEmailCounts = {};
+  (state.leads || []).forEach(l => {
+    const p = (l.phone || '').replace(/[^0-9]/g, '').slice(-10);
+    const e = (l.email || '').toLowerCase().trim();
+    if (p) leadPhoneCounts[p] = (leadPhoneCounts[p] || 0) + 1;
+    if (e) leadEmailCounts[e] = (leadEmailCounts[e] || 0) + 1;
+  });
+
+  tbody.innerHTML = list.length ? list.map(x => {
+    const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
+    const lp = cleanPhone.slice(-10);
+    const le = (x.email || '').toLowerCase().trim();
+    const isRepeatLead = (lp && leadPhoneCounts[lp] > 1) || (le && leadEmailCounts[le] > 1);
+    const repeatTag = isRepeatLead ? `<div style="margin-top:3px;"><span class="pill" style="background:#fef3c7; color:#92400e; font-size:10px; font-weight:700; border:1px solid #fde68a;">🔥 Repeat Client (${Math.max(leadPhoneCounts[lp] || 0, leadEmailCounts[le] || 0)} Enquiries)</span></div>` : '';
+
+    return `
     <tr>
       <td>
         <b>#${x.id}</b><br>
@@ -3607,7 +3650,9 @@ function renderLeadRows() {
         <div style="margin-top:4px;">${window.renderSourceBadge ? window.renderSourceBadge(x.source) : esc(x.source || '')}</div>
       </td>
       <td>
-        <b>${esc(x.name)}</b><br>${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
+        <b>${esc(x.name)}</b>
+        ${repeatTag}
+        <br>${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
         ${x.budget ? `<br><span style="font-size:11.5px; color:#0f766e; font-weight:700;">💰 ${esc(x.budget)}</span>` : ''}
       </td>
       <td>
@@ -3619,13 +3664,13 @@ function renderLeadRows() {
       <td>${x.follow_up_at ? localDate(x.follow_up_at) : '—'}</td>
       <td>${esc(x.notes || '—')}</td>
       <td class="actions" style="white-space:nowrap;">
-        ${(x.phone || '').replace(/[^0-9]/g, '') ? `<a href="https://wa.me/91${(x.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="btn smallbtn" style="text-decoration:none; color:#15803d; border-color:#86efac; background:#f0fdf4; display:inline-flex; align-items:center; gap:3px;" title="⚡ 1-Click Welcome WhatsApp">💬 WA</a>` : ''}
+        ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="btn smallbtn" style="text-decoration:none; color:#15803d; border-color:#86efac; background:#f0fdf4; display:inline-flex; align-items:center; gap:3px;" title="⚡ 1-Click Welcome WhatsApp">💬 WA</a>` : ''}
         <button class="btn smallbtn" onclick="openLeadDrawer(${x.id})">360° Drawer</button>
         <button class="btn smallbtn" onclick="editLeadInline(${x.id})">Edit</button>
         <button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button>
       </td>
     </tr>
-  `).join('') : '<tr><td colspan="8" class="empty">No saved enquiries matching filters. Use + Add Enquiry to create one.</td></tr>';
+  `}).join('') : '<tr><td colspan="8" class="empty">No saved enquiries matching filters. Use + Add Enquiry to create one.</td></tr>';
 }
 
 async function loadLeads() {
@@ -5631,17 +5676,50 @@ async function loadCustomers() {
   }
 }
 
+let showingRepeatOnly = false;
+function toggleRepeatFilter() {
+  showingRepeatOnly = !showingRepeatOnly;
+  const btn = $('filterRepeatBtn');
+  if (btn) {
+    if (showingRepeatOnly) {
+      btn.style.background = 'var(--gold, #d97706)';
+      btn.style.color = '#ffffff';
+      btn.style.borderColor = '#b45309';
+      btn.textContent = '✓ Repeat Enquirers Only';
+    } else {
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+      btn.textContent = '⚡ Repeat Enquirers (>1)';
+    }
+  }
+  filterCustomerRows();
+}
+
 function renderCustomerRows(list) {
   if (!list || list.length === 0) {
-    $('urows').innerHTML = '<tr><td colspan="6" class="empty" style="padding:32px; text-align:center; color:var(--ink-muted);">No registered customer accounts found.</td></tr>';
+    $('urows').innerHTML = '<tr><td colspan="7" class="empty" style="padding:32px; text-align:center; color:var(--ink-muted);">No registered customer accounts found.</td></tr>';
     return;
   }
-  $('urows').innerHTML = list.map(x => `
+  $('urows').innerHTML = list.map(x => {
+    const enqCount = Number(x.enquiries_count || 0);
+    const leadsCount = Number(x.leads_count || 0);
+    const totalInteractions = Math.max(enqCount, leadsCount);
+    let enqBadge = '';
+    if (totalInteractions > 1) {
+      enqBadge = `<span class="pill" style="background:#fef3c7; color:#92400e; font-weight:700; border:1px solid #fde68a; display:inline-flex; align-items:center; gap:4px;">🔥 ${totalInteractions} Enquiries <span style="font-size:9.5px; background:#d97706; color:#fff; border-radius:3px; padding:1px 4px;">REPEAT</span></span>`;
+    } else if (totalInteractions === 1) {
+      enqBadge = `<span class="pill" style="background:#f1f5f9; color:#475569; font-weight:600;">1 Enquiry</span>`;
+    } else {
+      enqBadge = `<span class="pill" style="background:#f8fafc; color:#94a3b8;">0</span>`;
+    }
+    return `
     <tr>
       <td><b>${esc(x.name)}</b></td>
       <td>${esc(x.email || '—')}</td>
       <td>${esc(x.phone || '—')}</td>
       <td><span class="pill" style="${x.status === 'active' ? 'background:#dcfce7; color:#15803d; font-weight:700;' : 'background:#fee2e2; color:#b91c1c; font-weight:700;'}">${esc(x.status)}</span></td>
+      <td>${enqBadge}</td>
       <td>${localDate(x.created_at)}</td>
       <td class="actions">
         <button class="btn smallbtn" onclick="openCustomer(${x.id})">View 360°</button>
@@ -5650,20 +5728,23 @@ function renderCustomerRows(list) {
         <button class="btn smallbtn danger" onclick="deleteCustomer(${x.id},'${escAttr(x.name)}')">Delete</button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 }
 
 function filterCustomerRows() {
   const q = ($('customerSearch')?.value || '').toLowerCase().trim();
-  if (!q) {
-    renderCustomerRows(rawCustomersList);
-    return;
+  let filtered = rawCustomersList;
+  if (showingRepeatOnly) {
+    filtered = filtered.filter(x => Math.max(Number(x.enquiries_count || 0), Number(x.leads_count || 0)) > 1);
   }
-  const filtered = rawCustomersList.filter(x => 
-    (x.name || '').toLowerCase().includes(q) ||
-    (x.email || '').toLowerCase().includes(q) ||
-    (x.phone || '').includes(q)
-  );
+  if (q) {
+    filtered = filtered.filter(x => 
+      (x.name || '').toLowerCase().includes(q) ||
+      (x.email || '').toLowerCase().includes(q) ||
+      (x.phone || '').includes(q) ||
+      (q.includes('repeat') && Math.max(Number(x.enquiries_count || 0), Number(x.leads_count || 0)) > 1)
+    );
+  }
   renderCustomerRows(filtered);
 }
 
@@ -5689,7 +5770,71 @@ function editCustomer(id) {
 async function openCustomer(id) {
   try {
     const d = await get('/api/admin/users/' + id), u = d.data.user;
-    $('customerContent').innerHTML = `<div class="notice"><b>${esc(u.name)}</b><br>${esc(u.email)} · ${esc(u.phone)}<br>Status: ${esc(u.status)} · Joined: ${localDate(u.created_at)}</div><div class="history"><div class="box"><h3>Enquiries (${d.data.enquiries.length})</h3>${d.data.enquiries.map(x => `<p><b>${esc(x.enquiry_reference || '')}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')}<br>${esc(x.message)}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Pipeline (${d.data.leads.length})</h3>${d.data.leads.map(x => `<p><b>#${x.id}</b> · ${esc(x.status)}<br>${esc(x.project_name || 'General')} · ${esc(x.employee_name || 'Not Assigned')}</p>`).join('') || '<p class="muted">None</p>'}</div><div class="box"><h3>Site visits (${d.data.visits.length})</h3>${d.data.visits.map(x => `<p>${localDate(x.preferred_at)} · ${esc(x.status)}<br>${esc(x.project_name || 'General')}</p>`).join('') || '<p class="muted">None</p>'}</div></div>`;
+    const enqList = d.data.enquiries || [];
+    const leadList = d.data.leads || [];
+    const visitList = d.data.visits || [];
+    const isRepeat = enqList.length > 1 || leadList.length > 1;
+    const repeatNotice = isRepeat 
+      ? `<div style="margin-top:10px; padding:8px 12px; background:#fef3c7; border:1px solid #fde68a; border-radius:6px; color:#92400e; font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;">🔥 <span><b>Repeat Client (${Math.max(enqList.length, leadList.length)} Enquiries):</b> This customer has submitted multiple enquiries or leads across projects. Detailed interaction history is shown below.</span></div>`
+      : '';
+    $('customerContent').innerHTML = `
+      <div class="notice">
+        <b>${esc(u.name)}</b><br>${esc(u.email || 'No email registered')} · ${esc(u.phone || 'No phone registered')}<br>Status: <span class="pill" style="font-size:11px; ${u.status === 'active' ? 'background:#dcfce7; color:#15803d;' : 'background:#fee2e2; color:#b91c1c;'}">${esc(u.status)}</span> · Registered: ${localDate(u.created_at)}
+        ${repeatNotice}
+      </div>
+      <div class="history">
+        <div class="box">
+          <h3 style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Enquiries</span>
+            <span class="pill" style="font-size:11px; ${enqList.length > 1 ? 'background:#fef3c7; color:#92400e; font-weight:700;' : ''}">${enqList.length}</span>
+          </h3>
+          ${enqList.map(x => `
+            <div style="padding:8px 0; border-bottom:1px solid var(--line);">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>${esc(x.enquiry_reference || '')}</b>
+                <span class="pill" style="font-size:10px;">${esc(x.status)}</span>
+              </div>
+              <div style="font-size:12px; color:#0369a1; font-weight:600; margin-top:2px;">📍 ${esc(x.project_name || 'General Inquiry')}</div>
+              <div style="font-size:12px; color:var(--ink-muted); margin-top:2px;">${esc(x.message || '—')}</div>
+              <div style="font-size:11px; color:#94a3b8; margin-top:2px;">Submitted: ${localDate(x.created_at)}</div>
+            </div>
+          `).join('') || '<p class="muted" style="padding:10px 0;">No website enquiries recorded.</p>'}
+        </div>
+        <div class="box">
+          <h3 style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Pipeline Leads</span>
+            <span class="pill" style="font-size:11px; ${leadList.length > 1 ? 'background:#fef3c7; color:#92400e; font-weight:700;' : ''}">${leadList.length}</span>
+          </h3>
+          ${leadList.map(x => `
+            <div style="padding:8px 0; border-bottom:1px solid var(--line);">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>#${x.id}</b>
+                <span class="pill" style="font-size:10px;">${esc(x.status)}</span>
+              </div>
+              <div style="font-size:12px; color:#0369a1; font-weight:600; margin-top:2px;">📍 ${esc(x.project_name || 'General')}</div>
+              <div style="font-size:11px; color:var(--ink-muted); margin-top:2px;">Assigned: ${esc(x.employee_name || 'Not Assigned')}</div>
+              <div style="font-size:11px; color:#94a3b8; margin-top:2px;">Created: ${localDate(x.created_at)}</div>
+            </div>
+          `).join('') || '<p class="muted" style="padding:10px 0;">No active CRM leads.</p>'}
+        </div>
+        <div class="box">
+          <h3 style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Site Visits</span>
+            <span class="pill" style="font-size:11px;">${visitList.length}</span>
+          </h3>
+          ${visitList.map(x => `
+            <div style="padding:8px 0; border-bottom:1px solid var(--line);">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>${localDate(x.preferred_at)}</b>
+                <span class="pill" style="font-size:10px;">${esc(x.status)}</span>
+              </div>
+              <div style="font-size:12px; color:#0369a1; font-weight:600; margin-top:2px;">📍 ${esc(x.project_name || 'General')}</div>
+              ${x.notes ? `<div style="font-size:11px; color:var(--ink-muted); margin-top:2px;">${esc(x.notes)}</div>` : ''}
+            </div>
+          `).join('') || '<p class="muted" style="padding:10px 0;">No site visits scheduled.</p>'}
+        </div>
+      </div>
+    `;
     openModal('customerModal');
   } catch (e) {
     toast(e.message);

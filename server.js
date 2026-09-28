@@ -3370,20 +3370,32 @@ app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
 app.get("/api/admin/users",coordinatorOrAdmin,(req,res)=>{
   const role=clean(req.query.role,30);
   if(role==="all"){
-    return res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users ORDER BY id DESC").all()});
+    return res.json({success:true,data:db.prepare(`
+      SELECT u.id,u.name,u.email,u.phone,u.role,u.status,u.created_at,
+             (SELECT COUNT(DISTINCT id) FROM enquiries e WHERE e.user_id = u.id OR (u.phone <> '' AND e.phone = u.phone) OR (u.email <> '' AND lower(e.email) = lower(u.email))) AS enquiries_count,
+             (SELECT COUNT(DISTINCT id) FROM leads l WHERE l.user_id = u.id OR (u.phone <> '' AND l.phone = u.phone) OR (u.email <> '' AND lower(l.email) = lower(u.email))) AS leads_count
+      FROM users u ORDER BY id DESC
+    `).all()});
   }
   const targetRole=role||"customer";
   if(targetRole==="customer"){
     syncCustomersFromLeads();
   }
-  res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users WHERE role=? ORDER BY id DESC").all(targetRole)});
+  res.json({success:true,data:db.prepare(`
+    SELECT u.id,u.name,u.email,u.phone,u.role,u.status,u.created_at,
+           (SELECT COUNT(DISTINCT id) FROM enquiries e WHERE e.user_id = u.id OR (u.phone <> '' AND e.phone = u.phone) OR (u.email <> '' AND lower(e.email) = lower(u.email))) AS enquiries_count,
+           (SELECT COUNT(DISTINCT id) FROM leads l WHERE l.user_id = u.id OR (u.phone <> '' AND l.phone = u.phone) OR (u.email <> '' AND lower(l.email) = lower(u.email))) AS leads_count
+    FROM users u WHERE u.role=? ORDER BY enquiries_count DESC, leads_count DESC, u.id DESC
+  `).all(targetRole)});
 });
 app.get("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id), user=db.prepare("SELECT id,name,email,phone,role,status,created_at,updated_at FROM users WHERE id=?").get(id);
   if(!user)return res.status(404).json({success:false,error:"Customer not found"});
-  const enquiries=db.prepare(`SELECT e.id,e.enquiry_reference,e.status,e.message,e.admin_response,e.created_at,p.name project_name FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=? ORDER BY e.id DESC`).all(id);
-  const leads=db.prepare(`SELECT l.*,p.name project_name,e.name employee_name FROM leads l LEFT JOIN projects p ON p.id=l.project_id LEFT JOIN employees em ON em.id=l.assigned_employee_id LEFT JOIN users e ON e.id=em.user_id WHERE l.user_id=? ORDER BY l.id DESC`).all(id);
-  const visits=db.prepare(`SELECT v.*,p.name project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE v.user_id=? ORDER BY v.id DESC`).all(id);
+  const safePhone = user.phone || '';
+  const safeEmail = (user.email || '').toLowerCase();
+  const enquiries=db.prepare(`SELECT e.id,e.enquiry_reference,e.status,e.message,e.admin_response,e.created_at,p.name project_name FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=? OR (? <> '' AND e.phone=?) OR (? <> '' AND lower(e.email)=?) ORDER BY e.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
+  const leads=db.prepare(`SELECT l.*,p.name project_name,e.name employee_name FROM leads l LEFT JOIN projects p ON p.id=l.project_id LEFT JOIN employees em ON em.id=l.assigned_employee_id LEFT JOIN users e ON e.id=em.user_id WHERE l.user_id=? OR (? <> '' AND l.phone=?) OR (? <> '' AND lower(l.email)=?) ORDER BY l.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
+  const visits=db.prepare(`SELECT v.*,p.name project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE v.user_id=? OR (? <> '' AND v.phone=?) OR (? <> '' AND lower(v.email)=?) ORDER BY v.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
   res.json({success:true,data:{user,enquiries,leads,visits}});
 });
 app.put("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
