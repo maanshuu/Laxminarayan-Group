@@ -1757,10 +1757,10 @@ textarea {
           <button id="viewBtnKanban" class="view-switch-btn active" onclick="switchLeadView('kanban')">⊞ Board View</button>
           <button id="viewBtnTable" class="view-switch-btn" onclick="switchLeadView('table')">☰ List View</button>
         </div>
-        <select id="leadFilterProject" onchange="renderKanban();" style="max-width:200px; padding:6px 12px; font-size:12.5px;">
+        <select id="leadFilterProject" onchange="applyLeadFilters();" style="max-width:200px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Projects</option>
         </select>
-        <select id="leadFilterPriority" onchange="renderKanban();" style="max-width:160px; padding:6px 12px; font-size:12.5px;">
+        <select id="leadFilterPriority" onchange="applyLeadFilters();" style="max-width:160px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Priorities</option>
           <option value="hot">🔥 Hot Enquiries</option>
           <option value="warm">⚡ Warm Enquiries</option>
@@ -1817,7 +1817,7 @@ textarea {
           </div>
 
           <!-- Hidden synced select element to ensure zero breaking changes to existing scripts -->
-          <select id="leadFilterSource" onchange="syncChannelDropdownUI(); renderKanban(); renderLeadRows();" style="display:none;">
+          <select id="leadFilterSource" onchange="syncChannelDropdownUI(); applyLeadFilters();" style="display:none;">
             <option value="">All Sources</option>
             <option value="instagram">Instagram</option>
             <option value="facebook">Facebook</option>
@@ -1829,7 +1829,7 @@ textarea {
             <option value="walk-in">Site Walk-In</option>
           </select>
         </div>
-        <input id="leadFilterSearch" oninput="renderKanban(); renderLeadRows();" placeholder="Search name, phone, email..." style="max-width:210px; padding:6px 12px; font-size:12.5px;">
+        <input id="leadFilterSearch" oninput="applyLeadFilters();" placeholder="Search name, phone, email..." style="max-width:210px; padding:6px 12px; font-size:12.5px;">
       </div>
       <div class="actions">
         <button class="btn" onclick="exportLeadsCSV()" title="Export all enquiries to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
@@ -1935,7 +1935,7 @@ textarea {
       <div class="panel">
         <div class="toolbar">
           <div>
-            <h2 style="margin:0">Saved enquiries</h2>
+            <h2 style="margin:0; display:inline-flex; align-items:center; gap:8px;">Saved enquiries <span id="leadTableCountBadge" class="pill" style="font-size:11px; font-weight:700; background:#f1f5f9; color:#475569;"></span></h2>
             <p class="muted" style="margin-bottom:0">Saved records are read-only here. Use Edit to load an enquiry into the form above, or click on any card in the Board View to open the 360° Drawer.</p>
           </div>
         </div>
@@ -3358,12 +3358,14 @@ function switchLeadView(mode) {
     if ($('leadKanbanContainer')) $('leadKanbanContainer').style.display = 'flex';
     if ($('leadTableContainer')) $('leadTableContainer').style.display = 'none';
     state.leadViewMode = 'kanban';
+    renderKanban();
   } else {
     if ($('viewBtnTable')) $('viewBtnTable').classList.add('active');
     if ($('viewBtnKanban')) $('viewBtnKanban').classList.remove('active');
     if ($('leadKanbanContainer')) $('leadKanbanContainer').style.display = 'none';
     if ($('leadTableContainer')) $('leadTableContainer').style.display = 'block';
     state.leadViewMode = 'table';
+    renderLeadRows();
   }
 }
 
@@ -3379,8 +3381,7 @@ function setFilterChannel(val) {
   if (sel) {
     sel.value = val;
     syncChannelDropdownUI();
-    renderKanban();
-    renderLeadRows();
+    applyLeadFilters();
   }
   const m = $('channelSelectMenu');
   if (m) m.style.display = 'none';
@@ -3421,23 +3422,41 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function renderKanban() {
+function getFilteredLeads() {
   const pid = $('leadFilterProject')?.value;
   const pri = $('leadFilterPriority')?.value;
   const src = ($('leadFilterSource')?.value || '').toLowerCase().trim();
   const q = ($('leadFilterSearch')?.value || '').toLowerCase().trim();
 
   let list = state.leads || [];
-  if (pid) list = list.filter(l => Number(l.project_id) === Number(pid));
+  if (pid) {
+    const selectedOption = $('leadFilterProject')?.selectedOptions?.[0];
+    const selectedText = selectedOption ? selectedOption.textContent.trim().toLowerCase() : '';
+    list = list.filter(l => {
+      if (l.project_id != null && Number(l.project_id) === Number(pid)) return true;
+      if (selectedText && l.project_name && l.project_name.trim().toLowerCase() === selectedText) return true;
+      return false;
+    });
+  }
   if (pri) list = list.filter(l => (l.sentiment || 'warm') === pri);
   if (src) list = list.filter(l => (l.source || 'website').toLowerCase().includes(src));
   if (q) list = list.filter(l =>
     (l.name && l.name.toLowerCase().includes(q)) ||
     (l.phone && l.phone.toLowerCase().includes(q)) ||
     (l.email && l.email.toLowerCase().includes(q)) ||
-    (l.notes && l.notes.toLowerCase().includes(q))
+    (l.notes && l.notes.toLowerCase().includes(q)) ||
+    (l.project_name && l.project_name.toLowerCase().includes(q))
   );
+  return list;
+}
 
+function applyLeadFilters() {
+  renderKanban();
+  renderLeadRows();
+}
+
+function renderKanban() {
+  const list = getFilteredLeads();
   const stages = ['new', 'contacted', 'qualified', 'site_visit', 'negotiation', 'won', 'lost'];
   const now = new Date();
 
@@ -3487,24 +3506,16 @@ function renderKanban() {
 }
 
 function renderLeadRows() {
-  const pid = $('leadFilterProject')?.value;
-  const pri = $('leadFilterPriority')?.value;
-  const src = ($('leadFilterSource')?.value || '').toLowerCase().trim();
-  const q = ($('leadFilterSearch')?.value || '').toLowerCase().trim();
-
-  let list = state.leads || [];
-  if (pid) list = list.filter(l => Number(l.project_id) === Number(pid));
-  if (pri) list = list.filter(l => (l.sentiment || 'warm') === pri);
-  if (src) list = list.filter(l => (l.source || 'website').toLowerCase().includes(src));
-  if (q) list = list.filter(l =>
-    (l.name && l.name.toLowerCase().includes(q)) ||
-    (l.phone && l.phone.toLowerCase().includes(q)) ||
-    (l.email && l.email.toLowerCase().includes(q)) ||
-    (l.notes && l.notes.toLowerCase().includes(q))
-  );
+  const list = getFilteredLeads();
 
   const tbody = $('leadRows');
   if (!tbody) return;
+
+  const countBadge = $('leadTableCountBadge');
+  if (countBadge) {
+    const totalCount = (state.leads || []).length;
+    countBadge.textContent = list.length === totalCount ? `${list.length} Enquiries` : `${list.length} of ${totalCount} filtered`;
+  }
 
   tbody.innerHTML = list.length ? list.map(x => `
     <tr>
@@ -3540,15 +3551,16 @@ async function loadLeads() {
     const d = await get('/api/admin/leads');
     state.leads = d.data;
 
-    // Populate project filter in lead toolbar
+    // Populate project filter in lead toolbar and preserve user selection
     const leadPFilter = $('leadFilterProject');
     if (leadPFilter) {
+      const currentVal = leadPFilter.value;
       const activeProjects = (state.projects || []).filter(p => p.status === 'active');
       leadPFilter.innerHTML = '<option value="">All Projects</option>' + activeProjects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+      if (currentVal) leadPFilter.value = currentVal;
     }
 
-    renderKanban();
-    renderLeadRows();
+    applyLeadFilters();
   } catch (e) {
     toast(e.message);
   }
