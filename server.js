@@ -210,10 +210,41 @@ function migrateLegacySchema(){
   if(!c.has("source")) db.exec("ALTER TABLE enquiries ADD COLUMN source TEXT NOT NULL DEFAULT 'website'");
   db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_enquiries_reference_unique ON enquiries(enquiry_reference) WHERE enquiry_reference IS NOT NULL AND enquiry_reference <> ''");
   db.prepare("UPDATE enquiries SET enquiry_reference='ENQ-' || printf('%06d',id) WHERE enquiry_reference IS NULL OR enquiry_reference=''").run();
-  db.exec("CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_enquiries_user_id ON enquiries(user_id)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_enquiries_status ON enquiries(status)");
   db.exec("CREATE INDEX IF NOT EXISTS idx_enquiries_project_id ON enquiries(project_id)");
+
+  try {
+    const userTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get()?.sql || "";
+    if (userTableSql && !userTableSql.includes("'coordinator'")) {
+      db.exec(`
+        PRAGMA foreign_keys=OFF;
+        CREATE TABLE users_temp (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          email TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
+          phone TEXT NOT NULL DEFAULT '',
+          password_hash TEXT NOT NULL,
+          role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','admin','employee','coordinator','manager')),
+          status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','suspended')),
+          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          session_version INTEGER NOT NULL DEFAULT 0
+        );
+        INSERT INTO users_temp(id, name, email, phone, password_hash, role, status, created_at, updated_at, session_version)
+          SELECT id, name, email, phone, password_hash, role, status, created_at, updated_at, COALESCE(session_version, 0) FROM users;
+        DROP TABLE users;
+        ALTER TABLE users_temp RENAME TO users;
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_unique ON users(email) WHERE email <> '';
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_users_phone_unique ON users(phone) WHERE phone <> '';
+        CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
+        PRAGMA foreign_keys=ON;
+      `);
+      console.log("[Migration] users table CHECK constraint successfully upgraded to support coordinator and manager roles.");
+    }
+  } catch (err) {
+    console.error("[Migration Error] Failed upgrading users table:", err);
+  }
 }
 migrateLegacySchema();
 
@@ -1726,7 +1757,26 @@ app.post("/api/admin/employees",admin,(req,res)=>{
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120),password=String(req.body.password||"");
   const role=(req.body.role==='coordinator'||req.body.role==='manager')?'coordinator':'employee';
   if(name.length<2||!validEmail(email)||!passwordOk(password))return res.status(400).json({success:false,error:"Enter name, valid email and a password of 8–128 characters"});
-  if(db.prepare("SELECT id FROM users WHERE email=?").get(email))return res.status(409).json({success:false,error:"An account with this email already exists"});
+  
+  const existingUser = db.prepare("SELECT * FROM users WHERE email=?").get(email);
+  if(existingUser) {
+    const existingEmp = db.prepare("SELECT id FROM employees WHERE user_id=?").get(existingUser.id);
+    if(existingEmp) {
+      return res.status(409).json({success:false,error:`An account with email '${email}' already exists as team member #${existingEmp.id}. Use 'Edit' below to update their role.`});
+    } else {
+      // Existing user registered as customer or web account - upgrade them to team role
+      const tx = db.transaction(() => {
+        db.prepare("UPDATE users SET name=?, phone=?, role=?, password_hash=?, status='active', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name, phone || existingUser.phone, role, bcrypt.hashSync(password, 12), existingUser.id);
+        const code = `EMP-${String(existingUser.id).padStart(4,"0")}`;
+        const e = db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(existingUser.id, code, department, designation);
+        return e.lastInsertRowid;
+      });
+      const id = tx();
+      audit(req, "create", "employee", id, `${name} (activated as ${role})`);
+      return res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id WHERE e.id=?`).get(id)});
+    }
+  }
+
   if(phone && db.prepare("SELECT id FROM users WHERE phone=?").get(phone))return res.status(409).json({success:false,error:"An account with this phone number already exists"});
   const tx=db.transaction(()=>{const u=db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run(name,email,phone,bcrypt.hashSync(password,12),role,"active"); const code=`EMP-${String(u.lastInsertRowid).padStart(4,"0")}`; const e=db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(u.lastInsertRowid,code,department,designation); return e.lastInsertRowid;});
   const id=tx(); audit(req,"create","employee",id,name); res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id WHERE e.id=?`).get(id)});
@@ -1761,7 +1811,7 @@ app.delete("/api/admin/employees/:id",admin,(req,res)=>{
   if(!row)return res.status(404).json({success:false,error:"Team member not found"});
   const assigned=db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=?").get(id).c;
   if(assigned)return res.status(409).json({success:false,error:"This team member has assigned leads. Reassign those leads before deletion, or deactivate the account."});
-  db.transaction(()=>{db.prepare("DELETE FROM employees WHERE id=?").run(id);db.prepare("DELETE FROM users WHERE id=? AND role='employee'").run(row.user_id)})();
+  db.transaction(()=>{db.prepare("DELETE FROM employees WHERE id=?").run(id);db.prepare("DELETE FROM users WHERE id=? AND role IN ('employee','coordinator','manager')").run(row.user_id)})();
   audit(req,"delete","employee",id,`Employee deleted: ${row.name}`); res.json({success:true});
 });
 

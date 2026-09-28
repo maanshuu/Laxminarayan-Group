@@ -2320,7 +2320,7 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
         </select>
         <input id="tDepartment" placeholder="Department">
         <input id="tDesignation" placeholder="Designation">
-        <input id="tPassword" type="password" minlength="8" placeholder="Password (new account / optional on edit)">
+        <input id="tPassword" type="password" minlength="8" placeholder="Password (min 8 chars required for new account)">
         <div class="span2 actions">
           <button class="btn primary" type="submit" id="teamSubmit">Create team account</button>
           <button class="btn" type="button" onclick="resetTeamForm()">Clear</button>
@@ -5264,37 +5264,61 @@ function resetTeamForm() {
   $('tDepartment').value = '';
   $('tDesignation').value = '';
   $('tPassword').value = '';
+  if ($('tPassword')) {
+    $('tPassword').required = true;
+    $('tPassword').placeholder = 'Password (min 8 chars required for new account)';
+  }
   $('teamSubmit').textContent = 'Create team account';
+  $('teamSubmit').disabled = false;
   $('teamMsg').textContent = '';
+  $('teamMsg').style.color = '';
 }
 
 if ($('teamForm')) {
   $('teamForm').onsubmit = async e => {
     e.preventDefault();
     const id = $('tId').value;
+    const btn = $('teamSubmit');
+    const origText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = id ? 'Updating account...' : 'Creating account...';
+    $('teamMsg').textContent = '';
+    $('teamMsg').style.color = '';
+
     const body = {
-      name: $('tName').value,
-      email: $('tEmail').value,
-      phone: $('tPhone').value,
+      name: $('tName').value.trim(),
+      email: $('tEmail').value.trim(),
+      phone: $('tPhone').value.trim(),
       role: $('tRole') ? $('tRole').value : 'employee',
-      department: $('tDepartment').value,
-      designation: $('tDesignation').value
+      department: $('tDepartment').value.trim(),
+      designation: $('tDesignation').value.trim()
     };
     try {
       if (id) {
+        if ($('tPassword').value.trim()) {
+          body.password = $('tPassword').value.trim();
+        }
         await send('/api/admin/employees/' + id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         toast('Team member updated');
       } else {
-        body.password = $('tPassword').value;
+        body.password = $('tPassword').value.trim();
+        if (!body.password || body.password.length < 8) {
+          throw new Error('Please enter a password of at least 8 characters for this new account.');
+        }
         await send('/api/admin/employees', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        toast('Team account created');
+        toast('Team account created successfully');
       }
       resetTeamForm();
-      loadTeam();
-      loadLeads();
+      await loadTeam();
+      await loadLeads();
     } catch (err) {
       $('teamMsg').textContent = err.message;
+      $('teamMsg').style.color = '#dc2626';
+      $('teamMsg').style.fontWeight = '700';
       toast(err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = id ? 'Save team member' : 'Create team account';
     }
   };
 }
@@ -5326,8 +5350,13 @@ async function editTeam(id) {
   $('tDepartment').value = x.department || '';
   $('tDesignation').value = x.designation || '';
   $('tPassword').value = '';
+  if ($('tPassword')) {
+    $('tPassword').required = false;
+    $('tPassword').placeholder = 'Password (leave blank to keep current)';
+  }
   $('teamSubmit').textContent = 'Save team member';
   $('teamMsg').textContent = 'Editing ' + x.name;
+  $('teamMsg').style.color = '#0284c7';
   showView('teamView');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
