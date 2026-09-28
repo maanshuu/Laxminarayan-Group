@@ -598,7 +598,7 @@ async function handleVerifyOtp(e) {
     clearInterval(timerInterval);
     btn.textContent = "AUTHENTICATED ✓";
 
-    if (d.user.role === "admin") location.href = "admin.html";
+    if (d.user.role === "admin" || d.user.role === "coordinator" || d.user.role === "manager") location.href = "admin.html";
     else if (d.user.role === "employee") location.href = "advisor.html";
     else location.href = safeTarget || "dashboard.html";
 
@@ -647,7 +647,7 @@ async function handlePassLogin(e) {
     }
     if (!r.ok || !d.success) throw new Error(d.error || "Incorrect email/phone or password");
 
-    if (d.user.role === "admin") location.href = "admin.html";
+    if (d.user.role === "admin" || d.user.role === "coordinator" || d.user.role === "manager") location.href = "admin.html";
     else if (d.user.role === "employee") location.href = "advisor.html";
     else location.href = safeTarget || "dashboard.html";
   } catch (err) {

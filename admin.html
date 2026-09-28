@@ -1566,6 +1566,24 @@ textarea {
   .top { flex-direction: column; align-items: flex-start; }
   .tabs { border-radius: var(--radius-md); }
 }
+
+/* ─── ROLE-BASED ACCESS CONTROL: SALES COORDINATOR ─── */
+body.role-coordinator .danger,
+body.role-coordinator button[onclick*="delete"],
+body.role-coordinator button[onclick*="Delete"],
+body.role-coordinator [data-admin-only="true"],
+body.role-coordinator .tab[data-view="attendanceView"],
+body.role-coordinator .tab[data-view="auditView"],
+body.role-coordinator .tab[data-view="teamView"],
+body.role-coordinator #attendanceView,
+body.role-coordinator #auditView,
+body.role-coordinator #teamView,
+body.role-coordinator .team-snapshot-panel,
+body.role-coordinator .attendance-mini,
+body.role-coordinator #leadModalDeleteBtn,
+body.role-coordinator [onclick*="openIntegrationModal"] {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -1579,7 +1597,7 @@ textarea {
       <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
     </div>
     <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
-    <span class="top-status-badge" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
+    <span class="top-status-badge" data-admin-only="true" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
   </div>
   <div class="top-actions-flex">
     <a href="index.html" class="top-link">← Website</a>
@@ -1596,7 +1614,7 @@ textarea {
       <p id="pageSubtitle" class="muted" style="margin-top:0">High-level pulse of projects, sales pipeline, and site operations.</p>
     </div>
     <div class="actions">
-      <button class="btn" onclick="openIntegrationModal()" title="View live SMTP and WhatsApp status or dispatch a test email">⚡ Email & WA Diagnostics</button>
+      <button class="btn" data-admin-only="true" onclick="openIntegrationModal()" title="View live SMTP and WhatsApp status or dispatch a test email">⚡ Email & WA Diagnostics</button>
       <button class="btn" onclick="refreshAll()">Refresh</button>
     </div>
   </div>
@@ -1612,7 +1630,7 @@ textarea {
     <div class="stat"><strong id="statAvailable">23</strong>Available units</div>
     <div class="stat"><strong id="statSold">0</strong>Sold / Booked</div>
     <div class="stat"><strong id="statBookings">0</strong>Bookings</div>
-    <div class="stat"><strong id="employees">0</strong>Team active</div>
+    <div class="stat" data-admin-only="true"><strong id="employees">0</strong>Team active</div>
     <div class="stat"><strong id="projects">0</strong>Active projects</div>
     <div class="stat"><strong id="new">0</strong>New today</div>
   </div>
@@ -1723,7 +1741,7 @@ textarea {
       </table>
     </div>
 
-    <div class="recent-panel">
+    <div class="recent-panel" data-admin-only="true">
       <div class="panel" style="margin-top:16px">
         <div class="toolbar">
           <div>
@@ -1733,7 +1751,7 @@ textarea {
         </div>
         <div id="recentActivity" class="activity-list"></div>
       </div>
-      <div class="panel" style="margin-top:16px">
+      <div class="panel team-snapshot-panel" style="margin-top:16px">
         <div class="toolbar">
           <div>
             <h2 style="margin:0">Today’s team snapshot</h2>
@@ -2287,6 +2305,7 @@ textarea {
       <div style="display:flex; align-items:center; gap:8px; margin:10px 0 14px; flex-wrap:wrap;">
         <span style="font-size:12px; font-weight:600; color:#64748b;">⚡ Quick Role Templates:</span>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Sales Advisor')">+ Sales Advisor</button>
+        <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Sales Coordinator')">+ Sales Coordinator</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Site Relationship Manager')">+ Relationship Manager</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Project Engineer')">+ Project Engineer</button>
       </div>
@@ -2295,6 +2314,10 @@ textarea {
         <input id="tName" required placeholder="Full name">
         <input id="tEmail" required type="email" placeholder="Email">
         <input id="tPhone" placeholder="Phone">
+        <select id="tRole" style="padding:10px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; background:#fff;">
+          <option value="employee">Sales Advisor (Field / Advisor Portal)</option>
+          <option value="coordinator">Sales Coordinator (CRM Operations & Coordination)</option>
+        </select>
         <input id="tDepartment" placeholder="Department">
         <input id="tDesignation" placeholder="Designation">
         <input id="tPassword" type="password" minlength="8" placeholder="Password (new account / optional on edit)">
@@ -3090,7 +3113,45 @@ const VIEW_METADATA = {
   }
 };
 
+function applyRolePermissions(user) {
+  if (!user) return;
+  const isCoordinator = user.role === 'coordinator' || user.role === 'manager';
+  if (isCoordinator) {
+    document.body.classList.add('role-coordinator');
+    const tabsToHide = ['attendanceView', 'auditView', 'teamView'];
+    tabsToHide.forEach(viewId => {
+      const tabBtn = document.querySelector(`.tab[data-view="${viewId}"]`);
+      if (tabBtn) tabBtn.style.display = 'none';
+      const viewEl = document.getElementById(viewId);
+      if (viewEl) viewEl.style.display = 'none';
+    });
+
+    document.querySelectorAll('[data-admin-only="true"], button[onclick*="openIntegrationModal"], span[onclick*="openIntegrationModal"]').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    document.querySelectorAll('.attendance-mini, .team-snapshot-panel').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    const subTitle = document.querySelector('.top-sub');
+    if (subTitle) {
+      subTitle.textContent = 'COORDINATOR CRM · COMMAND CENTER';
+      subTitle.style.color = '#38bdf8';
+    }
+
+    document.querySelectorAll('.danger, button[onclick*="delete"], button[onclick*="Delete"], #leadModalDeleteBtn').forEach(el => {
+      el.style.display = 'none';
+    });
+  }
+}
+
 function showView(id) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    if (id === 'attendanceView' || id === 'auditView' || id === 'teamView') {
+      id = 'overview';
+    }
+  }
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x.dataset.view === id));
   const view = $(id);
@@ -3105,6 +3166,11 @@ function showView(id) {
 }
 
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    if (b.dataset.view === 'attendanceView' || b.dataset.view === 'auditView' || b.dataset.view === 'teamView') {
+      return;
+    }
+  }
   showView(b.dataset.view);
   if (b.dataset.view === 'reportsView') loadReports();
   if (b.dataset.view === 'auditView') loadAudit();
@@ -3130,6 +3196,10 @@ function openModal(id) {
 
 async function load() {
   const d = await get('/api/admin/dashboard');
+  state.currentUser = d.currentUser || null;
+  applyRolePermissions(state.currentUser);
+  const isCoordinator = state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager');
+
   if ($('users')) $('users').textContent = d.stats.users;
   if ($('enq')) $('enq').textContent = d.stats.enquiries;
   if ($('new')) $('new').textContent = d.stats.newEnquiries;
@@ -3144,10 +3214,12 @@ async function load() {
   if ($('statBookings')) $('statBookings').textContent = d.stats.bookings || 0;
   if ($('heroOpenLeads')) $('heroOpenLeads').textContent = d.stats.openLeads;
   if ($('heroNewEnquiries')) $('heroNewEnquiries').textContent = d.stats.newEnquiries;
-  if ($('attPresent')) $('attPresent').textContent = d.stats.attendance.present;
-  if ($('attAbsent')) $('attAbsent').textContent = d.stats.attendance.absent;
-  if ($('attLeave')) $('attLeave').textContent = d.stats.attendance.leave;
-  if ($('attHalf')) $('attHalf').textContent = d.stats.attendance.half_day;
+  if (!isCoordinator) {
+    if ($('attPresent')) $('attPresent').textContent = d.stats.attendance.present;
+    if ($('attAbsent')) $('attAbsent').textContent = d.stats.attendance.absent;
+    if ($('attLeave')) $('attLeave').textContent = d.stats.attendance.leave;
+    if ($('attHalf')) $('attHalf').textContent = d.stats.attendance.half_day;
+  }
 
   // Speed-to-lead Action Pulse Banner
   if ($('speedAlertBanner') && $('speedAlertText')) {
@@ -3166,18 +3238,24 @@ async function load() {
     }
   }
 
-  renderRecentActivity(d.stats.recent);
-  if ($('teamSnapshotText')) {
-    $('teamSnapshotText').textContent = `${d.stats.attendance.present} present · ${d.stats.attendance.absent} absent · ${d.stats.attendance.leave} on leave · ${d.stats.attendance.half_day} half day`;
+  if (!isCoordinator) {
+    renderRecentActivity(d.stats.recent);
+    if ($('teamSnapshotText')) {
+      $('teamSnapshotText').textContent = `${d.stats.attendance.present} present · ${d.stats.attendance.absent} absent · ${d.stats.attendance.leave} on leave · ${d.stats.attendance.half_day} half day`;
+    }
   }
 
   try {
     const [t] = await Promise.all([get('/api/admin/employees')]);
     state.employees = t.data;
-    fillAttendanceEmployeeSelect();
+    if (!isCoordinator) fillAttendanceEmployeeSelect();
   } catch (e) {}
 
-  await Promise.all([loadEnquiries(), loadTeam(), loadCustomers(), loadProjects()]);
+  if (isCoordinator) {
+    await Promise.all([loadEnquiries(), loadCustomers(), loadProjects()]);
+  } else {
+    await Promise.all([loadEnquiries(), loadTeam(), loadCustomers(), loadProjects()]);
+  }
   await Promise.all([loadLeads(), loadVisits(), loadUnits(), loadBookings()]);
 }
 
@@ -3321,6 +3399,10 @@ async function loadEnquiries() {
 }
 
 async function deleteEnquiry(id, name) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete enquiries.');
+    return;
+  }
   if (!confirm(`Are you sure you want to delete enquiry from "${name || 'this contact'}"?`)) return;
   try {
     const res = await send(`/api/admin/enquiries/${id}`, { method: 'DELETE' });
@@ -3907,6 +3989,10 @@ if ($('leadFormInline')) {
 }
 
 async function deleteLead(id) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete enquiries.');
+    return;
+  }
   const lead = (state.leads || []).find(l => Number(l.id) === Number(id));
   const leadName = lead ? `"${lead.name}" (#${id})` : `#${id}`;
   if (!confirm(`Delete enquiry for ${leadName}?\n\nThis cannot be undone. If this is an accidental or duplicate walk-in, click OK to remove it.`)) return;
@@ -3921,6 +4007,10 @@ async function deleteLead(id) {
 }
 
 async function deleteLeadFromDrawer() {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete enquiries.');
+    return;
+  }
   if (!state.currentDrawerLead) return;
   const lead = state.currentDrawerLead;
   if (!confirm(`Delete enquiry for "${lead.name || 'Customer'}" (#${lead.id})?\n\nThis cannot be undone. If this is an accidental or duplicate walk-in, click OK to remove it.`)) return;
@@ -4304,6 +4394,10 @@ function editUnit(id) {
 }
 
 async function deleteUnit(id, unitNum) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete units.');
+    return;
+  }
   if (!confirm(`Delete unit ${unitNum || id}?`)) return;
   try {
     await send('/api/admin/units/' + id, { method: 'DELETE' });
@@ -4466,6 +4560,10 @@ if ($('bookingForm')) {
 }
 
 async function deleteBooking(id, ref) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete bookings.');
+    return;
+  }
   if (!confirm(`Delete booking ${ref || ('#' + id)}?`)) return;
   try {
     await send('/api/admin/bookings/' + id, { method: 'DELETE' });
@@ -4671,6 +4769,10 @@ async function loadVisits() {
 }
 
 async function deleteVisit(id) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete site visits.');
+    return;
+  }
   if (!confirm('Delete this site visit?')) return;
   try {
     await send('/api/admin/site-visits/' + id, { method: 'DELETE' });
@@ -5069,6 +5171,10 @@ async function deleteProjectMedia(mediaId) {
 
 // ─── SAFE DELETE & ARCHIVE MODAL ───
 function openDeleteProjectModal(id) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete projects.');
+    return;
+  }
   deletingProjectId = id;
   const p = state.projects.find(x => Number(x.id) === Number(id));
   if (!p) return;
@@ -5154,6 +5260,7 @@ function resetTeamForm() {
   $('tName').value = '';
   $('tEmail').value = '';
   $('tPhone').value = '';
+  if ($('tRole')) $('tRole').value = 'employee';
   $('tDepartment').value = '';
   $('tDesignation').value = '';
   $('tPassword').value = '';
@@ -5169,6 +5276,7 @@ if ($('teamForm')) {
       name: $('tName').value,
       email: $('tEmail').value,
       phone: $('tPhone').value,
+      role: $('tRole') ? $('tRole').value : 'employee',
       department: $('tDepartment').value,
       designation: $('tDesignation').value
     };
@@ -5195,7 +5303,12 @@ async function loadTeam() {
   try {
     const d = await get('/api/admin/employees');
     state.employees = d.data;
-    $('teamRows').innerHTML = d.data.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`).join('') || '<tr><td colspan="7" class="empty">No team members yet.</td></tr>';
+    $('teamRows').innerHTML = d.data.map(x => {
+      const roleBadge = (x.role === 'coordinator' || x.role === 'manager')
+        ? '<span class="pill" style="background:#e0e7ff; color:#4338ca; border-color:#c7d2fe;">Coordinator</span>'
+        : (x.role === 'admin' ? '<span class="pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">Admin</span>' : '<span class="pill">Advisor</span>');
+      return `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}<br>${roleBadge}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`;
+    }).join('') || '<tr><td colspan="7" class="empty">No team members yet.</td></tr>';
   } catch (e) {
     toast(e.message);
   }
@@ -5209,6 +5322,7 @@ async function editTeam(id) {
   $('tName').value = x.name || '';
   $('tEmail').value = x.email || '';
   $('tPhone').value = x.phone || '';
+  if ($('tRole')) $('tRole').value = (x.role === 'coordinator' || x.role === 'manager') ? 'coordinator' : 'employee';
   $('tDepartment').value = x.department || '';
   $('tDesignation').value = x.designation || '';
   $('tPassword').value = '';
@@ -5230,6 +5344,10 @@ async function toggleEmployee(id, status) {
 }
 
 async function deleteEmployee(id, name) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete team members.');
+    return;
+  }
   if (!confirm(`Delete ${name}?`)) return;
   try {
     await send('/api/admin/employees/' + id, { method: 'DELETE' });
@@ -5561,6 +5679,10 @@ async function toggleUser(id, status) {
 }
 
 async function deleteCustomer(id, name) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+    toast('Access Denied: Coordinators do not have permission to delete customers.');
+    return;
+  }
   if (!confirm(`Permanently delete customer ${name}?`)) return;
   if (!confirm('Their historical enquiries and site visits will remain but become unlinked. Continue?')) return;
   try {
@@ -5793,13 +5915,20 @@ function exportTeamCSV() {
 
 function prefillAdvisorRole(roleName) {
   resetTeamForm();
-  if (roleName === 'Sales Advisor') {
+  if (roleName === 'Sales Coordinator') {
+    if ($('tRole')) $('tRole').value = 'coordinator';
+    $('tDepartment').value = 'Sales Operations';
+    $('tDesignation').value = 'Sales Coordinator';
+  } else if (roleName === 'Sales Advisor') {
+    if ($('tRole')) $('tRole').value = 'employee';
     $('tDepartment').value = 'Sales & CRM';
     $('tDesignation').value = 'Senior Sales Advisor';
   } else if (roleName === 'Site Relationship Manager') {
+    if ($('tRole')) $('tRole').value = 'employee';
     $('tDepartment').value = 'Site Operations';
     $('tDesignation').value = 'Relationship Manager';
   } else if (roleName === 'Project Engineer') {
+    if ($('tRole')) $('tRole').value = 'employee';
     $('tDepartment').value = 'Site Engineering';
     $('tDesignation').value = 'Project Quality Engineer';
   }

@@ -606,25 +606,34 @@ function admin(req,res,next){auth(req,res,()=>{
  if(u.role!=="admin")return res.status(403).json({success:false,error:"Admin access required"});
  next();
 })}
+function coordinatorOrAdmin(req,res,next){auth(req,res,()=>{
+ const u=db.prepare("SELECT status,role,name,email FROM users WHERE id=?").get(req.user.id);
+ if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
+ if(u.role!=="admin" && u.role!=="coordinator" && u.role!=="manager")return res.status(403).json({success:false,error:"Coordinator or admin access required"});
+ req.user.role=u.role;
+ req.user.name=u.name;
+ req.user.email=u.email;
+ next();
+})}
 function employeeOrAdmin(req,res,next){auth(req,res,()=>{
  const u=db.prepare("SELECT status,role FROM users WHERE id=?").get(req.user.id);
  if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
- if(u.role!=="admin" && u.role!=="employee")return res.status(403).json({success:false,error:"Advisor or admin access required"});
+ if(u.role!=="admin" && u.role!=="employee" && u.role!=="coordinator" && u.role!=="manager")return res.status(403).json({success:false,error:"Advisor or admin access required"});
  req.user.role=u.role;
  next();
 })}
 function currentEmployee(userId){
   if(!userId) return null;
-  let emp = db.prepare("SELECT e.*, u.name, u.email, u.phone FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
+  let emp = db.prepare("SELECT e.*, u.name, u.email, u.phone, u.role FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
   if(!emp){
     const u = db.prepare("SELECT id, name, email, phone, role FROM users WHERE id=?").get(userId);
-    if(u && (u.role === 'admin' || u.role === 'employee')){
+    if(u && (u.role === 'admin' || u.role === 'employee' || u.role === 'coordinator' || u.role === 'manager')){
       const code = u.role === 'admin' ? 'EMP-0001' : `EMP-${String(u.id).padStart(4, '0')}`;
-      const desig = u.role === 'admin' ? 'Principal Administrator' : 'Sales Advisor';
-      const dept = u.role === 'admin' ? 'Executive Leadership' : 'Sales & Advisory';
+      const desig = u.role === 'admin' ? 'Principal Administrator' : (u.role === 'coordinator' ? 'Sales Coordinator' : 'Sales Advisor');
+      const dept = u.role === 'admin' ? 'Executive Leadership' : (u.role === 'coordinator' ? 'Sales Operations' : 'Sales & Advisory');
       try {
         db.prepare("INSERT OR IGNORE INTO employees(user_id, employee_code, department, designation, joined_at) VALUES(?, ?, ?, ?, CURRENT_TIMESTAMP)").run(u.id, code, dept, desig);
-        emp = db.prepare("SELECT e.*, u.name, u.email, u.phone FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
+        emp = db.prepare("SELECT e.*, u.name, u.email, u.phone, u.role FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
       } catch(_) {}
     }
   }
@@ -1133,7 +1142,7 @@ app.post("/api/admin/trigger-daily-digest", admin, async (req, res) => {
 });
 
 // ---------------- Production CRM administration ----------------
-app.post("/api/admin/leads",admin,(req,res)=>{
+app.post("/api/admin/leads",coordinatorOrAdmin,(req,res)=>{
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase();
   const source=clean(req.body.source,80)||"admin",status=clean(req.body.status,30)||"new",notes=clean(req.body.notes,4000);
   const projectId=req.body.project_id?Number(req.body.project_id):null;
@@ -1218,12 +1227,12 @@ app.delete("/api/admin/leads/:id", admin, (req, res) => {
   audit(req, "delete", "lead", id, `Enquiry deleted: #${id} ${existing.name} (${existing.phone || 'no phone'})`);
   res.json({ success: true, message: `Enquiry #${id} deleted successfully` });
 });
-app.get("/api/admin/site-visits",admin,(req,res)=>{
+app.get("/api/admin/site-visits",coordinatorOrAdmin,(req,res)=>{
   const status=clean(req.query.status,30);
   const sql=`SELECT v.*,p.name AS project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id ${status?"WHERE v.status=?":""} ORDER BY datetime(v.preferred_at) ASC`;
   res.json({success:true,data:(status?db.prepare(sql).all(status):db.prepare(sql).all())});
 });
-app.post("/api/admin/site-visits",admin,(req,res)=>{
+app.post("/api/admin/site-visits",coordinatorOrAdmin,(req,res)=>{
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase();
   const preferred=clean(req.body.preferred_at,50),status=clean(req.body.status,30)||"requested",notes=clean(req.body.notes,2000),adminNotes=clean(req.body.admin_notes,3000);
   const projectId=req.body.project_id?Number(req.body.project_id):null,userId=req.body.user_id?Number(req.body.user_id):null,enquiryId=req.body.enquiry_id?Number(req.body.enquiry_id):null;
@@ -1241,7 +1250,7 @@ app.post("/api/admin/site-visits",admin,(req,res)=>{
   audit(req,"create","site_visit",r.lastInsertRowid,`${name} · ${preferred}`);
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM site_visits WHERE id=?").get(r.lastInsertRowid)});
 });
-app.put("/api/admin/site-visits/:id",admin,(req,res)=>{
+app.put("/api/admin/site-visits/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM site_visits WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Site visit not found"});
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),preferred=clean(req.body.preferred_at,50);
@@ -1265,7 +1274,7 @@ app.delete("/api/admin/site-visits/:id",admin,(req,res)=>{
   db.prepare("DELETE FROM site_visits WHERE id=?").run(id); audit(req,"delete","site_visit",id,"Site visit deleted"); res.json({success:true});
 });
 
-app.get("/api/admin/leads",admin,(req,res)=>{
+app.get("/api/admin/leads",coordinatorOrAdmin,(req,res)=>{
   const rows=db.prepare(`SELECT l.*,p.name AS project_name,pu.unit_number,e.employee_code,eu.name AS employee_name
     FROM leads l
     LEFT JOIN projects p ON p.id=l.project_id
@@ -1274,7 +1283,7 @@ app.get("/api/admin/leads",admin,(req,res)=>{
     LEFT JOIN users eu ON eu.id=e.user_id ORDER BY l.id DESC`).all();
   res.json({success:true,data:rows});
 });
-app.patch("/api/admin/leads/:id",admin,(req,res)=>{
+app.patch("/api/admin/leads/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM leads WHERE id=?").get(id); if(!existing)return res.status(404).json({success:false,error:"Lead not found"});
   const allowed=["new","contacted","qualified","site_visit","negotiation","won","lost"];
   const status=clean(req.body.status,30)||existing.status; if(!allowed.includes(status))return res.status(400).json({success:false,error:"Invalid lead status"});
@@ -1297,7 +1306,7 @@ app.patch("/api/admin/leads/:id",admin,(req,res)=>{
 });
 
 // Convert an enquiry directly to a qualified lead
-app.post("/api/admin/enquiries/:id/convert",admin,(req,res)=>{
+app.post("/api/admin/enquiries/:id/convert",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id);
   const enq=db.prepare("SELECT * FROM enquiries WHERE id=?").get(id);
   if(!enq) return res.status(404).json({success:false,error:"Enquiry not found"});
@@ -1316,7 +1325,7 @@ app.post("/api/admin/enquiries/:id/convert",admin,(req,res)=>{
 });
 
 // ---------------- Enterprise PropTech: Project Unit Inventory ----------------
-app.get("/api/admin/units",admin,(req,res)=>{
+app.get("/api/admin/units",coordinatorOrAdmin,(req,res)=>{
   const projectId=req.query.project_id?Number(req.query.project_id):null;
   const status=clean(req.query.status,20);
   const search=clean(req.query.search,100).toLowerCase();
@@ -1370,7 +1379,7 @@ app.put("/api/admin/units/:id",admin,(req,res)=>{
   res.json({success:true,data:db.prepare("SELECT u.*,p.name AS project_name FROM project_units u LEFT JOIN projects p ON p.id=u.project_id WHERE u.id=?").get(id)});
 });
 
-app.patch("/api/admin/units/:id/status",admin,(req,res)=>{
+app.patch("/api/admin/units/:id/status",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id);
   const existing=db.prepare("SELECT * FROM project_units WHERE id=?").get(id);
   if(!existing) return res.status(404).json({success:false,error:"Unit not found"});
@@ -1393,7 +1402,7 @@ app.delete("/api/admin/units/:id",admin,(req,res)=>{
 });
 
 // ---------------- Enterprise PropTech: Bookings & Deal Closures ----------------
-app.get("/api/admin/bookings",admin,(req,res)=>{
+app.get("/api/admin/bookings",coordinatorOrAdmin,(req,res)=>{
   const rows=db.prepare(`SELECT b.*,p.name AS project_name,pu.unit_number,pu.unit_type,u.name AS user_name,u.email AS user_email
     FROM bookings b
     LEFT JOIN projects p ON p.id=b.project_id
@@ -1403,7 +1412,7 @@ app.get("/api/admin/bookings",admin,(req,res)=>{
   res.json({success:true,data:rows});
 });
 
-app.post("/api/admin/bookings",admin,(req,res)=>{
+app.post("/api/admin/bookings",coordinatorOrAdmin,(req,res)=>{
   const projectId=Number(req.body.project_id);
   const unitId=req.body.unit_id?Number(req.body.unit_id):null;
   const leadId=req.body.lead_id?Number(req.body.lead_id):null;
@@ -1460,7 +1469,7 @@ app.post("/api/admin/bookings",admin,(req,res)=>{
   res.status(201).json({success:true,data:createdRecord});
 });
 
-app.put("/api/admin/bookings/:id",admin,(req,res)=>{
+app.put("/api/admin/bookings/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id);
   const existing=db.prepare("SELECT * FROM bookings WHERE id=?").get(id);
   if(!existing) return res.status(404).json({success:false,error:"Booking not found"});
@@ -1491,7 +1500,7 @@ app.delete("/api/admin/bookings/:id",admin,(req,res)=>{
   res.json({success:true});
 });
 
-app.get("/api/admin/bookings/:id/allotment-letter", admin, (req, res) => {
+app.get("/api/admin/bookings/:id/allotment-letter", coordinatorOrAdmin, (req, res) => {
   const id = Number(req.params.id);
   const booking = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type
     FROM bookings b
@@ -1509,7 +1518,7 @@ app.get("/api/admin/bookings/:id/allotment-letter", admin, (req, res) => {
 });
 
 // ─── SEND OFFICIAL ALLOTMENT LETTER & PDF ATTACHMENT VIA EMAIL ───
-app.post("/api/admin/bookings/:id/send-email", admin, async (req, res) => {
+app.post("/api/admin/bookings/:id/send-email", coordinatorOrAdmin, async (req, res) => {
   const id = Number(req.params.id);
   const booking = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type
     FROM bookings b
@@ -1698,7 +1707,7 @@ app.post("/api/webhooks/meta-leads", (req, res) => {
   }
 });
 
-app.patch("/api/admin/site-visits/:id",admin,(req,res)=>{
+app.patch("/api/admin/site-visits/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id);
   const existing=db.prepare("SELECT * FROM site_visits WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Site visit not found"});
@@ -1712,23 +1721,32 @@ app.patch("/api/admin/site-visits/:id",admin,(req,res)=>{
   res.json({success:true,data:saved});
 });
 
-app.get("/api/admin/employees",admin,(req,res)=>res.json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id ORDER BY e.id DESC`).all()}));
+app.get("/api/admin/employees",coordinatorOrAdmin,(req,res)=>res.json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id ORDER BY e.id DESC`).all()}));
 app.post("/api/admin/employees",admin,(req,res)=>{
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120),password=String(req.body.password||"");
+  const role=(req.body.role==='coordinator'||req.body.role==='manager')?'coordinator':'employee';
   if(name.length<2||!validEmail(email)||!passwordOk(password))return res.status(400).json({success:false,error:"Enter name, valid email and a password of 8–128 characters"});
   if(db.prepare("SELECT id FROM users WHERE email=?").get(email))return res.status(409).json({success:false,error:"An account with this email already exists"});
   if(phone && db.prepare("SELECT id FROM users WHERE phone=?").get(phone))return res.status(409).json({success:false,error:"An account with this phone number already exists"});
-  const tx=db.transaction(()=>{const u=db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run(name,email,phone,bcrypt.hashSync(password,12),"employee","active"); const code=`EMP-${String(u.lastInsertRowid).padStart(4,"0")}`; const e=db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(u.lastInsertRowid,code,department,designation); return e.lastInsertRowid;});
-  const id=tx(); audit(req,"create","employee",id,name); res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id WHERE e.id=?`).get(id)});
+  const tx=db.transaction(()=>{const u=db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run(name,email,phone,bcrypt.hashSync(password,12),role,"active"); const code=`EMP-${String(u.lastInsertRowid).padStart(4,"0")}`; const e=db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(u.lastInsertRowid,code,department,designation); return e.lastInsertRowid;});
+  const id=tx(); audit(req,"create","employee",id,name); res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id WHERE e.id=?`).get(id)});
 });
 app.put("/api/admin/employees/:id",admin,(req,res)=>{
   const id=Number(req.params.id), row=db.prepare("SELECT e.*,u.id AS user_id FROM employees e JOIN users u ON u.id=e.user_id WHERE e.id=?").get(id);
   if(!row)return res.status(404).json({success:false,error:"Team member not found"});
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120);
+  const role=req.body.role;
   if(name.length<2||!validEmail(email))return res.status(400).json({success:false,error:"Enter name and a valid email"});
   const dup=db.prepare("SELECT id FROM users WHERE email=? AND id<>?").get(email,row.user_id); if(dup)return res.status(409).json({success:false,error:"Another account already uses this email"});
   if(phone){const dupP=db.prepare("SELECT id FROM users WHERE phone=? AND id<>?").get(phone,row.user_id); if(dupP)return res.status(409).json({success:false,error:"Another account already uses this phone number"});}
-  db.transaction(()=>{db.prepare("UPDATE users SET name=?,email=?,phone=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,row.user_id);db.prepare("UPDATE employees SET department=?,designation=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(department,designation,id)})();
+  db.transaction(()=>{
+    if(role && (role==='coordinator'||role==='employee'||role==='manager')) {
+      db.prepare("UPDATE users SET name=?,email=?,phone=?,role=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,role==='manager'?'coordinator':role,row.user_id);
+    } else {
+      db.prepare("UPDATE users SET name=?,email=?,phone=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,row.user_id);
+    }
+    db.prepare("UPDATE employees SET department=?,designation=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(department,designation,id);
+  })();
   audit(req,"update","employee",id,name); res.json({success:true});
 });
 app.post("/api/admin/employees/:id/reset-password",admin,(req,res)=>{
@@ -1949,7 +1967,7 @@ function formatCsvOutput(headers, rows) {
   return '\uFEFF' + [headerLine, ...rowLines].join('\r\n');
 }
 
-app.get("/api/admin/reports.csv", admin, (req, res) => {
+app.get("/api/admin/reports.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT l.id, l.name, l.phone, l.email, l.source, l.sentiment, l.status, l.budget, l.notes, p.name AS project_name, eu.name AS employee_name, l.follow_up_at, l.created_at, l.updated_at FROM leads l LEFT JOIN projects p ON p.id = l.project_id LEFT JOIN employees e ON e.id = l.assigned_employee_id LEFT JOIN users eu ON eu.id = e.user_id ORDER BY l.id DESC`).all();
   const headers = [
     { label: "ID", key: "id" },
@@ -1971,11 +1989,11 @@ app.get("/api/admin/reports.csv", admin, (req, res) => {
   res.send(formatCsvOutput(headers, rows));
 });
 
-app.get("/api/admin/reports/leads.csv", admin, (req, res) => {
+app.get("/api/admin/reports/leads.csv", coordinatorOrAdmin, (req, res) => {
   res.redirect("/api/admin/reports.csv");
 });
 
-app.get("/api/admin/reports/units.csv", admin, (req, res) => {
+app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT pu.*, p.name AS project_name FROM project_units pu LEFT JOIN projects p ON p.id = pu.project_id ORDER BY pu.project_id ASC, pu.unit_number ASC`).all();
   const headers = [
     { label: "Unit ID", key: "id" },
@@ -1997,7 +2015,7 @@ app.get("/api/admin/reports/units.csv", admin, (req, res) => {
   res.send(formatCsvOutput(headers, rows));
 });
 
-app.get("/api/admin/reports/visits.csv", admin, (req, res) => {
+app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT sv.*, p.name AS project_name, u.name AS user_name FROM site_visits sv LEFT JOIN projects p ON p.id = sv.project_id LEFT JOIN users u ON u.id = sv.user_id ORDER BY sv.id DESC`).all();
   const headers = [
     { label: "Visit ID", key: "id" },
@@ -2016,7 +2034,7 @@ app.get("/api/admin/reports/visits.csv", admin, (req, res) => {
   res.send(formatCsvOutput(headers, rows));
 });
 
-app.get("/api/admin/reports/bookings.csv", admin, (req, res) => {
+app.get("/api/admin/reports/bookings.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type FROM bookings b LEFT JOIN projects p ON p.id = b.project_id LEFT JOIN project_units pu ON pu.id = b.unit_id ORDER BY b.id DESC`).all();
   const headers = [
     { label: "Booking ID", key: "id" },
@@ -2039,7 +2057,7 @@ app.get("/api/admin/reports/bookings.csv", admin, (req, res) => {
   res.send(formatCsvOutput(headers, rows));
 });
 
-app.get("/api/admin/report",admin,(req,res)=>{
+app.get("/api/admin/report",coordinatorOrAdmin,(req,res)=>{
  const start=clean(req.query.start,10),end=clean(req.query.end,10);
  const where=start&&end?"WHERE date(created_at) BETWEEN ? AND ?":start?"WHERE date(created_at)>=?":end?"WHERE date(created_at)<=?":"";
  const params=start&&end?[start,end]:start?[start]:end?[end]:[];
@@ -3140,35 +3158,39 @@ app.post("/api/projects/:id/interest",auth,(req,res)=>{
 });
 app.get("/api/my/enquiries",auth,(req,res)=>res.json({success:true,data:db.prepare("SELECT e.id,e.enquiry_reference,e.project_id,p.name AS project_name,e.name,e.phone,e.email,e.message,e.status,e.admin_response,e.created_at FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=? ORDER BY e.id DESC").all(req.user.id)}));
 
-app.get("/api/admin/dashboard",admin,(req,res)=>{
+app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
+ const isCoordinator = req.user && (req.user.role === 'coordinator' || req.user.role === 'manager');
  const today=todayIST();
- const att=db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(today);
+ const att=isCoordinator ? [] : db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(today);
  const amap=Object.fromEntries(att.map(x=>[x.status,Number(x.c)]));
- const recent=db.prepare(`SELECT a.action,a.entity_type,a.entity_id,a.details,a.created_at,u.name user_name FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 6`).all();
+ const recent=isCoordinator ? [] : db.prepare(`SELECT a.action,a.entity_type,a.entity_id,a.details,a.created_at,u.name user_name FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 6`).all();
  const unitStats=db.prepare("SELECT status,COUNT(*) c FROM project_units GROUP BY status").all();
  const umap=Object.fromEntries(unitStats.map(x=>[x.status,Number(x.c)]));
  const totalUnits=db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
  const bookingCount=db.prepare("SELECT COUNT(*) c FROM bookings").get().c;
  const followUpsToday=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=? AND status NOT IN ('won','lost')").get(today).c;
  const overdueLeads=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost')").get(today).c;
- res.json({success:true,stats:{
- users:db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c,
- enquiries:db.prepare("SELECT COUNT(*) c FROM enquiries").get().c,
- newEnquiries:db.prepare("SELECT COUNT(*) c FROM enquiries WHERE status='new'").get().c,
- projects:db.prepare("SELECT COUNT(*) c FROM projects WHERE status='active'").get().c,
- leads:db.prepare("SELECT COUNT(*) c FROM leads").get().c,
- openLeads:db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c,
- visits:db.prepare("SELECT COUNT(*) c FROM site_visits").get().c,
- employees:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
- attendance:{total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
- units:{total:totalUnits,available:umap.available||0,blocked:umap.blocked||0,sold:umap.sold||0},
- bookings:bookingCount,
- followUpsToday,
- overdueLeads,
- recent
-}});
+ res.json({success:true,
+   currentUser: { id: req.user.id, name: req.user.name, email: req.user.email, role: req.user.role },
+   stats:{
+     users:db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c,
+     enquiries:db.prepare("SELECT COUNT(*) c FROM enquiries").get().c,
+     newEnquiries:db.prepare("SELECT COUNT(*) c FROM enquiries WHERE status='new'").get().c,
+     projects:db.prepare("SELECT COUNT(*) c FROM projects WHERE status='active'").get().c,
+     leads:db.prepare("SELECT COUNT(*) c FROM leads").get().c,
+     openLeads:db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c,
+     visits:db.prepare("SELECT COUNT(*) c FROM site_visits").get().c,
+     employees:isCoordinator ? 0 : db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
+     attendance:isCoordinator ? {total:0,present:0,absent:0,leave:0,half_day:0} : {total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
+     units:{total:totalUnits,available:umap.available||0,blocked:umap.blocked||0,sold:umap.sold||0},
+     bookings:bookingCount,
+     followUpsToday,
+     overdueLeads,
+     recent
+   }
+ });
 });
-app.get("/api/admin/users",admin,(req,res)=>{
+app.get("/api/admin/users",coordinatorOrAdmin,(req,res)=>{
   const role=clean(req.query.role,30);
   if(role==="all"){
     return res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users ORDER BY id DESC").all()});
@@ -3176,7 +3198,7 @@ app.get("/api/admin/users",admin,(req,res)=>{
   const targetRole=role||"customer";
   res.json({success:true,data:db.prepare("SELECT id,name,email,phone,role,status,created_at FROM users WHERE role=? ORDER BY id DESC").all(targetRole)});
 });
-app.get("/api/admin/users/:id",admin,(req,res)=>{
+app.get("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id), user=db.prepare("SELECT id,name,email,phone,role,status,created_at,updated_at FROM users WHERE id=?").get(id);
   if(!user)return res.status(404).json({success:false,error:"Customer not found"});
   const enquiries=db.prepare(`SELECT e.id,e.enquiry_reference,e.status,e.message,e.admin_response,e.created_at,p.name project_name FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=? ORDER BY e.id DESC`).all(id);
@@ -3184,7 +3206,7 @@ app.get("/api/admin/users/:id",admin,(req,res)=>{
   const visits=db.prepare(`SELECT v.*,p.name project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE v.user_id=? ORDER BY v.id DESC`).all(id);
   res.json({success:true,data:{user,enquiries,leads,visits}});
 });
-app.put("/api/admin/users/:id",admin,(req,res)=>{
+app.put("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM users WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Customer not found"});
   if(existing.role!=='customer')return res.status(400).json({success:false,error:"Only customer profiles can be edited here"});
@@ -3214,7 +3236,7 @@ app.patch("/api/admin/users/:id/status",admin,(req,res)=>{
  audit(req,"update","customer",id,`Status ${status}`);
  res.json({success:true});
 });
-app.post("/api/admin/enquiries",admin,(req,res)=>{
+app.post("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>{
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),message=clean(req.body.message,3000),status=clean(req.body.status,30)||"new",source=clean(req.body.source,80)||"admin";
   const projectId=req.body.project_id?Number(req.body.project_id):null,userId=req.body.user_id?Number(req.body.user_id):null;
   if(name.length<2)return res.status(400).json({success:false,error:"Enter the customer name"});
@@ -3231,8 +3253,8 @@ app.post("/api/admin/enquiries",admin,(req,res)=>{
   audit(req,"create","enquiry",created.id,`${created.reference} · ${name}`);
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM enquiries WHERE id=?").get(created.id)});
 });
-app.get("/api/admin/enquiries",admin,(req,res)=>res.json({success:true,data:db.prepare("SELECT e.*,u.role,p.name AS project_name,p.category AS project_category FROM enquiries e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC").all()}));
-app.put("/api/admin/enquiries/:id",admin,(req,res)=>{
+app.get("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>res.json({success:true,data:db.prepare("SELECT e.*,u.role,p.name AS project_name,p.category AS project_category FROM enquiries e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC").all()}));
+app.put("/api/admin/enquiries/:id",coordinatorOrAdmin,(req,res)=>{
  const id=Number(req.params.id), existing=db.prepare("SELECT * FROM enquiries WHERE id=?").get(id);
  if(!existing)return res.status(404).json({success:false,error:"Enquiry not found"});
  const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase();
@@ -3250,7 +3272,7 @@ app.put("/api/admin/enquiries/:id",admin,(req,res)=>{
  res.json({success:true,data:updated});
 });
 
-app.patch("/api/admin/enquiries/:id",admin,(req,res)=>{
+app.patch("/api/admin/enquiries/:id",coordinatorOrAdmin,(req,res)=>{
  const status=clean(req.body.status,30),allowed=["new","contacted","closed"];
  if(!allowed.includes(status))return res.status(400).json({success:false,error:"Invalid status"});
  const id=Number(req.params.id);
@@ -3279,7 +3301,7 @@ app.delete("/api/admin/enquiries/:id",admin,(req,res)=>{
 const VALID_PROJECT_CATEGORIES = ["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDUSTRIAL","LUXURY VILLAS","APARTMENTS & SHOPS","VILLAS","PLOTS / LAND","MIXED USE","PENTHOUSES"];
 const VALID_PROJECT_STATUSES = ["active","completed","sold_out","inactive"];
 
-app.get("/api/admin/projects",admin,(req,res)=>{
+app.get("/api/admin/projects",coordinatorOrAdmin,(req,res)=>{
   const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects ORDER BY CASE WHEN status='active' THEN 0 WHEN status='completed' THEN 1 WHEN status='sold_out' THEN 2 ELSE 3 END, id ASC").all();
   const countStmt=db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?");
   const coverStmt=db.prepare("SELECT file_path FROM project_media WHERE project_id=? AND media_type='image' ORDER BY is_cover DESC,id ASC LIMIT 1");
@@ -3404,7 +3426,7 @@ app.patch("/api/admin/projects/:id/status",admin,(req,res)=>{
  audit(req,"update","project",id,`Status ${status}`);
  res.json({success:true,data:db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=?").get(id)});
 });
-app.get("/api/admin/projects/:id/media",admin,(req,res)=>{
+app.get("/api/admin/projects/:id/media",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id); if(!Number.isInteger(id)||id<1)return res.status(400).json({success:false,error:"Invalid project id"});
   const project=projectRow(id); if(!project)return res.status(404).json({success:false,error:"Project not found"});
   res.json({success:true,project,data:mediaRows(id)});
@@ -3436,7 +3458,7 @@ app.get("/admin.html", (req, res) => {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     const u = db.prepare("SELECT status, role, session_version FROM users WHERE id=?").get(payload.id);
-    if (!u || u.status !== "active" || u.role !== "admin" || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
+    if (!u || u.status !== "active" || (u.role !== "admin" && u.role !== "coordinator" && u.role !== "manager") || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
       return res.redirect(302, "/login.html?redirect=/admin.html");
     }
     if (req.query.token) {
