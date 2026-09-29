@@ -311,6 +311,7 @@ function migrateProductionSchema(){
   // Complete migrations for tables that may already exist in an older CRM build.
   c=cols("employees");
   if(!c.has("user_id")) db.exec("ALTER TABLE employees ADD COLUMN user_id INTEGER");
+  if(!c.has("project_id")) db.exec("ALTER TABLE employees ADD COLUMN project_id INTEGER");
   if(!c.has("employee_code")) db.exec("ALTER TABLE employees ADD COLUMN employee_code TEXT NOT NULL DEFAULT ''");
   if(!c.has("department")) db.exec("ALTER TABLE employees ADD COLUMN department TEXT NOT NULL DEFAULT ''");
   if(!c.has("designation")) db.exec("ALTER TABLE employees ADD COLUMN designation TEXT NOT NULL DEFAULT ''");
@@ -318,6 +319,7 @@ function migrateProductionSchema(){
   if(!c.has("joined_at")) db.exec("ALTER TABLE employees ADD COLUMN joined_at TEXT");
   if(!c.has("created_at")) db.exec("ALTER TABLE employees ADD COLUMN created_at TEXT NOT NULL DEFAULT ''");
   if(!c.has("updated_at")) db.exec("ALTER TABLE employees ADD COLUMN updated_at TEXT NOT NULL DEFAULT ''");
+  db.exec("CREATE INDEX IF NOT EXISTS idx_employees_project_id ON employees(project_id)");
   const blankEmployees=db.prepare("SELECT id FROM employees WHERE employee_code='' ORDER BY id").all();
   for(const e of blankEmployees){ db.prepare("UPDATE employees SET employee_code=? WHERE id=?").run(`EMP-${String(e.id).padStart(4,'0')}`,e.id); }
   c=cols("site_visits");
@@ -721,14 +723,14 @@ function auth(req,res,next){
  const bearer=(req.headers.authorization||"").startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
  const token=req.cookies.lg_session || bearer;
  if(!token)return res.status(401).json({success:false,error:"Please log in"});
- try{
-  req.user=jwt.verify(token,JWT_SECRET);
-  const sessionUser=db.prepare("SELECT status,session_version FROM users WHERE id=?").get(req.user.id);
-  if(!sessionUser || sessionUser.status!=="active") return res.status(401).json({success:false,error:"Please log in"});
-  if(Number(req.user.sv||0)!==Number(sessionUser.session_version||0)) return res.status(401).json({success:false,error:"Session ended. Please log in again"});
+  try{
+   req.user=jwt.verify(token,JWT_SECRET);
+   const sessionUser=db.prepare("SELECT status,session_version FROM users WHERE id=?").get(req.user.id);
+   if(!sessionUser || sessionUser.status!=="active") return res.status(401).json({success:false,error:"Please log in"});
+   if(Number(req.user.sv||0)!==Number(sessionUser.session_version||0)) return res.status(401).json({success:false,error:"Session ended. Please log in again"});
+  }
+  catch(e){console.error('[AUTH ERROR STACK]', e.stack); return res.status(401).json({success:false,error:"Session expired. Please log in again"})}
   next();
- }
- catch(e){return res.status(401).json({success:false,error:"Session expired. Please log in again"})}
 }
 function admin(req,res,next){auth(req,res,()=>{
  const u=db.prepare("SELECT status,role FROM users WHERE id=?").get(req.user.id);
@@ -737,17 +739,29 @@ function admin(req,res,next){auth(req,res,()=>{
  next();
 })}
 function coordinatorOrAdmin(req,res,next){auth(req,res,()=>{
- const u=db.prepare("SELECT status,role,name,email FROM users WHERE id=?").get(req.user.id);
+ const u=db.prepare("SELECT id,status,role,name,email FROM users WHERE id=?").get(req.user.id);
  if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
  if(u.role!=="admin" && u.role!=="coordinator" && u.role!=="manager" && u.role!=="builder" && u.role!=="partner")return res.status(403).json({success:false,error:"Staff or admin access required"});
  req.user.role=u.role;
  req.user.name=u.name;
  req.user.email=u.email;
+ const emp = req.user?.id ? db.prepare("SELECT e.id, e.project_id, p.name AS project_name FROM employees e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=?").get(req.user.id) : null;
+ req.user.employee_id = emp?.id || null;
+ req.user.project_id = (emp && emp.project_id) ? Number(emp.project_id) : null;
+ req.user.project_name = emp?.project_name || null;
  next();
 })}
 
 function isBuilderOrPartner(req) {
   return req.user && (req.user.role === 'builder' || req.user.role === 'partner');
+}
+
+function getBuilderProjectId(req) {
+  if (!isBuilderOrPartner(req)) return null;
+  if (req.user.project_id !== undefined && req.user.project_id !== null) return req.user.project_id;
+  const emp = db.prepare("SELECT project_id FROM employees WHERE user_id=?").get(req.user.id);
+  req.user.project_id = (emp && emp.project_id) ? Number(emp.project_id) : null;
+  return req.user.project_id;
 }
 
 function maskPhone(phone) {
@@ -1390,9 +1404,14 @@ app.delete("/api/admin/leads/:id", admin, (req, res) => {
 });
 app.get("/api/admin/site-visits",coordinatorOrAdmin,(req,res)=>{
   syncAllExistingSiteVisits();
+  const builderProjId = getBuilderProjectId(req);
   const status=clean(req.query.status,30);
-  const sql=`SELECT v.*,p.name AS project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id ${status?"WHERE v.status=?":""} ORDER BY datetime(v.preferred_at) ASC`;
-  const rows = (status?db.prepare(sql).all(status):db.prepare(sql).all());
+  let sql=`SELECT v.*,p.name AS project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE 1=1`;
+  const params=[];
+  if (status) { sql += " AND v.status=?"; params.push(status); }
+  if (builderProjId) { sql += " AND v.project_id=?"; params.push(builderProjId); }
+  sql += " ORDER BY datetime(v.preferred_at) ASC";
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(v => {
       v.phone = maskPhone(v.phone);
@@ -1446,12 +1465,20 @@ app.delete("/api/admin/site-visits/:id",admin,(req,res)=>{
 });
 
 app.get("/api/admin/leads",coordinatorOrAdmin,(req,res)=>{
-  const rows=db.prepare(`SELECT l.*,p.name AS project_name,pu.unit_number,e.employee_code,eu.name AS employee_name
+  const builderProjId = getBuilderProjectId(req);
+  let sql = `SELECT l.*,p.name AS project_name,pu.unit_number,e.employee_code,eu.name AS employee_name
     FROM leads l
     LEFT JOIN projects p ON p.id=l.project_id
     LEFT JOIN project_units pu ON pu.id=l.unit_id
     LEFT JOIN employees e ON e.id=l.assigned_employee_id
-    LEFT JOIN users eu ON eu.id=e.user_id ORDER BY l.id DESC`).all();
+    LEFT JOIN users eu ON eu.id=e.user_id`;
+  const params = [];
+  if (builderProjId) {
+    sql += ` WHERE l.project_id = ?`;
+    params.push(builderProjId);
+  }
+  sql += ` ORDER BY l.id DESC`;
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(l => {
       l.phone = maskPhone(l.phone);
@@ -1510,7 +1537,8 @@ app.post("/api/admin/enquiries/:id/convert",coordinatorOrAdmin,(req,res)=>{
 
 // ---------------- Enterprise PropTech: Project Unit Inventory ----------------
 app.get("/api/admin/units",coordinatorOrAdmin,(req,res)=>{
-  const projectId=req.query.project_id?Number(req.query.project_id):null;
+  const builderProjId = getBuilderProjectId(req);
+  const projectId = builderProjId || (req.query.project_id ? Number(req.query.project_id) : null);
   const status=clean(req.query.status,20);
   const search=clean(req.query.search,100).toLowerCase();
   let sql=`SELECT u.*,p.name AS project_name,p.category AS project_category FROM project_units u LEFT JOIN projects p ON p.id=u.project_id WHERE 1=1`;
@@ -1593,12 +1621,19 @@ app.delete("/api/admin/units/:id",admin,(req,res)=>{
 
 // ---------------- Enterprise PropTech: Bookings & Deal Closures ----------------
 app.get("/api/admin/bookings",coordinatorOrAdmin,(req,res)=>{
-  const rows=db.prepare(`SELECT b.*,p.name AS project_name,pu.unit_number,pu.unit_type,u.name AS user_name,u.email AS user_email
+  const builderProjId = getBuilderProjectId(req);
+  let sql = `SELECT b.*,p.name AS project_name,pu.unit_number,pu.unit_type,u.name AS user_name,u.email AS user_email
     FROM bookings b
     LEFT JOIN projects p ON p.id=b.project_id
     LEFT JOIN project_units pu ON pu.id=b.unit_id
-    LEFT JOIN users u ON u.id=b.user_id
-    ORDER BY b.id DESC`).all();
+    LEFT JOIN users u ON u.id=b.user_id`;
+  const params = [];
+  if (builderProjId) {
+    sql += ` WHERE b.project_id = ?`;
+    params.push(builderProjId);
+  }
+  sql += ` ORDER BY b.id DESC`;
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(b => {
       b.customer_phone = maskPhone(b.customer_phone);
@@ -1922,9 +1957,10 @@ app.patch("/api/admin/site-visits/:id",coordinatorOrAdmin,(req,res)=>{
   res.json({success:true,data:saved});
 });
 
-app.get("/api/admin/employees",coordinatorOrAdmin,(req,res)=>res.json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id ORDER BY e.id DESC`).all()}));
+app.get("/api/admin/employees",coordinatorOrAdmin,(req,res)=>res.json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status,p.name AS project_name FROM employees e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC`).all()}));
 app.post("/api/admin/employees",admin,(req,res)=>{
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120),password=String(req.body.password||"");
+  const projectId = req.body.project_id ? Number(req.body.project_id) : null;
   let role = 'employee';
   if (req.body.role === 'coordinator' || req.body.role === 'manager') role = 'coordinator';
   else if (req.body.role === 'builder' || req.body.role === 'partner') role = 'builder';
@@ -1940,23 +1976,31 @@ app.post("/api/admin/employees",admin,(req,res)=>{
       const tx = db.transaction(() => {
         db.prepare("UPDATE users SET name=?, phone=?, role=?, password_hash=?, status='active', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name, phone || existingUser.phone, role, bcrypt.hashSync(password, 12), existingUser.id);
         const code = `EMP-${String(existingUser.id).padStart(4,"0")}`;
-        const e = db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(existingUser.id, code, department, designation);
+        const e = db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at,project_id) VALUES(?,?,?,?,CURRENT_TIMESTAMP,?)").run(existingUser.id, code, department, designation, projectId);
         return e.lastInsertRowid;
       });
       const id = tx();
       audit(req, "create", "employee", id, `${name} (activated as ${role})`);
-      return res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id WHERE e.id=?`).get(id)});
+      return res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status,p.name AS project_name FROM employees e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id WHERE e.id=?`).get(id)});
     }
   }
 
   if(phone && db.prepare("SELECT id FROM users WHERE phone=?").get(phone))return res.status(409).json({success:false,error:"An account with this phone number already exists"});
-  const tx=db.transaction(()=>{const u=db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run(name,email,phone,bcrypt.hashSync(password,12),role,"active"); const code=`EMP-${String(u.lastInsertRowid).padStart(4,"0")}`; const e=db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(u.lastInsertRowid,code,department,designation); return e.lastInsertRowid;});
-  const id=tx(); audit(req,"create","employee",id,name); res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id WHERE e.id=?`).get(id)});
+  const tx=db.transaction(()=>{
+    const u=db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run(name,email,phone,bcrypt.hashSync(password,12),role,"active"); 
+    const code=`EMP-${String(u.lastInsertRowid).padStart(4,"0")}`; 
+    const e=db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at,project_id) VALUES(?,?,?,?,CURRENT_TIMESTAMP,?)").run(u.lastInsertRowid,code,department,designation,projectId); 
+    return e.lastInsertRowid;
+  });
+  const id=tx(); 
+  audit(req,"create","employee",id,name); 
+  res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status,p.name AS project_name FROM employees e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id WHERE e.id=?`).get(id)});
 });
 app.put("/api/admin/employees/:id",admin,(req,res)=>{
   const id=Number(req.params.id), row=db.prepare("SELECT e.*,u.id AS user_id FROM employees e JOIN users u ON u.id=e.user_id WHERE e.id=?").get(id);
   if(!row)return res.status(404).json({success:false,error:"Team member not found"});
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120);
+  const projectId = Object.prototype.hasOwnProperty.call(req.body, "project_id") ? (req.body.project_id ? Number(req.body.project_id) : null) : row.project_id;
   const role=req.body.role;
   if(name.length<2||!validEmail(email))return res.status(400).json({success:false,error:"Enter name and a valid email"});
   const dup=db.prepare("SELECT id FROM users WHERE email=? AND id<>?").get(email,row.user_id); if(dup)return res.status(409).json({success:false,error:"Another account already uses this email"});
@@ -1968,7 +2012,7 @@ app.put("/api/admin/employees/:id",admin,(req,res)=>{
     } else {
       db.prepare("UPDATE users SET name=?,email=?,phone=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,row.user_id);
     }
-    db.prepare("UPDATE employees SET department=?,designation=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(department,designation,id);
+    db.prepare("UPDATE employees SET department=?,designation=?,project_id=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(department,designation,projectId,id);
   })();
   audit(req,"update","employee",id,name); res.json({success:true});
 });
@@ -2191,7 +2235,15 @@ function formatCsvOutput(headers, rows) {
 }
 
 app.get("/api/admin/reports.csv", coordinatorOrAdmin, (req, res) => {
-  const rows = db.prepare(`SELECT l.id, l.name, l.phone, l.email, l.source, l.sentiment, l.status, l.budget, l.notes, p.name AS project_name, eu.name AS employee_name, l.follow_up_at, l.created_at, l.updated_at FROM leads l LEFT JOIN projects p ON p.id = l.project_id LEFT JOIN employees e ON e.id = l.assigned_employee_id LEFT JOIN users eu ON eu.id = e.user_id ORDER BY l.id DESC`).all();
+  const builderProjId = getBuilderProjectId(req);
+  let sql = `SELECT l.id, l.name, l.phone, l.email, l.source, l.sentiment, l.status, l.budget, l.notes, p.name AS project_name, eu.name AS employee_name, l.follow_up_at, l.created_at, l.updated_at FROM leads l LEFT JOIN projects p ON p.id = l.project_id LEFT JOIN employees e ON e.id = l.assigned_employee_id LEFT JOIN users eu ON eu.id = e.user_id`;
+  const params = [];
+  if (builderProjId) {
+    sql += ` WHERE l.project_id = ?`;
+    params.push(builderProjId);
+  }
+  sql += ` ORDER BY l.id DESC`;
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(r => {
       r.phone = maskPhone(r.phone);
@@ -2223,7 +2275,15 @@ app.get("/api/admin/reports/leads.csv", coordinatorOrAdmin, (req, res) => {
 });
 
 app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
-  const rows = db.prepare(`SELECT pu.*, p.name AS project_name FROM project_units pu LEFT JOIN projects p ON p.id = pu.project_id ORDER BY pu.project_id ASC, pu.unit_number ASC`).all();
+  const builderProjId = getBuilderProjectId(req);
+  let sql = `SELECT pu.*, p.name AS project_name FROM project_units pu LEFT JOIN projects p ON p.id = pu.project_id`;
+  const params = [];
+  if (builderProjId) {
+    sql += ` WHERE pu.project_id = ?`;
+    params.push(builderProjId);
+  }
+  sql += ` ORDER BY pu.project_id ASC, pu.unit_number ASC`;
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(r => {
       r.buyer_phone = maskPhone(r.buyer_phone);
@@ -2250,7 +2310,15 @@ app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
 });
 
 app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
-  const rows = db.prepare(`SELECT sv.*, p.name AS project_name, u.name AS user_name FROM site_visits sv LEFT JOIN projects p ON p.id = sv.project_id LEFT JOIN users u ON u.id = sv.user_id ORDER BY sv.id DESC`).all();
+  const builderProjId = getBuilderProjectId(req);
+  let sql = `SELECT sv.*, p.name AS project_name, u.name AS user_name FROM site_visits sv LEFT JOIN projects p ON p.id = sv.project_id LEFT JOIN users u ON u.id = sv.user_id`;
+  const params = [];
+  if (builderProjId) {
+    sql += ` WHERE sv.project_id = ?`;
+    params.push(builderProjId);
+  }
+  sql += ` ORDER BY sv.id DESC`;
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(r => {
       r.phone = maskPhone(r.phone);
@@ -2275,7 +2343,15 @@ app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
 });
 
 app.get("/api/admin/reports/bookings.csv", coordinatorOrAdmin, (req, res) => {
-  const rows = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type FROM bookings b LEFT JOIN projects p ON p.id = b.project_id LEFT JOIN project_units pu ON pu.id = b.unit_id ORDER BY b.id DESC`).all();
+  const builderProjId = getBuilderProjectId(req);
+  let sql = `SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type FROM bookings b LEFT JOIN projects p ON p.id = b.project_id LEFT JOIN project_units pu ON pu.id = b.unit_id`;
+  const params = [];
+  if (builderProjId) {
+    sql += ` WHERE b.project_id = ?`;
+    params.push(builderProjId);
+  }
+  sql += ` ORDER BY b.id DESC`;
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(r => {
       r.customer_phone = maskPhone(r.customer_phone);
@@ -3428,39 +3504,84 @@ app.get("/api/my/enquiries",auth,(req,res)=>res.json({success:true,data:db.prepa
 app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
  const isCoordinator = req.user && (req.user.role === 'coordinator' || req.user.role === 'manager');
  const isBuilder = isBuilderOrPartner(req);
+ const builderProjId = getBuilderProjectId(req);
  const hideSensitive = isCoordinator || isBuilder;
  const today=todayIST();
  const att=hideSensitive ? [] : db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(today);
  const amap=Object.fromEntries(att.map(x=>[x.status,Number(x.c)]));
  const recent=hideSensitive ? [] : db.prepare(`SELECT a.action,a.entity_type,a.entity_id,a.details,a.created_at,u.name user_name FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 6`).all();
- const unitStats=db.prepare("SELECT status,COUNT(*) c FROM project_units GROUP BY status").all();
+ 
+ let unitStats, totalUnits, bookingCount, followUpsToday, overdueLeads, totalVisits, totalCustomers, totalEnquiries, totalNewEnquiries, totalProjects, totalLeads, totalOpenLeads;
+
+ if (builderProjId) {
+   unitStats = db.prepare("SELECT status,COUNT(*) c FROM project_units WHERE project_id=? GROUP BY status").all(builderProjId);
+   totalUnits = db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?").get(builderProjId).c;
+   bookingCount = db.prepare("SELECT COUNT(*) c FROM bookings WHERE project_id=?").get(builderProjId).c;
+   followUpsToday = db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=? AND status NOT IN ('won','lost') AND project_id=?").get(today, builderProjId).c;
+   overdueLeads = db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost') AND project_id=?").get(today, builderProjId).c;
+
+   totalVisits = db.prepare(`
+     SELECT COUNT(DISTINCT uid) c FROM (
+       SELECT coalesce(nullif(phone,''), 'sv_' || id) AS uid FROM site_visits WHERE status <> 'cancelled' AND project_id=?
+       UNION
+       SELECT coalesce(nullif(phone,''), 'ld_' || id) AS uid FROM leads WHERE status = 'site_visit' AND project_id=?
+     )
+   `).get(builderProjId, builderProjId).c;
+
+   totalCustomers = db.prepare(`
+     SELECT COUNT(DISTINCT u.id) c FROM users u
+     WHERE u.role='customer' AND (
+       EXISTS (SELECT 1 FROM enquiries e WHERE (e.user_id = u.id OR (u.phone <> '' AND e.phone = u.phone) OR (u.email <> '' AND lower(e.email) = lower(u.email))) AND e.project_id = ?)
+       OR EXISTS (SELECT 1 FROM leads l WHERE (l.user_id = u.id OR (u.phone <> '' AND l.phone = u.phone) OR (u.email <> '' AND lower(l.email) = lower(u.email))) AND l.project_id = ?)
+     )
+   `).get(builderProjId, builderProjId).c;
+
+   totalEnquiries = db.prepare("SELECT COUNT(*) c FROM enquiries WHERE project_id=?").get(builderProjId).c;
+   totalNewEnquiries = db.prepare("SELECT COUNT(*) c FROM leads WHERE status='new' AND project_id=?").get(builderProjId).c;
+   totalProjects = 1;
+   totalLeads = db.prepare("SELECT COUNT(*) c FROM leads WHERE project_id=?").get(builderProjId).c;
+   totalOpenLeads = db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost') AND project_id=?").get(builderProjId).c;
+ } else {
+   unitStats = db.prepare("SELECT status,COUNT(*) c FROM project_units GROUP BY status").all();
+   totalUnits = db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
+   bookingCount = db.prepare("SELECT COUNT(*) c FROM bookings").get().c;
+   followUpsToday = db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=? AND status NOT IN ('won','lost')").get(today).c;
+   overdueLeads = db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost')").get(today).c;
+
+   totalVisits = db.prepare(`
+     SELECT COUNT(DISTINCT uid) c FROM (
+       SELECT coalesce(nullif(phone,''), 'sv_' || id) AS uid FROM site_visits WHERE status <> 'cancelled'
+       UNION
+       SELECT coalesce(nullif(phone,''), 'ld_' || id) AS uid FROM leads WHERE status = 'site_visit'
+     )
+   `).get().c;
+
+   totalCustomers = db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c;
+   totalEnquiries = db.prepare("SELECT COUNT(*) c FROM enquiries").get().c;
+   totalNewEnquiries = db.prepare("SELECT COUNT(*) c FROM leads WHERE status='new'").get().c;
+   totalProjects = db.prepare("SELECT COUNT(*) c FROM projects WHERE status='active'").get().c;
+   totalLeads = db.prepare("SELECT COUNT(*) c FROM leads").get().c;
+   totalOpenLeads = db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c;
+ }
+
  const umap=Object.fromEntries(unitStats.map(x=>[x.status,Number(x.c)]));
- const totalUnits=db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
- const bookingCount=db.prepare("SELECT COUNT(*) c FROM bookings").get().c;
- const followUpsToday=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)=? AND status NOT IN ('won','lost')").get(today).c;
- const overdueLeads=db.prepare("SELECT COUNT(*) c FROM leads WHERE date(follow_up_at)<? AND status NOT IN ('won','lost')").get(today).c;
-
- // Real-time active site visits across scheduled visits and CRM pipeline stages
- const totalVisits = db.prepare(`
-   SELECT COUNT(DISTINCT uid) c FROM (
-     SELECT coalesce(nullif(phone,''), 'sv_' || id) AS uid FROM site_visits WHERE status <> 'cancelled'
-     UNION
-     SELECT coalesce(nullif(phone,''), 'ld_' || id) AS uid FROM leads WHERE status = 'site_visit'
-   )
- `).get().c;
-
- // Real-time verified customer accounts
- const totalCustomers = db.prepare("SELECT COUNT(*) c FROM users WHERE role='customer'").get().c;
 
  res.json({success:true,
-   currentUser: { id: req.user.id, name: req.user.name, email: req.user.email, role: req.user.role },
+   currentUser: {
+     id: req.user.id,
+     name: req.user.name,
+     email: req.user.email,
+     role: req.user.role,
+     assigned_project_id: builderProjId || null,
+     assigned_project_name: req.user.project_name || null
+   },
    stats:{
      users: totalCustomers,
-     enquiries: db.prepare("SELECT COUNT(*) c FROM enquiries").get().c,
-     newEnquiries: db.prepare("SELECT COUNT(*) c FROM leads WHERE status='new'").get().c,
-     projects: db.prepare("SELECT COUNT(*) c FROM projects WHERE status='active'").get().c,
-     leads: db.prepare("SELECT COUNT(*) c FROM leads").get().c,
-     openLeads: db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c,
+     enquiries: totalEnquiries,
+     newEnquiries: totalNewEnquiries,
+     projects: totalProjects,
+     leads: totalLeads,
+     openLeads: totalOpenLeads,
      visits: totalVisits,
      employees: hideSensitive ? 0 : db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
      attendance: hideSensitive ? {total:0,present:0,absent:0,leave:0,half_day:0} : {total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
@@ -3474,6 +3595,28 @@ app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
 });
 app.get("/api/admin/users",coordinatorOrAdmin,(req,res)=>{
   const role=clean(req.query.role,30);
+  const builderProjId = getBuilderProjectId(req);
+
+  if (builderProjId) {
+    const rows = db.prepare(`
+      SELECT u.id,u.name,u.email,u.phone,u.role,u.status,u.created_at,
+             (SELECT COUNT(DISTINCT id) FROM enquiries e WHERE (e.user_id = u.id OR (u.phone <> '' AND e.phone = u.phone) OR (u.email <> '' AND lower(e.email) = lower(u.email))) AND e.project_id = ?) AS enquiries_count,
+             (SELECT COUNT(DISTINCT id) FROM leads l WHERE (l.user_id = u.id OR (u.phone <> '' AND l.phone = u.phone) OR (u.email <> '' AND lower(l.email) = lower(u.email))) AND l.project_id = ?) AS leads_count
+      FROM users u
+      WHERE u.role='customer'
+        AND (
+          EXISTS (SELECT 1 FROM enquiries e WHERE (e.user_id = u.id OR (u.phone <> '' AND e.phone = u.phone) OR (u.email <> '' AND lower(e.email) = lower(u.email))) AND e.project_id = ?)
+          OR EXISTS (SELECT 1 FROM leads l WHERE (l.user_id = u.id OR (u.phone <> '' AND l.phone = u.phone) OR (u.email <> '' AND lower(l.email) = lower(u.email))) AND l.project_id = ?)
+        )
+      ORDER BY enquiries_count DESC, leads_count DESC, u.id DESC
+    `).all(builderProjId, builderProjId, builderProjId, builderProjId);
+    rows.forEach(u => {
+      u.phone = maskPhone(u.phone);
+      u.email = maskEmail(u.email);
+    });
+    return res.json({success:true,data:rows});
+  }
+
   if(role==="all"){
     const rows = db.prepare(`
       SELECT u.id,u.name,u.email,u.phone,u.role,u.status,u.created_at,
@@ -3512,9 +3655,31 @@ app.get("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
   if(!user)return res.status(404).json({success:false,error:"Customer not found"});
   const safePhone = user.phone || '';
   const safeEmail = (user.email || '').toLowerCase();
-  const enquiries=db.prepare(`SELECT e.id,e.enquiry_reference,e.status,e.message,e.admin_response,e.created_at,p.name project_name FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=? OR (? <> '' AND e.phone=?) OR (? <> '' AND lower(e.email)=?) ORDER BY e.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
-  const leads=db.prepare(`SELECT l.*,p.name project_name,e.name employee_name FROM leads l LEFT JOIN projects p ON p.id=l.project_id LEFT JOIN employees em ON em.id=l.assigned_employee_id LEFT JOIN users e ON e.id=em.user_id WHERE l.user_id=? OR (? <> '' AND l.phone=?) OR (? <> '' AND lower(l.email)=?) ORDER BY l.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
-  const visits=db.prepare(`SELECT v.*,p.name project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE v.user_id=? OR (? <> '' AND v.phone=?) OR (? <> '' AND lower(v.email)=?) ORDER BY v.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
+  const builderProjId = getBuilderProjectId(req);
+
+  let enqSql = `SELECT e.id,e.enquiry_reference,e.status,e.message,e.admin_response,e.created_at,p.name project_name FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE (e.user_id=? OR (? <> '' AND e.phone=?) OR (? <> '' AND lower(e.email)=?))`;
+  let leadSql = `SELECT l.*,p.name project_name,e.name employee_name FROM leads l LEFT JOIN projects p ON p.id=l.project_id LEFT JOIN employees em ON em.id=l.assigned_employee_id LEFT JOIN users e ON e.id=em.user_id WHERE (l.user_id=? OR (? <> '' AND l.phone=?) OR (? <> '' AND lower(l.email)=?))`;
+  let visitSql = `SELECT v.*,p.name project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE (v.user_id=? OR (? <> '' AND v.phone=?) OR (? <> '' AND lower(v.email)=?))`;
+  const enqParams = [id, safePhone, safePhone, safeEmail, safeEmail];
+  const leadParams = [id, safePhone, safePhone, safeEmail, safeEmail];
+  const visitParams = [id, safePhone, safePhone, safeEmail, safeEmail];
+
+  if (builderProjId) {
+    enqSql += ` AND e.project_id = ?`;
+    enqParams.push(builderProjId);
+    leadSql += ` AND l.project_id = ?`;
+    leadParams.push(builderProjId);
+    visitSql += ` AND v.project_id = ?`;
+    visitParams.push(builderProjId);
+  }
+  enqSql += ` ORDER BY e.id DESC`;
+  leadSql += ` ORDER BY l.id DESC`;
+  visitSql += ` ORDER BY v.id DESC`;
+
+  const enquiries=db.prepare(enqSql).all(...enqParams);
+  const leads=db.prepare(leadSql).all(...leadParams);
+  const visits=db.prepare(visitSql).all(...visitParams);
+
   if (isBuilderOrPartner(req)) {
     user.phone = maskPhone(user.phone);
     user.email = maskEmail(user.email);
@@ -3574,7 +3739,15 @@ app.post("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>{
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM enquiries WHERE id=?").get(created.id)});
 });
 app.get("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>{
-  const rows = db.prepare("SELECT e.*,u.role,p.name AS project_name,p.category AS project_category FROM enquiries e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC").all();
+  const builderProjId = getBuilderProjectId(req);
+  let sql = "SELECT e.*,u.role,p.name AS project_name,p.category AS project_category FROM enquiries e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id";
+  const params = [];
+  if (builderProjId) {
+    sql += " WHERE e.project_id = ?";
+    params.push(builderProjId);
+  }
+  sql += " ORDER BY e.id DESC";
+  const rows = db.prepare(sql).all(...params);
   if (isBuilderOrPartner(req)) {
     rows.forEach(e => {
       e.phone = maskPhone(e.phone);
@@ -3633,7 +3806,15 @@ const VALID_PROJECT_CATEGORIES = ["RESIDENTIAL","COMMERCIAL","DEVELOPMENT","INDU
 const VALID_PROJECT_STATUSES = ["active","completed","sold_out","inactive"];
 
 app.get("/api/admin/projects",coordinatorOrAdmin,(req,res)=>{
-  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects ORDER BY CASE WHEN status='active' THEN 0 WHEN status='completed' THEN 1 WHEN status='sold_out' THEN 2 ELSE 3 END, id ASC").all();
+  const builderProjId = getBuilderProjectId(req);
+  let sql = "SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects";
+  const params = [];
+  if (builderProjId) {
+    sql += " WHERE id = ?";
+    params.push(builderProjId);
+  }
+  sql += " ORDER BY CASE WHEN status='active' THEN 0 WHEN status='completed' THEN 1 WHEN status='sold_out' THEN 2 ELSE 3 END, id ASC";
+  const projects=db.prepare(sql).all(...params);
   const countStmt=db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?");
   const coverStmt=db.prepare("SELECT file_path FROM project_media WHERE project_id=? AND media_type='image' ORDER BY is_cover DESC,id ASC LIMIT 1");
   const unitsStmt=db.prepare("SELECT COUNT(*) total, SUM(CASE WHEN status='available' THEN 1 ELSE 0 END) avail, SUM(CASE WHEN status='blocked' THEN 1 ELSE 0 END) blocked, SUM(CASE WHEN status='sold' THEN 1 ELSE 0 END) sold FROM project_units WHERE project_id=?");

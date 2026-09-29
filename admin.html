@@ -2365,10 +2365,13 @@ body.role-builder [data-write-action="true"] {
         <input id="tName" required placeholder="Full name">
         <input id="tEmail" required type="email" placeholder="Email">
         <input id="tPhone" placeholder="Phone">
-        <select id="tRole" style="padding:10px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; background:#fff;">
+        <select id="tRole" onchange="handleTeamRoleChange()" style="padding:10px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; background:#fff;">
           <option value="employee">Sales Advisor (Field / Advisor Portal)</option>
           <option value="coordinator">Sales Coordinator (CRM Operations & Coordination)</option>
           <option value="builder">Builder / Investor (Executive Oversight & Analytics — Read-Only)</option>
+        </select>
+        <select id="tProject" style="padding:10px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; background:#fff;">
+          <option value="">Assigned Project: All Projects (Global Access)</option>
         </select>
         <input id="tDepartment" placeholder="Department">
         <input id="tDesignation" placeholder="Designation">
@@ -2388,6 +2391,7 @@ body.role-builder [data-write-action="true"] {
             <th>Contact</th>
             <th>Department</th>
             <th>Designation</th>
+            <th>Assigned Project</th>
             <th>Code</th>
             <th>Status</th>
             <th>Actions</th>
@@ -3229,12 +3233,16 @@ function applyRolePermissions(user) {
         const banner = document.createElement('div');
         banner.id = 'builderNoticeBanner';
         banner.style.cssText = 'background:linear-gradient(90deg, rgba(212,175,55,0.12), rgba(2,132,199,0.08)); border:1px solid rgba(212,175,55,0.4); border-radius:12px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; color:#1e293b; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,0.03);';
+        const projectTitle = user.assigned_project_name ? ` · Assigned: ${esc(user.assigned_project_name)}` : ' · Global Portfolio';
+        const projectSub = user.assigned_project_name
+          ? `Privileged real-time executive oversight exclusively for <b>${esc(user.assigned_project_name)}</b> (inventory, enquiries, visits, bookings). Customer contacts masked for privacy.`
+          : 'Privileged real-time executive oversight across portfolio developments. Customer contacts masked for privacy.';
         banner.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px;">
             <span style="font-size:20px;">🛡️</span>
             <div>
-              <strong style="color:#854d0e; font-weight:700;">Executive Builder & Partner View (Read-Only)</strong>
-              <div style="color:#64748b; font-size:12px;">You have privileged real-time oversight of inventory, sales closures, enquiries, and site visits. Customer phone numbers and emails are masked for confidentiality.</div>
+              <strong style="color:#854d0e; font-weight:700;">Executive Builder & Partner View${projectTitle} (Read-Only)</strong>
+              <div style="color:#64748b; font-size:12px;">${projectSub}</div>
             </div>
           </div>
           <span style="background:#fef3c7; color:#92400e; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; border:1px solid #fde68a;">AUDIT PROTECTED</span>
@@ -4964,6 +4972,7 @@ async function loadProjects() {
   try {
     const d = await get('/api/admin/projects');
     state.projects = d.data || [];
+    fillTeamProjectSelect();
 
     // Calculate real-time KPI metrics
     const total = state.projects.length;
@@ -5422,12 +5431,38 @@ function refreshProjects() {
 }
 
 // ─── TEAM & EMPLOYEES ───
+function fillTeamProjectSelect() {
+  const el = $('tProject');
+  if (!el) return;
+  const curVal = el.value;
+  const list = state.projects || [];
+  el.innerHTML = '<option value="">Assigned Project: All Projects (Global Access)</option>' +
+    list.map(p => `<option value="${p.id}">🏗️ ${esc(p.name)} (${esc(p.category || 'Project')})</option>`).join('');
+  if (curVal) el.value = curVal;
+}
+
+function handleTeamRoleChange() {
+  const role = $('tRole') ? $('tRole').value : 'employee';
+  const pSelect = $('tProject');
+  if (!pSelect) return;
+  if (role === 'builder') {
+    pSelect.style.borderColor = '#f59e0b';
+    pSelect.style.background = '#fffbeb';
+  } else {
+    pSelect.style.borderColor = '#cbd5e1';
+    pSelect.style.background = '#fff';
+  }
+}
+
 function resetTeamForm() {
   $('tId').value = '';
   $('tName').value = '';
   $('tEmail').value = '';
   $('tPhone').value = '';
   if ($('tRole')) $('tRole').value = 'employee';
+  if ($('tProject')) $('tProject').value = '';
+  handleTeamRoleChange();
+  fillTeamProjectSelect();
   $('tDepartment').value = '';
   $('tDesignation').value = '';
   $('tPassword').value = '';
@@ -5457,6 +5492,7 @@ if ($('teamForm')) {
       email: $('tEmail').value.trim(),
       phone: $('tPhone').value.trim(),
       role: $('tRole') ? $('tRole').value : 'employee',
+      project_id: $('tProject') && $('tProject').value ? Number($('tProject').value) : null,
       department: $('tDepartment').value.trim(),
       designation: $('tDesignation').value.trim()
     };
@@ -5492,20 +5528,25 @@ if ($('teamForm')) {
 
 async function loadTeam() {
   try {
+    fillTeamProjectSelect();
     const d = await get('/api/admin/employees');
     state.employees = d.data;
     $('teamRows').innerHTML = d.data.map(x => {
       const roleBadge = (x.role === 'coordinator' || x.role === 'manager')
         ? '<span class="pill" style="background:#e0e7ff; color:#4338ca; border-color:#c7d2fe;">Coordinator</span>'
         : (x.role === 'admin' ? '<span class="pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">Admin</span>' : (x.role === 'builder' || x.role === 'partner' ? '<span class="pill" style="background:#fef3c7; color:#854d0e; border-color:#fde68a; font-weight:700;">🛡️ Builder (Read-Only)</span>' : '<span class="pill">Advisor</span>'));
-      return `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}<br>${roleBadge}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`;
-    }).join('') || '<tr><td colspan="7" class="empty">No team members yet.</td></tr>';
+      const projBadge = x.project_name
+        ? `<span class="pill" style="background:#e0f2fe; color:#0369a1; font-weight:600; border-color:#bae6fd;">🏗️ ${esc(x.project_name)}</span>`
+        : `<span class="pill" style="background:#f1f5f9; color:#475569;">🌐 All Projects</span>`;
+      return `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}<br>${roleBadge}</td><td>${projBadge}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`;
+    }).join('') || '<tr><td colspan="8" class="empty">No team members yet.</td></tr>';
   } catch (e) {
     toast(e.message);
   }
 }
 
 async function editTeam(id) {
+  fillTeamProjectSelect();
   const d = await get('/api/admin/employees');
   const x = d.data.find(v => Number(v.id) === Number(id));
   if (!x) return;
@@ -5514,6 +5555,8 @@ async function editTeam(id) {
   $('tEmail').value = x.email || '';
   $('tPhone').value = x.phone || '';
   if ($('tRole')) $('tRole').value = (x.role === 'coordinator' || x.role === 'manager') ? 'coordinator' : (x.role === 'builder' || x.role === 'partner' ? 'builder' : 'employee');
+  if ($('tProject')) $('tProject').value = x.project_id || '';
+  handleTeamRoleChange();
   $('tDepartment').value = x.department || '';
   $('tDesignation').value = x.designation || '';
   $('tPassword').value = '';
@@ -5527,6 +5570,7 @@ async function editTeam(id) {
   showView('teamView');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 
 async function toggleEmployee(id, status) {
   try {
