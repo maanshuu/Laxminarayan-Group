@@ -1610,6 +1610,9 @@ body.role-builder button[onclick*="editLeadInline"],
 body.role-builder button[onclick*="editCustomer"],
 body.role-builder button[onclick*="toggleUser"],
 body.role-builder button[onclick*="deleteCustomer"],
+body.role-builder #visitAddPanel,
+body.role-builder #visitFormInline,
+body.role-builder button[onclick*="resetVisitForm"],
 body.role-builder button[onclick*="editVisit"],
 body.role-builder button[onclick*="deleteVisit"],
 body.role-builder button[onclick*="editUnit"],
@@ -2117,7 +2120,7 @@ body.role-builder [data-write-action="true"] {
 
   <!-- VISITS VIEW -->
   <section id="visitsView" class="view">
-    <div class="panel">
+    <div class="panel" id="visitAddPanel" data-builder-hide="true">
       <div class="toolbar">
         <div>
           <h2 style="margin:0" id="visitFormTitle">Add site visit</h2>
@@ -2153,6 +2156,7 @@ body.role-builder [data-write-action="true"] {
           <p class="muted" style="margin-bottom:0">Saved records stay here after Save and Refresh. Use Edit to load a record into the form above.</p>
         </div>
         <div class="actions">
+          <button class="btn" onclick="refreshVisits()" title="Reload site visits">↻ Refresh</button>
           <button class="btn" onclick="exportVisitsCSV()" title="Export all site visits to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
         </div>
       </div>
@@ -3980,6 +3984,10 @@ function createBookingFromDrawer() {
 }
 
 function openVisitFromDrawer() {
+  if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+    toast('Access Denied: Builder accounts cannot schedule site visits.');
+    return;
+  }
   if (!state.currentDrawerLead) return;
   const lead = state.currentDrawerLead;
   closeLeadDrawer();
@@ -4889,6 +4897,7 @@ async function sendTestEmailDiagnostic() {
 
 // ─── SITE VISITS ───
 function resetVisitForm() {
+  if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) return;
   const f = $('visitFormInline');
   if (!f) return;
   f.reset();
@@ -4901,6 +4910,10 @@ function resetVisitForm() {
 }
 
 function editVisit(id) {
+  if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+    toast('Access Denied: Builder account has read-only access.');
+    return;
+  }
   get('/api/admin/site-visits').then(d => {
     const x = d.data.find(v => Number(v.id) === Number(id));
     if (!x) return;
@@ -4939,6 +4952,10 @@ if ($('visitUserInline')) {
 if ($('visitFormInline')) {
   $('visitFormInline').onsubmit = async e => {
     e.preventDefault();
+    if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+      toast('Access Denied: Builder accounts cannot add or edit site visits.');
+      return;
+    }
     const id = $('visitIdInline').value;
     const body = {
       name: $('visitNameInline').value,
