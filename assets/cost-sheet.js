@@ -255,6 +255,10 @@
   }
 
   window.openCostSheetModal = function(opts = {}) {
+    if (document.body.classList.contains('role-builder') || (window.state && window.state.currentUser && (window.state.currentUser.role === 'builder' || window.state.currentUser.role === 'partner'))) {
+      if (typeof window.toast === 'function') window.toast('Cost Sheet generation is restricted for Builder / Partner accounts.');
+      return;
+    }
     ensureModalDOM();
     const modal = document.getElementById('costSheetModal');
     if (opts.clientName) document.getElementById('csClientName').value = opts.clientName;

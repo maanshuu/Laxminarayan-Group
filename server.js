@@ -1735,6 +1735,9 @@ app.delete("/api/admin/bookings/:id",admin,(req,res)=>{
 });
 
 app.get("/api/admin/bookings/:id/allotment-letter", coordinatorOrAdmin, (req, res) => {
+  if (isBuilderOrPartner(req)) {
+    return res.status(403).json({ success: false, error: "Access Denied: Official Allotment Letters are restricted for Builder / Partner accounts." });
+  }
   const id = Number(req.params.id);
   const booking = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type
     FROM bookings b
@@ -2235,6 +2238,9 @@ function formatCsvOutput(headers, rows) {
 }
 
 app.get("/api/admin/reports.csv", coordinatorOrAdmin, (req, res) => {
+  if (isBuilderOrPartner(req)) {
+    return res.status(403).json({ success: false, error: "Access Denied: CSV exports are restricted for Builder / Partner accounts." });
+  }
   const builderProjId = getBuilderProjectId(req);
   let sql = `SELECT l.id, l.name, l.phone, l.email, l.source, l.sentiment, l.status, l.budget, l.notes, p.name AS project_name, eu.name AS employee_name, l.follow_up_at, l.created_at, l.updated_at FROM leads l LEFT JOIN projects p ON p.id = l.project_id LEFT JOIN employees e ON e.id = l.assigned_employee_id LEFT JOIN users eu ON eu.id = e.user_id`;
   const params = [];
@@ -2244,12 +2250,6 @@ app.get("/api/admin/reports.csv", coordinatorOrAdmin, (req, res) => {
   }
   sql += ` ORDER BY l.id DESC`;
   const rows = db.prepare(sql).all(...params);
-  if (isBuilderOrPartner(req)) {
-    rows.forEach(r => {
-      r.phone = maskPhone(r.phone);
-      r.email = maskEmail(r.email);
-    });
-  }
   const headers = [
     { label: "ID", key: "id" },
     { label: "Name", key: "name" },
@@ -2271,10 +2271,16 @@ app.get("/api/admin/reports.csv", coordinatorOrAdmin, (req, res) => {
 });
 
 app.get("/api/admin/reports/leads.csv", coordinatorOrAdmin, (req, res) => {
+  if (isBuilderOrPartner(req)) {
+    return res.status(403).json({ success: false, error: "Access Denied: CSV exports are restricted for Builder / Partner accounts." });
+  }
   res.redirect("/api/admin/reports.csv");
 });
 
 app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
+  if (isBuilderOrPartner(req)) {
+    return res.status(403).json({ success: false, error: "Access Denied: CSV exports are restricted for Builder / Partner accounts." });
+  }
   const builderProjId = getBuilderProjectId(req);
   let sql = `SELECT pu.*, p.name AS project_name FROM project_units pu LEFT JOIN projects p ON p.id = pu.project_id`;
   const params = [];
@@ -2284,11 +2290,6 @@ app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
   }
   sql += ` ORDER BY pu.project_id ASC, pu.unit_number ASC`;
   const rows = db.prepare(sql).all(...params);
-  if (isBuilderOrPartner(req)) {
-    rows.forEach(r => {
-      r.buyer_phone = maskPhone(r.buyer_phone);
-    });
-  }
   const headers = [
     { label: "Unit ID", key: "id" },
     { label: "Project Name", key: "project_name" },
@@ -2310,6 +2311,9 @@ app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
 });
 
 app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
+  if (isBuilderOrPartner(req)) {
+    return res.status(403).json({ success: false, error: "Access Denied: CSV exports are restricted for Builder / Partner accounts." });
+  }
   const builderProjId = getBuilderProjectId(req);
   let sql = `SELECT sv.*, p.name AS project_name, u.name AS user_name FROM site_visits sv LEFT JOIN projects p ON p.id = sv.project_id LEFT JOIN users u ON u.id = sv.user_id`;
   const params = [];
@@ -2319,12 +2323,6 @@ app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
   }
   sql += ` ORDER BY sv.id DESC`;
   const rows = db.prepare(sql).all(...params);
-  if (isBuilderOrPartner(req)) {
-    rows.forEach(r => {
-      r.phone = maskPhone(r.phone);
-      r.email = maskEmail(r.email);
-    });
-  }
   const headers = [
     { label: "Visit ID", key: "id" },
     { label: "Customer Name", key: "name" },
@@ -2343,6 +2341,9 @@ app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
 });
 
 app.get("/api/admin/reports/bookings.csv", coordinatorOrAdmin, (req, res) => {
+  if (isBuilderOrPartner(req)) {
+    return res.status(403).json({ success: false, error: "Access Denied: CSV exports are restricted for Builder / Partner accounts." });
+  }
   const builderProjId = getBuilderProjectId(req);
   let sql = `SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type FROM bookings b LEFT JOIN projects p ON p.id = b.project_id LEFT JOIN project_units pu ON pu.id = b.unit_id`;
   const params = [];
@@ -2396,17 +2397,71 @@ app.get("/api/admin/backup/download", admin, (req, res) => {
 });
 
 app.get("/api/admin/report",coordinatorOrAdmin,(req,res)=>{
- const start=clean(req.query.start,10),end=clean(req.query.end,10);
- const where=start&&end?"WHERE date(created_at) BETWEEN ? AND ?":start?"WHERE date(created_at)>=?":end?"WHERE date(created_at)<=?":"";
- const params=start&&end?[start,end]:start?[start]:end?[end]:[];
- const totalLeads=db.prepare(`SELECT COUNT(*) c FROM leads ${where}`).get(...params).c;
- const wonWhere=where?`${where} AND status='won'`:`WHERE status='won'`;
- const won=db.prepare(`SELECT COUNT(*) c FROM leads ${wonWhere}`).get(...params).c;
- const byStatus=db.prepare(`SELECT status,COUNT(*) count FROM leads ${where} GROUP BY status ORDER BY count DESC`).all(...params);
- const byProject=db.prepare(`SELECT COALESCE(p.name,'General') project_name,COUNT(l.id) count FROM leads l LEFT JOIN projects p ON p.id=l.project_id ${where.replaceAll('created_at','l.created_at')} GROUP BY l.project_id ORDER BY count DESC LIMIT 12`).all(...params);
- const monthly=db.prepare(`SELECT substr(created_at,1,7) month,COUNT(*) count FROM leads WHERE created_at>=date('now','-11 months') ${start?"AND date(created_at)>=?":""} ${end?"AND date(created_at)<=?":""} GROUP BY substr(created_at,1,7) ORDER BY month`).all(...(start&&end?[start,end]:start?[start]:end?[end]:[]));
- const visits=db.prepare("SELECT status,COUNT(*) count FROM site_visits GROUP BY status").all();
- res.json({success:true,data:{totalLeads,won,conversionRate:totalLeads?Math.round(won*1000/totalLeads)/10:0,byStatus,byProject,monthly,visits,start:start||null,end:end||null}});
+  if (isBuilderOrPartner(req)) {
+    return res.status(403).json({ success: false, error: "Access Denied: Reports are restricted for Builder / Partner accounts." });
+  }
+  const start=clean(req.query.start,10),end=clean(req.query.end,10);
+  const builderProjId = getBuilderProjectId(req);
+
+  const conditions = [];
+  const params = [];
+
+  if (builderProjId) {
+    conditions.push("project_id = ?");
+    params.push(builderProjId);
+  }
+  if (start && end) {
+    conditions.push("date(created_at) BETWEEN ? AND ?");
+    params.push(start, end);
+  } else if (start) {
+    conditions.push("date(created_at) >= ?");
+    params.push(start);
+  } else if (end) {
+    conditions.push("date(created_at) <= ?");
+    params.push(end);
+  }
+
+  const where = conditions.length ? ("WHERE " + conditions.join(" AND ")) : "";
+
+  const totalLeads=db.prepare(`SELECT COUNT(*) c FROM leads ${where}`).get(...params).c;
+
+  const wonConditions = [...conditions, "status='won'"];
+  const wonWhere = "WHERE " + wonConditions.join(" AND ");
+  const won=db.prepare(`SELECT COUNT(*) c FROM leads ${wonWhere}`).get(...params).c;
+
+  const byStatus=db.prepare(`SELECT status,COUNT(*) count FROM leads ${where} GROUP BY status ORDER BY count DESC`).all(...params);
+
+  const lConditions = conditions.map(c => c.replace("project_id", "l.project_id").replace("created_at", "l.created_at"));
+  const lWhere = lConditions.length ? ("WHERE " + lConditions.join(" AND ")) : "";
+  const byProject=db.prepare(`SELECT COALESCE(p.name,'General') project_name,COUNT(l.id) count FROM leads l LEFT JOIN projects p ON p.id=l.project_id ${lWhere} GROUP BY l.project_id ORDER BY count DESC LIMIT 12`).all(...params);
+
+  const mConditions = ["created_at>=date('now','-11 months')"];
+  const mParams = [];
+  if (builderProjId) {
+    mConditions.push("project_id = ?");
+    mParams.push(builderProjId);
+  }
+  if (start) {
+    mConditions.push("date(created_at) >= ?");
+    mParams.push(start);
+  }
+  if (end) {
+    mConditions.push("date(created_at) <= ?");
+    mParams.push(end);
+  }
+  const mWhere = "WHERE " + mConditions.join(" AND ");
+  const monthly=db.prepare(`SELECT substr(created_at,1,7) month,COUNT(*) count FROM leads ${mWhere} GROUP BY substr(created_at,1,7) ORDER BY month`).all(...mParams);
+
+  const vConditions = [];
+  const vParams = [];
+  if (builderProjId) {
+    vConditions.push("project_id = ?");
+    vParams.push(builderProjId);
+  }
+  const vWhere = vConditions.length ? ("WHERE " + vConditions.join(" AND ")) : "";
+  const visits=db.prepare(`SELECT status,COUNT(*) count FROM site_visits ${vWhere} GROUP BY status`).all(...vParams);
+
+  res.json({success:true,data:{totalLeads,won,conversionRate:totalLeads?Math.round(won*1000/totalLeads)/10:0,byStatus,byProject,monthly,visits,start:start||null,end:end||null}});
 });
 
 // ---------------- Sales Advisor / Employee Scoped Portal ----------------

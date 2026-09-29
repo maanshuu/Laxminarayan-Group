@@ -1617,12 +1617,29 @@ body.role-builder button[onclick*="deleteUnit"],
 body.role-builder button[onclick*="editProject"],
 body.role-builder button[onclick*="deleteProject"],
 body.role-builder button[onclick*="sendBookingAllotmentEmailAction"],
+body.role-builder a[href*="allotment-letter"],
 body.role-builder button[onclick*="deleteBooking"],
 body.role-builder button[onclick*="deleteLeadFromDrawer"],
 body.role-builder button[onclick*="saveLeadFromDrawer"],
 body.role-builder button[onclick*="createBookingFromDrawer"],
 body.role-builder button[onclick*="openVisitFromDrawer"],
 body.role-builder button[onclick*="openCostSheetFromDrawer"],
+body.role-builder button[onclick*="openCostSheetModal"],
+body.role-builder button[onclick*="CostSheet"],
+body.role-builder .unit-btn-quote,
+body.role-builder button[onclick*="exportLeadsCSV"],
+body.role-builder button[onclick*="exportUnitsCSV"],
+body.role-builder button[onclick*="exportBookingsCSV"],
+body.role-builder button[onclick*="exportVisitsCSV"],
+body.role-builder button[onclick*="exportTeamCSV"],
+body.role-builder button[onclick*="export"],
+body.role-builder button[onclick*="Export"],
+body.role-builder a[href*="reports.csv"],
+body.role-builder #reportExportCsvBtn,
+body.role-builder #drawerWaBtn,
+body.role-builder #drawerCallBtn,
+body.role-builder a[href^="tel:"],
+body.role-builder a[href*="wa.me"],
 body.role-builder .drawer-actions button,
 body.role-builder .drawer-actions a,
 body.role-builder .card-icon-btn,
@@ -1630,6 +1647,7 @@ body.role-builder .card-wa,
 body.role-builder .card-call,
 body.role-builder a[title*="WhatsApp"],
 body.role-builder a[title*="Call"],
+body.role-builder [data-builder-hide="true"],
 body.role-builder [data-write-action="true"] {
   display: none !important;
 }
@@ -2448,7 +2466,7 @@ body.role-builder [data-write-action="true"] {
           <button class="btn primary" onclick="loadReports()">Apply filters</button>
           <button class="btn" onclick="clearReportFilters()">Clear filters</button>
           <button class="btn" onclick="refreshReports()">Refresh</button>
-          <a class="btn" href="/api/admin/reports.csv">Export enquiries CSV</a>
+          <a class="btn" id="reportExportCsvBtn" data-builder-hide="true" href="/api/admin/reports.csv">Export enquiries CSV</a>
           <a class="btn" data-admin-only="true" href="/api/admin/backup/download" style="background:var(--sky-light, #e0f2fe); color:var(--sky-deep, #0369a1); border-color:#bae6fd; font-weight:700;" title="Download complete portable database backup (.db)">📥 Download Database (.db)</a>
         </div>
       </div>
@@ -3229,6 +3247,11 @@ function applyRolePermissions(user) {
         el.style.display = 'none';
       });
 
+      // Strict Builder Restrictions: Hide WhatsApp, Call, Export CSV, Cost Sheet, and Allotment PDF
+      document.querySelectorAll('button[onclick*="export"], button[onclick*="Export"], a[href*="reports.csv"], a[href*="allotment-letter"], button[onclick*="sendBookingAllotmentEmailAction"], button[onclick*="openCostSheet"], button[onclick*="CostSheet"], .unit-btn-quote, #reportExportCsvBtn, #drawerWaBtn, #drawerCallBtn, .card-wa, .card-call, a[href^="tel:"], a[href*="wa.me"], [data-builder-hide="true"]').forEach(el => {
+        el.style.display = 'none';
+      });
+
       if (!document.getElementById('builderNoticeBanner')) {
         const banner = document.createElement('div');
         banner.id = 'builderNoticeBanner';
@@ -3474,6 +3497,7 @@ async function loadEnquiries() {
   try {
     const d = await get('/api/admin/enquiries');
     const phoneCounts = {}, emailCounts = {};
+    const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
     for (const e of (d.data || [])) {
       const p = (e.phone || '').replace(/[^0-9]/g, '').slice(-10);
       const em = (e.email || '').toLowerCase().trim();
@@ -3499,19 +3523,22 @@ async function loadEnquiries() {
           </td>
           <td>
             ${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
+            ${(!isBuilder && (p || x.phone)) ? `
             <div style="display:flex; gap:6px; margin-top:4px;">
               ${p ? `<a href="https://wa.me/91${p}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp Welcome">💬</a>` : ''}
               ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Call">📞</a>` : ''}
-            </div>
+            </div>` : ''}
           </td>
           <td>${esc(x.message)}</td>
           <td>${esc(x.project_name || 'General')}</td>
           <td><span class="pill">${esc(x.status)}</span></td>
           <td>${esc(x.admin_response || '—')}</td>
           <td class="actions">
+            ${!isBuilder ? `
             <button class="btn smallbtn" onclick="editEnquiry(${x.id})">Edit</button>
             <button class="btn smallbtn gold" onclick="convertEnquiryToLead(${x.id})">Convert to Lead →</button>
             <button class="btn smallbtn" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;" onclick="deleteEnquiry(${x.id}, '${esc(x.name)}')">Delete</button>
+            ` : `<span class="pill" style="color:#64748b;">Read-Only</span>`}
           </td>
         </tr>
       `;
@@ -3742,6 +3769,7 @@ function renderLeadRows() {
     if (e) leadEmailCounts[e] = (leadEmailCounts[e] || 0) + 1;
   });
 
+  const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
   tbody.innerHTML = list.length ? list.map(x => {
     const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
     const lp = cleanPhone.slice(-10);
@@ -3771,13 +3799,15 @@ function renderLeadRows() {
       <td>${x.follow_up_at ? localDate(x.follow_up_at) : '—'}</td>
       <td>${esc(x.notes || '—')}</td>
       <td class="actions" style="white-space:nowrap;">
-        ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="btn smallbtn" style="text-decoration:none; color:#15803d; border-color:#86efac; background:#f0fdf4; display:inline-flex; align-items:center; gap:3px;" title="⚡ 1-Click Welcome WhatsApp">💬 WA</a>` : ''}
+        ${(!isBuilder && cleanPhone) ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="btn smallbtn" style="text-decoration:none; color:#15803d; border-color:#86efac; background:#f0fdf4; display:inline-flex; align-items:center; gap:3px;" title="⚡ 1-Click Welcome WhatsApp">💬 WA</a>` : ''}
         <button class="btn smallbtn" onclick="openLeadDrawer(${x.id})">360° Drawer</button>
+        ${!isBuilder ? `
         <button class="btn smallbtn" onclick="editLeadInline(${x.id})">Edit</button>
         <button class="btn smallbtn danger" onclick="deleteLead(${x.id})">Delete</button>
+        ` : ''}
       </td>
     </tr>
-  `}).join('') : '<tr><td colspan="8" class="empty">No saved enquiries matching filters. Use + Add Enquiry to create one.</td></tr>';
+  `}).join('') : '<tr><td colspan="8" class="empty">No saved enquiries matching filters.</td></tr>';
 }
 
 async function loadLeads() {
@@ -3871,6 +3901,12 @@ function openLeadDrawer(id) {
   const drawerInputs = ['drawerName', 'drawerPhone', 'drawerEmail', 'drawerProject', 'drawerBudget', 'drawerSentiment', 'drawerEmployee', 'drawerFollowUp', 'drawerNotes', 'drawerLostReason'];
   drawerInputs.forEach(k => { if ($(k)) $(k).disabled = isBuilder; });
 
+  if ($('drawerWaBtn')) $('drawerWaBtn').style.display = isBuilder ? 'none' : 'inline-flex';
+  if ($('drawerCallBtn')) $('drawerCallBtn').style.display = isBuilder ? 'none' : 'inline-flex';
+  document.querySelectorAll('button[onclick*="openCostSheetFromDrawer"], button[onclick*="openVisitFromDrawer"]').forEach(el => {
+    el.style.display = isBuilder ? 'none' : 'inline-flex';
+  });
+
   const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
   $('drawerCallBtn').href = x.phone ? ('tel:' + x.phone) : '#';
   const waText = `Hello ${x.name}, greeting from Laxminarayan Group regarding ${x.project_name || 'our projects'}. I would be pleased to share our project brochure, master layout and current payment milestones with you.`;
@@ -3883,6 +3919,10 @@ function openLeadDrawer(id) {
 }
 
 function openCostSheetFromDrawer() {
+  if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+    toast('Cost Sheet generation is restricted for Builder / Partner accounts.');
+    return;
+  }
   const name = $('drawerName')?.value || '';
   const phone = $('drawerPhone')?.value || '';
   const projSel = $('drawerProject');
@@ -4431,6 +4471,7 @@ function renderUnits() {
     return '';
   }
 
+  const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
   grid.innerHTML = list.map(u => {
     const statusClass = u.status === 'available' ? 'available' : (u.status === 'blocked' ? 'blocked' : 'sold');
     const badgeMarkup = u.status === 'available' 
@@ -4494,6 +4535,7 @@ function renderUnits() {
         </div>
 
         <div class="unit-actions-row">
+          ${!isBuilder ? `
           <button class="unit-btn-quote" onclick="openCostSheetModal({ unitNumber: '${escAttr(u.unit_number)}', areaSqft: ${u.area_sqft || 1400}, projectName: '${escAttr(u.project_name || '')}' })" title="Generate Quotation & Cost Sheet">📄 Quote</button>
           ${u.status === 'available' ? `
             <button class="unit-btn-status hold" onclick="promptUnitStatus(${u.id}, 'blocked')" title="Place unit on reservation hold">Hold</button>
@@ -4506,6 +4548,7 @@ function renderUnits() {
           `)}
           <button class="unit-btn-icon" onclick="editUnit(${u.id})" title="Edit Unit Specs">✏️</button>
           <button class="unit-btn-icon danger" onclick="deleteUnit(${u.id}, '${escAttr(u.unit_number)}')" title="Delete Unit">🗑️</button>
+          ` : `<span class="pill" style="color:#64748b; font-size:11px;">View Only</span>`}
         </div>
       </div>
     `;
@@ -4514,6 +4557,10 @@ function renderUnits() {
 
 
 async function promptUnitStatus(id, newStatus) {
+  if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+    toast('Access Denied: Unit status cannot be modified by Builder accounts.');
+    return;
+  }
   let buyerName = '';
   let buyerPhone = '';
   if (newStatus === 'blocked' || newStatus === 'sold') {
@@ -4640,6 +4687,7 @@ async function loadBookings() {
   try {
     const d = await get('/api/admin/bookings');
     state.bookings = d.data;
+    const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
     $('bookingRows').innerHTML = d.data.length ? d.data.map(x => {
       const cp = (x.customer_phone || '').replace(/[^0-9]/g, '');
       return `
@@ -4647,10 +4695,11 @@ async function loadBookings() {
         <td><b>${esc(x.booking_reference || ('BK-' + x.id))}</b><br><span class="small">${localDate(x.created_at)}</span></td>
         <td>
           <b>${esc(x.customer_name)}</b><br>${esc(x.customer_phone)}<br><span class="small">${esc(x.customer_email || '')}</span>
+          ${(!isBuilder && (cp || x.customer_phone)) ? `
           <div style="display:flex; gap:6px; margin-top:4px;">
             ${cp ? `<a href="https://wa.me/91${cp}?text=${encodeURIComponent('Hello ' + x.customer_name + ', your booking ' + (x.booking_reference || '') + ' at Laxminarayan Group is confirmed.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp Booking Acknowledgment">💬</a>` : ''}
             ${x.customer_phone ? `<a href="tel:${escAttr(x.customer_phone)}" class="card-icon-btn card-call" title="Call">📞</a>` : ''}
-          </div>
+          </div>` : ''}
         </td>
         <td><b>${esc(x.project_name || 'General')}</b><br><span class="pill" style="margin-top:4px;">${x.unit_number ? ('Unit ' + esc(x.unit_number)) : (esc(x.allotted_unit || 'Custom Allotment'))}</span></td>
         <td><b style="color:var(--ink); font-family:monospace; font-size:14px;">${esc(x.agreement_value || '—')}</b></td>
@@ -4658,6 +4707,7 @@ async function loadBookings() {
         <td><span class="pill" style="background:#ecfdf5; color:#065f46;">${esc(x.payment_status || 'token_received').replace(/_/g, ' ')}</span></td>
         <td><span class="pill" style="background:${x.status === 'confirmed' ? '#ecfdf5' : '#fffbeb'}; color:${x.status === 'confirmed' ? '#065f46' : '#92400e'};">${esc(x.status)}</span></td>
         <td class="actions" style="white-space:nowrap;">
+          ${!isBuilder ? `
           <a href="/api/admin/bookings/${x.id}/allotment-letter" target="_blank" class="btn smallbtn gold" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-weight:700;" title="Download Official Signed PDF Allotment Letter">
             📄 Allotment PDF
           </a>
@@ -4665,6 +4715,7 @@ async function loadBookings() {
             📧 Email PDF
           </button>
           <button class="btn smallbtn danger" onclick="deleteBooking(${x.id}, '${escAttr(x.booking_reference)}')">Delete</button>
+          ` : `<span class="pill" style="color:#64748b;">Read-Only</span>`}
         </td>
       </tr>
     `;}).join('') : '<tr><td colspan="8" class="empty">No bookings recorded yet. Use + New Booking or convert directly from an Enquiry.</td></tr>';
@@ -4915,6 +4966,7 @@ if ($('visitFormInline')) {
 async function loadVisits() {
   try {
     const d = await get('/api/admin/site-visits');
+    const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
     $('visitRows').innerHTML = d.data.length ? d.data.map(x => {
       const vp = (x.phone || '').replace(/[^0-9]/g, '');
       return `
@@ -4923,18 +4975,21 @@ async function loadVisits() {
         <td>${localDate(x.preferred_at)}</td>
         <td>
           <b>${esc(x.name)}</b><br>${esc(x.phone)}<br><span class="small">${esc(x.email || '')}</span>
+          ${(!isBuilder && (vp || x.phone)) ? `
           <div style="display:flex; gap:6px; margin-top:4px;">
             ${vp ? `<a href="https://wa.me/91${vp}?text=${encodeURIComponent('Hello ' + x.name + ', regarding your site visit scheduled on ' + localDate(x.preferred_at) + ' with Laxminarayan Group.')}" target="_blank" class="card-icon-btn card-wa" title="WhatsApp Site Visit Details">💬</a>` : ''}
             ${x.phone ? `<a href="tel:${escAttr(x.phone)}" class="card-icon-btn card-call" title="Call">📞</a>` : ''}
-          </div>
+          </div>` : ''}
         </td>
         <td>${esc(x.project_name || 'General')}</td>
         <td><span class="pill">${esc(x.status)}</span></td>
         <td>${esc(x.notes || '—')}</td>
         <td>${esc(x.admin_notes || '—')}</td>
         <td class="actions">
+          ${!isBuilder ? `
           <button class="btn smallbtn" onclick="editVisit(${x.id})">Edit</button>
           <button class="btn smallbtn danger" onclick="deleteVisit(${x.id})">Delete</button>
+          ` : `<span class="pill" style="color:#64748b;">Read-Only</span>`}
         </td>
       </tr>
     `;}).join('') : '<tr><td colspan="8" class="empty">No saved site visits yet.</td></tr>';
@@ -6125,6 +6180,10 @@ async function refreshAll() {
 
 // ─── UNIVERSAL CSV EXPORT ENGINE (EXCEL COMPLIANT WITH UTF-8 BOM) ───
 function downloadCSV(filename, headers, rows) {
+  if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+    toast('CSV Export is restricted for Builder / Partner accounts.');
+    return;
+  }
   if (!rows || !rows.length) {
     toast('No records available to export.');
     return;
