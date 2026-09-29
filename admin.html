@@ -1584,6 +1584,55 @@ body.role-coordinator #leadModalDeleteBtn,
 body.role-coordinator [onclick*="openIntegrationModal"] {
   display: none !important;
 }
+
+/* ─── ROLE-BASED ACCESS CONTROL: BUILDER / PARTNER (READ ONLY) ─── */
+body.role-builder .danger,
+body.role-builder button[onclick*="delete"],
+body.role-builder button[onclick*="Delete"],
+body.role-builder [data-admin-only="true"],
+body.role-builder .tab[data-view="attendanceView"],
+body.role-builder .tab[data-view="auditView"],
+body.role-builder .tab[data-view="teamView"],
+body.role-builder #attendanceView,
+body.role-builder #auditView,
+body.role-builder #teamView,
+body.role-builder .team-snapshot-panel,
+body.role-builder .attendance-mini,
+body.role-builder #leadModalDeleteBtn,
+body.role-builder [onclick*="openIntegrationModal"],
+body.role-builder button[onclick*="openLeadModal"],
+body.role-builder button[onclick*="openBookingModal"],
+body.role-builder button[onclick*="openProjectModal"],
+body.role-builder button[onclick*="openUnitModal"],
+body.role-builder button[onclick*="openSiteVisitModal"],
+body.role-builder button[onclick*="openNewEnquiryModal"],
+body.role-builder button[onclick*="editLeadInline"],
+body.role-builder button[onclick*="editCustomer"],
+body.role-builder button[onclick*="toggleUser"],
+body.role-builder button[onclick*="deleteCustomer"],
+body.role-builder button[onclick*="editVisit"],
+body.role-builder button[onclick*="deleteVisit"],
+body.role-builder button[onclick*="editUnit"],
+body.role-builder button[onclick*="deleteUnit"],
+body.role-builder button[onclick*="editProject"],
+body.role-builder button[onclick*="deleteProject"],
+body.role-builder button[onclick*="sendBookingAllotmentEmailAction"],
+body.role-builder button[onclick*="deleteBooking"],
+body.role-builder button[onclick*="deleteLeadFromDrawer"],
+body.role-builder button[onclick*="saveLeadFromDrawer"],
+body.role-builder button[onclick*="createBookingFromDrawer"],
+body.role-builder button[onclick*="openVisitFromDrawer"],
+body.role-builder button[onclick*="openCostSheetFromDrawer"],
+body.role-builder .drawer-actions button,
+body.role-builder .drawer-actions a,
+body.role-builder .card-icon-btn,
+body.role-builder .card-wa,
+body.role-builder .card-call,
+body.role-builder a[title*="WhatsApp"],
+body.role-builder a[title*="Call"],
+body.role-builder [data-write-action="true"] {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -2309,6 +2358,7 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Sales Coordinator')">+ Sales Coordinator</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Site Relationship Manager')">+ Relationship Manager</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Project Engineer')">+ Project Engineer</button>
+        <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Builder / Investor')" style="background:#fffbeb; color:#92400e; border-color:#fde68a; font-weight:700;">+ Builder / Partner</button>
       </div>
       <form id="teamForm" class="formgrid">
         <input id="tId" type="hidden">
@@ -2318,6 +2368,7 @@ body.role-coordinator [onclick*="openIntegrationModal"] {
         <select id="tRole" style="padding:10px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; background:#fff;">
           <option value="employee">Sales Advisor (Field / Advisor Portal)</option>
           <option value="coordinator">Sales Coordinator (CRM Operations & Coordination)</option>
+          <option value="builder">Builder / Investor (Executive Oversight & Analytics — Read-Only)</option>
         </select>
         <input id="tDepartment" placeholder="Department">
         <input id="tDesignation" placeholder="Designation">
@@ -3133,8 +3184,12 @@ const VIEW_METADATA = {
 function applyRolePermissions(user) {
   if (!user) return;
   const isCoordinator = user.role === 'coordinator' || user.role === 'manager';
-  if (isCoordinator) {
-    document.body.classList.add('role-coordinator');
+  const isBuilder = user.role === 'builder' || user.role === 'partner';
+
+  if (isCoordinator || isBuilder) {
+    if (isCoordinator) document.body.classList.add('role-coordinator');
+    if (isBuilder) document.body.classList.add('role-builder');
+
     const tabsToHide = ['attendanceView', 'auditView', 'teamView'];
     tabsToHide.forEach(viewId => {
       const tabBtn = document.querySelector(`.tab[data-view="${viewId}"]`);
@@ -3153,18 +3208,46 @@ function applyRolePermissions(user) {
 
     const subTitle = document.querySelector('.top-sub');
     if (subTitle) {
-      subTitle.textContent = 'COORDINATOR CRM · COMMAND CENTER';
-      subTitle.style.color = '#38bdf8';
+      if (isBuilder) {
+        subTitle.innerHTML = '<span style="color:#d4af37; font-weight:800;">BUILDER & INVESTOR PORTAL</span> · READ ONLY ACCESS';
+      } else {
+        subTitle.textContent = 'COORDINATOR CRM · COMMAND CENTER';
+        subTitle.style.color = '#38bdf8';
+      }
     }
 
     document.querySelectorAll('.danger, button[onclick*="delete"], button[onclick*="Delete"], #leadModalDeleteBtn').forEach(el => {
       el.style.display = 'none';
     });
+
+    if (isBuilder) {
+      document.querySelectorAll('button[onclick*="openLeadModal"], button[onclick*="openBookingModal"], button[onclick*="openProjectModal"], button[onclick*="openUnitModal"], button[onclick*="openSiteVisitModal"], button[onclick*="openNewEnquiryModal"]').forEach(el => {
+        el.style.display = 'none';
+      });
+
+      if (!document.getElementById('builderNoticeBanner')) {
+        const banner = document.createElement('div');
+        banner.id = 'builderNoticeBanner';
+        banner.style.cssText = 'background:linear-gradient(90deg, rgba(212,175,55,0.12), rgba(2,132,199,0.08)); border:1px solid rgba(212,175,55,0.4); border-radius:12px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; color:#1e293b; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,0.03);';
+        banner.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:20px;">🛡️</span>
+            <div>
+              <strong style="color:#854d0e; font-weight:700;">Executive Builder & Partner View (Read-Only)</strong>
+              <div style="color:#64748b; font-size:12px;">You have privileged real-time oversight of inventory, sales closures, enquiries, and site visits. Customer phone numbers and emails are masked for confidentiality.</div>
+            </div>
+          </div>
+          <span style="background:#fef3c7; color:#92400e; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; border:1px solid #fde68a;">AUDIT PROTECTED</span>
+        `;
+        const mainWrap = document.querySelector('main.wrap');
+        if (mainWrap) mainWrap.insertBefore(banner, mainWrap.firstChild);
+      }
+    }
   }
 }
 
 function showView(id) {
-  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
     if (id === 'attendanceView' || id === 'auditView' || id === 'teamView') {
       id = 'overview';
     }
@@ -3183,7 +3266,7 @@ function showView(id) {
 }
 
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
-  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager')) {
+  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
     if (b.dataset.view === 'attendanceView' || b.dataset.view === 'auditView' || b.dataset.view === 'teamView') {
       return;
     }
@@ -3231,7 +3314,8 @@ async function load() {
   if ($('todayFollowUps')) $('todayFollowUps').textContent = d.stats.followUpsToday || 0;
   if ($('heroOpenLeads')) $('heroOpenLeads').textContent = d.stats.openLeads;
   if ($('heroNewEnquiries')) $('heroNewEnquiries').textContent = d.stats.newEnquiries;
-  if (!isCoordinator) {
+  const hideAttendance = state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
+  if (!hideAttendance && d.stats.attendance) {
     if ($('attPresent')) $('attPresent').textContent = d.stats.attendance.present;
     if ($('attAbsent')) $('attAbsent').textContent = d.stats.attendance.absent;
     if ($('attLeave')) $('attLeave').textContent = d.stats.attendance.leave;
@@ -3732,6 +3816,10 @@ function renderDrawerStepper(currentStatus) {
 }
 
 async function changeDrawerStage(newStage) {
+  if (state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+    toast('Access Denied: Builder account has read-only access.');
+    return;
+  }
   if (!state.currentDrawerLead) return;
   try {
     await send('/api/admin/leads/' + state.currentDrawerLead.id, {
@@ -3770,6 +3858,10 @@ function openLeadDrawer(id) {
   $('drawerFollowUp').value = toDatetimeLocalIST(x.follow_up_at);
   $('drawerNotes').value = x.notes || '';
   $('drawerLostReason').value = x.lost_reason || '';
+
+  const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
+  const drawerInputs = ['drawerName', 'drawerPhone', 'drawerEmail', 'drawerProject', 'drawerBudget', 'drawerSentiment', 'drawerEmployee', 'drawerFollowUp', 'drawerNotes', 'drawerLostReason'];
+  drawerInputs.forEach(k => { if ($(k)) $(k).disabled = isBuilder; });
 
   const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
   $('drawerCallBtn').href = x.phone ? ('tel:' + x.phone) : '#';
@@ -3883,6 +3975,21 @@ function openLeadModal(x = null) {
     $('leadModalTitle').textContent = 'Register New Enquiry';
     if (delBtn) delBtn.style.display = 'none';
   }
+
+  const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
+  if (isBuilder) {
+    if (!x) return;
+    if ($('leadModalSubmit')) $('leadModalSubmit').style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+    $('leadModalTitle').textContent = 'Enquiry Details (Confidential · Read-Only)';
+    Array.from($('leadForm').elements).forEach(el => {
+      if (el.tagName !== 'BUTTON' || el.type === 'submit') el.disabled = true;
+    });
+  } else {
+    if ($('leadModalSubmit')) $('leadModalSubmit').style.display = 'inline-block';
+    Array.from($('leadForm').elements).forEach(el => el.disabled = false);
+  }
+
   openModal('leadModal');
 }
 
@@ -5390,7 +5497,7 @@ async function loadTeam() {
     $('teamRows').innerHTML = d.data.map(x => {
       const roleBadge = (x.role === 'coordinator' || x.role === 'manager')
         ? '<span class="pill" style="background:#e0e7ff; color:#4338ca; border-color:#c7d2fe;">Coordinator</span>'
-        : (x.role === 'admin' ? '<span class="pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">Admin</span>' : '<span class="pill">Advisor</span>');
+        : (x.role === 'admin' ? '<span class="pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">Admin</span>' : (x.role === 'builder' || x.role === 'partner' ? '<span class="pill" style="background:#fef3c7; color:#854d0e; border-color:#fde68a; font-weight:700;">🛡️ Builder (Read-Only)</span>' : '<span class="pill">Advisor</span>'));
       return `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.email)}<br>${esc(x.phone)}</td><td>${esc(x.department)}</td><td>${esc(x.designation)}<br>${roleBadge}</td><td><code>${esc(x.employee_code)}</code></td><td><span class="pill">${esc(x.status)}</span></td><td class="actions"><button class="btn smallbtn" onclick="editTeam(${x.id})">Edit</button><button class="btn smallbtn" onclick="openPassword(${x.id})">Reset password</button><button class="btn smallbtn" onclick="toggleEmployee(${x.id},'${escAttr(x.status)}')">${x.status === 'active' ? 'Deactivate' : 'Activate'}</button><button class="btn smallbtn danger" onclick="deleteEmployee(${x.id},'${escAttr(x.name)}')">Delete</button></td></tr>`;
     }).join('') || '<tr><td colspan="7" class="empty">No team members yet.</td></tr>';
   } catch (e) {
@@ -5406,7 +5513,7 @@ async function editTeam(id) {
   $('tName').value = x.name || '';
   $('tEmail').value = x.email || '';
   $('tPhone').value = x.phone || '';
-  if ($('tRole')) $('tRole').value = (x.role === 'coordinator' || x.role === 'manager') ? 'coordinator' : 'employee';
+  if ($('tRole')) $('tRole').value = (x.role === 'coordinator' || x.role === 'manager') ? 'coordinator' : (x.role === 'builder' || x.role === 'partner' ? 'builder' : 'employee');
   $('tDepartment').value = x.department || '';
   $('tDesignation').value = x.designation || '';
   $('tPassword').value = '';
@@ -6120,6 +6227,10 @@ function prefillAdvisorRole(roleName) {
     if ($('tRole')) $('tRole').value = 'employee';
     $('tDepartment').value = 'Site Engineering';
     $('tDesignation').value = 'Project Quality Engineer';
+  } else if (roleName === 'Builder / Investor') {
+    if ($('tRole')) $('tRole').value = 'builder';
+    $('tDepartment').value = 'Executive Board';
+    $('tDesignation').value = 'Project Partner / Builder';
   }
   $('tName').focus();
 }

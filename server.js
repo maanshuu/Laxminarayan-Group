@@ -216,7 +216,7 @@ function migrateLegacySchema(){
 
   try {
     const userTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get()?.sql || "";
-    if (userTableSql && !userTableSql.includes("'coordinator'")) {
+    if (userTableSql && (!userTableSql.includes("'coordinator'") || !userTableSql.includes("'builder'"))) {
       db.exec(`
         PRAGMA foreign_keys=OFF;
         CREATE TABLE users_temp (
@@ -225,7 +225,7 @@ function migrateLegacySchema(){
           email TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
           phone TEXT NOT NULL DEFAULT '',
           password_hash TEXT NOT NULL,
-          role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','admin','employee','coordinator','manager')),
+          role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','admin','employee','coordinator','manager','builder','partner')),
           status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','suspended')),
           created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
           updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -240,7 +240,7 @@ function migrateLegacySchema(){
         CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
         PRAGMA foreign_keys=ON;
       `);
-      console.log("[Migration] users table CHECK constraint successfully upgraded to support coordinator and manager roles.");
+      console.log("[Migration] users table CHECK constraint successfully upgraded to support builder and partner roles.");
     }
   } catch (err) {
     console.error("[Migration Error] Failed upgrading users table:", err);
@@ -739,12 +739,38 @@ function admin(req,res,next){auth(req,res,()=>{
 function coordinatorOrAdmin(req,res,next){auth(req,res,()=>{
  const u=db.prepare("SELECT status,role,name,email FROM users WHERE id=?").get(req.user.id);
  if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
- if(u.role!=="admin" && u.role!=="coordinator" && u.role!=="manager")return res.status(403).json({success:false,error:"Coordinator or admin access required"});
+ if(u.role!=="admin" && u.role!=="coordinator" && u.role!=="manager" && u.role!=="builder" && u.role!=="partner")return res.status(403).json({success:false,error:"Staff or admin access required"});
  req.user.role=u.role;
  req.user.name=u.name;
  req.user.email=u.email;
  next();
 })}
+
+function isBuilderOrPartner(req) {
+  return req.user && (req.user.role === 'builder' || req.user.role === 'partner');
+}
+
+function maskPhone(phone) {
+  if (!phone) return '—';
+  const str = String(phone).trim();
+  const digits = str.replace(/\D/g, '');
+  if (digits.length >= 10) {
+    const cleanDigits = digits.slice(-10);
+    return `+91 ${cleanDigits.slice(0, 3)}*****${cleanDigits.slice(-2)}`;
+  }
+  return '******';
+}
+
+function maskEmail(email) {
+  if (!email) return '—';
+  const str = String(email).trim().toLowerCase();
+  const parts = str.split('@');
+  if (parts.length !== 2) return '******';
+  const user = parts[0];
+  const domain = parts[1];
+  const maskedUser = user.length <= 2 ? user[0] + '***' : user[0] + '***' + user.slice(-1);
+  return `${maskedUser}@${domain}`;
+}
 function employeeOrAdmin(req,res,next){auth(req,res,()=>{
  const u=db.prepare("SELECT status,role FROM users WHERE id=?").get(req.user.id);
  if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
@@ -1273,6 +1299,7 @@ app.post("/api/admin/trigger-daily-digest", admin, async (req, res) => {
 
 // ---------------- Production CRM administration ----------------
 app.post("/api/admin/leads",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase();
   const source=clean(req.body.source,80)||"admin",status=clean(req.body.status,30)||"new",notes=clean(req.body.notes,4000);
   const projectId=req.body.project_id?Number(req.body.project_id):null;
@@ -1365,9 +1392,17 @@ app.get("/api/admin/site-visits",coordinatorOrAdmin,(req,res)=>{
   syncAllExistingSiteVisits();
   const status=clean(req.query.status,30);
   const sql=`SELECT v.*,p.name AS project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id ${status?"WHERE v.status=?":""} ORDER BY datetime(v.preferred_at) ASC`;
-  res.json({success:true,data:(status?db.prepare(sql).all(status):db.prepare(sql).all())});
+  const rows = (status?db.prepare(sql).all(status):db.prepare(sql).all());
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(v => {
+      v.phone = maskPhone(v.phone);
+      v.email = maskEmail(v.email);
+    });
+  }
+  res.json({success:true,data:rows});
 });
 app.post("/api/admin/site-visits",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase();
   const preferred=clean(req.body.preferred_at,50),status=clean(req.body.status,30)||"requested",notes=clean(req.body.notes,2000),adminNotes=clean(req.body.admin_notes,3000);
   const projectId=req.body.project_id?Number(req.body.project_id):null,userId=req.body.user_id?Number(req.body.user_id):null,enquiryId=req.body.enquiry_id?Number(req.body.enquiry_id):null;
@@ -1386,6 +1421,7 @@ app.post("/api/admin/site-visits",coordinatorOrAdmin,(req,res)=>{
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM site_visits WHERE id=?").get(r.lastInsertRowid)});
 });
 app.put("/api/admin/site-visits/:id",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM site_visits WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Site visit not found"});
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),preferred=clean(req.body.preferred_at,50);
@@ -1416,9 +1452,16 @@ app.get("/api/admin/leads",coordinatorOrAdmin,(req,res)=>{
     LEFT JOIN project_units pu ON pu.id=l.unit_id
     LEFT JOIN employees e ON e.id=l.assigned_employee_id
     LEFT JOIN users eu ON eu.id=e.user_id ORDER BY l.id DESC`).all();
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(l => {
+      l.phone = maskPhone(l.phone);
+      l.email = maskEmail(l.email);
+    });
+  }
   res.json({success:true,data:rows});
 });
 app.patch("/api/admin/leads/:id",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM leads WHERE id=?").get(id); if(!existing)return res.status(404).json({success:false,error:"Lead not found"});
   const allowed=["new","contacted","qualified","site_visit","negotiation","won","lost"];
   const status=clean(req.body.status,30)||existing.status; if(!allowed.includes(status))return res.status(400).json({success:false,error:"Invalid lead status"});
@@ -1447,6 +1490,7 @@ app.patch("/api/admin/leads/:id",coordinatorOrAdmin,(req,res)=>{
 
 // Convert an enquiry directly to a qualified lead
 app.post("/api/admin/enquiries/:id/convert",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id=Number(req.params.id);
   const enq=db.prepare("SELECT * FROM enquiries WHERE id=?").get(id);
   if(!enq) return res.status(404).json({success:false,error:"Enquiry not found"});
@@ -1476,6 +1520,11 @@ app.get("/api/admin/units",coordinatorOrAdmin,(req,res)=>{
   if(search){ sql+=` AND (LOWER(u.unit_number) LIKE ? OR LOWER(u.buyer_name) LIKE ? OR LOWER(p.name) LIKE ?)`; params.push(`%${search}%`,`%${search}%`,`%${search}%`); }
   sql+=` ORDER BY u.project_id ASC, u.floor_number ASC, u.unit_number ASC`;
   const units=db.prepare(sql).all(...params);
+  if (isBuilderOrPartner(req)) {
+    units.forEach(u => {
+      u.buyer_phone = maskPhone(u.buyer_phone);
+    });
+  }
   res.json({success:true,data:units});
 });
 
@@ -1520,6 +1569,7 @@ app.put("/api/admin/units/:id",admin,(req,res)=>{
 });
 
 app.patch("/api/admin/units/:id/status",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id=Number(req.params.id);
   const existing=db.prepare("SELECT * FROM project_units WHERE id=?").get(id);
   if(!existing) return res.status(404).json({success:false,error:"Unit not found"});
@@ -1549,10 +1599,18 @@ app.get("/api/admin/bookings",coordinatorOrAdmin,(req,res)=>{
     LEFT JOIN project_units pu ON pu.id=b.unit_id
     LEFT JOIN users u ON u.id=b.user_id
     ORDER BY b.id DESC`).all();
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(b => {
+      b.customer_phone = maskPhone(b.customer_phone);
+      b.customer_email = maskEmail(b.customer_email);
+      b.user_email = maskEmail(b.user_email);
+    });
+  }
   res.json({success:true,data:rows});
 });
 
 app.post("/api/admin/bookings",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const projectId=Number(req.body.project_id);
   const unitId=req.body.unit_id?Number(req.body.unit_id):null;
   const leadId=req.body.lead_id?Number(req.body.lead_id):null;
@@ -1610,6 +1668,7 @@ app.post("/api/admin/bookings",coordinatorOrAdmin,(req,res)=>{
 });
 
 app.put("/api/admin/bookings/:id",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id=Number(req.params.id);
   const existing=db.prepare("SELECT * FROM bookings WHERE id=?").get(id);
   if(!existing) return res.status(404).json({success:false,error:"Booking not found"});
@@ -1659,6 +1718,7 @@ app.get("/api/admin/bookings/:id/allotment-letter", coordinatorOrAdmin, (req, re
 
 // ─── SEND OFFICIAL ALLOTMENT LETTER & PDF ATTACHMENT VIA EMAIL ───
 app.post("/api/admin/bookings/:id/send-email", coordinatorOrAdmin, async (req, res) => {
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id = Number(req.params.id);
   const booking = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type
     FROM bookings b
@@ -1848,6 +1908,7 @@ app.post("/api/webhooks/meta-leads", (req, res) => {
 });
 
 app.patch("/api/admin/site-visits/:id",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id=Number(req.params.id);
   const existing=db.prepare("SELECT * FROM site_visits WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Site visit not found"});
@@ -1864,7 +1925,9 @@ app.patch("/api/admin/site-visits/:id",coordinatorOrAdmin,(req,res)=>{
 app.get("/api/admin/employees",coordinatorOrAdmin,(req,res)=>res.json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status FROM employees e LEFT JOIN users u ON u.id=e.user_id ORDER BY e.id DESC`).all()}));
 app.post("/api/admin/employees",admin,(req,res)=>{
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120),password=String(req.body.password||"");
-  const role=(req.body.role==='coordinator'||req.body.role==='manager')?'coordinator':'employee';
+  let role = 'employee';
+  if (req.body.role === 'coordinator' || req.body.role === 'manager') role = 'coordinator';
+  else if (req.body.role === 'builder' || req.body.role === 'partner') role = 'builder';
   if(name.length<2||!validEmail(email)||!passwordOk(password))return res.status(400).json({success:false,error:"Enter name, valid email and a password of 8–128 characters"});
   
   const existingUser = db.prepare("SELECT * FROM users WHERE email=?").get(email);
@@ -1899,8 +1962,9 @@ app.put("/api/admin/employees/:id",admin,(req,res)=>{
   const dup=db.prepare("SELECT id FROM users WHERE email=? AND id<>?").get(email,row.user_id); if(dup)return res.status(409).json({success:false,error:"Another account already uses this email"});
   if(phone){const dupP=db.prepare("SELECT id FROM users WHERE phone=? AND id<>?").get(phone,row.user_id); if(dupP)return res.status(409).json({success:false,error:"Another account already uses this phone number"});}
   db.transaction(()=>{
-    if(role && (role==='coordinator'||role==='employee'||role==='manager')) {
-      db.prepare("UPDATE users SET name=?,email=?,phone=?,role=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,role==='manager'?'coordinator':role,row.user_id);
+    if(role && (role==='coordinator'||role==='employee'||role==='manager'||role==='builder'||role==='partner')) {
+      const finalRole = (role==='manager'?'coordinator':(role==='partner'?'builder':role));
+      db.prepare("UPDATE users SET name=?,email=?,phone=?,role=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,finalRole,row.user_id);
     } else {
       db.prepare("UPDATE users SET name=?,email=?,phone=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,row.user_id);
     }
@@ -1920,7 +1984,7 @@ app.delete("/api/admin/employees/:id",admin,(req,res)=>{
   if(!row)return res.status(404).json({success:false,error:"Team member not found"});
   const assigned=db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=?").get(id).c;
   if(assigned)return res.status(409).json({success:false,error:"This team member has assigned leads. Reassign those leads before deletion, or deactivate the account."});
-  db.transaction(()=>{db.prepare("DELETE FROM employees WHERE id=?").run(id);db.prepare("DELETE FROM users WHERE id=? AND role IN ('employee','coordinator','manager')").run(row.user_id)})();
+  db.transaction(()=>{db.prepare("DELETE FROM employees WHERE id=?").run(id);db.prepare("DELETE FROM users WHERE id=? AND role IN ('employee','coordinator','manager','builder','partner')").run(row.user_id)})();
   audit(req,"delete","employee",id,`Employee deleted: ${row.name}`); res.json({success:true});
 });
 
@@ -2128,6 +2192,12 @@ function formatCsvOutput(headers, rows) {
 
 app.get("/api/admin/reports.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT l.id, l.name, l.phone, l.email, l.source, l.sentiment, l.status, l.budget, l.notes, p.name AS project_name, eu.name AS employee_name, l.follow_up_at, l.created_at, l.updated_at FROM leads l LEFT JOIN projects p ON p.id = l.project_id LEFT JOIN employees e ON e.id = l.assigned_employee_id LEFT JOIN users eu ON eu.id = e.user_id ORDER BY l.id DESC`).all();
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(r => {
+      r.phone = maskPhone(r.phone);
+      r.email = maskEmail(r.email);
+    });
+  }
   const headers = [
     { label: "ID", key: "id" },
     { label: "Name", key: "name" },
@@ -2154,6 +2224,11 @@ app.get("/api/admin/reports/leads.csv", coordinatorOrAdmin, (req, res) => {
 
 app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT pu.*, p.name AS project_name FROM project_units pu LEFT JOIN projects p ON p.id = pu.project_id ORDER BY pu.project_id ASC, pu.unit_number ASC`).all();
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(r => {
+      r.buyer_phone = maskPhone(r.buyer_phone);
+    });
+  }
   const headers = [
     { label: "Unit ID", key: "id" },
     { label: "Project Name", key: "project_name" },
@@ -2176,6 +2251,12 @@ app.get("/api/admin/reports/units.csv", coordinatorOrAdmin, (req, res) => {
 
 app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT sv.*, p.name AS project_name, u.name AS user_name FROM site_visits sv LEFT JOIN projects p ON p.id = sv.project_id LEFT JOIN users u ON u.id = sv.user_id ORDER BY sv.id DESC`).all();
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(r => {
+      r.phone = maskPhone(r.phone);
+      r.email = maskEmail(r.email);
+    });
+  }
   const headers = [
     { label: "Visit ID", key: "id" },
     { label: "Customer Name", key: "name" },
@@ -2195,6 +2276,12 @@ app.get("/api/admin/reports/visits.csv", coordinatorOrAdmin, (req, res) => {
 
 app.get("/api/admin/reports/bookings.csv", coordinatorOrAdmin, (req, res) => {
   const rows = db.prepare(`SELECT b.*, p.name AS project_name, pu.unit_number, pu.unit_type FROM bookings b LEFT JOIN projects p ON p.id = b.project_id LEFT JOIN project_units pu ON pu.id = b.unit_id ORDER BY b.id DESC`).all();
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(r => {
+      r.customer_phone = maskPhone(r.customer_phone);
+      r.customer_email = maskEmail(r.customer_email);
+    });
+  }
   const headers = [
     { label: "Booking ID", key: "id" },
     { label: "Booking Reference", key: "booking_reference" },
@@ -3340,10 +3427,12 @@ app.get("/api/my/enquiries",auth,(req,res)=>res.json({success:true,data:db.prepa
 
 app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
  const isCoordinator = req.user && (req.user.role === 'coordinator' || req.user.role === 'manager');
+ const isBuilder = isBuilderOrPartner(req);
+ const hideSensitive = isCoordinator || isBuilder;
  const today=todayIST();
- const att=isCoordinator ? [] : db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(today);
+ const att=hideSensitive ? [] : db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(today);
  const amap=Object.fromEntries(att.map(x=>[x.status,Number(x.c)]));
- const recent=isCoordinator ? [] : db.prepare(`SELECT a.action,a.entity_type,a.entity_id,a.details,a.created_at,u.name user_name FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 6`).all();
+ const recent=hideSensitive ? [] : db.prepare(`SELECT a.action,a.entity_type,a.entity_id,a.details,a.created_at,u.name user_name FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 6`).all();
  const unitStats=db.prepare("SELECT status,COUNT(*) c FROM project_units GROUP BY status").all();
  const umap=Object.fromEntries(unitStats.map(x=>[x.status,Number(x.c)]));
  const totalUnits=db.prepare("SELECT COUNT(*) c FROM project_units").get().c;
@@ -3373,8 +3462,8 @@ app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
      leads: db.prepare("SELECT COUNT(*) c FROM leads").get().c,
      openLeads: db.prepare("SELECT COUNT(*) c FROM leads WHERE status NOT IN ('won','lost')").get().c,
      visits: totalVisits,
-     employees: isCoordinator ? 0 : db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
-     attendance: isCoordinator ? {total:0,present:0,absent:0,leave:0,half_day:0} : {total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
+     employees: hideSensitive ? 0 : db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,
+     attendance: hideSensitive ? {total:0,present:0,absent:0,leave:0,half_day:0} : {total:db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c,present:amap.present||0,absent:amap.absent||0,leave:amap.leave||0,half_day:amap.half_day||0},
      units: {total:totalUnits,available:umap.available||0,blocked:umap.blocked||0,sold:umap.sold||0},
      bookings: bookingCount,
      followUpsToday,
@@ -3386,23 +3475,37 @@ app.get("/api/admin/dashboard",coordinatorOrAdmin,(req,res)=>{
 app.get("/api/admin/users",coordinatorOrAdmin,(req,res)=>{
   const role=clean(req.query.role,30);
   if(role==="all"){
-    return res.json({success:true,data:db.prepare(`
+    const rows = db.prepare(`
       SELECT u.id,u.name,u.email,u.phone,u.role,u.status,u.created_at,
              (SELECT COUNT(DISTINCT id) FROM enquiries e WHERE e.user_id = u.id OR (u.phone <> '' AND e.phone = u.phone) OR (u.email <> '' AND lower(e.email) = lower(u.email))) AS enquiries_count,
              (SELECT COUNT(DISTINCT id) FROM leads l WHERE l.user_id = u.id OR (u.phone <> '' AND l.phone = u.phone) OR (u.email <> '' AND lower(l.email) = lower(u.email))) AS leads_count
       FROM users u ORDER BY id DESC
-    `).all()});
+    `).all();
+    if (isBuilderOrPartner(req)) {
+      rows.forEach(u => {
+        u.phone = maskPhone(u.phone);
+        u.email = maskEmail(u.email);
+      });
+    }
+    return res.json({success:true,data:rows});
   }
   const targetRole=role||"customer";
   if(targetRole==="customer"){
     syncCustomersFromLeads();
   }
-  res.json({success:true,data:db.prepare(`
+  const rows = db.prepare(`
     SELECT u.id,u.name,u.email,u.phone,u.role,u.status,u.created_at,
            (SELECT COUNT(DISTINCT id) FROM enquiries e WHERE e.user_id = u.id OR (u.phone <> '' AND e.phone = u.phone) OR (u.email <> '' AND lower(e.email) = lower(u.email))) AS enquiries_count,
            (SELECT COUNT(DISTINCT id) FROM leads l WHERE l.user_id = u.id OR (u.phone <> '' AND l.phone = u.phone) OR (u.email <> '' AND lower(l.email) = lower(u.email))) AS leads_count
     FROM users u WHERE u.role=? ORDER BY enquiries_count DESC, leads_count DESC, u.id DESC
-  `).all(targetRole)});
+  `).all(targetRole);
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(u => {
+      u.phone = maskPhone(u.phone);
+      u.email = maskEmail(u.email);
+    });
+  }
+  res.json({success:true,data:rows});
 });
 app.get("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
   const id=Number(req.params.id), user=db.prepare("SELECT id,name,email,phone,role,status,created_at,updated_at FROM users WHERE id=?").get(id);
@@ -3412,9 +3515,17 @@ app.get("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
   const enquiries=db.prepare(`SELECT e.id,e.enquiry_reference,e.status,e.message,e.admin_response,e.created_at,p.name project_name FROM enquiries e LEFT JOIN projects p ON p.id=e.project_id WHERE e.user_id=? OR (? <> '' AND e.phone=?) OR (? <> '' AND lower(e.email)=?) ORDER BY e.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
   const leads=db.prepare(`SELECT l.*,p.name project_name,e.name employee_name FROM leads l LEFT JOIN projects p ON p.id=l.project_id LEFT JOIN employees em ON em.id=l.assigned_employee_id LEFT JOIN users e ON e.id=em.user_id WHERE l.user_id=? OR (? <> '' AND l.phone=?) OR (? <> '' AND lower(l.email)=?) ORDER BY l.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
   const visits=db.prepare(`SELECT v.*,p.name project_name FROM site_visits v LEFT JOIN projects p ON p.id=v.project_id WHERE v.user_id=? OR (? <> '' AND v.phone=?) OR (? <> '' AND lower(v.email)=?) ORDER BY v.id DESC`).all(id, safePhone, safePhone, safeEmail, safeEmail);
+  if (isBuilderOrPartner(req)) {
+    user.phone = maskPhone(user.phone);
+    user.email = maskEmail(user.email);
+    enquiries.forEach(e => { e.phone = maskPhone(e.phone); e.email = maskEmail(e.email); });
+    leads.forEach(l => { l.phone = maskPhone(l.phone); l.email = maskEmail(l.email); });
+    visits.forEach(v => { v.phone = maskPhone(v.phone); v.email = maskEmail(v.email); });
+  }
   res.json({success:true,data:{user,enquiries,leads,visits}});
 });
 app.put("/api/admin/users/:id",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM users WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Customer not found"});
   if(existing.role!=='customer')return res.status(400).json({success:false,error:"Only customer profiles can be edited here"});
@@ -3445,6 +3556,7 @@ app.patch("/api/admin/users/:id/status",admin,(req,res)=>{
  res.json({success:true});
 });
 app.post("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
   const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase(),message=clean(req.body.message,3000),status=clean(req.body.status,30)||"new",source=clean(req.body.source,80)||"admin";
   const projectId=req.body.project_id?Number(req.body.project_id):null,userId=req.body.user_id?Number(req.body.user_id):null;
   if(name.length<2)return res.status(400).json({success:false,error:"Enter the customer name"});
@@ -3461,8 +3573,18 @@ app.post("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>{
   audit(req,"create","enquiry",created.id,`${created.reference} · ${name}`);
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM enquiries WHERE id=?").get(created.id)});
 });
-app.get("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>res.json({success:true,data:db.prepare("SELECT e.*,u.role,p.name AS project_name,p.category AS project_category FROM enquiries e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC").all()}));
+app.get("/api/admin/enquiries",coordinatorOrAdmin,(req,res)=>{
+  const rows = db.prepare("SELECT e.*,u.role,p.name AS project_name,p.category AS project_category FROM enquiries e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC").all();
+  if (isBuilderOrPartner(req)) {
+    rows.forEach(e => {
+      e.phone = maskPhone(e.phone);
+      e.email = maskEmail(e.email);
+    });
+  }
+  res.json({success:true,data:rows});
+});
 app.put("/api/admin/enquiries/:id",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
  const id=Number(req.params.id), existing=db.prepare("SELECT * FROM enquiries WHERE id=?").get(id);
  if(!existing)return res.status(404).json({success:false,error:"Enquiry not found"});
  const name=clean(req.body.name,120),phone=clean(req.body.phone,30),email=clean(req.body.email,160).toLowerCase();
@@ -3481,6 +3603,7 @@ app.put("/api/admin/enquiries/:id",coordinatorOrAdmin,(req,res)=>{
 });
 
 app.patch("/api/admin/enquiries/:id",coordinatorOrAdmin,(req,res)=>{
+  if (isBuilderOrPartner(req)) return res.status(403).json({success:false,error:"Access Denied: Builder account has read-only permissions."});
  const status=clean(req.body.status,30),allowed=["new","contacted","closed"];
  if(!allowed.includes(status))return res.status(400).json({success:false,error:"Invalid status"});
  const id=Number(req.params.id);
@@ -3666,7 +3789,7 @@ app.get("/admin.html", (req, res) => {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     const u = db.prepare("SELECT status, role, session_version FROM users WHERE id=?").get(payload.id);
-    if (!u || u.status !== "active" || (u.role !== "admin" && u.role !== "coordinator" && u.role !== "manager") || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
+    if (!u || u.status !== "active" || (u.role !== "admin" && u.role !== "coordinator" && u.role !== "manager" && u.role !== "builder" && u.role !== "partner") || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
       return res.redirect(302, "/login.html?redirect=/admin.html");
     }
     if (req.query.token) {
