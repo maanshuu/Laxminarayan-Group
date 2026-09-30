@@ -1078,11 +1078,6 @@ function seed(){
     `).run(p2.id);
   }
 
-  try {
-    db.prepare("DELETE FROM project_units WHERE project_id NOT IN (SELECT id FROM projects WHERE name IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa'))").run();
-    db.prepare("DELETE FROM projects WHERE name NOT IN ('DS 208 (Developed by Akshar Group)', 'Nilkanth Villa')").run();
-  } catch (_) {}
-
   // 2. Seed Units for DS 208 (16 units)
   const p1Id = (db.prepare("SELECT id FROM projects WHERE name LIKE '%DS 208%'").get() || {}).id || 1;
   const p1UnitCount = db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?").get(p1Id).c;
