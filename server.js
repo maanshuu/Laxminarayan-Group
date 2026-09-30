@@ -1,6 +1,13 @@
 require("dotenv").config();
 process.env.TZ = process.env.TZ || "Asia/Kolkata";
 
+process.on("uncaughtException", (err) => {
+  console.error("[PROCESS CRASH GUARD] Uncaught Exception caught safely:", err?.stack || err);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("[PROCESS CRASH GUARD] Unhandled Rejection caught safely:", reason);
+});
+
 function todayIST() {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata" }).format(new Date());
 }
@@ -743,7 +750,7 @@ function signIn(res,user,req=null){
 }
 function auth(req,res,next){
  const bearer=(req.headers.authorization||"").startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
- const token=req.cookies.lg_session || bearer;
+ const token=req.cookies.lg_session || bearer || req.query.token;
  if(!token)return res.status(401).json({success:false,error:"Please log in"});
   try{
    req.user=jwt.verify(token,JWT_SECRET);
@@ -2629,18 +2636,40 @@ app.get("/api/admin/reports/bookings.csv", coordinatorOrAdmin, (req, res) => {
 });
 
 app.get("/api/admin/backup/download", admin, (req, res) => {
+  const tmpBackupPath = path.join(os.tmpdir(), `crm-backup-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.db`);
+  const filename = `laxminarayan-crm-backup-${todayIST()}.db`;
+
   try {
-    // Flush all pending WAL journal transactions into primary database file
-    db.pragma("wal_checkpoint(TRUNCATE)");
-    if (!fs.existsSync(DB_FILE)) {
-      return res.status(404).json({ success: false, error: "Database file not found on disk" });
-    }
-    const filename = `laxminarayan-crm-backup-${todayIST()}.db`;
+    // 1. Atomic snapshot using SQLite VACUUM INTO (non-blocking, non-locking, perfectly consistent)
+    const sqlPath = tmpBackupPath.replace(/\\/g, "/");
+    db.exec(`VACUUM INTO '${sqlPath}'`);
+
     audit(req, "backup_download", "system", 0, `Admin downloaded live database backup: ${filename}`);
-    res.download(DB_FILE, filename);
+
+    res.download(tmpBackupPath, filename, (err) => {
+      try { if (fs.existsSync(tmpBackupPath)) fs.unlinkSync(tmpBackupPath); } catch (_) {}
+      if (err && !res.headersSent) {
+        console.error("[BACKUP DOWNLOAD ERROR]", err.message);
+        res.status(500).json({ success: false, error: "Failed to download backup: " + err.message });
+      }
+    });
   } catch (err) {
-    console.error("[BACKUP DOWNLOAD ERROR]", err);
-    res.status(500).json({ success: false, error: "Failed to create database backup: " + err.message });
+    console.error("[BACKUP SNAPSHOT ERROR]", err.message);
+    try { if (fs.existsSync(tmpBackupPath)) fs.unlinkSync(tmpBackupPath); } catch (_) {}
+
+    // Fallback if VACUUM INTO fails: safe copy to temporary file
+    try {
+      if (fs.existsSync(DB_FILE)) {
+        fs.copyFileSync(DB_FILE, tmpBackupPath);
+        return res.download(tmpBackupPath, filename, () => {
+          try { if (fs.existsSync(tmpBackupPath)) fs.unlinkSync(tmpBackupPath); } catch (_) {}
+        });
+      }
+    } catch (fallbackErr) {
+      console.error("[BACKUP FALLBACK ERROR]", fallbackErr.message);
+    }
+
+    res.status(500).json({ success: false, error: "Database backup snapshot failed: " + err.message });
   }
 });
 
