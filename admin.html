@@ -1667,7 +1667,7 @@ body.role-builder [data-write-action="true"] {
       <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
     </div>
     <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
-    <a href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this); return false;" data-admin-only="true" class="top-status-badge" style="text-decoration:none; cursor:pointer; background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3); font-weight:700;" title="Download complete portable database backup (.db)"><span class="top-status-dot" style="background:#0284c7;"></span> 📥 BACKUP DB</a>
+    <a href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this, event);" data-admin-only="true" class="top-status-badge" style="text-decoration:none; cursor:pointer; background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3); font-weight:700;" title="Download complete portable database backup (.db)"><span class="top-status-dot" style="background:#0284c7;"></span> 📥 BACKUP DB</a>
     <span class="top-status-badge" data-admin-only="true" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
   </div>
   <div class="top-actions-flex">
@@ -2471,7 +2471,7 @@ body.role-builder [data-write-action="true"] {
           <button class="btn" onclick="clearReportFilters()">Clear filters</button>
           <button class="btn" onclick="refreshReports()">Refresh</button>
           <a class="btn" id="reportExportCsvBtn" data-builder-hide="true" href="/api/admin/reports.csv">Export enquiries CSV</a>
-          <a class="btn" data-admin-only="true" href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this); return false;" style="background:var(--sky-light, #e0f2fe); color:var(--sky-deep, #0369a1); border-color:#bae6fd; font-weight:700;" title="Download complete portable database backup (.db)">📥 Download Database (.db)</a>
+          <a class="btn" data-admin-only="true" href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this, event);" style="background:var(--sky-light, #e0f2fe); color:var(--sky-deep, #0369a1); border-color:#bae6fd; font-weight:700;" title="Download complete portable database backup (.db)">📥 Download Database (.db)</a>
         </div>
       </div>
       <div class="charts">
@@ -3050,7 +3050,7 @@ body.role-builder [data-write-action="true"] {
               Single-file database storing all customers, enquiries, leads, attendance records & units. Free to download & migrate anytime.
             </div>
           </div>
-          <a class="btn" href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this); return false;" style="background:var(--sky-deep, #0284c7); color:#fff; border:none; font-weight:700; text-decoration:none; padding:8px 14px; border-radius:6px; font-size:12.5px;">📥 Download .db Backup</a>
+          <a class="btn" href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this, event);" style="background:var(--sky-deep, #0284c7); color:#fff; border:none; font-weight:700; text-decoration:none; padding:8px 14px; border-radius:6px; font-size:12.5px;">📥 Download .db Backup</a>
         </div>
 
         <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:18px;">
@@ -5631,22 +5631,25 @@ async function moveMediaToOtherProject(mediaId) {
   }
 }
 
-async function downloadDatabaseBackup(btn) {
+async function downloadDatabaseBackup(btn, evt) {
+  if (evt && evt.preventDefault) evt.preventDefault();
   const origHtml = btn ? btn.innerHTML : '';
   if (btn) {
     btn.style.pointerEvents = 'none';
     btn.style.opacity = '0.7';
     btn.innerHTML = '⏳ Preparing Backup...';
   }
-  toast('Preparing atomic database snapshot, please wait...');
+  toast('Preparing live database snapshot, please wait...');
 
   try {
     const res = await fetch('/api/admin/backup/download', {
-      headers: { 'Authorization': 'Bearer ' + (token || '') }
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store'
     });
 
     if (!res.ok) {
-      let errText = 'Server error during backup generation';
+      let errText = `Server error (${res.status})`;
       try {
         const errJson = await res.json();
         if (errJson && errJson.error) errText = errJson.error;
@@ -5672,17 +5675,21 @@ async function downloadDatabaseBackup(btn) {
     setTimeout(() => {
       window.URL.revokeObjectURL(url);
       a.remove();
-    }, 1000);
+    }, 2000);
 
     toast('Database backup (.db) downloaded successfully!');
   } catch (err) {
-    console.error('Backup download error:', err);
-    toast('Download failed: ' + err.message);
+    console.warn('Blob backup download failed, falling back to direct navigation:', err);
+    // Direct native browser download fallback
+    window.location.assign('/api/admin/backup/download');
+    toast('Download initiated!');
   } finally {
     if (btn) {
-      btn.style.pointerEvents = '';
-      btn.style.opacity = '';
-      btn.innerHTML = origHtml;
+      setTimeout(() => {
+        btn.style.pointerEvents = '';
+        btn.style.opacity = '';
+        btn.innerHTML = origHtml;
+      }, 1500);
     }
   }
 }
