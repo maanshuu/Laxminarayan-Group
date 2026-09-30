@@ -2861,6 +2861,39 @@ body.role-builder [data-write-action="true"] {
           </div>
         </div>
       </div>
+
+      <!-- Architectural CAD Plan / Master Layout Upload Box -->
+      <div class="span4" style="background:var(--bg-subtle); padding:16px 20px; border-radius:var(--radius-md); border:1px dashed var(--line-strong); margin-top:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:4px;">
+          <b style="display:flex; align-items:center; gap:6px; color:var(--ink-heading);">
+            <span>📐 Architectural CAD Plan / Master Layout</span>
+            <span class="pill" style="font-size:11px; background:#fef3c7; color:#92400e; font-weight:700;">Floor Plan & Blueprint</span>
+          </b>
+          <button type="button" id="pmCadClearBtn" class="btn smallbtn danger" style="display:none; padding:3px 9px; font-size:11px;" onclick="clearCadPlanSelection()">✕ Remove CAD Plan</button>
+        </div>
+        <p class="muted small" style="margin:0 0 10px 0;">Upload official architectural layout, CAD drawing, or unit blueprint (AutoCAD <b>.DWG</b>, <b>.DXF</b>, Sanctioned <b>.PDF</b>, or High-Res Plan <b>.PNG</b>, <b>.JPG</b>, <b>.WEBP</b>, <b>.SVG</b>). Shown on project detail & buyer brochures.</p>
+        
+        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+          <div id="pmCadPreviewBox" style="width:140px; height:90px; border-radius:8px; background:#e2e8f0; overflow:hidden; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); flex-shrink:0;">
+            <img id="pmCadPreview" src="" style="width:100%; height:100%; object-fit:cover; display:none;" alt="CAD Plan Preview">
+            <div id="pmCadDocPreview" style="display:none; text-align:center; padding:6px;">
+              <span style="font-size:26px;">📐</span>
+              <div id="pmCadDocName" style="font-size:10px; font-weight:700; color:var(--sky-deep); max-width:124px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;">CAD Document</div>
+            </div>
+            <span id="pmCadPlaceholder" style="font-size:11px; color:var(--ink-muted); text-align:center; padding:8px;">No CAD plan chosen</span>
+          </div>
+          <div style="flex:1; min-width:220px;">
+            <input id="pmCadFile" type="file" accept=".dwg,.dxf,.pdf,image/png,image/jpeg,image/webp,image/svg+xml" style="font-size:12px; margin-bottom:6px;">
+            <div class="small muted">Supported: AutoCAD DWG/DXF, PDF, PNG, JPG, WebP, SVG (Max 250 MB).</div>
+            <input id="pmCadUrl" type="hidden">
+            <div id="pmCadCurrentLink" style="margin-top:6px; font-size:12px; display:none;">
+              <a href="#" target="_blank" id="pmCadDownloadAnchor" style="color:var(--sky-deep); font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                <span>🔗 View Current CAD Plan</span> ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div class="span4 actions" style="margin-top:10px;">
         <button class="btn primary" type="submit" id="pmSubmitBtn" style="padding:10px 24px; font-weight:700;">Save Project</button>
@@ -5190,6 +5223,7 @@ function renderProjectGrid(list) {
             <button class="btn smallbtn" onclick="openProjectModal(${p.id})" style="font-weight:600;">✏️ Edit</button>
             <button class="btn smallbtn" onclick="openProjectMediaModal(${p.id})">📸 Media (${p.media_count || 0})</button>
             <button class="btn smallbtn" onclick="viewProjectUnits(${p.id})">📦 Units (${totalU})</button>
+            ${p.cad_plan ? `<a href="${escAttr(p.cad_plan)}" target="_blank" class="btn smallbtn" style="color:#b45309; border-color:#fde68a; background:#fefce8; font-weight:700;" title="View Sanctioned CAD Layout Plan">📐 CAD</a>` : ''}
             <button class="btn smallbtn" onclick="previewProjectLive(${p.id})" title="View public page in new tab">🌐 Live ↗</button>
           </div>
           <div style="display:flex; gap:4px;">
@@ -5227,7 +5261,10 @@ function renderProjectTable(list) {
           <span style="font-weight:700;">${p.units_total || 0} Units</span>
           <div class="small muted">${p.units_available || 0} Avail · ${p.units_sold || 0} Sold</div>
         </td>
-        <td><button class="btn smallbtn" onclick="openProjectMediaModal(${p.id})">📸 ${p.media_count || 0} files</button></td>
+        <td>
+          <button class="btn smallbtn" onclick="openProjectMediaModal(${p.id})">📸 ${p.media_count || 0} files</button>
+          ${p.cad_plan ? `<a href="${escAttr(p.cad_plan)}" target="_blank" class="btn smallbtn" style="margin-left:4px; color:#b45309; border-color:#fde68a; background:#fefce8; font-weight:700;" title="View CAD Layout Plan">📐 CAD</a>` : ''}
+        </td>
         <td style="text-align:right;">
           <div class="actions" style="justify-content:flex-end;">
             <button class="btn smallbtn" onclick="openProjectModal(${p.id})">Edit</button>
@@ -5257,6 +5294,42 @@ function openProjectModal(id = null) {
   $('pmImageFile').value = '';
   $('pmMsg').textContent = '';
 
+  // Reset CAD Plan fields
+  window.pmClearCadFlag = false;
+  $('pmCadUrl').value = p ? (p.cad_plan || '') : '';
+  $('pmCadFile').value = '';
+  const cadPreview = $('pmCadPreview');
+  const cadDocPreview = $('pmCadDocPreview');
+  const cadPlaceholder = $('pmCadPlaceholder');
+  const cadClearBtn = $('pmCadClearBtn');
+  const cadLinkDiv = $('pmCadCurrentLink');
+  const cadAnchor = $('pmCadDownloadAnchor');
+
+  if (p && p.cad_plan) {
+    const isDoc = p.cad_plan.endsWith('.pdf') || p.cad_plan.endsWith('.dwg') || p.cad_plan.endsWith('.dxf');
+    if (isDoc) {
+      cadPreview.style.display = 'none';
+      cadDocPreview.style.display = 'block';
+      $('pmCadDocName').textContent = p.cad_plan.split('/').pop();
+      cadPlaceholder.style.display = 'none';
+    } else {
+      cadPreview.src = p.cad_plan;
+      cadPreview.style.display = 'block';
+      cadDocPreview.style.display = 'none';
+      cadPlaceholder.style.display = 'none';
+    }
+    cadLinkDiv.style.display = 'block';
+    cadAnchor.href = p.cad_plan;
+    cadClearBtn.style.display = 'inline-block';
+  } else {
+    cadPreview.src = '';
+    cadPreview.style.display = 'none';
+    cadDocPreview.style.display = 'none';
+    cadPlaceholder.style.display = 'block';
+    cadLinkDiv.style.display = 'none';
+    cadClearBtn.style.display = 'none';
+  }
+
   $('projectModalTitle').textContent = p ? `Edit Project — ${p.name}` : 'Add New Real Estate Project';
 
   const preview = $('pmImagePreview');
@@ -5275,6 +5348,20 @@ function openProjectModal(id = null) {
   openModal('projectModal');
 }
 
+// Clear selected or existing CAD plan
+function clearCadPlanSelection() {
+  window.pmClearCadFlag = true;
+  $('pmCadUrl').value = '';
+  $('pmCadFile').value = '';
+  $('pmCadPreview').src = '';
+  $('pmCadPreview').style.display = 'none';
+  $('pmCadDocPreview').style.display = 'none';
+  $('pmCadPlaceholder').style.display = 'block';
+  $('pmCadCurrentLink').style.display = 'none';
+  $('pmCadClearBtn').style.display = 'none';
+  toast('CAD plan removed (will be saved upon form submission).');
+}
+
 // Attach image live preview handler
 if ($('pmImageFile')) {
   $('pmImageFile').onchange = e => {
@@ -5284,6 +5371,32 @@ if ($('pmImageFile')) {
       $('pmImagePreview').src = url;
       $('pmImagePreview').style.display = 'block';
       $('pmImagePlaceholder').style.display = 'none';
+    }
+  };
+}
+
+// Attach CAD Plan live preview handler
+if ($('pmCadFile')) {
+  $('pmCadFile').onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      window.pmClearCadFlag = false;
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const isImg = ['png', 'jpg', 'jpeg', 'webp', 'svg'].includes(ext);
+      if (isImg) {
+        const url = URL.createObjectURL(file);
+        $('pmCadPreview').src = url;
+        $('pmCadPreview').style.display = 'block';
+        $('pmCadDocPreview').style.display = 'none';
+        $('pmCadPlaceholder').style.display = 'none';
+      } else {
+        $('pmCadPreview').style.display = 'none';
+        $('pmCadDocPreview').style.display = 'block';
+        $('pmCadDocName').textContent = file.name;
+        $('pmCadPlaceholder').style.display = 'none';
+      }
+      $('pmCadClearBtn').style.display = 'inline-block';
+      $('pmCadCurrentLink').style.display = 'none';
     }
   };
 }
@@ -5307,6 +5420,15 @@ if ($('projectModalForm')) {
 
     if ($('pmImageFile').files[0]) {
       fd.append('image_file', $('pmImageFile').files[0]);
+    }
+
+    // Append CAD plan data
+    fd.append('cad_plan', $('pmCadUrl').value.trim());
+    if ($('pmCadFile').files[0]) {
+      fd.append('cad_plan_file', $('pmCadFile').files[0]);
+    }
+    if (window.pmClearCadFlag) {
+      fd.append('clear_cad_plan', 'true');
     }
 
     const id = $('pmId').value;

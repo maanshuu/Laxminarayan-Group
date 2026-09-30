@@ -183,13 +183,30 @@ function deleteMediaFile(filePath){
   const full=safeMediaPath(filePath); if(full) try{fs.unlinkSync(full)}catch(_e){}
 }
 function projectRow(id){
-  return db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=?").get(id);
+  return db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan,status,created_at,updated_at FROM projects WHERE id=?").get(id);
 }
 function mediaRows(projectId){
   return db.prepare("SELECT id,project_id,media_type,mime_type,original_name,file_path,file_size,is_cover,created_at FROM project_media WHERE project_id=? ORDER BY is_cover DESC,id ASC").all(projectId);
 }
 
-const projectUpload=multer({storage:projectStorage,limits:{fileSize:250*1024*1024},fileFilter:(req,file,cb)=>{const ext=path.extname(file.originalname||"").toLowerCase();if(ALLOWED_IMAGE_EXT.has(ext))return cb(null,true);cb(new Error("Supported project images: JPG, JPEG, PNG, WEBP, GIF, AVIF, HEIC, HEIF or TIFF"));}});
+const ALLOWED_CAD_EXT=new Set([".dwg",".dxf",".pdf",".png",".jpg",".jpeg",".webp",".svg"]);
+const projectUpload=multer({
+  storage:projectStorage,
+  limits:{fileSize:250*1024*1024},
+  fileFilter:(req,file,cb)=>{
+    const ext=path.extname(file.originalname||"").toLowerCase();
+    if(file.fieldname==="cad_plan_file"){
+      if(ALLOWED_CAD_EXT.has(ext)) return cb(null,true);
+      return cb(new Error("Supported CAD plan files: DWG, DXF, PDF, PNG, JPG, JPEG, WEBP, SVG"));
+    }
+    if(ALLOWED_IMAGE_EXT.has(ext)) return cb(null,true);
+    cb(new Error("Supported project images: JPG, JPEG, PNG, WEBP, GIF, AVIF, HEIC, HEIF or TIFF"));
+  }
+});
+const projectUploadFields=projectUpload.fields([
+  { name:"image_file", maxCount:1 },
+  { name:"cad_plan_file", maxCount:1 }
+]);
 const db=new Database(DB_FILE);
 db.pragma("journal_mode=WAL");
 db.pragma("foreign_keys=ON");
@@ -254,6 +271,11 @@ function migrateProductionSchema(){
   if(!pc.has("location")) db.exec("ALTER TABLE projects ADD COLUMN location TEXT NOT NULL DEFAULT ''");
   if(!pc.has("price")) db.exec("ALTER TABLE projects ADD COLUMN price TEXT NOT NULL DEFAULT ''");
   if(!pc.has("amenities")) db.exec("ALTER TABLE projects ADD COLUMN amenities TEXT NOT NULL DEFAULT ''");
+  if(!pc.has("cad_plan")) db.exec("ALTER TABLE projects ADD COLUMN cad_plan TEXT NOT NULL DEFAULT ''");
+  try {
+    db.prepare("UPDATE projects SET cad_plan='/assets/projects/ds-208/floor_plans/ds208_3bhk_unit_floorplan.png' WHERE (name LIKE '%DS%208%' OR name LIKE '%DS 208%') AND (cad_plan IS NULL OR cad_plan='')").run();
+    db.prepare("UPDATE projects SET cad_plan='/assets/projects/nilkanth/floor_plans/nilkanth_master_layout_plan.png' WHERE name LIKE '%Nilkanth%' AND (cad_plan IS NULL OR cad_plan='')").run();
+  } catch(_e) {}
   let c=cols("leads");
   if(!c.has("user_id")) db.exec("ALTER TABLE leads ADD COLUMN user_id INTEGER");
   if(!c.has("name")) db.exec("ALTER TABLE leads ADD COLUMN name TEXT NOT NULL DEFAULT ''");
@@ -1189,7 +1211,7 @@ createRollingBackup();
 
 app.get("/api/projects/:id",(req,res)=>{
   const id=Number(req.params.id); if(!Number.isInteger(id)||id<1)return res.status(400).json({success:false,error:"Invalid project id"});
-  const p=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=? AND status IN ('active','completed','sold_out')").get(id);
+  const p=db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan,status,created_at,updated_at FROM projects WHERE id=? AND status IN ('active','completed','sold_out')").get(id);
   if(!p)return res.status(404).json({success:false,error:"Project not found"});
   res.json({success:true,data:p,media:mediaRows(id)});
 });
@@ -3457,7 +3479,7 @@ app.get("/api/auth/me",auth,(req,res)=>{
 });
 
 app.get("/api/projects",(req,res)=>{
-  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,status FROM projects WHERE status IN ('active','completed','sold_out') ORDER BY CASE WHEN status='active' THEN 0 WHEN status='completed' THEN 1 ELSE 2 END, id ASC").all();
+  const projects=db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan,status FROM projects WHERE status IN ('active','completed','sold_out') ORDER BY CASE WHEN status='active' THEN 0 WHEN status='completed' THEN 1 ELSE 2 END, id ASC").all();
   const countMedia=db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?");
   const countUnits=db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?");
   for(const p of projects){
@@ -3476,11 +3498,11 @@ app.get("/api/projects/category/:category",(req,res)=>{
   if(!category)return res.status(400).json({success:false,error:"Project category is required"});
   let data=[];
   if(category==='RESIDENTIAL'){
-    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' AND (category LIKE '%RESIDENTIAL%' OR category='APARTMENTS & SHOPS' OR category='LUXURY VILLAS') ORDER BY id").all();
+    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan FROM projects WHERE status='active' AND (category LIKE '%RESIDENTIAL%' OR category='APARTMENTS & SHOPS' OR category='LUXURY VILLAS') ORDER BY id").all();
   } else if(category==='COMMERCIAL'){
-    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' AND (category LIKE '%COMMERCIAL%' OR category='APARTMENTS & SHOPS') ORDER BY id").all();
+    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan FROM projects WHERE status='active' AND (category LIKE '%COMMERCIAL%' OR category='APARTMENTS & SHOPS') ORDER BY id").all();
   } else {
-    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities FROM projects WHERE status='active' AND (category=? OR category LIKE ?) ORDER BY id").all(category, `%${category}%`);
+    data=db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan FROM projects WHERE status='active' AND (category=? OR category LIKE ?) ORDER BY id").all(category, `%${category}%`);
   }
   res.json({success:true,data});
 });
@@ -3862,7 +3884,7 @@ const VALID_PROJECT_STATUSES = ["active","completed","sold_out","inactive"];
 
 app.get("/api/admin/projects",coordinatorOrAdmin,(req,res)=>{
   const builderProjId = getBuilderProjectId(req);
-  let sql = "SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects";
+  let sql = "SELECT id,name,category,description,image,location,price,amenities,cad_plan,status,created_at,updated_at FROM projects";
   const params = [];
   if (builderProjId) {
     sql += " WHERE id = ?";
@@ -3886,39 +3908,56 @@ app.get("/api/admin/projects",coordinatorOrAdmin,(req,res)=>{
   res.json({success:true,data:projects});
 });
 
-app.post("/api/admin/projects",admin,projectUpload.single("image_file"),(req,res)=>{
+app.post("/api/admin/projects",admin,projectUploadFields,(req,res)=>{
  try{
   const name=clean(req.body.name,160), category=clean(req.body.category,40).toUpperCase(), description=clean(req.body.description,5000), location=clean(req.body.location,300), price=clean(req.body.price,200), amenities=clean(req.body.amenities,2000), status=clean(req.body.status,20).toLowerCase()||"active";
+  const imageFile = req.files?.image_file?.[0] || req.file;
+  const cadFile = req.files?.cad_plan_file?.[0];
   let image=clean(req.body.image,1000);
-  if(req.file) image="/uploads/projects/"+req.file.filename;
+  if(imageFile) image="/uploads/projects/"+imageFile.filename;
+  let cadPlan=clean(req.body.cad_plan,1000);
+  if(cadFile) cadPlan="/uploads/projects/"+cadFile.filename;
   if(name.length<2)return res.status(400).json({success:false,error:"Enter a project name"});
   if(!VALID_PROJECT_CATEGORIES.includes(category))return res.status(400).json({success:false,error:"Select a valid category"});
   if(!VALID_PROJECT_STATUSES.includes(status))return res.status(400).json({success:false,error:"Invalid status"});
-  const info=db.prepare("INSERT INTO projects(name,category,description,image,location,price,amenities,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?, ?,datetime('now'),datetime('now'))").run(name,category,description,image,location,price,amenities,status);
+  const info=db.prepare("INSERT INTO projects(name,category,description,image,location,price,amenities,cad_plan,status,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))").run(name,category,description,image,location,price,amenities,cadPlan,status);
   audit(req,"create","project",info.lastInsertRowid,name);
-  res.json({success:true,data:db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=?").get(info.lastInsertRowid)});
+  res.json({success:true,data:db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan,status,created_at,updated_at FROM projects WHERE id=?").get(info.lastInsertRowid)});
  }catch(e){
-  if(req.file)try{fs.unlinkSync(req.file.path)}catch(_e){}
+  if(req.files?.image_file?.[0])try{fs.unlinkSync(req.files.image_file[0].path)}catch(_e){}
+  if(req.files?.cad_plan_file?.[0])try{fs.unlinkSync(req.files.cad_plan_file[0].path)}catch(_e){}
   throw e;
  }
 });
-app.put("/api/admin/projects/:id",admin,projectUpload.single("image_file"),(req,res)=>{
+app.put("/api/admin/projects/:id",admin,projectUploadFields,(req,res)=>{
  try{
   const id=Number(req.params.id), existing=db.prepare("SELECT * FROM projects WHERE id=?").get(id);
   if(!existing)return res.status(404).json({success:false,error:"Project not found"});
   const name=clean(req.body.name,160), category=clean(req.body.category,40).toUpperCase(), description=clean(req.body.description,5000), location=clean(req.body.location,300), price=clean(req.body.price,200), amenities=clean(req.body.amenities,2000), status=clean(req.body.status,20).toLowerCase()||"active";
+  const imageFile = req.files?.image_file?.[0] || req.file;
+  const cadFile = req.files?.cad_plan_file?.[0];
   let image=clean(req.body.image,1000);
-  if(req.file) image="/uploads/projects/"+req.file.filename;
+  if(imageFile) image="/uploads/projects/"+imageFile.filename;
   else if(!image) image=existing.image||"";
+  let cadPlan=clean(req.body.cad_plan,1000);
+  if(cadFile) {
+    cadPlan="/uploads/projects/"+cadFile.filename;
+  } else if(req.body.clear_cad_plan === 'true' || req.body.clear_cad_plan === true) {
+    cadPlan="";
+  } else if(!cadPlan) {
+    cadPlan=existing.cad_plan||"";
+  }
   if(name.length<2)return res.status(400).json({success:false,error:"Enter a project name"});
   if(!VALID_PROJECT_CATEGORIES.includes(category))return res.status(400).json({success:false,error:"Select a valid category"});
   if(!VALID_PROJECT_STATUSES.includes(status))return res.status(400).json({success:false,error:"Invalid status"});
-  db.prepare("UPDATE projects SET name=?,category=?,description=?,image=?,location=?,price=?,amenities=?,status=?,updated_at=datetime('now') WHERE id=?").run(name,category,description,image,location,price,amenities,status,id);
-  if(req.file && existing.image && existing.image.startsWith("/uploads/projects/")) deleteMediaFile(existing.image);
+  db.prepare("UPDATE projects SET name=?,category=?,description=?,image=?,location=?,price=?,amenities=?,cad_plan=?,status=?,updated_at=datetime('now') WHERE id=?").run(name,category,description,image,location,price,amenities,cadPlan,status,id);
+  if(imageFile && existing.image && existing.image.startsWith("/uploads/projects/")) deleteMediaFile(existing.image);
+  if((cadFile || req.body.clear_cad_plan === 'true') && existing.cad_plan && existing.cad_plan.startsWith("/uploads/projects/")) deleteMediaFile(existing.cad_plan);
   audit(req,"update","project",id,name);
-  res.json({success:true,data:db.prepare("SELECT id,name,category,description,image,location,price,amenities,status,created_at,updated_at FROM projects WHERE id=?").get(id)});
+  res.json({success:true,data:db.prepare("SELECT id,name,category,description,image,location,price,amenities,cad_plan,status,created_at,updated_at FROM projects WHERE id=?").get(id)});
  }catch(e){
-  if(req.file)try{fs.unlinkSync(req.file.path)}catch(_e){}
+  if(req.files?.image_file?.[0])try{fs.unlinkSync(req.files.image_file[0].path)}catch(_e){}
+  if(req.files?.cad_plan_file?.[0])try{fs.unlinkSync(req.files.cad_plan_file[0].path)}catch(_e){}
   throw e;
  }
 });

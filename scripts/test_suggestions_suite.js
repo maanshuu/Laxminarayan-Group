@@ -153,8 +153,8 @@ async function runTests() {
       method: "POST",
       headers: { "Content-Type": "application/json" }
     }, {
-      identifier: "admin@laxminarayangroup.com",
-      password: "Newt@1234"
+      identifier: process.env.ADMIN_EMAIL || "admin@laxminarayangroup.com",
+      password: process.env.ADMIN_PASSWORD || "LaxmiGroup#2026$Secure!"
     });
     const adminData = JSON.parse(adminLoginRes.body);
     const adminToken = adminData.token;
