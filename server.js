@@ -1267,6 +1267,156 @@ function seed(){
 }
 seed();
 
+// Automated Media Recovery: scan persistent storage volume for orphaned photos uploaded
+// for Vincitor Rivera & Vincitore Vintage, reconnecting them to project_media and setting covers.
+function recoverOrphanedProjectMedia() {
+  try {
+    const candidateDirs = new Set();
+    if (PROJECT_UPLOAD_DIR && fs.existsSync(PROJECT_UPLOAD_DIR)) {
+      candidateDirs.add(PROJECT_UPLOAD_DIR);
+      const subProjects = path.join(PROJECT_UPLOAD_DIR, "projects");
+      if (fs.existsSync(subProjects)) candidateDirs.add(subProjects);
+    }
+    if (fs.existsSync('/data/uploads')) {
+      candidateDirs.add('/data/uploads');
+      if (fs.existsSync('/data/uploads/projects')) candidateDirs.add('/data/uploads/projects');
+    }
+    if (fs.existsSync('/data/projects')) {
+      candidateDirs.add('/data/projects');
+    }
+    if (LEGACY_UPLOAD_DIR && fs.existsSync(LEGACY_UPLOAD_DIR)) {
+      candidateDirs.add(LEGACY_UPLOAD_DIR);
+    }
+    const localUploads = path.join(__dirname, "uploads");
+    if (fs.existsSync(localUploads)) {
+      candidateDirs.add(localUploads);
+      const sub = path.join(localUploads, "projects");
+      if (fs.existsSync(sub)) candidateDirs.add(sub);
+    }
+
+    const registered = new Set();
+    try {
+      db.prepare("SELECT file_path FROM project_media").all().forEach(r => {
+        if (r.file_path) registered.add(path.basename(r.file_path).toLowerCase());
+      });
+    } catch (_) {}
+
+    const seedBasenames = new Set([
+      'ds208_bird_eye_view.jpg', 'ds208_front_elevation.jpg', 'ds208_entrance_view.jpg',
+      'ds208_balcony_view.jpg', 'ds208_children_play_area_view.jpg', 'ds208_children_play_area.jpg',
+      'ds208_corner_view_of_club_house.jpg', 'ds208_corner_view_of_garden.jpg', 'ds208_corner_view_of_common_plot.jpg',
+      'ds208_corner_view_1.jpg', 'ds208_corner_view_2.jpg', 'ds208_side_view_of_club_house.jpg',
+      'ds208_top_view_of_common_plot.jpg', 'ds208_view_from_balcony.jpg', 'ds208_sample_hall.png',
+      'ds208_sample_bedroom.png', 'ds208_sample_kitchen.png',
+      'nilkanth_front_elevation.jpg', 'nilkanth_bird_eye_view.jpg', 'nilkanth_entrance_gate_day.jpg',
+      'nilkanth_street_view.jpg', 'nilkanth_corner_view_day.jpg', 'nilkanth_entrance_gate_night.jpg',
+      'nilkanth_gazebo_pavilion.jpg', 'nilkanth_central_garden.jpg'
+    ]);
+
+    const p3Row = db.prepare("SELECT id, name, image FROM projects WHERE id=3 OR name LIKE '%Rivera%'").get();
+    const p4Row = db.prepare("SELECT id, name, image FROM projects WHERE id=4 OR name LIKE '%Vintage%'").get();
+    if (!p3Row && !p4Row) return { recovered: 0, files: [] };
+
+    const p3Id = p3Row ? p3Row.id : 3;
+    const p4Id = p4Row ? p4Row.id : 4;
+
+    const orphanedFiles = [];
+    for (const dir of candidateDirs) {
+      let entries = [];
+      try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) {}
+      for (const ent of entries) {
+        if (!ent.isFile()) continue;
+        const fname = ent.name;
+        const ext = path.extname(fname).toLowerCase();
+        if (!ALLOWED_IMAGE_EXT.has(ext) && !ALLOWED_VIDEO_EXT.has(ext)) continue;
+        const lower = fname.toLowerCase();
+        if (registered.has(lower) || seedBasenames.has(lower)) continue;
+        if (lower.startsWith(".") || lower.endsWith(".opt")) continue;
+
+        const fullPath = path.join(dir, fname);
+        let stat;
+        try { stat = fs.statSync(fullPath); } catch (_) { continue; }
+        if (stat.size < 1000) continue;
+
+        orphanedFiles.push({
+          fullPath,
+          filename: fname,
+          ext,
+          size: stat.size,
+          mtime: stat.mtimeMs,
+          lower
+        });
+        registered.add(lower);
+      }
+    }
+
+    if (orphanedFiles.length === 0) {
+      return { recovered: 0, files: [] };
+    }
+
+    console.log(`[MEDIA RECOVERY] Found ${orphanedFiles.length} unindexed media files on disk:`, orphanedFiles.map(o => o.filename));
+    orphanedFiles.sort((a, b) => a.mtime - b.mtime);
+
+    let recoveredCount = 0;
+    const insM = db.prepare(`
+      INSERT INTO project_media(project_id, media_type, mime_type, original_name, file_path, file_size, is_cover)
+      VALUES(?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const targetDir = PROJECT_UPLOAD_DIR;
+
+    for (let i = 0; i < orphanedFiles.length; i++) {
+      const item = orphanedFiles[i];
+      let assignedProjectId = p3Id;
+
+      if (item.lower.includes("vintage") || item.lower.includes("shop") || item.lower.includes("commercial") || item.lower.includes("flat") || item.lower.includes("apartment") || item.lower.includes("suite")) {
+        assignedProjectId = p4Id;
+      } else if (item.lower.includes("rivera") || item.lower.includes("vincitor") || item.lower.includes("villa") || item.lower.includes("bungalow")) {
+        assignedProjectId = p3Id;
+      } else {
+        assignedProjectId = (i < Math.ceil(orphanedFiles.length / 2)) ? p3Id : p4Id;
+      }
+
+      const destPath = path.join(targetDir, item.filename);
+      if (path.resolve(item.fullPath) !== path.resolve(destPath) && !fs.existsSync(destPath)) {
+        try { fs.copyFileSync(item.fullPath, destPath); } catch (_) {}
+      }
+
+      const relPath = "/uploads/projects/" + item.filename;
+      const mediaType = ALLOWED_VIDEO_EXT.has(item.ext) ? "video" : "image";
+      const mimeType = mediaType === "video" ? `video/${item.ext.replace(/^\./, "")}` : (item.ext === ".png" ? "image/png" : "image/jpeg");
+
+      let origName = item.filename;
+      const parts = item.filename.split("-");
+      if (parts.length >= 3 && /^\d+$/.test(parts[0])) {
+        origName = parts.slice(2).join("-");
+      }
+
+      const existingCoverCount = db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=? AND is_cover=1").get(assignedProjectId).c;
+      const isCover = existingCoverCount === 0 && mediaType === "image" ? 1 : 0;
+
+      insM.run(assignedProjectId, mediaType, mimeType, origName, relPath, item.size, isCover);
+      recoveredCount++;
+
+      const currProj = db.prepare("SELECT image FROM projects WHERE id=?").get(assignedProjectId);
+      if (!currProj?.image || currProj.image.startsWith("/assets/")) {
+        db.prepare("UPDATE projects SET image=? WHERE id=?").run(relPath, assignedProjectId);
+      }
+    }
+
+    if (recoveredCount > 0) {
+      db.prepare("DELETE FROM project_media WHERE project_id IN (?, ?) AND file_path LIKE '/assets/%'").run(p3Id, p4Id);
+    }
+
+    console.log(`[MEDIA RECOVERY] Successfully recovered ${recoveredCount} photos/videos!`);
+    return { recovered: recoveredCount, files: orphanedFiles.map(o => o.filename) };
+  } catch (err) {
+    console.error("[MEDIA RECOVERY WARNING]", err.message);
+    return { recovered: 0, error: err.message };
+  }
+}
+recoverOrphanedProjectMedia();
+
 // Safety backup: keep rolling SQLite backups outside the project folder. This protects
 // users/projects/enquiries even if a future code update is damaged.
 async function createRollingBackup(){
@@ -4098,6 +4248,24 @@ app.delete("/api/admin/projects/:projectId/media/:mediaId",admin,(req,res)=>{
   }
   audit(req,"delete","project_media",mediaId,"Project media deleted");
   res.json({success:true,data:mediaRows(projectId)});
+});
+
+app.patch("/api/admin/projects/:projectId/media/:mediaId/move",admin,(req,res)=>{
+  const mediaId=Number(req.params.mediaId), targetProjectId=Number(req.body.targetProjectId);
+  if(!Number.isInteger(mediaId)||!Number.isInteger(targetProjectId)||targetProjectId<1)return res.status(400).json({success:false,error:"Invalid project id"});
+  const targetProj=db.prepare("SELECT id,name FROM projects WHERE id=?").get(targetProjectId);
+  if(!targetProj)return res.status(404).json({success:false,error:"Target project not found"});
+  const media=db.prepare("SELECT * FROM project_media WHERE id=?").get(mediaId);
+  if(!media)return res.status(404).json({success:false,error:"Media not found"});
+  db.prepare("UPDATE project_media SET project_id=?,is_cover=0 WHERE id=?").run(targetProjectId,mediaId);
+  audit(req,"update","project_media",mediaId,`Moved media #${mediaId} to ${targetProj.name}`);
+  res.json({success:true,message:`Media moved to ${targetProj.name}`});
+});
+
+app.post("/api/admin/media-recovery/scan",admin,(req,res)=>{
+  const result=recoverOrphanedProjectMedia();
+  audit(req,"recover","project_media",0,`Scanned storage: recovered ${result.recovered||0} orphaned media files`);
+  res.json({success:true,...result});
 });
 
 app.patch("/api/admin/projects/:id/status",admin,(req,res)=>{
