@@ -2894,6 +2894,38 @@ body.role-builder [data-write-action="true"] {
           </div>
         </div>
       </div>
+
+      <!-- Official Project E-Brochure (PDF / Document) Upload Box -->
+      <div class="span4" style="background:var(--bg-subtle); padding:16px 20px; border-radius:var(--radius-md); border:1px dashed var(--line-strong); margin-top:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:4px;">
+          <b style="display:flex; align-items:center; gap:6px; color:var(--ink-heading);">
+            <span>📑 Official Project E-Brochure</span>
+            <span class="pill" style="font-size:11px; background:#e0f2fe; color:#0369a1; font-weight:700;">Sales PDF & Prospectus</span>
+          </b>
+          <button type="button" id="pmBrochureClearBtn" class="btn smallbtn danger" style="display:none; padding:3px 9px; font-size:11px;" onclick="clearBrochureSelection()">✕ Remove Brochure</button>
+        </div>
+        <p class="muted small" style="margin:0 0 10px 0;">Upload official sales brochure or prospectus (<b>.PDF</b> format). Downloaded by visitors when they click "Download Brochure" on the website.</p>
+        
+        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+          <div id="pmBrochurePreviewBox" style="width:140px; height:90px; border-radius:8px; background:#e2e8f0; overflow:hidden; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); flex-shrink:0;">
+            <div id="pmBrochureDocPreview" style="display:none; text-align:center; padding:6px;">
+              <span style="font-size:26px;">📄</span>
+              <div id="pmBrochureDocName" style="font-size:10px; font-weight:700; color:var(--sky-deep); max-width:124px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;">Brochure PDF</div>
+            </div>
+            <span id="pmBrochurePlaceholder" style="font-size:11px; color:var(--ink-muted); text-align:center; padding:8px;">No brochure chosen</span>
+          </div>
+          <div style="flex:1; min-width:220px;">
+            <input id="pmBrochureFile" type="file" accept=".pdf" style="font-size:12px; margin-bottom:6px;">
+            <div class="small muted">Supported: PDF Brochure (Max 250 MB).</div>
+            <input id="pmBrochureUrl" type="hidden">
+            <div id="pmBrochureCurrentLink" style="margin-top:6px; font-size:12px; display:none;">
+              <a href="#" target="_blank" id="pmBrochureDownloadAnchor" style="color:var(--sky-deep); font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+                <span>🔗 View Current Brochure</span> ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div class="span4 actions" style="margin-top:10px;">
         <button class="btn primary" type="submit" id="pmSubmitBtn" style="padding:10px 24px; font-weight:700;">Save Project</button>
@@ -5225,6 +5257,7 @@ function renderProjectGrid(list) {
             <button class="btn smallbtn" onclick="openProjectMediaModal(${p.id})">📸 Media (${p.media_count || 0})</button>
             <button class="btn smallbtn" onclick="viewProjectUnits(${p.id})">📦 Units (${totalU})</button>
             ${p.cad_plan ? `<a href="${escAttr(p.cad_plan)}" target="_blank" class="btn smallbtn" style="color:#b45309; border-color:#fde68a; background:#fefce8; font-weight:700;" title="View Sanctioned CAD Layout Plan">📐 CAD</a>` : ''}
+            ${p.brochure ? `<a href="${escAttr(p.brochure)}" target="_blank" class="btn smallbtn" style="color:#0369a1; border-color:#bae6fd; background:#f0f9ff; font-weight:700;" title="View Official E-Brochure">📄 Brochure</a>` : ''}
             <button class="btn smallbtn" onclick="previewProjectLive(${p.id})" title="View public page in new tab">🌐 Live ↗</button>
           </div>
           <div style="display:flex; gap:4px;">
@@ -5265,6 +5298,7 @@ function renderProjectTable(list) {
         <td>
           <button class="btn smallbtn" onclick="openProjectMediaModal(${p.id})">📸 ${p.media_count || 0} files</button>
           ${p.cad_plan ? `<a href="${escAttr(p.cad_plan)}" target="_blank" class="btn smallbtn" style="margin-left:4px; color:#b45309; border-color:#fde68a; background:#fefce8; font-weight:700;" title="View CAD Layout Plan">📐 CAD</a>` : ''}
+          ${p.brochure ? `<a href="${escAttr(p.brochure)}" target="_blank" class="btn smallbtn" style="margin-left:4px; color:#0369a1; border-color:#bae6fd; background:#f0f9ff; font-weight:700;" title="View Official E-Brochure">📄 Brochure</a>` : ''}
         </td>
         <td style="text-align:right;">
           <div class="actions" style="justify-content:flex-end;">
@@ -5331,6 +5365,30 @@ function openProjectModal(id = null) {
     cadClearBtn.style.display = 'none';
   }
 
+  // Reset Brochure fields
+  window.pmClearBrochureFlag = false;
+  $('pmBrochureUrl').value = p ? (p.brochure || '') : '';
+  $('pmBrochureFile').value = '';
+  const brochureDocPreview = $('pmBrochureDocPreview');
+  const brochurePlaceholder = $('pmBrochurePlaceholder');
+  const brochureClearBtn = $('pmBrochureClearBtn');
+  const brochureLinkDiv = $('pmBrochureCurrentLink');
+  const brochureAnchor = $('pmBrochureDownloadAnchor');
+
+  if (p && p.brochure) {
+    brochureDocPreview.style.display = 'block';
+    $('pmBrochureDocName').textContent = p.brochure.split('/').pop();
+    brochurePlaceholder.style.display = 'none';
+    brochureLinkDiv.style.display = 'block';
+    brochureAnchor.href = p.brochure;
+    brochureClearBtn.style.display = 'inline-block';
+  } else {
+    brochureDocPreview.style.display = 'none';
+    brochurePlaceholder.style.display = 'block';
+    brochureLinkDiv.style.display = 'none';
+    brochureClearBtn.style.display = 'none';
+  }
+
   $('projectModalTitle').textContent = p ? `Edit Project — ${p.name}` : 'Add New Real Estate Project';
 
   const preview = $('pmImagePreview');
@@ -5361,6 +5419,18 @@ function clearCadPlanSelection() {
   $('pmCadCurrentLink').style.display = 'none';
   $('pmCadClearBtn').style.display = 'none';
   toast('CAD plan removed (will be saved upon form submission).');
+}
+
+// Clear selected or existing Brochure
+function clearBrochureSelection() {
+  window.pmClearBrochureFlag = true;
+  $('pmBrochureUrl').value = '';
+  $('pmBrochureFile').value = '';
+  $('pmBrochureDocPreview').style.display = 'none';
+  $('pmBrochurePlaceholder').style.display = 'block';
+  $('pmBrochureCurrentLink').style.display = 'none';
+  $('pmBrochureClearBtn').style.display = 'none';
+  toast('Brochure removed (will be saved upon form submission).');
 }
 
 // Attach image live preview handler
@@ -5402,6 +5472,21 @@ if ($('pmCadFile')) {
   };
 }
 
+// Attach Brochure live preview handler
+if ($('pmBrochureFile')) {
+  $('pmBrochureFile').onchange = e => {
+    const file = e.target.files[0];
+    if (file) {
+      window.pmClearBrochureFlag = false;
+      $('pmBrochureDocPreview').style.display = 'block';
+      $('pmBrochureDocName').textContent = file.name;
+      $('pmBrochurePlaceholder').style.display = 'none';
+      $('pmBrochureClearBtn').style.display = 'inline-block';
+      $('pmBrochureCurrentLink').style.display = 'none';
+    }
+  };
+}
+
 if ($('projectModalForm')) {
   $('projectModalForm').onsubmit = async e => {
     e.preventDefault();
@@ -5430,6 +5515,15 @@ if ($('projectModalForm')) {
     }
     if (window.pmClearCadFlag) {
       fd.append('clear_cad_plan', 'true');
+    }
+
+    // Append Brochure data
+    fd.append('brochure', $('pmBrochureUrl').value.trim());
+    if ($('pmBrochureFile').files[0]) {
+      fd.append('brochure_file', $('pmBrochureFile').files[0]);
+    }
+    if (window.pmClearBrochureFlag) {
+      fd.append('clear_brochure', 'true');
     }
 
     const id = $('pmId').value;
