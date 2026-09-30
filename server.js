@@ -1078,6 +1078,34 @@ function seed(){
     `).run(p2.id);
   }
 
+  // 1c. Seed Vincitor Rivera (ID 3 - Restored)
+  const p3 = db.prepare("SELECT id FROM projects WHERE id=3 OR name LIKE '%Rivera%' OR name LIKE '%Vincitor Rivera%'").get();
+  if(!p3) {
+    db.prepare("INSERT INTO projects(id,name,category,description,image,location,price,amenities,status) VALUES(3,?,?,?,?,?,?,?,'active')").run(
+      "Vincitor Rivera",
+      "LUXURY VILLAS",
+      "Ultra-luxury riverside residences and private villas featuring contemporary architecture, landscaped gardens, private club facilities, and 24/7 smart security.",
+      "/assets/signature-villas.jpg",
+      "Riverfront Boulevard, Gujarat",
+      "₹1.15 Cr - ₹2.10 Cr",
+      "Private Garden, River View Promenade, Residents Clubhouse, Gymnasium, 24/7 Security, EV Charging Station, Children Play Zone, Power Backup"
+    );
+  }
+
+  // 1d. Seed Vincitore Vintage (ID 4 - Restored)
+  const p4 = db.prepare("SELECT id FROM projects WHERE id=4 OR name LIKE '%Vintage%' OR name LIKE '%Vincitore Vintage%'").get();
+  if(!p4) {
+    db.prepare("INSERT INTO projects(id,name,category,description,image,location,price,amenities,status) VALUES(4,?,?,?,?,?,?,?,'active')").run(
+      "Vincitore Vintage",
+      "APARTMENTS & SHOPS",
+      "Grand architectural landmark blending vintage European aesthetics with modern lifestyle amenities, premium residential suites, and boutique high-street commercial promenade.",
+      "/assets/signature-homes.jpg",
+      "Heritage Corridor, Gujarat",
+      "₹55 Lakh - ₹92 Lakh",
+      "Grand Entrance Lobby, Swimming Pool, Rooftop Sky Lounge, High-Street Retail, Children Play Park, Yoga Deck, 24/7 CCTV & Security, High-Speed Elevators"
+    );
+  }
+
   // 2. Seed Units for DS 208 (16 units)
   const p1Id = (db.prepare("SELECT id FROM projects WHERE name LIKE '%DS 208%'").get() || {}).id || 1;
   const p1UnitCount = db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?").get(p1Id).c;
@@ -1121,6 +1149,35 @@ function seed(){
     for(const v of villaUnits) insU.run(p2Id, v.u, v.t, v.f, v.a, v.p, v.s, `Nilkanth Villa Official Residence (${v.t})`);
   }
 
+  // 3b. Seed Units for Vincitor Rivera (4 luxury units)
+  const p3Id = (db.prepare("SELECT id FROM projects WHERE name LIKE '%Rivera%'").get() || {}).id || 3;
+  const p3UnitCount = db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?").get(p3Id)?.c || 0;
+  if(p3UnitCount === 0) {
+    const riveraUnits = [
+      { u: 'Villa 101', t: '4 BHK Luxury Villa', f: 0, a: 2950, p: '₹1.15 Cr', s: 'available' },
+      { u: 'Villa 102', t: '4 BHK Luxury Villa', f: 0, a: 2950, p: '₹1.18 Cr', s: 'available' },
+      { u: 'Villa 201', t: '5 BHK Riverview Villa', f: 0, a: 3450, p: '₹1.65 Cr', s: 'available' },
+      { u: 'Villa 202', t: '5 BHK Grand Estate Villa', f: 0, a: 4100, p: '₹2.10 Cr', s: 'available' }
+    ];
+    const insU = db.prepare("INSERT INTO project_units (project_id, unit_number, unit_type, floor_number, area_sqft, price, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    for(const u of riveraUnits) insU.run(p3Id, u.u, u.t, u.f, u.a, u.p, u.s, `Vincitor Rivera Residence (${u.t})`);
+  }
+
+  // 3c. Seed Units for Vincitore Vintage (5 units)
+  const p4Id = (db.prepare("SELECT id FROM projects WHERE name LIKE '%Vintage%'").get() || {}).id || 4;
+  const p4UnitCount = db.prepare("SELECT COUNT(*) c FROM project_units WHERE project_id=?").get(p4Id)?.c || 0;
+  if(p4UnitCount === 0) {
+    const vintageUnits = [
+      { u: 'Shop V-01', t: 'High-Street Retail Shop', f: 0, a: 380, p: '₹36 Lakh', s: 'available' },
+      { u: 'Shop V-02', t: 'Corner Boutique Store', f: 0, a: 460, p: '₹44 Lakh', s: 'available' },
+      { u: 'Suite 201', t: '2 BHK Vintage Suite', f: 2, a: 1200, p: '₹55 Lakh', s: 'available' },
+      { u: 'Suite 301', t: '3 BHK Royal Residence', f: 3, a: 1650, p: '₹75 Lakh', s: 'available' },
+      { u: 'Suite 401', t: '3 BHK Luxury Pent-Suite', f: 4, a: 1950, p: '₹92 Lakh', s: 'available' }
+    ];
+    const insU = db.prepare("INSERT INTO project_units (project_id, unit_number, unit_type, floor_number, area_sqft, price, status, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    for(const u of vintageUnits) insU.run(p4Id, u.u, u.t, u.f, u.a, u.p, u.s, `Vincitore Vintage Official Unit (${u.t})`);
+  }
+
   // 4. Seed Media for DS 208 (17 media records)
   const p1MediaCount = db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?").get(p1Id).c;
   if(p1MediaCount === 0) {
@@ -1162,6 +1219,30 @@ function seed(){
     ];
     const insM = db.prepare("INSERT INTO project_media (project_id, media_type, mime_type, original_name, file_path, file_size, is_cover) VALUES (?, 'image', 'image/jpeg', ?, ?, 800000, ?)");
     for(const m of nilkanthMedia) insM.run(p2Id, m.name, m.path, m.cover);
+  }
+
+  // 5b. Seed Media for Vincitor Rivera (3 media records)
+  const p3MediaCount = db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?").get(p3Id)?.c || 0;
+  if(p3MediaCount === 0) {
+    const riveraMedia = [
+      { name: 'Vincitor Rivera Villa Architecture', path: '/assets/signature-villas.jpg', cover: 1 },
+      { name: 'Riverfront Landscape & Gardens', path: '/assets/hero-villa.png', cover: 0 },
+      { name: 'Luxury Residential Grounds', path: '/assets/residential-properties.jpg', cover: 0 }
+    ];
+    const insM = db.prepare("INSERT INTO project_media (project_id, media_type, mime_type, original_name, file_path, file_size, is_cover) VALUES (?, 'image', 'image/jpeg', ?, ?, 500000, ?)");
+    for(const m of riveraMedia) insM.run(p3Id, m.name, m.path, m.cover);
+  }
+
+  // 5c. Seed Media for Vincitore Vintage (3 media records)
+  const p4MediaCount = db.prepare("SELECT COUNT(*) c FROM project_media WHERE project_id=?").get(p4Id)?.c || 0;
+  if(p4MediaCount === 0) {
+    const vintageMedia = [
+      { name: 'Vincitore Vintage Grand Facade', path: '/assets/signature-homes.jpg', cover: 1 },
+      { name: 'Commercial & Retail Promenade', path: '/assets/commercial-properties.jpg', cover: 0 },
+      { name: 'Urban Landmark Architecture', path: '/assets/project-2.jpg', cover: 0 }
+    ];
+    const insM = db.prepare("INSERT INTO project_media (project_id, media_type, mime_type, original_name, file_path, file_size, is_cover) VALUES (?, 'image', 'image/jpeg', ?, ?, 500000, ?)");
+    for(const m of vintageMedia) insM.run(p4Id, m.name, m.path, m.cover);
   }
 
   // 6. Seed Leaders
