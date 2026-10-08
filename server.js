@@ -856,7 +856,7 @@ function maskEmail(email) {
 function employeeOrAdmin(req,res,next){auth(req,res,()=>{
  const u=db.prepare("SELECT status,role FROM users WHERE id=?").get(req.user.id);
  if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
- if(u.role!=="admin" && u.role!=="employee" && u.role!=="coordinator" && u.role!=="manager")return res.status(403).json({success:false,error:"Advisor or admin access required"});
+ if(u.role!=="admin" && u.role!=="employee" && u.role!=="coordinator" && u.role!=="manager" && u.role!=="hr")return res.status(403).json({success:false,error:"Advisor, staff or admin access required"});
  req.user.role=u.role;
  next();
 })}
@@ -2979,6 +2979,19 @@ app.get("/api/employee/attendance/sites",employeeOrAdmin,(req,res)=>{
   res.json({success:true,sites:AUTHORIZED_SITES});
 });
 
+app.get("/api/employee/attendance/today",employeeOrAdmin,(req,res)=>{
+  const emp=currentEmployee(req.user.id);
+  if(!emp)return res.status(400).json({success:false,error:"Employee record not found"});
+  const today=todayIST();
+  const attendance=db.prepare("SELECT * FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(emp.id,today);
+  res.json({
+    success:true,
+    employee:emp,
+    todayAttendance:attendance||{status:"not_marked"},
+    authorized_sites:AUTHORIZED_SITES
+  });
+});
+
 app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
   const emp=currentEmployee(req.user.id);
   if(!emp)return res.status(400).json({success:false,error:"Employee record not found"});
@@ -2992,6 +3005,14 @@ app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
   const loc = evaluateAttendanceLocation(lat, lng, accuracy);
 
   if(existing){
+    if(existing.check_out && !req.body.force) {
+      return res.json({
+        success:true,
+        already_completed:true,
+        message:`Shift already completed for today (${existing.check_out}) · Total duration: ${existing.work_duration || '—'}`,
+        record:existing
+      });
+    }
     const checkOut=timeNow;
     const checkInTime=existing.check_in||timeNow;
     const eod_summary = req.body && req.body.eod_summary ? clean(req.body.eod_summary, 5000) : (existing.eod_summary || '');
@@ -3039,6 +3060,53 @@ app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
       record:created
     });
   }
+});
+
+app.post("/api/employee/attendance/check-out",employeeOrAdmin,(req,res)=>{
+  const emp=currentEmployee(req.user.id);
+  if(!emp)return res.status(400).json({success:false,error:"Employee record not found"});
+  const today=todayIST();
+  const timeNow=nowIST().slice(11);
+  const existing=db.prepare("SELECT * FROM employee_attendance WHERE employee_id=? AND attendance_date=?").get(emp.id,today);
+
+  if(!existing || !existing.check_in){
+    return res.status(400).json({success:false,error:"No check-in record found for today. Please mark check-in first."});
+  }
+
+  const lat = req.body && req.body.lat !== undefined ? Number(req.body.lat) : null;
+  const lng = req.body && req.body.lng !== undefined ? Number(req.body.lng) : null;
+  const accuracy = req.body && req.body.accuracy !== undefined ? Number(req.body.accuracy) : null;
+  const loc = evaluateAttendanceLocation(lat, lng, accuracy);
+
+  const checkOut=timeNow;
+  const checkInTime=existing.check_in;
+  const eod_summary = req.body && req.body.eod_summary ? clean(req.body.eod_summary, 5000) : (existing.eod_summary || '');
+  const walkins_count = req.body && req.body.walkins_count !== undefined ? Math.max(0, parseInt(req.body.walkins_count, 10) || 0) : (existing.walkins_count || 0);
+  const followups_count = req.body && req.body.followups_count !== undefined ? Math.max(0, parseInt(req.body.followups_count, 10) || 0) : (existing.followups_count || 0);
+  const duration = calculateShiftDuration(checkInTime, checkOut);
+
+  db.prepare(`UPDATE employee_attendance SET 
+    check_in=?,
+    check_out=?, 
+    check_out_lat=?, check_out_lng=?, check_out_accuracy=?, 
+    check_out_site=?, check_out_distance_m=?, check_out_status=?,
+    eod_summary=?, walkins_count=?, followups_count=?, work_duration=?,
+    updated_at=CURRENT_TIMESTAMP 
+    WHERE id=?`).run(
+    checkInTime,
+    checkOut,
+    loc.lat || null, loc.lng || null, loc.accuracy || null,
+    loc.site_name || '', loc.distance_m ?? null, loc.status || '',
+    eod_summary, walkins_count, followups_count, duration,
+    existing.id
+  );
+  audit(req,"update","attendance",existing.id,`Check-out: ${timeNow} · ${loc.site_name} · Shift: ${duration}`);
+  const updated = db.prepare("SELECT * FROM employee_attendance WHERE id=?").get(existing.id);
+  return res.json({
+    success:true,
+    message:`Checked out successfully at ${timeNow}${loc.is_on_site ? ` (Verified at ${loc.site_name})` : loc.status === 'off_site' ? ` (${loc.site_name})` : ''} · Shift Duration: ${duration}`,
+    record:updated
+  });
 });
 
 app.get("/api/health",(req,res)=>res.json({success:true,service:"Laxminarayan Group",timezone:"Asia/Kolkata (IST)",ist_time:nowIST(),time:new Date().toISOString()}));

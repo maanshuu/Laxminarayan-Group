@@ -1812,6 +1812,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
       <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
     </div>
     <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
+    <span id="topPunchBadge" class="top-status-badge" style="cursor:pointer; display:none;" onclick="showView('attendanceView')" title="Click to view Attendance & Punch"><span class="top-status-dot" style="background:#0284c7;"></span> 📍 My Punch</span>
     <a href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this, event);" data-admin-only="true" class="top-status-badge" style="text-decoration:none; cursor:pointer; background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3); font-weight:700;" title="Download complete portable database backup (.db)"><span class="top-status-dot" style="background:#0284c7;"></span> 📥 BACKUP DB</a>
     <span class="top-status-badge" data-admin-only="true" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
   </div>
@@ -2324,6 +2325,34 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
 
   <!-- ATTENDANCE VIEW -->
   <section id="attendanceView" class="view">
+    <!-- PERSONAL ATTENDANCE PUNCH CARD (GPS GEOFENCE VERIFIED) -->
+    <div id="myPunchCard" class="panel" style="background:linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%); border:1px solid rgba(2, 132, 199, 0.28); box-shadow:0 6px 24px -4px rgba(2, 132, 199, 0.12); margin-bottom:18px; position:relative; overflow:hidden;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div style="flex:1 1 320px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,#0284c7,#0369a1); display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; box-shadow:0 2px 8px rgba(2,132,199,0.35);">📍</div>
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--ink);">My Daily Attendance (Punch)</h3>
+                <span id="myPunchBadge" class="pill" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:11px;">Checking...</span>
+              </div>
+              <div id="myPunchSubtitle" style="font-size:12px; color:var(--ink-muted); margin-top:2px;">
+                Official shift check-in & geofenced GPS verification
+              </div>
+            </div>
+          </div>
+          <div id="myPunchDetails" style="font-size:13px; color:#1e293b; margin-top:10px; padding:10px 14px; background:rgba(255,255,255,0.85); border:1px solid rgba(2,132,199,0.15); border-radius:8px; line-height:1.5;">
+            Loading today's attendance status...
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button id="myCheckInBtn" class="btn" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; font-weight:700; border:none; padding:11px 22px; font-size:13px; border-radius:10px; box-shadow:0 4px 14px rgba(2,132,199,0.3); display:inline-flex; align-items:center; gap:6px;" onclick="handleMyPunchAction()">
+            <span>📍</span><span id="myCheckInBtnText">Mark My Check-In</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="toolbar">
         <div>
@@ -2826,6 +2855,42 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
         <button class="btn" onclick="closeModal('adminEodModal')">Close</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- PERSONAL CHECK-OUT & EOD MODAL -->
+<div id="myCheckOutModal" class="modal">
+  <div class="modal-card" style="max-width:520px;">
+    <div class="headrow" style="margin-bottom:12px;">
+      <div>
+        <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--ink);">🚪 End-of-Day Check-Out</h3>
+        <p class="muted" style="margin-top:2px; font-size:12px;">Verify your departure GPS location and record your daily shift summary.</p>
+      </div>
+      <button class="btn smallbtn" onclick="closeModal('myCheckOutModal')">✕</button>
+    </div>
+    <form id="myCheckOutForm" onsubmit="submitMyCheckOut(event)">
+      <div style="background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin-bottom:12px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div>
+          <div style="font-size:11px; text-transform:uppercase; color:var(--ink-muted); font-weight:700;">Check-In Time</div>
+          <div id="myModalCheckInTime" style="font-size:15px; font-weight:800; color:var(--ink); margin-top:2px;">—</div>
+        </div>
+        <div>
+          <div style="font-size:11px; text-transform:uppercase; color:var(--ink-muted); font-weight:700;">Current Shift</div>
+          <div id="myModalShiftDuration" style="font-size:15px; font-weight:800; color:#0284c7; margin-top:2px;">Calculating...</div>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; font-weight:700; color:var(--ink); display:block; margin-bottom:4px;">📋 Daily Work Summary & Accomplishments (Optional)</label>
+        <textarea id="myCheckOutSummary" rows="3" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; font-family:inherit; font-size:12.5px; box-sizing:border-box;" placeholder="E.g. Completed team attendance review, staff onboarding, interviews..."></textarea>
+      </div>
+      <div id="myCheckOutGeoStatus" style="font-size:11.5px; color:#0369a1; background:#f0f9ff; border:1px solid #bae6fd; border-radius:6px; padding:7px 10px; margin-bottom:14px;">
+        📍 Browser will auto-verify your GPS location upon checkout.
+      </div>
+      <div class="actions" style="justify-content:flex-end; gap:8px;">
+        <button type="button" class="btn" onclick="closeModal('myCheckOutModal')">Cancel</button>
+        <button type="submit" id="myCheckOutSubmitBtn" class="btn primary" style="background:#059669; border-color:#059669;">Confirm Check-Out →</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -3656,7 +3721,7 @@ async function load() {
   } else {
     await Promise.all([loadEnquiries(), loadTeam(), loadCustomers(), loadProjects()]);
   }
-  await Promise.all([loadLeads(), loadVisits(), loadUnits(), loadBookings()]);
+  await Promise.all([loadLeads(), loadVisits(), loadUnits(), loadBookings(), loadMyAttendance()]);
 }
 
 function fillProjectSelect(id, includeGeneral = true) {
@@ -6327,6 +6392,7 @@ function openAdminEodModal(employeeId) {
 
 async function loadAttendance() {
   try {
+    loadMyAttendance().catch(() => {});
     if (!$('attendanceDate').value) $('attendanceDate').value = todayLocal();
     const d = await get('/api/admin/attendance?date=' + encodeURIComponent($('attendanceDate').value));
     state.attendanceData = d.data || [];
@@ -6419,6 +6485,326 @@ async function refreshAttendance() {
   resetAttendanceForm();
   await loadAttendance();
   toast('Attendance refreshed; form cleared');
+}
+
+// ─── PERSONAL ATTENDANCE (GPS PUNCH & CHECK-OUT FOR HR & STAFF) ───
+function captureGeolocation() {
+  if (!('geolocation' in navigator)) return Promise.resolve(null);
+  return new Promise(resolve => {
+    let finished = false;
+    const safetyTimer = setTimeout(() => {
+      if (!finished) {
+        finished = true;
+        console.warn('Geolocation safety timeout fired (4.5s limit)');
+        toast('⚠️ GPS taking longer than usual. Proceeding with punch...');
+        resolve(null);
+      }
+    }, 4500);
+
+    try {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          if (!finished) {
+            finished = true;
+            clearTimeout(safetyTimer);
+            resolve({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracy: pos.coords.accuracy
+            });
+          }
+        },
+        err => {
+          if (!finished) {
+            finished = true;
+            clearTimeout(safetyTimer);
+            console.warn('Geolocation capture:', err);
+            if (err.code === 1) {
+              toast('⚠️ Location access was denied in browser. Punching without GPS.');
+              alert('📍 Location Permission is Blocked:\n\nTo verify on-site attendance at Head Office or site, please tap the lock/tune icon at the top of your browser (next to the website URL), set Location to "Allow", and ensure phone/computer location is ON.');
+            } else if (err.code === 2) {
+              toast('⚠️ Device GPS is unavailable. Please check location settings.');
+            } else {
+              toast('⚠️ Location request timed out. Proceeding...');
+            }
+            resolve(null);
+          }
+        },
+        { enableHighAccuracy: true, timeout: 4000, maximumAge: 300000 }
+      );
+    } catch (e) {
+      if (!finished) {
+        finished = true;
+        clearTimeout(safetyTimer);
+        resolve(null);
+      }
+    }
+  });
+}
+
+async function loadMyAttendance() {
+  try {
+    const res = await get('/api/employee/attendance/today');
+    if (!res || !res.success) return;
+    state.myAttendance = res.todayAttendance || {};
+    state.myEmployee = res.employee || {};
+    renderMyPunchCard(state.myAttendance, state.myEmployee);
+  } catch (err) {
+    console.warn('Could not load personal attendance:', err);
+  }
+}
+
+function renderMyPunchCard(att, emp) {
+  const badgeEl = $('myPunchBadge');
+  const detailsEl = $('myPunchDetails');
+  const btnEl = $('myCheckInBtn');
+  const btnTextEl = $('myCheckInBtnText');
+  const topBadge = $('topPunchBadge');
+
+  if (!badgeEl || !detailsEl || !btnEl) return;
+
+  const empName = emp?.name || state.currentUser?.name || 'Staff Member';
+  const empRole = emp?.designation || (state.currentUser?.role === 'hr' ? 'HR Manager' : 'Employee');
+  const empDept = emp?.department || (state.currentUser?.role === 'hr' ? 'Human Resources' : 'General');
+  const empCode = emp?.employee_code || '';
+
+  // Calculate live shift duration if currently checked in
+  let liveDuration = '';
+  if (att && att.check_in) {
+    try {
+      const nowTime = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+      const parts = String(att.check_in).replace(/[^0-9:]/g, '').split(':');
+      const h1 = parseInt(parts[0], 10) || 0;
+      const m1 = parseInt(parts[1], 10) || 0;
+      const nowParts = nowTime.split(':');
+      const h2 = parseInt(nowParts[0], 10) || 0;
+      const m2 = parseInt(nowParts[1], 10) || 0;
+      let diffMins = (h2 * 60 + m2) - (h1 * 60 + m1);
+      if (diffMins < 0) diffMins += 24 * 60;
+      const hrs = Math.floor(diffMins / 60);
+      const mins = diffMins % 60;
+      liveDuration = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+    } catch (_) {}
+  }
+
+  // Case 1: Not checked in yet
+  if (!att || !att.check_in) {
+    badgeEl.textContent = '⏳ Not Checked In';
+    badgeEl.style.background = '#fef3c7';
+    badgeEl.style.color = '#b45309';
+
+    detailsEl.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <b>${esc(empName)}</b> <span class="muted">(${esc(empRole)} · ${esc(empDept)}${empCode ? ` · <code>${esc(empCode)}</code>` : ''})</span>
+        </div>
+        <span style="color:#d97706; font-weight:700; font-size:12px;">⏳ Shift not started yet</span>
+      </div>
+      <div style="margin-top:6px; color:#475569; font-size:12.5px;">
+        Click <b>"Mark My Check-In"</b> below to capture your GPS coordinates, verify your location (Head Office / Site), and record your arrival.
+      </div>
+    `;
+
+    btnEl.disabled = false;
+    btnEl.style.background = 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)';
+    btnEl.style.boxShadow = '0 4px 14px rgba(2,132,199,0.3)';
+    btnEl.style.cursor = 'pointer';
+    btnEl.onclick = handleMyPunchAction;
+    if (btnTextEl) btnTextEl.textContent = 'Mark My Check-In';
+
+    if (topBadge) {
+      topBadge.style.display = 'inline-flex';
+      topBadge.innerHTML = '<span class="top-status-dot" style="background:#f59e0b;"></span> 📍 Punch In';
+      topBadge.title = 'You have not checked in yet today. Click to mark attendance.';
+    }
+    return;
+  }
+
+  // Case 2: Checked in, shift ongoing
+  if (att.check_in && !att.check_out) {
+    badgeEl.textContent = '🟢 Shift Active';
+    badgeEl.style.background = '#dcfce7';
+    badgeEl.style.color = '#15803d';
+
+    let locNote = '';
+    if (att.check_in_status === 'office') locNote = `🏢 Office (${att.check_in_site || 'Head Office'})`;
+    else if (att.check_in_status === 'on_site') locNote = `🟢 On-Site (${att.check_in_site || 'Project Site'})`;
+    else if (att.check_in_status === 'off_site') locNote = `⚠️ Off-Site (${att.check_in_site || 'Outside boundary'})`;
+    else locNote = `📍 Recorded at ${att.check_in}`;
+
+    detailsEl.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <b>${esc(empName)}</b> <span class="muted">(${esc(empRole)})</span>
+          <span class="pill" style="margin-left:6px; background:#dcfce7; color:#15803d; font-weight:700; font-size:11px;">🟢 On Shift</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#0369a1; font-weight:800; font-size:12.5px;">⏱ Active: ~${esc(liveDuration || 'Ongoing')}</span>
+        </div>
+      </div>
+      <div style="margin-top:6px; font-size:12.5px; display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+        <span>Checked In: <b style="color:#0f172a;">${esc(att.check_in)}</b></span>
+        <span class="pill" style="font-size:11px; background:#f1f5f9; color:#334155;">${esc(locNote)}</span>
+        ${att.check_in_lat && att.check_in_lng ? `<a href="https://www.google.com/maps?q=${att.check_in_lat},${att.check_in_lng}" target="_blank" rel="noopener" style="font-size:11px; color:#0284c7; font-weight:700; text-decoration:none;">📍 View GPS Map</a>` : ''}
+      </div>
+    `;
+
+    btnEl.disabled = false;
+    btnEl.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+    btnEl.style.boxShadow = '0 4px 14px rgba(5,150,105,0.3)';
+    btnEl.style.cursor = 'pointer';
+    btnEl.onclick = openMyCheckOutModal;
+    if (btnTextEl) btnTextEl.textContent = 'Check Out & Shift Report';
+
+    if (topBadge) {
+      topBadge.style.display = 'inline-flex';
+      topBadge.innerHTML = `<span class="top-status-dot" style="background:#10b981;"></span> 🟢 In: ${esc(att.check_in)}`;
+      topBadge.title = `Checked in at ${att.check_in} (~${liveDuration}). Click to view or check out.`;
+    }
+    return;
+  }
+
+  // Case 3: Checked out, shift completed
+  if (att.check_in && att.check_out) {
+    badgeEl.textContent = '✅ Shift Completed';
+    badgeEl.style.background = '#e0f2fe';
+    badgeEl.style.color = '#0369a1';
+
+    const dur = att.work_duration || liveDuration || '—';
+    detailsEl.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <b>${esc(empName)}</b> <span class="muted">(${esc(empRole)})</span>
+          <span class="pill" style="margin-left:6px; background:#e0f2fe; color:#0369a1; font-weight:800; font-size:11px;">⏱ Total: ${esc(dur)}</span>
+        </div>
+        <span style="color:#059669; font-weight:700; font-size:12px;">✅ Workday Concluded</span>
+      </div>
+      <div style="margin-top:6px; font-size:12.5px; display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+        <span>In: <b>${esc(att.check_in)}</b></span>
+        <span>Out: <b>${esc(att.check_out)}</b></span>
+        ${att.check_out_site ? `<span class="pill" style="font-size:11px; background:#f1f5f9;">📍 ${esc(att.check_out_site)}</span>` : ''}
+        ${att.check_out_lat && att.check_out_lng ? `<a href="https://www.google.com/maps?q=${att.check_out_lat},${att.check_out_lng}" target="_blank" rel="noopener" style="font-size:11px; color:#0284c7; font-weight:700; text-decoration:none;">📍 Out GPS</a>` : ''}
+      </div>
+      ${att.eod_summary ? `<div style="margin-top:6px; font-size:12px; color:#475569; background:#fff; padding:6px 10px; border-radius:6px; border:1px solid #e2e8f0;">📝 <b>Summary:</b> ${esc(att.eod_summary)}</div>` : ''}
+    `;
+
+    btnEl.disabled = false;
+    btnEl.style.background = '#64748b';
+    btnEl.style.boxShadow = 'none';
+    btnEl.style.cursor = 'pointer';
+    btnEl.onclick = openMyCheckOutModal;
+    if (btnTextEl) btnTextEl.textContent = '✅ Shift Completed (View/Update)';
+
+    if (topBadge) {
+      topBadge.style.display = 'inline-flex';
+      topBadge.innerHTML = `<span class="top-status-dot" style="background:#0284c7;"></span> ✅ Done (${esc(dur)})`;
+      topBadge.title = `Shift completed: ${att.check_in} - ${att.check_out} (${dur}).`;
+    }
+  }
+}
+
+async function handleMyPunchAction() {
+  const att = state.myAttendance;
+  if (att && att.check_in) {
+    openMyCheckOutModal();
+    return;
+  }
+
+  // Perform Check-in
+  const btn = $('myCheckInBtn');
+  const btnText = $('myCheckInBtnText');
+  if (btn) btn.disabled = true;
+  if (btnText) btnText.textContent = '📍 Verifying GPS...';
+
+  try {
+    toast('📍 Verifying GPS location for check-in...');
+    const geoData = await captureGeolocation();
+    const res = await send('/api/employee/attendance/check-in', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(geoData || {})
+    });
+    toast(res.message || 'Check-in recorded successfully!');
+    await loadMyAttendance();
+    await loadAttendance();
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (btnText && (!state.myAttendance || !state.myAttendance.check_in)) {
+      btnText.textContent = 'Mark My Check-In';
+    }
+  }
+}
+
+function openMyCheckOutModal() {
+  const att = state.myAttendance;
+  if ($('myModalCheckInTime')) $('myModalCheckInTime').textContent = att?.check_in || '—';
+  
+  // calculate live shift duration
+  let liveDuration = att?.work_duration || '';
+  if (!liveDuration && att?.check_in) {
+    try {
+      const nowTime = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
+      const parts = String(att.check_in).replace(/[^0-9:]/g, '').split(':');
+      const h1 = parseInt(parts[0], 10) || 0;
+      const m1 = parseInt(parts[1], 10) || 0;
+      const nowParts = nowTime.split(':');
+      const h2 = parseInt(nowParts[0], 10) || 0;
+      const m2 = parseInt(nowParts[1], 10) || 0;
+      let diffMins = (h2 * 60 + m2) - (h1 * 60 + m1);
+      if (diffMins < 0) diffMins += 24 * 60;
+      const hrs = Math.floor(diffMins / 60);
+      const mins = diffMins % 60;
+      liveDuration = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+    } catch (_) {
+      liveDuration = 'Shift ongoing';
+    }
+  }
+  if ($('myModalShiftDuration')) $('myModalShiftDuration').textContent = liveDuration || 'Ongoing';
+  if ($('myCheckOutSummary')) $('myCheckOutSummary').value = att?.eod_summary || '';
+  openModal('myCheckOutModal');
+}
+
+async function submitMyCheckOut(e) {
+  if (e) e.preventDefault();
+  const submitBtn = $('myCheckOutSubmitBtn');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '📍 Verifying GPS & Checking Out...';
+  }
+
+  try {
+    toast('📍 Verifying location & checking out...');
+    const geoData = await captureGeolocation();
+    const payload = {
+      ...(geoData || {}),
+      eod_summary: $('myCheckOutSummary')?.value?.trim() || ''
+    };
+
+    const res = await send('/api/employee/attendance/check-out', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    toast(res.message || 'Check-out recorded successfully!');
+    closeModal('myCheckOutModal');
+    await loadMyAttendance();
+    await loadAttendance();
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Confirm Check-Out →';
+    }
+  }
+}
+
+if ($('myCheckOutModal')) {
+  $('myCheckOutModal').addEventListener('click', e => {
+    if (e.target === $('myCheckOutModal')) closeModal('myCheckOutModal');
+  });
 }
 
 // ─── CUSTOMERS ───
