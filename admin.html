@@ -2378,6 +2378,7 @@ body.role-builder [data-write-action="true"] {
         <span style="font-size:12px; font-weight:600; color:#64748b;">⚡ Quick Role Templates:</span>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Sales Advisor')">+ Sales Advisor</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Sales Coordinator')">+ Sales Coordinator</button>
+        <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('HR Manager')" style="background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;">+ HR Manager</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Site Relationship Manager')">+ Relationship Manager</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Project Engineer')">+ Project Engineer</button>
         <button type="button" class="btn smallbtn" onclick="prefillAdvisorRole('Builder / Investor')" style="background:#fffbeb; color:#92400e; border-color:#fde68a; font-weight:700;">+ Builder / Partner</button>
@@ -2390,6 +2391,7 @@ body.role-builder [data-write-action="true"] {
         <select id="tRole" onchange="handleTeamRoleChange()" style="padding:10px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; background:#fff;">
           <option value="employee">Sales Advisor (Field / Advisor Portal)</option>
           <option value="coordinator">Sales Coordinator (CRM Operations & Coordination)</option>
+          <option value="hr">HR Manager (Staff & Attendance Management)</option>
           <option value="builder">Builder / Investor (Executive Oversight & Analytics — Read-Only)</option>
         </select>
         <select id="tProject" style="padding:10px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:13px; background:#fff;">
@@ -5932,7 +5934,7 @@ async function loadTeam() {
     $('teamRows').innerHTML = d.data.map(x => {
       const roleBadge = (x.role === 'coordinator' || x.role === 'manager')
         ? '<span class="pill" style="background:#e0e7ff; color:#4338ca; border-color:#c7d2fe;">Coordinator</span>'
-        : (x.role === 'admin' ? '<span class="pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">Admin</span>' : (x.role === 'builder' || x.role === 'partner' ? '<span class="pill" style="background:#fef3c7; color:#854d0e; border-color:#fde68a; font-weight:700;">🛡️ Builder (Read-Only)</span>' : '<span class="pill">Advisor</span>'));
+        : (x.role === 'admin' ? '<span class="pill" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">Admin</span>' : (x.role === 'hr' ? '<span class="pill" style="background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;">HR Manager</span>' : (x.role === 'builder' || x.role === 'partner' ? '<span class="pill" style="background:#fef3c7; color:#854d0e; border-color:#fde68a; font-weight:700;">🛡️ Builder (Read-Only)</span>' : '<span class="pill">Advisor</span>')));
       const projBadge = x.project_name
         ? `<span class="pill" style="background:#e0f2fe; color:#0369a1; font-weight:600; border-color:#bae6fd;">🏗️ ${esc(x.project_name)}</span>`
         : `<span class="pill" style="background:#f1f5f9; color:#475569;">🌐 All Projects</span>`;
@@ -5952,7 +5954,7 @@ async function editTeam(id) {
   $('tName').value = x.name || '';
   $('tEmail').value = x.email || '';
   $('tPhone').value = x.phone || '';
-  if ($('tRole')) $('tRole').value = (x.role === 'coordinator' || x.role === 'manager') ? 'coordinator' : (x.role === 'builder' || x.role === 'partner' ? 'builder' : 'employee');
+  if ($('tRole')) $('tRole').value = (x.role === 'coordinator' || x.role === 'manager') ? 'coordinator' : (x.role === 'builder' || x.role === 'partner' ? 'builder' : (x.role === 'hr' ? 'hr' : 'employee'));
   if ($('tProject')) $('tProject').value = x.project_id || '';
   handleTeamRoleChange();
   $('tDepartment').value = x.department || '';
@@ -6661,6 +6663,10 @@ function prefillAdvisorRole(roleName) {
     if ($('tRole')) $('tRole').value = 'coordinator';
     $('tDepartment').value = 'Sales Operations';
     $('tDesignation').value = 'Sales Coordinator';
+  } else if (roleName === 'HR Manager') {
+    if ($('tRole')) $('tRole').value = 'hr';
+    $('tDepartment').value = 'Human Resources';
+    $('tDesignation').value = 'HR Manager';
   } else if (roleName === 'Sales Advisor') {
     if ($('tRole')) $('tRole').value = 'employee';
     $('tDepartment').value = 'Sales & CRM';

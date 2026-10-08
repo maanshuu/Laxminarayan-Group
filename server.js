@@ -796,7 +796,7 @@ function teamOrAdmin(req,res,next){auth(req,res,()=>{
 function coordinatorOrAdmin(req,res,next){auth(req,res,()=>{
  const u=db.prepare("SELECT id,status,role,name,email FROM users WHERE id=?").get(req.user.id);
  if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
- if(u.role!=="admin" && u.role!=="coordinator" && u.role!=="manager" && u.role!=="builder" && u.role!=="partner")return res.status(403).json({success:false,error:"Staff or admin access required"});
+ if(u.role!=="admin" && u.role!=="coordinator" && u.role!=="manager" && u.role!=="builder" && u.role!=="partner" && u.role!=="hr")return res.status(403).json({success:false,error:"Staff or admin access required"});
  req.user.role=u.role;
  req.user.name=u.name;
  req.user.email=u.email;
@@ -852,10 +852,10 @@ function currentEmployee(userId){
   let emp = db.prepare("SELECT e.*, u.name, u.email, u.phone, u.role FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
   if(!emp){
     const u = db.prepare("SELECT id, name, email, phone, role FROM users WHERE id=?").get(userId);
-    if(u && (u.role === 'admin' || u.role === 'employee' || u.role === 'coordinator' || u.role === 'manager')){
+    if(u && (u.role === 'admin' || u.role === 'employee' || u.role === 'coordinator' || u.role === 'manager' || u.role === 'hr')){
       const code = u.role === 'admin' ? 'EMP-0001' : `EMP-${String(u.id).padStart(4, '0')}`;
-      const desig = u.role === 'admin' ? 'Principal Administrator' : (u.role === 'coordinator' ? 'Sales Coordinator' : 'Sales Advisor');
-      const dept = u.role === 'admin' ? 'Executive Leadership' : (u.role === 'coordinator' ? 'Sales Operations' : 'Sales & Advisory');
+      const desig = u.role === 'admin' ? 'Principal Administrator' : (u.role === 'coordinator' ? 'Sales Coordinator' : (u.role === 'hr' ? 'HR Manager' : 'Sales Advisor'));
+      const dept = u.role === 'admin' ? 'Executive Leadership' : (u.role === 'coordinator' ? 'Sales Operations' : (u.role === 'hr' ? 'Human Resources' : 'Sales & Advisory'));
       try {
         db.prepare("INSERT OR IGNORE INTO employees(user_id, employee_code, department, designation, joined_at) VALUES(?, ?, ?, ?, CURRENT_TIMESTAMP)").run(u.id, code, dept, desig);
         emp = db.prepare("SELECT e.*, u.name, u.email, u.phone, u.role FROM employees e JOIN users u ON u.id=e.user_id WHERE e.user_id=?").get(userId);
@@ -4446,7 +4446,7 @@ app.get("/admin.html", (req, res) => {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     const u = db.prepare("SELECT status, role, session_version FROM users WHERE id=?").get(payload.id);
-    if (!u || u.status !== "active" || (u.role !== "admin" && u.role !== "coordinator" && u.role !== "manager" && u.role !== "builder" && u.role !== "partner") || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
+    if (!u || u.status !== "active" || (u.role !== "admin" && u.role !== "coordinator" && u.role !== "manager" && u.role !== "builder" && u.role !== "partner" && u.role !== "hr") || Number(payload.sv || 0) !== Number(u.session_version || 0)) {
       return res.redirect(302, "/login.html?redirect=/admin.html");
     }
     if (req.query.token) {
