@@ -1559,6 +1559,12 @@ textarea {
   .history { grid-template-columns: 1fr; }
 }
 @media (max-width: 650px) {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    width: 100%;
+  }
+
   /* Top App Bar & Navigation Fixes (Issue 1) */
   .top {
     position: relative;
@@ -1566,14 +1572,35 @@ textarea {
     gap: 10px;
     flex-direction: column;
     align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
   .top-brand-flex {
-    justify-content: space-between;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     width: 100%;
+  }
+  .top-title-wrap {
+    flex: 1 1 auto;
+    min-width: 140px;
+  }
+  .top-status-badge {
+    margin-left: 0;
+    font-size: 10px;
+    padding: 3px 8px;
   }
   .top-actions-flex {
     width: 100%;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
   .top-link, .top button {
     padding: 6px 12px;
@@ -1598,6 +1625,8 @@ textarea {
   .wrap {
     width: 96%;
     margin: 12px auto 40px;
+    box-sizing: border-box;
+    max-width: 100vw;
   }
   .headrow {
     margin-bottom: 16px;
@@ -1627,7 +1656,21 @@ textarea {
     padding: 7px 10px;
     justify-content: center;
   }
-  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .stat {
+    padding: 14px 12px;
+    font-size: 12px;
+    box-sizing: border-box;
+    min-width: 0;
+  }
+  .stat strong {
+    font-size: 24px;
+  }
   .formgrid { grid-template-columns: 1fr; gap: 10px; }
   .span2, .span4 { grid-column: 1; }
   .charts { grid-template-columns: 1fr; }

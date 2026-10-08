@@ -203,6 +203,7 @@ header.scrolled {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(8px);
   transition: all .2s ease;
+  white-space: nowrap;
 }
 .account-link:hover {
   background: #fff;
@@ -1434,6 +1435,20 @@ footer {
   }
   .nav-links.open { display: flex; }
 }
+@media (max-width: 768px) {
+  .btn-contact { display: none; }
+  .account-link {
+    padding: 7px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .nav-actions {
+    gap: 8px;
+  }
+  .brand-logo div {
+    font-size: 14px;
+  }
+}
 @media (max-width: 600px) {
   .stats-grid { grid-template-columns: 1fr; }
   .hero-ctas { flex-direction: column; width: 100%; }
@@ -1531,6 +1546,7 @@ footer {
       <a href="#about">About</a>
       <a href="#impact">Our Impact</a>
       <a href="#faq">FAQ</a>
+      <a href="#contact" onclick="document.getElementById('navMenu').classList.remove('open')">Contact us</a>
     </nav>
 
     <div class="nav-actions">
