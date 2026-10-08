@@ -363,6 +363,8 @@ function migrateProductionSchema(){
   if(!c.has("user_id")) db.exec("ALTER TABLE site_visits ADD COLUMN user_id INTEGER");
   if(!c.has("project_id")) db.exec("ALTER TABLE site_visits ADD COLUMN project_id INTEGER");
   if(!c.has("enquiry_id")) db.exec("ALTER TABLE site_visits ADD COLUMN enquiry_id INTEGER");
+  if(!c.has("lead_id")) db.exec("ALTER TABLE site_visits ADD COLUMN lead_id INTEGER");
+  db.exec("CREATE INDEX IF NOT EXISTS idx_site_visits_lead_id ON site_visits(lead_id);");
   if(!c.has("name")) db.exec("ALTER TABLE site_visits ADD COLUMN name TEXT NOT NULL DEFAULT ''");
   if(!c.has("phone")) db.exec("ALTER TABLE site_visits ADD COLUMN phone TEXT NOT NULL DEFAULT ''");
   if(!c.has("email")) db.exec("ALTER TABLE site_visits ADD COLUMN email TEXT NOT NULL DEFAULT ''");
@@ -507,9 +509,28 @@ function syncLeadToSiteVisit(leadId) {
     const lead = db.prepare("SELECT * FROM leads WHERE id=?").get(Number(leadId));
     if (!lead || lead.status !== 'site_visit') return;
 
+    let validUserId = null;
+    if (lead.user_id) {
+      const u = db.prepare("SELECT id FROM users WHERE id=?").get(Number(lead.user_id));
+      if (u) validUserId = u.id;
+    }
+    let validProjectId = null;
+    if (lead.project_id) {
+      const p = db.prepare("SELECT id FROM projects WHERE id=?").get(Number(lead.project_id));
+      if (p) validProjectId = p.id;
+    }
+    let validEnquiryId = null;
+    if (lead.enquiry_id) {
+      const enq = db.prepare("SELECT id FROM enquiries WHERE id=?").get(Number(lead.enquiry_id));
+      if (enq) validEnquiryId = enq.id;
+    }
+
     let existing = null;
     if (lead.id) {
-      existing = db.prepare("SELECT * FROM site_visits WHERE enquiry_id=?").get(lead.id);
+      existing = db.prepare("SELECT * FROM site_visits WHERE lead_id=?").get(lead.id);
+    }
+    if (!existing && validEnquiryId) {
+      existing = db.prepare("SELECT * FROM site_visits WHERE enquiry_id=?").get(validEnquiryId);
     }
     if (!existing && lead.phone) {
       existing = db.prepare("SELECT * FROM site_visits WHERE phone <> '' AND phone=?").get(lead.phone);
@@ -522,29 +543,34 @@ function syncLeadToSiteVisit(leadId) {
 
     if (!existing) {
       db.prepare(`
-        INSERT INTO site_visits(user_id, project_id, enquiry_id, name, phone, email, preferred_at, status, notes, admin_notes, created_at, updated_at)
-        VALUES(?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO site_visits(user_id, project_id, enquiry_id, lead_id, name, phone, email, preferred_at, status, notes, admin_notes, created_at, updated_at)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `).run(
-        lead.user_id || null,
-        lead.project_id || null,
+        validUserId,
+        validProjectId,
+        validEnquiryId,
         lead.id,
         lead.name || 'Site Visitor',
         lead.phone || '',
         lead.email || '',
         safePreferred,
         lead.notes || 'Pipeline Site Visit',
-        `Active CRM Site Visit (Enquiry #${lead.id})`
+        `Active CRM Site Visit (Lead #${lead.id})`
       );
     } else {
       db.prepare(`
         UPDATE site_visits
-        SET name=?, phone=?, email=?, project_id=?, preferred_at=?, notes=?, updated_at=CURRENT_TIMESTAMP
+        SET user_id=coalesce(?, user_id), project_id=coalesce(?, project_id), enquiry_id=coalesce(?, enquiry_id), lead_id=coalesce(?, lead_id),
+            name=?, phone=?, email=?, preferred_at=?, notes=?, updated_at=CURRENT_TIMESTAMP
         WHERE id=?
       `).run(
+        validUserId,
+        validProjectId,
+        validEnquiryId,
+        lead.id,
         lead.name || existing.name,
         lead.phone || existing.phone,
         lead.email || existing.email,
-        lead.project_id || existing.project_id,
         safePreferred,
         lead.notes || existing.notes,
         existing.id
@@ -1753,7 +1779,7 @@ app.delete("/api/admin/leads/:id", admin, (req, res) => {
 
   const tx = db.transaction(() => {
     db.prepare("UPDATE bookings SET lead_id=NULL WHERE lead_id=?").run(id);
-    db.prepare("DELETE FROM site_visits WHERE enquiry_id=?").run(id);
+    db.prepare("DELETE FROM site_visits WHERE enquiry_id=? OR lead_id=?").run(id, id);
     db.prepare("DELETE FROM leads WHERE id=?").run(id);
   });
   tx();
@@ -1868,7 +1894,7 @@ app.patch("/api/admin/leads/:id",coordinatorOrAdmin,(req,res)=>{
   if(status==='site_visit'){
     syncLeadToSiteVisit(id);
   } else if(['negotiation','won'].includes(status)){
-    db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=?").run(id);
+    db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=? OR lead_id=?").run(id, id);
   }
   audit(req,"update","lead",id,`Status ${status} · Sentiment: ${sentiment}`);
   res.json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(id)});
@@ -2925,7 +2951,7 @@ app.patch("/api/employee/leads/:id",employeeOrAdmin,(req,res)=>{
   if(status==='site_visit'){
     syncLeadToSiteVisit(id);
   } else if(['negotiation','won'].includes(status)){
-    db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=?").run(id);
+    db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=? OR lead_id=?").run(id, id);
   }
   audit(req,"update","lead",id,`Updated by advisor: ${status} · ${sentiment}`);
   res.json({success:true,message:"Lead updated"});
