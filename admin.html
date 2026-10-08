@@ -1849,7 +1849,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
     <div class="stat"><strong id="statBookings">0</strong>Bookings</div>
     <div class="stat" data-admin-only="true"><strong id="employees">0</strong>Team active</div>
     <div class="stat"><strong id="projects">0</strong>Active projects</div>
-    <div class="stat"><strong id="todayFollowUps">0</strong>Today's Visits</div>
+    <div class="stat" style="cursor:pointer;" onclick="viewEnquiriesFromBanner('today')" title="Click to view Today's Scheduled Appointments & Follow-ups"><strong id="todayFollowUps">0</strong>Today's Visits</div>
   </div>
 
   <!-- SPEED-TO-LEAD ACTION PULSE BANNER -->
@@ -1858,8 +1858,10 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
       <span class="speed-badge">Quick Update</span>
       <span id="speedAlertText" style="font-weight:600; font-size:13.5px;">All enquiry follow-ups and unit allocations are up to date.</span>
     </div>
-    <div class="actions">
-      <button id="speedAlertBtn" class="btn gold" style="font-size:12px; padding:6px 14px;" onclick="viewEnquiriesFromBanner()">View Enquiries →</button>
+    <div id="speedAlertActions" class="actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button id="speedAlertOverdueBtn" class="btn" style="font-size:12px; padding:6px 12px; background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:700; display:none;" onclick="viewEnquiriesFromBanner('overdue')">⚠️ Overdue Follow-ups →</button>
+      <button id="speedAlertTodayBtn" class="btn gold" style="font-size:12px; padding:6px 14px; font-weight:700; display:none;" onclick="viewEnquiriesFromBanner('today')">📅 Today's Visits →</button>
+      <button id="speedAlertBtn" class="btn gold" style="font-size:12px; padding:6px 14px;" onclick="viewEnquiriesFromBanner('all')">View Enquiries →</button>
     </div>
   </div>
 
@@ -1995,8 +1997,9 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
         <select id="leadFilterProject" onchange="applyLeadFilters();" style="max-width:200px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Projects</option>
         </select>
-        <select id="leadFilterPriority" onchange="applyLeadFilters();" style="max-width:185px; padding:6px 12px; font-size:12.5px;">
+        <select id="leadFilterPriority" onchange="applyLeadFilters();" style="max-width:215px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Priorities</option>
+          <option value="today">📅 Today's Follow-ups / Visits</option>
           <option value="overdue">⚠️ Overdue Follow-ups</option>
           <option value="hot">🔥 Hot Enquiries</option>
           <option value="warm">⚡ Warm Enquiries</option>
@@ -3695,18 +3698,38 @@ async function load() {
 
   // Speed-to-lead Action Pulse Banner
   if ($('speedAlertBanner') && $('speedAlertText')) {
-    if (d.stats.overdueLeads > 0) {
-      $('speedAlertBanner').style.borderColor = '#f87171';
-      $('speedAlertBanner').style.background = '#fff1f2';
-      $('speedAlertText').innerHTML = `<b style="color:#e11d48;">Attention: ${d.stats.overdueLeads} enquiry follow-up(s) overdue!</b> · ${d.stats.followUpsToday} appointment(s) or site visit(s) scheduled for today.`;
-    } else if (d.stats.followUpsToday > 0) {
-      $('speedAlertBanner').style.borderColor = '#38bdf8';
-      $('speedAlertBanner').style.background = '#f0f9ff';
-      $('speedAlertText').innerHTML = `<b>${d.stats.followUpsToday} high-priority appointment(s) or site visit(s) scheduled today.</b> Speed to response is critical.`;
+    const overdue = Number(d.stats.overdueLeads) || 0;
+    const todayCount = Number(d.stats.followUpsToday) || 0;
+    const overdueBtn = $('speedAlertOverdueBtn');
+    const todayBtn = $('speedAlertTodayBtn');
+    const genericBtn = $('speedAlertBtn');
+
+    if (overdue > 0 || todayCount > 0) {
+      if (overdue > 0) {
+        $('speedAlertBanner').style.borderColor = '#f87171';
+        $('speedAlertBanner').style.background = '#fff1f2';
+        $('speedAlertText').innerHTML = `<b style="color:#e11d48;">Attention: ${overdue} enquiry follow-up(s) overdue!</b> · <b style="color:#0369a1;">${todayCount}</b> appointment(s) or site visit(s) scheduled for today.`;
+      } else {
+        $('speedAlertBanner').style.borderColor = '#38bdf8';
+        $('speedAlertBanner').style.background = '#f0f9ff';
+        $('speedAlertText').innerHTML = `<b>${todayCount} high-priority appointment(s) or site visit(s) scheduled today.</b> Speed to response is critical.`;
+      }
+      if (overdueBtn) {
+        overdueBtn.style.display = overdue > 0 ? 'inline-flex' : 'none';
+        overdueBtn.innerHTML = `⚠️ View Overdue (${overdue}) →`;
+      }
+      if (todayBtn) {
+        todayBtn.style.display = todayCount > 0 ? 'inline-flex' : 'none';
+        todayBtn.innerHTML = `📅 View Today's Schedule (${todayCount}) →`;
+      }
+      if (genericBtn) genericBtn.style.display = 'none';
     } else {
       $('speedAlertBanner').style.borderColor = 'rgba(56,189,248,0.2)';
       $('speedAlertBanner').style.background = '#f8fafc';
       $('speedAlertText').textContent = 'All enquiry follow-ups and unit allocations are up to date.';
+      if (overdueBtn) overdueBtn.style.display = 'none';
+      if (todayBtn) todayBtn.style.display = 'none';
+      if (genericBtn) genericBtn.style.display = 'inline-flex';
     }
   }
 
@@ -4020,7 +4043,7 @@ function highlightLeadsToolbar() {
   }, 1800);
 }
 
-async function viewEnquiriesFromBanner(filterMode = 'auto') {
+async function viewEnquiriesFromBanner(filterMode = 'today') {
   showView('leadsView');
 
   // Option 1: Smooth Auto-Scroll immediately to Enquiries workspace
@@ -4029,15 +4052,23 @@ async function viewEnquiriesFromBanner(filterMode = 'auto') {
   // Load latest enquiries data
   await loadLeads();
 
-  // Option 2: Smart Filter Preset for Overdue Follow-ups
-  const hasOverdue = (state.leads || []).some(l => l.follow_up_at && new Date(l.follow_up_at) < new Date() && !['won', 'lost'].includes(l.status));
-  const isAlertOverdue = state.stats && Number(state.stats.overdueLeads) > 0;
   const priSelect = $('leadFilterPriority');
-
-  if (priSelect && (filterMode === 'overdue' || isAlertOverdue || hasOverdue)) {
-    priSelect.value = 'overdue';
-    applyLeadFilters();
-    toast('⚠️ Filtered to Overdue Follow-ups · Click "✕ Reset" to view all');
+  if (priSelect) {
+    if (filterMode === 'overdue') {
+      priSelect.value = 'overdue';
+      applyLeadFilters();
+      const count = getFilteredLeads().length;
+      toast(`⚠️ Showing Overdue Follow-ups (${count}) · Click "✕ Reset" to view all`);
+    } else if (filterMode === 'today') {
+      priSelect.value = 'today';
+      applyLeadFilters();
+      const count = getFilteredLeads().length;
+      toast(`📅 Showing Today's Appointments & Follow-ups (${count}) · Click "✕ Reset" to view all`);
+    } else {
+      priSelect.value = '';
+      applyLeadFilters();
+      toast('Showing All Open Enquiries');
+    }
   }
 
   // Visual focus highlight pulse
@@ -4071,9 +4102,11 @@ function getFilteredLeads() {
     });
   }
   if (pri) {
+    const todayIST = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
     if (pri === 'overdue') {
-      const now = new Date();
-      list = list.filter(l => l.follow_up_at && new Date(l.follow_up_at) < now && !['won', 'lost'].includes(l.status));
+      list = list.filter(l => l.follow_up_at && String(l.follow_up_at).slice(0, 10) < todayIST && !['won', 'lost'].includes(l.status));
+    } else if (pri === 'today') {
+      list = list.filter(l => l.follow_up_at && String(l.follow_up_at).slice(0, 10) === todayIST && !['won', 'lost'].includes(l.status));
     } else {
       list = list.filter(l => (l.sentiment || 'warm') === pri);
     }
@@ -4105,7 +4138,7 @@ function applyLeadFilters() {
 function renderKanban() {
   const list = getFilteredLeads();
   const stages = ['new', 'contacted', 'qualified', 'site_visit', 'negotiation', 'won', 'lost'];
-  const now = new Date();
+  const todayIST = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
 
   const leadPhoneCounts = {}, leadEmailCounts = {};
   (state.leads || []).forEach(l => {
@@ -4130,7 +4163,9 @@ function renderKanban() {
 
     col.innerHTML = stageCards.map(x => {
       const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
-      const isOverdue = x.follow_up_at && new Date(x.follow_up_at) < now && !['won', 'lost'].includes(x.status);
+      const fDate = x.follow_up_at ? String(x.follow_up_at).slice(0, 10) : '';
+      const isOverdue = fDate && fDate < todayIST && !['won', 'lost'].includes(x.status);
+      const isToday = fDate && fDate === todayIST && !['won', 'lost'].includes(x.status);
       const sentiment = x.sentiment || 'warm';
       const lp = cleanPhone.slice(-10);
       const le = (x.email || '').toLowerCase().trim();
@@ -4148,6 +4183,7 @@ function renderKanban() {
             <span class="tag-priority tag-${sentiment}">${sentiment === 'hot' ? '🔥 Hot' : (sentiment === 'cold' ? '❄️ Cold' : '⚡ Warm')}</span>
             ${isRepeatLead ? `<span class="tag-priority" style="background:#fef3c7; color:#92400e; font-weight:700; border:1px solid #fde68a;">🔥 Repeat (${Math.max(leadPhoneCounts[lp] || 0, leadEmailCounts[le] || 0)})</span>` : ''}
             ${isOverdue ? '<span class="tag-overdue">⚠️ Overdue</span>' : ''}
+            ${isToday ? '<span class="tag-priority" style="background:#e0f2fe; color:#0369a1; font-weight:700; border:1px solid #bae6fd;">📅 Scheduled Today</span>' : ''}
             ${window.renderSourceBadge ? window.renderSourceBadge(x.source) : `<span class="card-tag" style="background:#f1f5f9; color:#475569;">${esc(x.source || 'web')}</span>`}
           </div>
           <div class="card-footer">
@@ -4185,12 +4221,17 @@ function renderLeadRows() {
   });
 
   const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
+  const todayIST = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+
   tbody.innerHTML = list.length ? list.map(x => {
     const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
     const lp = cleanPhone.slice(-10);
     const le = (x.email || '').toLowerCase().trim();
     const isRepeatLead = (lp && leadPhoneCounts[lp] > 1) || (le && leadEmailCounts[le] > 1);
     const repeatTag = isRepeatLead ? `<div style="margin-top:3px;"><span class="pill" style="background:#fef3c7; color:#92400e; font-size:10px; font-weight:700; border:1px solid #fde68a;">🔥 Repeat Client (${Math.max(leadPhoneCounts[lp] || 0, leadEmailCounts[le] || 0)} Enquiries)</span></div>` : '';
+    const fDate = x.follow_up_at ? String(x.follow_up_at).slice(0, 10) : '';
+    const isOverdue = fDate && fDate < todayIST && !['won', 'lost'].includes(x.status);
+    const isToday = fDate && fDate === todayIST && !['won', 'lost'].includes(x.status);
 
     return `
     <tr>
@@ -4211,7 +4252,13 @@ function renderLeadRows() {
       </td>
       <td><span class="pill">${esc(x.status)}</span></td>
       <td>${esc(x.employee_name || 'Not Assigned')}</td>
-      <td>${x.follow_up_at ? localDate(x.follow_up_at) : '—'}</td>
+      <td>
+        ${x.follow_up_at ? `
+          <b>${localDate(x.follow_up_at)}</b>
+          ${isOverdue ? '<div style="margin-top:2px;"><span class="pill" style="background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:700;">⚠️ Overdue</span></div>' : ''}
+          ${isToday ? '<div style="margin-top:2px;"><span class="pill" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:10px;">📅 Scheduled Today</span></div>' : ''}
+        ` : '<span class="muted">—</span>'}
+      </td>
       <td>${esc(x.notes || '—')}</td>
       <td class="actions" style="white-space:nowrap;">
         ${(!isBuilder && cleanPhone) ? `<a href="https://wa.me/91${cleanPhone}?text=${encodeURIComponent('Hello ' + x.name + ', greetings from Laxminarayan Group! Thank you for expressing interest in ' + (x.project_name || 'our luxury residences') + '. I am your dedicated relationship manager. Would you like to schedule a private site visit this week?')}" target="_blank" class="btn smallbtn" style="text-decoration:none; color:#15803d; border-color:#86efac; background:#f0fdf4; display:inline-flex; align-items:center; gap:3px;" title="⚡ 1-Click Welcome WhatsApp">💬 WA</a>` : ''}
