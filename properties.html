@@ -1003,8 +1003,26 @@
           if (d.success && d.user) {
             const a = document.getElementById("accountLink");
             if (a) {
-              a.textContent = d.user.role === "admin" ? "Admin Dashboard" : "My Account";
-              a.href = d.user.role === "admin" ? "admin.html" : "dashboard.html";
+              const role = d.user.role;
+              if (role === "admin") {
+                a.textContent = "Admin Dashboard";
+                a.href = "admin.html";
+              } else if (role === "hr") {
+                a.textContent = "HR Portal";
+                a.href = "admin.html";
+              } else if (role === "builder" || role === "partner") {
+                a.textContent = "Builder Portal";
+                a.href = "admin.html";
+              } else if (role === "coordinator" || role === "manager") {
+                a.textContent = "Coordinator CRM";
+                a.href = "admin.html";
+              } else if (role === "employee") {
+                a.textContent = "Advisor Portal";
+                a.href = "advisor.html";
+              } else {
+                a.textContent = "My Account";
+                a.href = "dashboard.html";
+              }
             }
           }
         }

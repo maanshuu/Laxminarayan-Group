@@ -2132,9 +2132,27 @@ async function updateAccountLink() {
     const r = await fetch(API + "/auth/me", { credentials: "same-origin", cache: "no-store" });
     if (!r.ok) throw Error();
     const d = await r.json();
-    if (d.success) {
-      accountLink.textContent = d.user.role === "admin" ? "Admin Dashboard" : "My Account";
-      accountLink.href = d.user.role === "admin" ? "admin.html" : "dashboard.html";
+    if (d.success && d.user) {
+      const role = d.user.role;
+      if (role === "admin") {
+        accountLink.textContent = "Admin Dashboard";
+        accountLink.href = "admin.html";
+      } else if (role === "hr") {
+        accountLink.textContent = "HR Portal";
+        accountLink.href = "admin.html";
+      } else if (role === "builder" || role === "partner") {
+        accountLink.textContent = "Builder Portal";
+        accountLink.href = "admin.html";
+      } else if (role === "coordinator" || role === "manager") {
+        accountLink.textContent = "Coordinator CRM";
+        accountLink.href = "admin.html";
+      } else if (role === "employee") {
+        accountLink.textContent = "Advisor Portal";
+        accountLink.href = "advisor.html";
+      } else {
+        accountLink.textContent = "My Account";
+        accountLink.href = "dashboard.html";
+      }
       return;
     }
   } catch (e) {}

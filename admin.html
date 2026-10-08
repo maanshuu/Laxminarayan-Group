@@ -1771,6 +1771,34 @@ body.role-builder [data-builder-hide="true"],
 body.role-builder [data-write-action="true"] {
   display: none !important;
 }
+
+/* ─── ROLE-BASED ACCESS CONTROL: HR MANAGER (TEAM & ATTENDANCE ONLY) ─── */
+body.role-hr .tab:not([data-view="teamView"]):not([data-view="attendanceView"]),
+body.role-hr #overview,
+body.role-hr #leadsView,
+body.role-hr #unitsView,
+body.role-hr #bookingsView,
+body.role-hr #visitsView,
+body.role-hr #projectsView,
+body.role-hr #customersView,
+body.role-hr #reportsView,
+body.role-hr #auditView,
+body.role-hr .dashboard-hero,
+body.role-hr .stats,
+body.role-hr .recent-panel,
+body.role-hr .charts,
+body.role-hr #speedAlertBanner,
+body.role-hr [data-admin-only="true"],
+body.role-hr button[onclick*="openIntegrationModal"],
+body.role-hr span[onclick*="openIntegrationModal"],
+body.role-hr button[onclick*="openLeadModal"],
+body.role-hr button[onclick*="openBookingModal"],
+body.role-hr button[onclick*="openProjectModal"],
+body.role-hr button[onclick*="openUnitModal"],
+body.role-hr button[onclick*="openSiteVisitModal"],
+body.role-hr button[onclick*="openNewEnquiryModal"] {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -3396,6 +3424,35 @@ function applyRolePermissions(user) {
   if (!user) return;
   const isCoordinator = user.role === 'coordinator' || user.role === 'manager';
   const isBuilder = user.role === 'builder' || user.role === 'partner';
+  const isHR = user.role === 'hr';
+
+  if (isHR) {
+    document.body.classList.add('role-hr');
+
+    const tabsToHide = ['overview', 'leadsView', 'unitsView', 'bookingsView', 'visitsView', 'projectsView', 'customersView', 'reportsView', 'auditView'];
+    tabsToHide.forEach(viewId => {
+      const tabBtn = document.querySelector(`.tab[data-view="${viewId}"]`);
+      if (tabBtn) tabBtn.style.display = 'none';
+      const viewEl = document.getElementById(viewId);
+      if (viewEl) viewEl.style.display = 'none';
+    });
+
+    document.querySelectorAll('[data-admin-only="true"], button[onclick*="openIntegrationModal"], span[onclick*="openIntegrationModal"], .dashboard-hero, .stats, .recent-panel, .charts, #speedAlertBanner').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    document.querySelectorAll('button[onclick*="openLeadModal"], button[onclick*="openBookingModal"], button[onclick*="openProjectModal"], button[onclick*="openUnitModal"], button[onclick*="openSiteVisitModal"], button[onclick*="openNewEnquiryModal"]').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    const subTitle = document.querySelector('.top-sub');
+    if (subTitle) {
+      subTitle.innerHTML = '<span style="color:#a855f7; font-weight:800;">HR MANAGEMENT PORTAL</span> · STAFF & ATTENDANCE';
+    }
+
+    showView('teamView');
+    return;
+  }
 
   if (isCoordinator || isBuilder) {
     if (isCoordinator) document.body.classList.add('role-coordinator');
@@ -3467,7 +3524,11 @@ function applyRolePermissions(user) {
 }
 
 function showView(id) {
-  if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
+  if (state.currentUser && state.currentUser.role === 'hr') {
+    if (id !== 'teamView' && id !== 'attendanceView') {
+      id = 'teamView';
+    }
+  } else if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
     if (id === 'attendanceView' || id === 'auditView' || id === 'teamView') {
       id = 'overview';
     }
@@ -3486,6 +3547,11 @@ function showView(id) {
 }
 
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  if (state.currentUser && state.currentUser.role === 'hr') {
+    if (b.dataset.view !== 'teamView' && b.dataset.view !== 'attendanceView') {
+      return;
+    }
+  }
   if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
     if (b.dataset.view === 'attendanceView' || b.dataset.view === 'auditView' || b.dataset.view === 'teamView') {
       return;
@@ -3518,6 +3584,19 @@ async function load() {
   const d = await get('/api/admin/dashboard');
   state.currentUser = d.currentUser || null;
   applyRolePermissions(state.currentUser);
+  const isHR = state.currentUser && state.currentUser.role === 'hr';
+  if (isHR) {
+    fillAttendanceEmployeeSelect();
+    try {
+      const [t] = await Promise.all([get('/api/admin/employees')]);
+      state.employees = t.data || [];
+    } catch (_) {}
+    fillAttendanceEmployeeSelect();
+    await Promise.all([loadTeam(), loadAttendance()]);
+    const activeView = document.getElementById('attendanceView')?.classList.contains('active') ? 'attendanceView' : 'teamView';
+    showView(activeView);
+    return;
+  }
   const isCoordinator = state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager');
 
   if ($('users')) $('users').textContent = d.stats.users;
@@ -6030,7 +6109,7 @@ if ($('teamForm')) {
       }
       resetTeamForm();
       await loadTeam();
-      await loadLeads();
+      if (state.currentUser?.role !== 'hr') await loadLeads();
     } catch (err) {
       $('teamMsg').textContent = err.message;
       $('teamMsg').style.color = '#dc2626';

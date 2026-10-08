@@ -403,6 +403,14 @@ async function load() {
     return;
   }
   const u = me.user;
+  if (u.role === 'admin' || u.role === 'hr' || u.role === 'coordinator' || u.role === 'manager' || u.role === 'builder' || u.role === 'partner') {
+    location.replace('admin.html');
+    return;
+  }
+  if (u.role === 'employee') {
+    location.replace('advisor.html');
+    return;
+  }
   $('name').textContent = u.name;
   $('user').textContent = u.name;
   $('email').textContent = u.email;
