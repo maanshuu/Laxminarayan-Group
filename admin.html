@@ -1559,12 +1559,86 @@ textarea {
   .history { grid-template-columns: 1fr; }
 }
 @media (max-width: 650px) {
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .formgrid { grid-template-columns: 1fr; }
+  /* Top App Bar & Navigation Fixes (Issue 1) */
+  .top {
+    position: relative;
+    padding: 12px 14px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .top-brand-flex {
+    justify-content: space-between;
+    width: 100%;
+  }
+  .top-actions-flex {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .top-link, .top button {
+    padding: 6px 12px;
+    font-size: 11.5px;
+  }
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    margin-bottom: 16px;
+    padding: 5px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  }
+  .tab {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+
+  /* Main Wrapper & Panel Padding Fixes (Issue 2) */
+  .wrap {
+    width: 96%;
+    margin: 12px auto 40px;
+  }
+  .headrow {
+    margin-bottom: 16px;
+  }
+  .headrow h1 {
+    font-size: 22px;
+  }
+  .panel {
+    padding: 16px 14px;
+    border-radius: var(--radius-md);
+    margin-top: 14px;
+  }
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .toolbar .actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .toolbar .actions .btn {
+    flex: 1 1 auto;
+    font-size: 12px;
+    padding: 7px 10px;
+    justify-content: center;
+  }
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .formgrid { grid-template-columns: 1fr; gap: 10px; }
   .span2, .span4 { grid-column: 1; }
   .charts { grid-template-columns: 1fr; }
-  .top { flex-direction: column; align-items: flex-start; }
-  .tabs { border-radius: var(--radius-md); }
+
+  /* Mobile Modals */
+  .modal { padding: 10px; }
+  .modal-card {
+    padding: 20px 16px;
+    border-radius: var(--radius-md);
+    max-height: 94vh;
+  }
 }
 
 /* ─── ROLE-BASED ACCESS CONTROL: SALES COORDINATOR ─── */
