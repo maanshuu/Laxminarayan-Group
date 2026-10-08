@@ -246,7 +246,7 @@ function migrateLegacySchema(){
 
   try {
     const userTableSql = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get()?.sql || "";
-    if (userTableSql && (!userTableSql.includes("'coordinator'") || !userTableSql.includes("'builder'"))) {
+    if (userTableSql && (!userTableSql.includes("'coordinator'") || !userTableSql.includes("'builder'") || !userTableSql.includes("'hr'"))) {
       db.exec(`
         PRAGMA foreign_keys=OFF;
         CREATE TABLE users_temp (
@@ -255,7 +255,7 @@ function migrateLegacySchema(){
           email TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
           phone TEXT NOT NULL DEFAULT '',
           password_hash TEXT NOT NULL,
-          role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','admin','employee','coordinator','manager','builder','partner')),
+          role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','admin','employee','coordinator','manager','builder','partner','hr')),
           status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','suspended')),
           created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
           updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -270,7 +270,7 @@ function migrateLegacySchema(){
         CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
         PRAGMA foreign_keys=ON;
       `);
-      console.log("[Migration] users table CHECK constraint successfully upgraded to support builder and partner roles.");
+      console.log("[Migration] users table CHECK constraint successfully upgraded to support builder, partner, and hr roles.");
     }
   } catch (err) {
     console.error("[Migration Error] Failed upgrading users table:", err);
@@ -773,6 +773,24 @@ function admin(req,res,next){auth(req,res,()=>{
  const u=db.prepare("SELECT status,role FROM users WHERE id=?").get(req.user.id);
  if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
  if(u.role!=="admin")return res.status(403).json({success:false,error:"Admin access required"});
+ next();
+})}
+function hrOrAdmin(req,res,next){auth(req,res,()=>{
+ const u=db.prepare("SELECT id,status,role,name,email FROM users WHERE id=?").get(req.user.id);
+ if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
+ if(u.role!=="admin" && u.role!=="hr")return res.status(403).json({success:false,error:"HR or admin access required"});
+ req.user.role=u.role;
+ req.user.name=u.name;
+ req.user.email=u.email;
+ next();
+})}
+function teamOrAdmin(req,res,next){auth(req,res,()=>{
+ const u=db.prepare("SELECT id,status,role,name,email FROM users WHERE id=?").get(req.user.id);
+ if(!u || u.status!=="active")return res.status(403).json({success:false,error:"Account is not active"});
+ if(u.role!=="admin" && u.role!=="coordinator" && u.role!=="manager" && u.role!=="builder" && u.role!=="partner" && u.role!=="hr")return res.status(403).json({success:false,error:"Staff or admin access required"});
+ req.user.role=u.role;
+ req.user.name=u.name;
+ req.user.email=u.email;
  next();
 })}
 function coordinatorOrAdmin(req,res,next){auth(req,res,()=>{
@@ -1278,6 +1296,18 @@ function seed(){
       db.prepare("UPDATE users SET password_hash=?, session_version=session_version+1, status='active', updated_at=CURRENT_TIMESTAMP WHERE id=?").run(hash, existing.id);
       console.log(`[AUTH] Admin password synchronized from .env for ${email}`);
     }
+  }
+
+  // 8. Seed Default HR User if not present
+  const hrEmail = "hr@laxminarayangroup.com";
+  const existingHr = db.prepare("SELECT id FROM users WHERE email=? OR role='hr'").get(hrEmail);
+  if(!existingHr){
+    const hrPass = process.env.HR_PASSWORD || "HRAdmin#2026$Secure!";
+    const hash = bcrypt.hashSync(hrPass, 12);
+    const r = db.prepare("INSERT INTO users(name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?)").run("Aanya Mehta (HR Head)", hrEmail, "9876500001", hash, "hr", "active");
+    const code = `EMP-${String(r.lastInsertRowid).padStart(4, "0")}`;
+    db.prepare("INSERT INTO employees(user_id,employee_code,department,designation,joined_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)").run(r.lastInsertRowid, code, "Human Resources", "Head of HR & People Operations");
+    console.log(`[AUTH] Default HR user seeded: ${hrEmail}`);
   }
 }
 seed();
@@ -2276,13 +2306,16 @@ app.patch("/api/admin/site-visits/:id",coordinatorOrAdmin,(req,res)=>{
   res.json({success:true,data:saved});
 });
 
-app.get("/api/admin/employees",coordinatorOrAdmin,(req,res)=>res.json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status,p.name AS project_name FROM employees e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC`).all()}));
-app.post("/api/admin/employees",admin,(req,res)=>{
+app.get("/api/admin/employees",teamOrAdmin,(req,res)=>res.json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status,p.name AS project_name FROM employees e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id ORDER BY e.id DESC`).all()}));
+app.post("/api/admin/employees",hrOrAdmin,(req,res)=>{
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120),password=String(req.body.password||"");
   const projectId = req.body.project_id ? Number(req.body.project_id) : null;
   let role = 'employee';
-  if (req.body.role === 'coordinator' || req.body.role === 'manager') role = 'coordinator';
-  else if (req.body.role === 'builder' || req.body.role === 'partner') role = 'builder';
+  if (req.user.role === 'admin') {
+    if (req.body.role === 'coordinator' || req.body.role === 'manager') role = 'coordinator';
+    else if (req.body.role === 'builder' || req.body.role === 'partner') role = 'builder';
+    else if (req.body.role === 'hr') role = 'hr';
+  }
   if(name.length<2||!validEmail(email)||!passwordOk(password))return res.status(400).json({success:false,error:"Enter name, valid email and a password of 8–128 characters"});
   
   const existingUser = db.prepare("SELECT * FROM users WHERE email=?").get(email);
@@ -2315,7 +2348,7 @@ app.post("/api/admin/employees",admin,(req,res)=>{
   audit(req,"create","employee",id,name); 
   res.status(201).json({success:true,data:db.prepare(`SELECT e.*,u.name,u.email,u.phone,u.role,u.status AS user_status,p.name AS project_name FROM employees e LEFT JOIN users u ON u.id=e.user_id LEFT JOIN projects p ON p.id=e.project_id WHERE e.id=?`).get(id)});
 });
-app.put("/api/admin/employees/:id",admin,(req,res)=>{
+app.put("/api/admin/employees/:id",hrOrAdmin,(req,res)=>{
   const id=Number(req.params.id), row=db.prepare("SELECT e.*,u.id AS user_id FROM employees e JOIN users u ON u.id=e.user_id WHERE e.id=?").get(id);
   if(!row)return res.status(404).json({success:false,error:"Team member not found"});
   const name=clean(req.body.name,120),email=clean(req.body.email,160).toLowerCase(),phone=clean(req.body.phone,30),department=clean(req.body.department,100),designation=clean(req.body.designation,120);
@@ -2325,7 +2358,7 @@ app.put("/api/admin/employees/:id",admin,(req,res)=>{
   const dup=db.prepare("SELECT id FROM users WHERE email=? AND id<>?").get(email,row.user_id); if(dup)return res.status(409).json({success:false,error:"Another account already uses this email"});
   if(phone){const dupP=db.prepare("SELECT id FROM users WHERE phone=? AND id<>?").get(phone,row.user_id); if(dupP)return res.status(409).json({success:false,error:"Another account already uses this phone number"});}
   db.transaction(()=>{
-    if(role && (role==='coordinator'||role==='employee'||role==='manager'||role==='builder'||role==='partner')) {
+    if(req.user.role === 'admin' && role && (role==='coordinator'||role==='employee'||role==='manager'||role==='builder'||role==='partner'||role==='hr')) {
       const finalRole = (role==='manager'?'coordinator':(role==='partner'?'builder':role));
       db.prepare("UPDATE users SET name=?,email=?,phone=?,role=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(name,email,phone,finalRole,row.user_id);
     } else {
@@ -2335,7 +2368,7 @@ app.put("/api/admin/employees/:id",admin,(req,res)=>{
   })();
   audit(req,"update","employee",id,name); res.json({success:true});
 });
-app.post("/api/admin/employees/:id/reset-password",admin,(req,res)=>{
+app.post("/api/admin/employees/:id/reset-password",hrOrAdmin,(req,res)=>{
   const id=Number(req.params.id), row=db.prepare("SELECT user_id FROM employees WHERE id=?").get(id), password=String(req.body.password||"");
   if(!row)return res.status(404).json({success:false,error:"Team member not found"});
   if(!passwordOk(password))return res.status(400).json({success:false,error:"Password must be 8–128 characters"});
@@ -2347,11 +2380,11 @@ app.delete("/api/admin/employees/:id",admin,(req,res)=>{
   if(!row)return res.status(404).json({success:false,error:"Team member not found"});
   const assigned=db.prepare("SELECT COUNT(*) c FROM leads WHERE assigned_employee_id=?").get(id).c;
   if(assigned)return res.status(409).json({success:false,error:"This team member has assigned leads. Reassign those leads before deletion, or deactivate the account."});
-  db.transaction(()=>{db.prepare("DELETE FROM employees WHERE id=?").run(id);db.prepare("DELETE FROM users WHERE id=? AND role IN ('employee','coordinator','manager','builder','partner')").run(row.user_id)})();
+  db.transaction(()=>{db.prepare("DELETE FROM employees WHERE id=?").run(id);db.prepare("DELETE FROM users WHERE id=? AND role IN ('employee','coordinator','manager','builder','partner','hr')").run(row.user_id)})();
   audit(req,"delete","employee",id,`Employee deleted: ${row.name}`); res.json({success:true});
 });
 
-app.patch("/api/admin/employees/:id/status",admin,(req,res)=>{
+app.patch("/api/admin/employees/:id/status",hrOrAdmin,(req,res)=>{
   const id=Number(req.params.id), status=clean(req.body.status,20); if(!["active","inactive"].includes(status))return res.status(400).json({success:false,error:"Invalid status"});
   const e=db.prepare("SELECT user_id FROM employees WHERE id=?").get(id); if(!e)return res.status(404).json({success:false,error:"Team member not found"});
   db.transaction(()=>{db.prepare("UPDATE employees SET status=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(status,id);db.prepare("UPDATE users SET status=?,session_version=session_version+1,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(status==="active"?"active":"suspended",e.user_id)})(); audit(req,"update","employee",id,`Status ${status}`); res.json({success:true});
@@ -2489,7 +2522,7 @@ function calculateShiftDuration(checkInStr, checkOutStr) {
   }
 }
 
-app.get("/api/admin/attendance",admin,(req,res)=>{
+app.get("/api/admin/attendance",hrOrAdmin,(req,res)=>{
  const date=clean(req.query.date,10)||todayIST();
  const rows=db.prepare(`SELECT e.id,e.employee_code,e.department,e.designation,e.status AS employee_status,u.name,u.email,u.phone,
    a.id attendance_id,a.attendance_date,a.status attendance_status,a.check_in,a.check_out,a.notes,
@@ -2500,7 +2533,7 @@ app.get("/api/admin/attendance",admin,(req,res)=>{
    ORDER BY CASE WHEN e.status='active' THEN 0 ELSE 1 END,e.id DESC`).all(date);
  res.json({success:true,data:rows,date,authorized_sites:AUTHORIZED_SITES});
 });
-app.post("/api/admin/attendance",admin,(req,res)=>{
+app.post("/api/admin/attendance",hrOrAdmin,(req,res)=>{
  const employeeId=Number(req.body.employee_id),date=clean(req.body.attendance_date,10),status=clean(req.body.status,20),checkIn=clean(req.body.check_in,30)||null,checkOut=clean(req.body.check_out,30)||null,notes=clean(req.body.notes,1000);
  if(!Number.isInteger(employeeId)||!db.prepare("SELECT id FROM employees WHERE id=?").get(employeeId))return res.status(400).json({success:false,error:"Valid employee is required"});
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return res.status(400).json({success:false,error:"Valid attendance date is required"});
@@ -2511,8 +2544,8 @@ app.post("/api/admin/attendance",admin,(req,res)=>{
  const r=db.prepare("INSERT INTO employee_attendance(employee_id,attendance_date,status,check_in,check_out,notes,work_duration) VALUES(?,?,?,?,?,?,?)").run(employeeId,date,status,checkIn,checkOut,notes,duration);
  audit(req,"create","attendance",r.lastInsertRowid,`${date} · ${status}`);res.status(201).json({success:true,id:Number(r.lastInsertRowid)});
 });
-app.delete("/api/admin/attendance/:id",admin,(req,res)=>{const id=Number(req.params.id);if(!db.prepare("SELECT id FROM employee_attendance WHERE id=?").get(id))return res.status(404).json({success:false,error:"Attendance record not found"});db.prepare("DELETE FROM employee_attendance WHERE id=?").run(id);audit(req,"delete","attendance",id,"Attendance record deleted");res.json({success:true});});
-app.get("/api/admin/attendance/summary",admin,(req,res)=>{
+app.delete("/api/admin/attendance/:id",hrOrAdmin,(req,res)=>{const id=Number(req.params.id);if(!db.prepare("SELECT id FROM employee_attendance WHERE id=?").get(id))return res.status(404).json({success:false,error:"Attendance record not found"});db.prepare("DELETE FROM employee_attendance WHERE id=?").run(id);audit(req,"delete","attendance",id,"Attendance record deleted");res.json({success:true});});
+app.get("/api/admin/attendance/summary",hrOrAdmin,(req,res)=>{
  const date=clean(req.query.date,10)||todayIST();
  const total=db.prepare("SELECT COUNT(*) c FROM employees WHERE status='active'").get().c;
  const counts=db.prepare("SELECT status,COUNT(*) c FROM employee_attendance WHERE attendance_date=? GROUP BY status").all(date);

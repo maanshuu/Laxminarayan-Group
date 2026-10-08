@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT NOT NULL DEFAULT '' COLLATE NOCASE,
   phone TEXT NOT NULL DEFAULT '',
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','admin','employee','coordinator','manager')),
+  role TEXT NOT NULL DEFAULT 'customer' CHECK(role IN ('customer','admin','employee','coordinator','manager','builder','partner','hr')),
   status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','suspended')),
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
