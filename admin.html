@@ -321,11 +321,28 @@ button, input, select, textarea { font-family: inherit; }
   font-size: 12px;
   font-weight: 600;
   color: var(--ink-muted);
+  cursor: pointer;
+  user-select: none;
 }
 .stat:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-hover);
-  border-color: var(--line-sky);
+  box-shadow: 0 10px 24px -4px rgba(2, 132, 199, 0.18);
+  border-color: rgba(2, 132, 199, 0.45);
+}
+.stat .stat-drilldown {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+  color: #94a3b8;
+  opacity: 0.35;
+  transition: all .2s ease;
+  pointer-events: none;
+}
+.stat:hover .stat-drilldown {
+  opacity: 1;
+  color: #0284c7;
+  transform: translate(2px, -2px);
 }
 .stat strong {
   display: block;
@@ -1838,18 +1855,18 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
 
   <!-- STATS KPI STRIP -->
   <div class="stats">
-    <div class="stat"><strong id="users">0</strong>Customers</div>
-    <div class="stat"><strong id="leads">0</strong>Total Enquiries</div>
-    <div class="stat"><strong id="new">0</strong>New Inquiries</div>
-    <div class="stat"><strong id="openLeads">0</strong>Open enquiries</div>
-    <div class="stat"><strong id="visits">0</strong>Site visits</div>
-    <div class="stat"><strong id="statUnits">23</strong>Total units</div>
-    <div class="stat"><strong id="statAvailable">23</strong>Available units</div>
-    <div class="stat"><strong id="statSold">0</strong>Sold / Booked</div>
-    <div class="stat"><strong id="statBookings">0</strong>Bookings</div>
-    <div class="stat" data-admin-only="true"><strong id="employees">0</strong>Team active</div>
-    <div class="stat"><strong id="projects">0</strong>Active projects</div>
-    <div class="stat" style="cursor:pointer;" onclick="viewEnquiriesFromBanner('today')" title="Click to view Today's Scheduled Appointments & Follow-ups"><strong id="todayFollowUps">0</strong>Today's Visits</div>
+    <div class="stat" onclick="drillDownTo('customersView')" title="Click to view Customer Directory"><span class="stat-drilldown">↗</span><strong id="users">0</strong>Customers</div>
+    <div class="stat" onclick="drillDownLeads('all')" title="Click to view All Enquiries Pipeline"><span class="stat-drilldown">↗</span><strong id="leads">0</strong>Total Enquiries</div>
+    <div class="stat" onclick="drillDownLeads('new')" title="Click to view New Enquiries awaiting contact"><span class="stat-drilldown">↗</span><strong id="new">0</strong>New Inquiries</div>
+    <div class="stat" onclick="drillDownLeads('open')" title="Click to view Open / Active Enquiries"><span class="stat-drilldown">↗</span><strong id="openLeads">0</strong>Open enquiries</div>
+    <div class="stat" onclick="drillDownTo('visitsView')" title="Click to view Site Visits Log"><span class="stat-drilldown">↗</span><strong id="visits">0</strong>Site visits</div>
+    <div class="stat" onclick="drillDownUnits('all')" title="Click to view All Project Units Matrix"><span class="stat-drilldown">↗</span><strong id="statUnits">23</strong>Total units</div>
+    <div class="stat" onclick="drillDownUnits('available')" title="Click to view Available Units"><span class="stat-drilldown">↗</span><strong id="statAvailable">23</strong>Available units</div>
+    <div class="stat" onclick="drillDownUnits('sold')" title="Click to view Sold / Booked Units"><span class="stat-drilldown">↗</span><strong id="statSold">0</strong>Sold / Booked</div>
+    <div class="stat" onclick="drillDownTo('bookingsView')" title="Click to view Bookings & Financial Closures"><span class="stat-drilldown">↗</span><strong id="statBookings">0</strong>Bookings</div>
+    <div class="stat" data-admin-only="true" onclick="drillDownTo('teamView')" title="Click to view Active Team Members"><span class="stat-drilldown">↗</span><strong id="employees">0</strong>Team active</div>
+    <div class="stat" onclick="drillDownTo('projectsView')" title="Click to view Active Projects Portfolio"><span class="stat-drilldown">↗</span><strong id="projects">0</strong>Active projects</div>
+    <div class="stat" onclick="viewEnquiriesFromBanner('today')" title="Click to view Today's Scheduled Appointments & Follow-ups"><span class="stat-drilldown">↗</span><strong id="todayFollowUps">0</strong>Today's Visits</div>
   </div>
 
   <!-- SPEED-TO-LEAD ACTION PULSE BANNER -->
@@ -4043,6 +4060,77 @@ function highlightLeadsToolbar() {
   }, 1800);
 }
 
+function drillDownTo(viewId) {
+  if (state.currentUser && state.currentUser.role === 'hr') {
+    if (viewId !== 'teamView' && viewId !== 'attendanceView') {
+      toast('HR Manager access is dedicated to Team Management and Attendance.');
+      showView('teamView', { scroll: true });
+      return;
+    }
+  }
+  showView(viewId, { scroll: true });
+  if (viewId === 'customersView') loadCustomers();
+  if (viewId === 'visitsView') loadVisits();
+  if (viewId === 'bookingsView') loadBookings();
+  if (viewId === 'teamView') loadTeam();
+  if (viewId === 'projectsView') loadProjects();
+  if (viewId === 'unitsView') loadUnits();
+}
+
+async function drillDownLeads(mode = 'all') {
+  if (state.currentUser && state.currentUser.role === 'hr') {
+    toast('HR Manager access is dedicated to Team Management and Attendance.');
+    showView('teamView', { scroll: true });
+    return;
+  }
+  showView('leadsView', { scroll: true });
+  await loadLeads();
+
+  if (mode === 'new') {
+    state.leadFilterStage = 'new';
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('📍 Filtered to New Enquiries awaiting first response');
+  } else if (mode === 'open') {
+    state.leadFilterStage = 'open';
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('📍 Filtered to Active / Open Pipeline');
+  } else {
+    state.leadFilterStage = null;
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('Showing All Enquiries');
+  }
+  highlightLeadsToolbar();
+}
+
+async function drillDownUnits(status = 'all') {
+  if (state.currentUser && state.currentUser.role === 'hr') {
+    toast('HR Manager access is dedicated to Team Management and Attendance.');
+    showView('teamView', { scroll: true });
+    return;
+  }
+  showView('unitsView', { scroll: true });
+  await loadUnits();
+  const statusSelect = $('unitFilterStatus');
+  if (statusSelect) {
+    if (status === 'available') {
+      statusSelect.value = 'available';
+      renderUnits();
+      toast('Showing Available Units (Open for sale)');
+    } else if (status === 'sold') {
+      statusSelect.value = 'sold';
+      renderUnits();
+      toast('Showing Sold / Booked Units');
+    } else {
+      statusSelect.value = '';
+      renderUnits();
+      toast('Showing All Units Matrix');
+    }
+  }
+}
+
 async function viewEnquiriesFromBanner(filterMode = 'today') {
   showView('leadsView');
 
@@ -4055,16 +4143,19 @@ async function viewEnquiriesFromBanner(filterMode = 'today') {
   const priSelect = $('leadFilterPriority');
   if (priSelect) {
     if (filterMode === 'overdue') {
+      state.leadFilterStage = null;
       priSelect.value = 'overdue';
       applyLeadFilters();
       const count = getFilteredLeads().length;
       toast(`⚠️ Showing Overdue Follow-ups (${count}) · Click "✕ Reset" to view all`);
     } else if (filterMode === 'today') {
+      state.leadFilterStage = null;
       priSelect.value = 'today';
       applyLeadFilters();
       const count = getFilteredLeads().length;
       toast(`📅 Showing Today's Appointments & Follow-ups (${count}) · Click "✕ Reset" to view all`);
     } else {
+      state.leadFilterStage = null;
       priSelect.value = '';
       applyLeadFilters();
       toast('Showing All Open Enquiries');
@@ -4076,6 +4167,7 @@ async function viewEnquiriesFromBanner(filterMode = 'today') {
 }
 
 function resetLeadFilters() {
+  state.leadFilterStage = null;
   if ($('leadFilterProject')) $('leadFilterProject').value = '';
   if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
   if ($('leadFilterSource')) $('leadFilterSource').value = '';
@@ -4111,6 +4203,13 @@ function getFilteredLeads() {
       list = list.filter(l => (l.sentiment || 'warm') === pri);
     }
   }
+  if (state.leadFilterStage) {
+    if (state.leadFilterStage === 'open') {
+      list = list.filter(l => !['won', 'lost'].includes(l.status));
+    } else {
+      list = list.filter(l => (l.status || 'new') === state.leadFilterStage);
+    }
+  }
   if (src) list = list.filter(l => (l.source || 'website').toLowerCase().includes(src));
   if (q) list = list.filter(l =>
     (l.name && l.name.toLowerCase().includes(q)) ||
@@ -4127,7 +4226,8 @@ function applyLeadFilters() {
     $('leadFilterProject')?.value ||
     $('leadFilterPriority')?.value ||
     $('leadFilterSource')?.value ||
-    $('leadFilterSearch')?.value
+    $('leadFilterSearch')?.value ||
+    state.leadFilterStage
   );
   const resetBtn = $('leadFilterResetBtn');
   if (resetBtn) resetBtn.style.display = hasFilter ? 'inline-flex' : 'none';
