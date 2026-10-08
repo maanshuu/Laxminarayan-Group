@@ -159,6 +159,59 @@ main {
   border-radius: var(--radius-md);
   padding: 20px 24px;
   box-shadow: var(--shadow-card);
+  position: relative;
+  transition: all .25s ease;
+}
+.kpi-card.clickable {
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+.kpi-card.clickable:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -4px rgba(2, 132, 199, 0.18);
+  border-color: rgba(2, 132, 199, 0.45);
+}
+.kpi-card.clickable .kpi-drilldown {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 13px;
+  color: #94a3b8;
+  opacity: 0.35;
+  transition: all .2s ease;
+  pointer-events: none;
+}
+.kpi-card.clickable:hover .kpi-drilldown {
+  opacity: 1;
+  color: var(--sky-primary);
+  transform: translate(2px, -2px);
+}
+.kpi-card.clickable::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--sky-primary), #38bdf8);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.kpi-card.clickable:hover::after {
+  opacity: 1;
+}
+.kpi-card.clickable.active {
+  border-color: var(--sky-primary);
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2), var(--shadow-card);
+}
+.kpi-card.clickable.active::after {
+  opacity: 1;
+}
+.kpi-card.clickable.active .kpi-drilldown {
+  opacity: 1;
+  color: var(--sky-primary);
 }
 .kpi-val {
   font-size: 28px;
@@ -446,15 +499,18 @@ tr:hover td { background: #fdfdfe; }
   </div>
 
   <div class="kpi-grid">
-    <div class="kpi-card">
+    <div id="cardStatAssigned" class="kpi-card clickable" onclick="filterAdvisorLeads('all')" title="Click to view all assigned enquiries">
+      <span class="kpi-drilldown">↗</span>
       <div id="statAssigned" class="kpi-val">0</div>
       <div class="kpi-lbl">Total Assigned Enquiries</div>
     </div>
-    <div class="kpi-card">
+    <div id="cardStatActive" class="kpi-card clickable" onclick="filterAdvisorLeads('active')" title="Click to view Active Deals (excluding won & lost)">
+      <span class="kpi-drilldown">↗</span>
       <div id="statActive" class="kpi-val">0</div>
       <div class="kpi-lbl">Active Deals</div>
     </div>
-    <div class="kpi-card">
+    <div id="cardStatFollowUps" class="kpi-card clickable" onclick="filterAdvisorLeads('today')" title="Click to view Today's Scheduled Follow-Ups & Visits">
+      <span class="kpi-drilldown">↗</span>
       <div id="statFollowUps" class="kpi-val">0</div>
       <div class="kpi-lbl">Today's Follow-Ups</div>
     </div>
@@ -465,11 +521,21 @@ tr:hover td { background: #fdfdfe; }
     </div>
   </div>
 
-  <div class="content-box">
+  <div class="content-box" id="advisorContentBox">
     <div class="box-header">
-      <h2>My Assigned Enquiries & Clients</h2>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span id="leadsCount" style="font-size:12px; color:var(--ink-muted); font-weight:600;">Loading enquiries...</span>
+      <div>
+        <h2>My Assigned Enquiries & Clients</h2>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:4px; flex-wrap:wrap;">
+          <span id="leadsCount" style="font-size:12px; color:var(--ink-muted); font-weight:600;">Loading enquiries...</span>
+          <span id="advisorActiveFilterPill" style="display:none; font-size:11px; font-weight:700; background:#e0f2fe; color:#0369a1; padding:2px 10px; border-radius:var(--radius-pill); border:1px solid #bae6fd;"></span>
+          <button id="advisorFilterResetBtn" class="btn-sm" style="display:none; color:#be123c; border-color:#fecdd3; background:#fff1f2; font-weight:700; padding:2px 8px; font-size:11px; cursor:pointer;" onclick="resetAdvisorFilters()" title="Reset all filters">✕ Reset to Show All</button>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div style="position:relative; display:inline-flex; align-items:center;">
+          <input id="advisorSearchInput" type="text" placeholder="Search name, phone, project..." oninput="onAdvisorSearchInput(this.value)" style="padding:7px 12px 7px 30px; font-size:12px; border:1px solid var(--line-strong); border-radius:var(--radius-pill); outline:none; width:220px; color:var(--ink-heading); background:#fff;">
+          <span style="position:absolute; left:10px; font-size:12px; color:var(--ink-muted); pointer-events:none;">🔍</span>
+        </div>
         <button class="btn-sm" onclick="openCostSheetModal()" style="border-color:#0284c7; color:#0284c7; font-weight:700; padding:6px 14px; background:#f0f9ff; display:inline-flex; align-items:center; gap:5px;">📄 Quotation</button>
         <button class="btn-sm btn-edit" onclick="openWalkInModal()" style="padding:6px 14px; font-weight:700;">+ Record Walk-In</button>
       </div>
@@ -683,7 +749,9 @@ let state = {
   projects: [],
   todayAttendance: null,
   walkinsToday: 0,
-  followupsDoneToday: 0
+  followupsDoneToday: 0,
+  activeFilter: 'all',
+  searchQuery: ''
 };
 
 async function loadProjects() {
@@ -810,20 +878,181 @@ async function loadPortal() {
   }
 }
 
-async function loadLeads() {
-  const r = await fetch('/api/employee/leads', { credentials: 'include', cache: 'no-store' });
-  const d = await r.json();
-  if (!r.ok || !d.success) return;
+function getTodayISTDate() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+}
 
-  state.leads = d.data || [];
-  $('leadsCount').textContent = `${state.leads.length} enquiries assigned`;
+function getFilteredAdvisorLeads() {
+  let list = state.leads || [];
+  const todayIST = getTodayISTDate();
 
-  if (state.leads.length === 0) {
-    $('leadsBody').innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--ink-muted);">No enquiries currently assigned to you.</td></tr>';
+  if (state.activeFilter === 'active') {
+    list = list.filter(l => !['won', 'lost'].includes(l.status));
+  } else if (state.activeFilter === 'today') {
+    list = list.filter(l => {
+      const fDate = l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '';
+      return fDate === todayIST && !['won', 'lost'].includes(l.status);
+    });
+  } else if (state.activeFilter === 'overdue') {
+    list = list.filter(l => {
+      const fDate = l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '';
+      return fDate && fDate < todayIST && !['won', 'lost'].includes(l.status);
+    });
+  } else if (state.activeFilter === 'won') {
+    list = list.filter(l => l.status === 'won');
+  }
+
+  const q = (state.searchQuery || '').trim().toLowerCase();
+  if (q) {
+    list = list.filter(l =>
+      (l.name && l.name.toLowerCase().includes(q)) ||
+      (l.phone && l.phone.toLowerCase().includes(q)) ||
+      (l.email && l.email.toLowerCase().includes(q)) ||
+      (l.notes && l.notes.toLowerCase().includes(q)) ||
+      (l.project_name && l.project_name.toLowerCase().includes(q)) ||
+      (l.status && l.status.toLowerCase().includes(q)) ||
+      String(l.id).includes(q)
+    );
+  }
+
+  return list;
+}
+
+function smoothScrollToAdvisorLeads() {
+  setTimeout(() => {
+    const target = $('advisorContentBox') || document.querySelector('.content-box');
+    if (!target) return;
+    const headerOffset = 76;
+    const elementPosition = target.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    window.scrollTo({
+      top: Math.max(0, Math.round(offsetPosition)),
+      behavior: 'smooth'
+    });
+  }, 60);
+}
+
+function highlightAdvisorTable() {
+  const box = $('advisorContentBox') || document.querySelector('.content-box');
+  if (!box) return;
+  box.style.transition = 'box-shadow 0.35s ease, border-color 0.35s ease';
+  box.style.boxShadow = '0 0 0 3px rgba(2, 132, 199, 0.45), 0 8px 30px rgba(2, 132, 199, 0.15)';
+  box.style.borderColor = '#0284c7';
+  setTimeout(() => {
+    box.style.boxShadow = '';
+    box.style.borderColor = '';
+  }, 1600);
+}
+
+function filterAdvisorLeads(mode = 'all', options = { scroll: true }) {
+  state.activeFilter = mode;
+
+  const cardAssigned = $('cardStatAssigned');
+  const cardActive = $('cardStatActive');
+  const cardFollowUps = $('cardStatFollowUps');
+
+  if (cardAssigned) cardAssigned.classList.toggle('active', mode === 'all');
+  if (cardActive) cardActive.classList.toggle('active', mode === 'active');
+  if (cardFollowUps) cardFollowUps.classList.toggle('active', mode === 'today');
+
+  renderAdvisorLeads();
+
+  const filteredCount = getFilteredAdvisorLeads().length;
+  if (mode === 'active') {
+    toast(`⚡ Showing Active Deals (${filteredCount}) · Click "✕ Reset" to view all`);
+  } else if (mode === 'today') {
+    toast(`📅 Showing Today's Follow-ups (${filteredCount}) · Click "✕ Reset" to view all`);
+  } else if (mode === 'overdue') {
+    toast(`⚠️ Showing Overdue Follow-ups (${filteredCount}) · Click "✕ Reset" to view all`);
+  } else {
+    if (state.searchQuery) {
+      toast(`Showing All Enquiries matching search (${filteredCount})`);
+    } else {
+      toast(`Showing All Assigned Enquiries (${filteredCount})`);
+    }
+  }
+
+  highlightAdvisorTable();
+
+  if (options && options.scroll) {
+    smoothScrollToAdvisorLeads();
+  }
+}
+
+function resetAdvisorFilters() {
+  state.activeFilter = 'all';
+  state.searchQuery = '';
+  const searchInput = $('advisorSearchInput');
+  if (searchInput) searchInput.value = '';
+
+  const cardAssigned = $('cardStatAssigned');
+  const cardActive = $('cardStatActive');
+  const cardFollowUps = $('cardStatFollowUps');
+  if (cardAssigned) cardAssigned.classList.remove('active');
+  if (cardActive) cardActive.classList.remove('active');
+  if (cardFollowUps) cardFollowUps.classList.remove('active');
+
+  renderAdvisorLeads();
+  toast('Filters cleared · Showing all assigned enquiries');
+}
+
+function onAdvisorSearchInput(val) {
+  state.searchQuery = val;
+  renderAdvisorLeads();
+}
+
+function renderAdvisorLeads() {
+  const filtered = getFilteredAdvisorLeads();
+  const totalCount = state.leads.length;
+
+  const countEl = $('leadsCount');
+  const resetBtn = $('advisorFilterResetBtn');
+  const activePill = $('advisorActiveFilterPill');
+
+  const hasFilter = state.activeFilter !== 'all' || Boolean(state.searchQuery.trim());
+  if (resetBtn) resetBtn.style.display = hasFilter ? 'inline-flex' : 'none';
+
+  let filterLabel = '';
+  if (state.activeFilter === 'active') filterLabel = 'Active Deals';
+  else if (state.activeFilter === 'today') filterLabel = "Today's Follow-ups";
+  else if (state.activeFilter === 'overdue') filterLabel = 'Overdue';
+  else if (state.activeFilter === 'won') filterLabel = 'Booked / Won';
+
+  if (activePill) {
+    if (filterLabel) {
+      activePill.style.display = 'inline-flex';
+      activePill.innerHTML = `<span>Filtered: <b>${filterLabel}</b></span>`;
+    } else {
+      activePill.style.display = 'none';
+    }
+  }
+
+  if (countEl) {
+    if (hasFilter) {
+      countEl.innerHTML = `Showing <b>${filtered.length}</b> of <b>${totalCount}</b> enquiries`;
+    } else {
+      countEl.textContent = `${totalCount} enquiries assigned`;
+    }
+  }
+
+  const tbody = $('leadsBody');
+  if (!tbody) return;
+
+  if (filtered.length === 0) {
+    const emptyMsg = hasFilter
+      ? 'No enquiries match the current filter or search criteria.'
+      : 'No enquiries currently assigned to you.';
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:45px 20px; color:var(--ink-muted);">
+      <div style="font-size:24px; margin-bottom:8px;">🔍</div>
+      <div style="font-weight:600; font-size:14px; color:var(--ink-heading); margin-bottom:4px;">${emptyMsg}</div>
+      ${hasFilter ? `<button class="btn-sm" style="margin-top:10px; border-color:#0284c7; color:#0284c7; font-weight:700;" onclick="resetAdvisorFilters()">Clear Filter to Show All (${totalCount})</button>` : ''}
+    </td></tr>`;
     return;
   }
 
-  $('leadsBody').innerHTML = state.leads.map(x => {
+  const todayIST = getTodayISTDate();
+
+  tbody.innerHTML = filtered.map(x => {
     const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
     const clientName = (x.name || 'Valued Buyer').trim();
     const projName = x.project_name || 'our luxury residences';
@@ -832,6 +1061,9 @@ async function loadLeads() {
     const waLink = cleanPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(waText)}` : '#';
     const telLink = cleanPhone ? `tel:${cleanPhone}` : '#';
     const sentClass = x.sentiment === 'hot' ? 'pill-hot' : (x.sentiment === 'cold' ? 'pill-cold' : 'pill-warm');
+    const fDate = x.follow_up_at ? String(x.follow_up_at).slice(0, 10) : '';
+    const isToday = fDate && fDate === todayIST && !['won', 'lost'].includes(x.status);
+    const isOverdue = fDate && fDate < todayIST && !['won', 'lost'].includes(x.status);
 
     return `
       <tr>
@@ -849,7 +1081,11 @@ async function loadLeads() {
         <td>${esc(x.project_name || 'General')}</td>
         <td><span class="status-tag">${esc(x.status)}</span></td>
         <td><span class="pill ${sentClass}">${esc(x.sentiment || 'warm')}</span></td>
-        <td><span style="font-weight:600; font-size:12px;">${formatIST(x.follow_up_at)}</span></td>
+        <td>
+          <span style="font-weight:600; font-size:12px;">${formatIST(x.follow_up_at)}</span>
+          ${isToday ? `<div style="margin-top:3px;"><span class="pill" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:10px; padding:2px 8px;">📅 Scheduled Today</span></div>` : ''}
+          ${isOverdue ? `<div style="margin-top:3px;"><span class="pill" style="background:#fee2e2; color:#b91c1c; font-weight:700; font-size:10px; padding:2px 8px;">⚠️ Overdue</span></div>` : ''}
+        </td>
         <td style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${esc(x.notes)}">${esc(x.notes || '—')}</td>
         <td>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -860,6 +1096,15 @@ async function loadLeads() {
       </tr>
     `;
   }).join('');
+}
+
+async function loadLeads() {
+  const r = await fetch('/api/employee/leads', { credentials: 'include', cache: 'no-store' });
+  const d = await r.json();
+  if (!r.ok || !d.success) return;
+
+  state.leads = d.data || [];
+  renderAdvisorLeads();
 }
 
 function captureGeolocation() {
