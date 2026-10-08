@@ -1812,7 +1812,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
       <span class="top-sub">EXECUTIVE CRM · COMMAND CENTER</span>
     </div>
     <span class="top-status-badge"><span class="top-status-dot"></span> LIVE DB</span>
-    <span id="topPunchBadge" class="top-status-badge" style="cursor:pointer; display:none;" onclick="showView('attendanceView')" title="Click to view Attendance & Punch"><span class="top-status-dot" style="background:#0284c7;"></span> 📍 My Punch</span>
+    <span id="topPunchBadge" class="top-status-badge" style="cursor:pointer; display:none;" onclick="showView('attendanceView', { scroll: true })" title="Click to view Attendance & Punch"><span class="top-status-dot" style="background:#0284c7;"></span> 📍 My Punch</span>
     <a href="/api/admin/backup/download" onclick="downloadDatabaseBackup(this, event);" data-admin-only="true" class="top-status-badge" style="text-decoration:none; cursor:pointer; background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3); font-weight:700;" title="Download complete portable database backup (.db)"><span class="top-status-dot" style="background:#0284c7;"></span> 📥 BACKUP DB</a>
     <span class="top-status-badge" data-admin-only="true" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
   </div>
@@ -1859,7 +1859,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
       <span id="speedAlertText" style="font-weight:600; font-size:13.5px;">All enquiry follow-ups and unit allocations are up to date.</span>
     </div>
     <div class="actions">
-      <button class="btn gold" style="font-size:12px; padding:6px 14px;" onclick="showView('leadsView')">View Enquiries →</button>
+      <button id="speedAlertBtn" class="btn gold" style="font-size:12px; padding:6px 14px;" onclick="viewEnquiriesFromBanner()">View Enquiries →</button>
     </div>
   </div>
 
@@ -1995,8 +1995,9 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
         <select id="leadFilterProject" onchange="applyLeadFilters();" style="max-width:200px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Projects</option>
         </select>
-        <select id="leadFilterPriority" onchange="applyLeadFilters();" style="max-width:160px; padding:6px 12px; font-size:12.5px;">
+        <select id="leadFilterPriority" onchange="applyLeadFilters();" style="max-width:185px; padding:6px 12px; font-size:12.5px;">
           <option value="">All Priorities</option>
+          <option value="overdue">⚠️ Overdue Follow-ups</option>
           <option value="hot">🔥 Hot Enquiries</option>
           <option value="warm">⚡ Warm Enquiries</option>
           <option value="cold">❄️ Cold Enquiries</option>
@@ -2065,6 +2066,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
           </select>
         </div>
         <input id="leadFilterSearch" oninput="applyLeadFilters();" placeholder="Search name, phone, email..." style="max-width:210px; padding:6px 12px; font-size:12.5px;">
+        <button id="leadFilterResetBtn" class="btn" onclick="resetLeadFilters()" style="display:none; font-size:12px; padding:6px 10px; color:#b91c1c; border-color:#fca5a5; background:#fff1f2; font-weight:700;" title="Clear all active filters">✕ Reset</button>
       </div>
       <div class="actions">
         <button class="btn" onclick="exportLeadsCSV()" title="Export all enquiries to CSV / Excel" style="font-weight:600; display:inline-flex; align-items:center; gap:5px;">📥 Export CSV</button>
@@ -3588,7 +3590,7 @@ function applyRolePermissions(user) {
   }
 }
 
-function showView(id) {
+function showView(id, options = {}) {
   if (state.currentUser && state.currentUser.role === 'hr') {
     if (id !== 'teamView' && id !== 'attendanceView') {
       id = 'teamView';
@@ -3609,6 +3611,10 @@ function showView(id) {
   if (titleEl) titleEl.textContent = meta.title;
   if (subEl) subEl.textContent = meta.subtitle;
   document.title = `${meta.title} — Laxminarayan Group CRM`;
+
+  if (options && options.scroll) {
+    if (typeof smoothScrollToWorkspace === 'function') smoothScrollToWorkspace();
+  }
 }
 
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
@@ -3648,6 +3654,7 @@ function openModal(id) {
 async function load() {
   const d = await get('/api/admin/dashboard');
   state.currentUser = d.currentUser || null;
+  state.stats = d.stats || {};
   applyRolePermissions(state.currentUser);
   const isHR = state.currentUser && state.currentUser.role === 'hr';
   if (isHR) {
@@ -3987,6 +3994,66 @@ document.addEventListener('click', function(e) {
   }
 });
 
+function smoothScrollToWorkspace() {
+  setTimeout(() => {
+    const targetEl = document.querySelector('.tabs') || document.getElementById('leadsView');
+    if (!targetEl) return;
+    const headerOffset = 76; // Sticky executive navbar (~62px) + breathing margin (14px)
+    const elementPosition = targetEl.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    window.scrollTo({
+      top: Math.max(0, Math.round(offsetPosition)),
+      behavior: 'smooth'
+    });
+  }, 60);
+}
+
+function highlightLeadsToolbar() {
+  const toolbar = document.querySelector('#leadsView .view-switcher-bar');
+  if (!toolbar) return;
+  toolbar.style.transition = 'box-shadow 0.35s ease, border-color 0.35s ease';
+  toolbar.style.boxShadow = '0 0 0 3px rgba(2, 132, 199, 0.45)';
+  toolbar.style.borderColor = '#0284c7';
+  setTimeout(() => {
+    toolbar.style.boxShadow = '';
+    toolbar.style.borderColor = '';
+  }, 1800);
+}
+
+async function viewEnquiriesFromBanner(filterMode = 'auto') {
+  showView('leadsView');
+
+  // Option 1: Smooth Auto-Scroll immediately to Enquiries workspace
+  smoothScrollToWorkspace();
+
+  // Load latest enquiries data
+  await loadLeads();
+
+  // Option 2: Smart Filter Preset for Overdue Follow-ups
+  const hasOverdue = (state.leads || []).some(l => l.follow_up_at && new Date(l.follow_up_at) < new Date() && !['won', 'lost'].includes(l.status));
+  const isAlertOverdue = state.stats && Number(state.stats.overdueLeads) > 0;
+  const priSelect = $('leadFilterPriority');
+
+  if (priSelect && (filterMode === 'overdue' || isAlertOverdue || hasOverdue)) {
+    priSelect.value = 'overdue';
+    applyLeadFilters();
+    toast('⚠️ Filtered to Overdue Follow-ups · Click "✕ Reset" to view all');
+  }
+
+  // Visual focus highlight pulse
+  highlightLeadsToolbar();
+}
+
+function resetLeadFilters() {
+  if ($('leadFilterProject')) $('leadFilterProject').value = '';
+  if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+  if ($('leadFilterSource')) $('leadFilterSource').value = '';
+  if ($('leadFilterSearch')) $('leadFilterSearch').value = '';
+  if (typeof syncChannelDropdownUI === 'function') syncChannelDropdownUI();
+  applyLeadFilters();
+  toast('Filters cleared · Showing all enquiries');
+}
+
 function getFilteredLeads() {
   const pid = $('leadFilterProject')?.value;
   const pri = $('leadFilterPriority')?.value;
@@ -4003,7 +4070,14 @@ function getFilteredLeads() {
       return false;
     });
   }
-  if (pri) list = list.filter(l => (l.sentiment || 'warm') === pri);
+  if (pri) {
+    if (pri === 'overdue') {
+      const now = new Date();
+      list = list.filter(l => l.follow_up_at && new Date(l.follow_up_at) < now && !['won', 'lost'].includes(l.status));
+    } else {
+      list = list.filter(l => (l.sentiment || 'warm') === pri);
+    }
+  }
   if (src) list = list.filter(l => (l.source || 'website').toLowerCase().includes(src));
   if (q) list = list.filter(l =>
     (l.name && l.name.toLowerCase().includes(q)) ||
@@ -4016,6 +4090,14 @@ function getFilteredLeads() {
 }
 
 function applyLeadFilters() {
+  const hasFilter = Boolean(
+    $('leadFilterProject')?.value ||
+    $('leadFilterPriority')?.value ||
+    $('leadFilterSource')?.value ||
+    $('leadFilterSearch')?.value
+  );
+  const resetBtn = $('leadFilterResetBtn');
+  if (resetBtn) resetBtn.style.display = hasFilter ? 'inline-flex' : 'none';
   renderKanban();
   renderLeadRows();
 }
