@@ -706,7 +706,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req,res,next)=>{
-  res.set("Permissions-Policy","camera=(), microphone=(), geolocation=(), payment=()");
+  res.set("Permissions-Policy","camera=(), microphone=(), geolocation=(self), payment=()");
   if(req.path.startsWith("/api/") || req.path==="/admin.html" || req.path==="/dashboard.html" || req.path==="/project-category.html") {
     res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
     res.set("Pragma","no-cache");
@@ -731,7 +731,7 @@ app.use((req, res, next) => {
   const p = req.path.toLowerCase();
   if (p.startsWith("/api/")) return next();
   if (p.startsWith("/assets/")) return next();
-  if (p === "/robots.txt" || p === "/sitemap.xml") return next();
+  if (p === "/robots.txt" || p === "/sitemap.xml" || p === "/manifest.json" || p === "/manifest.webmanifest" || p === "/sw.js" || p === "/offline.html") return next();
 
   for (const dir of FORBIDDEN_DIRS) {
     if (p === dir || p.startsWith(dir + "/") || p.includes(dir + "/")) {
@@ -4798,6 +4798,24 @@ ${JSON.stringify(schemaData, null, 2)}
 
 app.get("/favicon.ico", (req, res) => {
   res.sendFile(path.join(__dirname, "assets", "favicon.jpg"));
+});
+
+// ─── PWA MANIFEST & SERVICE WORKER ROUTES ───
+app.get("/manifest.json", (req, res) => {
+  res.type("application/manifest+json").sendFile(path.join(__dirname, "manifest.json"));
+});
+app.get("/manifest.webmanifest", (req, res) => {
+  res.type("application/manifest+json").sendFile(path.join(__dirname, "manifest.webmanifest"));
+});
+app.get("/sw.js", (req, res) => {
+  res.set({
+    "Content-Type": "application/javascript",
+    "Service-Worker-Allowed": "/",
+    "Cache-Control": "no-cache, no-store, must-revalidate"
+  }).sendFile(path.join(__dirname, "sw.js"));
+});
+app.get("/offline.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "offline.html"));
 });
 
 // ─── PUBLIC ASSETS & UPLOADED MEDIA (7-DAY BROWSER CACHE + GZIP) ───

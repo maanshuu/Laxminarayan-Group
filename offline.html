@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline | Laxminarayan Group</title>
+  <link rel="icon" type="image/png" href="/assets/icons/icon-96x96.png">
+  <meta name="theme-color" content="#0B1528">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: radial-gradient(circle at 50% 20%, #162444 0%, #0B1528 70%);
+      color: #E2E8F0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      background: rgba(18, 30, 54, 0.75);
+      border: 1px solid rgba(197, 160, 89, 0.25);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(197, 160, 89, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 44px 32px;
+      max-width: 440px;
+      width: 100%;
+      animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo-container {
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 20px;
+      background: rgba(11, 21, 40, 0.8);
+      border: 1px solid rgba(197, 160, 89, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-shadow: 0 0 25px rgba(197, 160, 89, 0.2);
+    }
+    .logo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #FCA5A5;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #EF4444;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    p {
+      color: #94A3B8;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .btn-retry {
+      width: 100%;
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #D4AF37 0%, #C5A059 50%, #A68032 100%);
+      color: #0B1528;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(197, 160, 89, 0.35);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(197, 160, 89, 0.5);
+    }
+    .btn-retry:active {
+      transform: translateY(0);
+    }
+    .footer-text {
+      margin-top: 24px;
+      font-size: 12px;
+      color: #64748B;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-container">
+      <img src="/assets/logo-mark.png" alt="Laxminarayan Group">
+    </div>
+    
+    <div class="status-badge">
+      <span class="pulse-dot"></span>
+      No Internet Connection
+    </div>
+    
+    <h1>You are currently offline</h1>
+    <p>Please check your cellular data or Wi-Fi network. Live CRM leads, project availability, and geofence punch-in require an active internet connection.</p>
+    
+    <button class="btn-retry" onclick="checkConnection()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+      Retry Connection
+    </button>
+
+    <div class="footer-text">
+      Laxminarayan Group • Secure Enterprise Portal
+    </div>
+  </div>
+
+  <script>
+    function checkConnection() {
+      if (navigator.onLine) {
+        window.location.reload();
+      } else {
+        const btn = document.querySelector('.btn-retry');
+        const orig = btn.innerHTML;
+        btn.innerHTML = 'Checking...';
+        btn.style.opacity = '0.7';
+        setTimeout(() => {
+          if (navigator.onLine) {
+            window.location.reload();
+          } else {
+            btn.innerHTML = orig;
+            btn.style.opacity = '1';
+            alert('Still offline. Please reconnect your Wi-Fi or Mobile Data.');
+          }
+        }, 1200);
+      }
+    }
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>
