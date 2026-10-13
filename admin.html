@@ -2021,6 +2021,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
           <option value="hot">🔥 Hot Enquiries</option>
           <option value="warm">⚡ Warm Enquiries</option>
           <option value="cold">❄️ Cold Enquiries</option>
+          <option value="closed">📁 Closed Enquiries</option>
         </select>
         <!-- Custom Channel Filter with Authentic Brand SVGs / Emoticons -->
         <div class="channel-dropdown-wrap" style="position:relative; display:inline-block;">
@@ -4244,16 +4245,18 @@ function getFilteredLeads() {
   if (pri) {
     const todayIST = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
     if (pri === 'overdue') {
-      list = list.filter(l => l.follow_up_at && String(l.follow_up_at).slice(0, 10) < todayIST && !['won', 'lost'].includes(l.status));
+      list = list.filter(l => l.follow_up_at && String(l.follow_up_at).slice(0, 10) < todayIST && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase()));
     } else if (pri === 'today') {
-      list = list.filter(l => l.follow_up_at && String(l.follow_up_at).slice(0, 10) === todayIST && !['won', 'lost'].includes(l.status));
+      list = list.filter(l => l.follow_up_at && String(l.follow_up_at).slice(0, 10) === todayIST && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase()));
+    } else if (pri === 'closed') {
+      list = list.filter(l => ['lost', 'closed'].includes(String(l.status || '').toLowerCase()));
     } else {
       list = list.filter(l => (l.sentiment || 'warm') === pri);
     }
   }
-  if (state.leadFilterStage) {
+  if (state.leadFilterStage && pri !== 'closed') {
     if (state.leadFilterStage === 'open') {
-      list = list.filter(l => !['won', 'lost'].includes(l.status));
+      list = list.filter(l => !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase()));
     } else {
       list = list.filter(l => (l.status || 'new') === state.leadFilterStage);
     }
@@ -4297,7 +4300,7 @@ function renderKanban() {
   });
 
   stages.forEach(st => {
-    const stageCards = list.filter(l => (l.status || 'new') === st);
+    const stageCards = list.filter(l => (l.status || 'new') === st || (st === 'lost' && String(l.status || '').toLowerCase() === 'closed'));
     const badge = $('badge-' + st);
     if (badge) badge.textContent = stageCards.length;
 
@@ -4312,8 +4315,8 @@ function renderKanban() {
     col.innerHTML = stageCards.map(x => {
       const cleanPhone = (x.phone || '').replace(/[^0-9]/g, '');
       const fDate = x.follow_up_at ? String(x.follow_up_at).slice(0, 10) : '';
-      const isOverdue = fDate && fDate < todayIST && !['won', 'lost'].includes(x.status);
-      const isToday = fDate && fDate === todayIST && !['won', 'lost'].includes(x.status);
+      const isOverdue = fDate && fDate < todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
+      const isToday = fDate && fDate === todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
       const sentiment = x.sentiment || 'warm';
       const lp = cleanPhone.slice(-10);
       const le = (x.email || '').toLowerCase().trim();
@@ -4378,8 +4381,8 @@ function renderLeadRows() {
     const isRepeatLead = (lp && leadPhoneCounts[lp] > 1) || (le && leadEmailCounts[le] > 1);
     const repeatTag = isRepeatLead ? `<div style="margin-top:3px;"><span class="pill" style="background:#fef3c7; color:#92400e; font-size:10px; font-weight:700; border:1px solid #fde68a;">🔥 Repeat Client (${Math.max(leadPhoneCounts[lp] || 0, leadEmailCounts[le] || 0)} Enquiries)</span></div>` : '';
     const fDate = x.follow_up_at ? String(x.follow_up_at).slice(0, 10) : '';
-    const isOverdue = fDate && fDate < todayIST && !['won', 'lost'].includes(x.status);
-    const isToday = fDate && fDate === todayIST && !['won', 'lost'].includes(x.status);
+    const isOverdue = fDate && fDate < todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
+    const isToday = fDate && fDate === todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
 
     return `
     <tr>
