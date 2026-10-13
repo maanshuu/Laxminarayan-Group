@@ -2916,6 +2916,49 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
   </div>
 </div>
 
+<!-- LOCATION / GPS PERMISSION HELP MODAL -->
+<div id="locationHelpModal" class="modal">
+  <div class="modal-card" style="max-width:480px;">
+    <div class="headrow" style="margin-bottom:12px;">
+      <div>
+        <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:8px;">
+          📍 How to Enable GPS & Location Access
+        </h3>
+        <p class="muted" style="margin-top:2px; font-size:12px;">Required for geofenced site attendance at DS 208, Nilkanth Villa & Head Office.</p>
+      </div>
+      <button class="btn smallbtn" onclick="closeModal('locationHelpModal')">✕</button>
+    </div>
+    <div style="font-size:13px; line-height:1.5; color:var(--ink); margin-bottom:16px;">
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px 12px; margin-bottom:14px; font-size:12px; color:#1e40af;">
+        💡 <b>Why wasn't there a popup?</b> If permission was previously blocked or phone GPS is off, Android Chrome silently stops location without showing a prompt. Follow these 10-second steps:
+      </div>
+
+      <div style="font-weight:700; color:#0369a1; margin-bottom:8px; font-size:13px; display:flex; align-items:center; gap:6px;">
+        🤖 For Android Users (Chrome / Samsung Internet):
+      </div>
+      <ol style="margin:0 0 16px 20px; padding:0; font-size:12.5px; color:#334155;">
+        <li style="margin-bottom:6px;">Tap the <b>tune/controls icon ⚙️</b> or <b>lock icon 🔒</b> at the top left of the address bar (next to the website URL).</li>
+        <li style="margin-bottom:6px;">Tap <b>Permissions</b> (or <b>Site settings</b>).</li>
+        <li style="margin-bottom:6px;">Find <b>Location</b> and select <b>"Allow"</b>.</li>
+        <li style="margin-bottom:6px;">Swipe down your phone's notification panel and ensure <b>Location / GPS</b> is toggled <b>ON</b>.</li>
+      </ol>
+
+      <div style="font-weight:700; color:#0369a1; margin-bottom:8px; font-size:13px; display:flex; align-items:center; gap:6px;">
+        🍎 For iPhone / iPad Users (Safari):
+      </div>
+      <ol style="margin:0 0 16px 20px; padding:0; font-size:12.5px; color:#334155;">
+        <li style="margin-bottom:6px;">Tap the <b>"aA"</b> icon in the left of Safari's address bar.</li>
+        <li style="margin-bottom:6px;">Tap <b>Website Settings</b> → tap <b>Location</b> → select <b>Allow</b>.</li>
+        <li style="margin-bottom:6px;">Make sure iOS <b>Settings > Privacy & Security > Location Services</b> is turned <b>ON</b>.</li>
+      </ol>
+    </div>
+    <div class="actions" style="justify-content:flex-end; gap:8px;">
+      <button type="button" class="btn" onclick="closeModal('locationHelpModal')">Close</button>
+      <button type="button" class="btn primary" onclick="closeModal('locationHelpModal'); location.reload();" style="background:#0284c7; border-color:#0284c7;">🔄 Refresh & Verify</button>
+    </div>
+  </div>
+</div>
+
 <!-- UNIT INVENTORY MODAL -->
 <div id="unitModal" class="modal">
   <div class="modal-card">
@@ -3373,6 +3416,11 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
 
 <!-- CRM CLIENT SCRIPTS -->
 <script>
+// Automatic HTTPS upgrade on remote devices (required for Android Chrome Geolocation API)
+if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+  location.href = window.location.href.replace(/^http:/, 'https:');
+}
+
 const $ = id => document.getElementById(id);
 const state = {
   employees: [],
@@ -6717,58 +6765,122 @@ async function refreshAttendance() {
 }
 
 // ─── PERSONAL ATTENDANCE (GPS PUNCH & CHECK-OUT FOR HR & STAFF) ───
-function captureGeolocation() {
+function captureGeolocation(onStatusUpdate) {
   if (!('geolocation' in navigator)) return Promise.resolve(null);
+
   return new Promise(resolve => {
     let finished = false;
-    const safetyTimer = setTimeout(() => {
-      if (!finished) {
-        finished = true;
-        console.warn('Geolocation safety timeout fired (4.5s limit)');
-        toast('⚠️ GPS taking longer than usual. Proceeding with punch...');
-        resolve(null);
-      }
-    }, 4500);
-
-    try {
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          if (!finished) {
-            finished = true;
-            clearTimeout(safetyTimer);
-            resolve({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              accuracy: pos.coords.accuracy
-            });
-          }
-        },
-        err => {
-          if (!finished) {
-            finished = true;
-            clearTimeout(safetyTimer);
-            console.warn('Geolocation capture:', err);
-            if (err.code === 1) {
-              toast('⚠️ Location access was denied in browser. Punching without GPS.');
-              alert('📍 Location Permission is Blocked:\n\nTo verify on-site attendance at Head Office or site, please tap the lock/tune icon at the top of your browser (next to the website URL), set Location to "Allow", and ensure phone/computer location is ON.');
-            } else if (err.code === 2) {
-              toast('⚠️ Device GPS is unavailable. Please check location settings.');
-            } else {
-              toast('⚠️ Location request timed out. Proceeding...');
-            }
-            resolve(null);
-          }
-        },
-        { enableHighAccuracy: true, timeout: 4000, maximumAge: 300000 }
-      );
-    } catch (e) {
+    const finish = res => {
       if (!finished) {
         finished = true;
         clearTimeout(safetyTimer);
-        resolve(null);
+        resolve(res);
       }
-    }
+    };
+
+    // Overall safety limit (16s) so check-in never hangs
+    const safetyTimer = setTimeout(() => {
+      if (!finished) {
+        console.warn('Geolocation overall safety timeout fired (16s limit)');
+        toast('⚠️ GPS taking longer than expected. Proceeding with punch...');
+        finish(null);
+      }
+    }, 16000);
+
+    const attemptPosition = (options) => {
+      return new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(
+          pos => res({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: Math.round(pos.coords.accuracy || 0)
+          }),
+          err => rej(err),
+          options
+        );
+      });
+    };
+
+    (async () => {
+      // Tier 1: Satellite GPS High Accuracy (up to 8.5 seconds)
+      if (typeof onStatusUpdate === 'function') {
+        onStatusUpdate('🛰️ Acquiring GPS satellite lock...');
+      }
+
+      try {
+        const satPos = await attemptPosition({
+          enableHighAccuracy: true,
+          timeout: 8500,
+          maximumAge: 60000
+        });
+        if (satPos) {
+          finish(satPos);
+          return;
+        }
+      } catch (err1) {
+        console.warn('Tier 1 satellite GPS capture:', err1);
+        if (err1 && err1.code === 1) {
+          // Permission denied
+          toast('⚠️ Location access was denied in browser. Punching without GPS.');
+          openModal('locationHelpModal');
+          finish(null);
+          return;
+        }
+      }
+
+      // Tier 2: Resilient Fallback to Standard Network Geolocation (Wi-Fi / Cell tower)
+      // Resolves in < 1-2s on Android indoors
+      if (typeof onStatusUpdate === 'function') {
+        onStatusUpdate('📶 Using network triangulation fallback...');
+      }
+
+      try {
+        const netPos = await attemptPosition({
+          enableHighAccuracy: false,
+          timeout: 6000,
+          maximumAge: 180000
+        });
+        if (netPos) {
+          finish(netPos);
+          return;
+        }
+      } catch (err2) {
+        console.warn('Tier 2 network location capture:', err2);
+        if (err2 && err2.code === 1) {
+          toast('⚠️ Location access was denied in browser.');
+          openModal('locationHelpModal');
+        } else if (err2.code === 2) {
+          toast('⚠️ Device GPS/location unavailable. Check device settings.');
+        } else {
+          toast('⚠️ Location request timed out. Proceeding...');
+        }
+        finish(null);
+      }
+    })();
   });
+}
+
+async function checkAndDisplayAdminGpsPermission() {
+  const hintEl = $('myPunchGpsHint');
+  if (!hintEl) return;
+  if (!navigator.permissions || !navigator.permissions.query) return;
+
+  try {
+    const perm = await navigator.permissions.query({ name: 'geolocation' });
+    const update = () => {
+      const el = $('myPunchGpsHint');
+      if (!el) return;
+      if (perm.state === 'denied') {
+        el.innerHTML = '⚠️ <span style="color:#dc2626; font-weight:700;">Location blocked in browser.</span> <a href="javascript:void(0)" onclick="openModal(\'locationHelpModal\')" style="color:#0284c7; font-weight:800; text-decoration:underline;">Tap for Android/iOS Guide ↗</a>';
+      } else if (perm.state === 'granted') {
+        el.innerHTML = '🟢 <span style="color:#16a34a; font-weight:700;">GPS Permitted</span> · Click <b>"Mark My Check-In"</b> below to verify arrival.';
+      } else {
+        el.innerHTML = 'Click <b>"Mark My Check-In"</b> below to capture your GPS coordinates, verify your location (Head Office / Site), and record your arrival.';
+      }
+    };
+    update();
+    perm.onchange = update;
+  } catch (_) {}
 }
 
 async function loadMyAttendance() {
@@ -6829,7 +6941,7 @@ function renderMyPunchCard(att, emp) {
         </div>
         <span style="color:#d97706; font-weight:700; font-size:12px;">⏳ Shift not started yet</span>
       </div>
-      <div style="margin-top:6px; color:#475569; font-size:12.5px;">
+      <div id="myPunchGpsHint" style="margin-top:6px; color:#475569; font-size:12.5px;">
         Click <b>"Mark My Check-In"</b> below to capture your GPS coordinates, verify your location (Head Office / Site), and record your arrival.
       </div>
     `;
@@ -6846,6 +6958,7 @@ function renderMyPunchCard(att, emp) {
       topBadge.innerHTML = '<span class="top-status-dot" style="background:#f59e0b;"></span> 📍 Punch In';
       topBadge.title = 'You have not checked in yet today. Click to mark attendance.';
     }
+    checkAndDisplayAdminGpsPermission();
     return;
   }
 
@@ -6947,7 +7060,9 @@ async function handleMyPunchAction() {
 
   try {
     toast('📍 Verifying GPS location for check-in...');
-    const geoData = await captureGeolocation();
+    const geoData = await captureGeolocation(msg => {
+      if (btnText) btnText.textContent = msg;
+    });
     const res = await send('/api/employee/attendance/check-in', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -6969,6 +7084,22 @@ async function handleMyPunchAction() {
 function openMyCheckOutModal() {
   const att = state.myAttendance;
   if ($('myModalCheckInTime')) $('myModalCheckInTime').textContent = att?.check_in || '—';
+
+  if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'geolocation' }).then(st => {
+      const el = $('myCheckOutGeoStatus');
+      if (!el) return;
+      if (st.state === 'denied') {
+        el.innerHTML = '⚠️ <span style="color:#dc2626; font-weight:700;">Location blocked.</span> <a href="javascript:void(0)" onclick="openModal(\'locationHelpModal\')" style="color:#0284c7; text-decoration:underline; font-weight:700;">Tap for Android/iOS Guide ↗</a>';
+        el.style.background = '#fef2f2';
+        el.style.borderColor = '#fecaca';
+      } else if (st.state === 'granted') {
+        el.innerHTML = '🟢 GPS Ready · Browser will auto-verify your location upon checkout.';
+        el.style.background = '#f0fdf4';
+        el.style.borderColor = '#bbf7d0';
+      }
+    }).catch(() => {});
+  }
   
   // calculate live shift duration
   let liveDuration = att?.work_duration || '';
@@ -7005,7 +7136,9 @@ async function submitMyCheckOut(e) {
 
   try {
     toast('📍 Verifying location & checking out...');
-    const geoData = await captureGeolocation();
+    const geoData = await captureGeolocation(msg => {
+      if (submitBtn) submitBtn.textContent = msg;
+    });
     const payload = {
       ...(geoData || {}),
       eod_summary: $('myCheckOutSummary')?.value?.trim() || ''

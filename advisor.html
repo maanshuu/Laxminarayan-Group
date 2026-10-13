@@ -736,12 +736,99 @@ tr:hover td { background: #fdfdfe; }
   </div>
 </div>
 
+<!-- LOCATION / GPS PERMISSION HELP MODAL -->
+<div id="locationHelpModal" class="modal-backdrop">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-head">
+      <div>
+        <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--ink-heading); display:flex; align-items:center; gap:8px;">
+          📍 How to Enable GPS & Location Access
+        </h3>
+        <p style="margin:4px 0 0; font-size:12px; color:var(--ink-muted);">Required for geofenced site attendance at DS 208, Nilkanth Villa & Head Office.</p>
+      </div>
+      <button class="modal-close" onclick="closeLocationHelpModal()">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:13px; line-height:1.5; color:var(--ink-heading);">
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px 12px; margin-bottom:14px; font-size:12px; color:#1e40af;">
+        💡 <b>Why wasn't there a popup?</b> If permission was previously blocked or phone GPS is off, Android Chrome silently stops location without showing a prompt. Follow these 10-second steps:
+      </div>
+
+      <div style="font-weight:700; color:#0369a1; margin-bottom:8px; font-size:13px; display:flex; align-items:center; gap:6px;">
+        🤖 For Android Users (Chrome / Samsung Internet):
+      </div>
+      <ol style="margin:0 0 16px 20px; padding:0; font-size:12.5px; color:#334155;">
+        <li style="margin-bottom:6px;">Tap the <b>tune/controls icon ⚙️</b> or <b>lock icon 🔒</b> at the top left of the address bar (next to the website URL).</li>
+        <li style="margin-bottom:6px;">Tap <b>Permissions</b> (or <b>Site settings</b>).</li>
+        <li style="margin-bottom:6px;">Find <b>Location</b> and select <b>"Allow"</b>.</li>
+        <li style="margin-bottom:6px;">Swipe down your phone's notification panel and ensure <b>Location / GPS</b> is toggled <b>ON</b>.</li>
+      </ol>
+
+      <div style="font-weight:700; color:#0369a1; margin-bottom:8px; font-size:13px; display:flex; align-items:center; gap:6px;">
+        🍎 For iPhone / iPad Users (Safari):
+      </div>
+      <ol style="margin:0 0 16px 20px; padding:0; font-size:12.5px; color:#334155;">
+        <li style="margin-bottom:6px;">Tap the <b>"aA"</b> icon in the left of Safari's address bar.</li>
+        <li style="margin-bottom:6px;">Tap <b>Website Settings</b> → tap <b>Location</b> → select <b>Allow</b>.</li>
+        <li style="margin-bottom:6px;">Make sure iOS <b>Settings > Privacy & Security > Location Services</b> is turned <b>ON</b>.</li>
+      </ol>
+    </div>
+    <div class="modal-foot" style="display:flex; justify-content:flex-end; gap:8px;">
+      <button type="button" class="btn-cancel" onclick="closeLocationHelpModal()">Close</button>
+      <button type="button" class="btn-save" onclick="closeLocationHelpModal(); location.reload();" style="background:#0284c7;">🔄 Refresh & Verify</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
+// Automatic HTTPS upgrade on remote devices (required for Android Chrome Geolocation API)
+if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+  location.href = window.location.href.replace(/^http:/, 'https:');
+}
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
 const escAttr = s => String(s ?? '').replace(/'/g, '&#039;').replace(/"/g, '&quot;');
+
+function openLocationHelpModal() {
+  const modal = $('locationHelpModal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeLocationHelpModal() {
+  const modal = $('locationHelpModal');
+  if (modal) modal.classList.remove('open');
+}
+
+if ($('locationHelpModal')) {
+  $('locationHelpModal').addEventListener('click', e => {
+    if (e.target === $('locationHelpModal')) closeLocationHelpModal();
+  });
+}
+
+async function checkAndDisplayGpsPermissionStatus() {
+  const hintEl = $('gpsStatusHint');
+  if (!hintEl) return;
+  if (!navigator.permissions || !navigator.permissions.query) return;
+
+  try {
+    const perm = await navigator.permissions.query({ name: 'geolocation' });
+    const update = () => {
+      const el = $('gpsStatusHint');
+      if (!el) return;
+      if (perm.state === 'denied') {
+        el.innerHTML = '⚠️ <span style="color:#dc2626; font-weight:700;">Location blocked in browser.</span> <a href="javascript:void(0)" onclick="openLocationHelpModal()" style="color:#0284c7; font-weight:800; text-decoration:underline;">Tap for Android/iOS Guide ↗</a>';
+      } else if (perm.state === 'granted') {
+        el.innerHTML = '🟢 <span style="color:#16a34a; font-weight:700;">GPS Permitted</span> · Auto-verifies site arrival (DS 208 / Nilkanth Villa / Office)';
+      } else {
+        el.innerHTML = '📍 GPS auto-verifies site arrival (DS 208 / Nilkanth Villa / Office)';
+      }
+    };
+    update();
+    perm.onchange = update;
+  } catch (_) {}
+}
 
 let state = {
   employee: null,
@@ -865,10 +952,11 @@ async function loadPortal() {
         $('attendanceBtn').style.opacity = '1';
       }
     } else {
-      $('attendanceStatusText').innerHTML = 'Not marked today <span style="font-size:11px; color:var(--ink-muted); display:block; margin-top:2px;">📍 GPS auto-verifies site arrival (DS 208 / Nilkanth Villa / Office)</span>';
+      $('attendanceStatusText').innerHTML = 'Not marked today <span id="gpsStatusHint" style="font-size:11px; color:var(--ink-muted); display:block; margin-top:2px;">📍 GPS auto-verifies site arrival (DS 208 / Nilkanth Villa / Office)</span>';
       $('attendanceBtn').textContent = 'MARK CHECK-IN';
       $('attendanceBtn').disabled = false;
       $('attendanceBtn').style.opacity = '1';
+      checkAndDisplayGpsPermissionStatus();
     }
 
     await loadProjects();
@@ -1107,61 +1195,98 @@ async function loadLeads() {
   renderAdvisorLeads();
 }
 
-function captureGeolocation() {
+function captureGeolocation(onStatusUpdate) {
   if (!('geolocation' in navigator)) return Promise.resolve(null);
+
   return new Promise(resolve => {
     let finished = false;
-    const safetyTimer = setTimeout(() => {
-      if (!finished) {
-        finished = true;
-        console.warn('Geolocation safety timeout fired (5s limit)');
-        toast('⚠️ GPS taking longer than usual. Proceeding with punch...');
-        resolve(null);
-      }
-    }, 5000);
-
-    try {
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          if (!finished) {
-            finished = true;
-            clearTimeout(safetyTimer);
-            resolve({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              accuracy: pos.coords.accuracy
-            });
-          }
-        },
-        err => {
-          if (!finished) {
-            finished = true;
-            clearTimeout(safetyTimer);
-            console.warn('Geolocation capture:', err);
-            if (err.code === 1) {
-              toast('⚠️ Location access was denied in browser. Punching without GPS.');
-              alert('📍 Location Permission is Blocked:\n\nTo verify on-site attendance at DS 208 or Nilkanth Villa, please tap the lock/tune icon at the top of your browser (next to the website URL), set Location to "Allow", and ensure phone GPS is ON.');
-            } else if (err.code === 2) {
-              toast('⚠️ Phone GPS is unavailable. Please check device location settings.');
-            } else {
-              toast('⚠️ Location request timed out. Proceeding...');
-            }
-            resolve(null);
-          }
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 4500,
-          maximumAge: 300000
-        }
-      );
-    } catch (e) {
+    const finish = res => {
       if (!finished) {
         finished = true;
         clearTimeout(safetyTimer);
-        resolve(null);
+        resolve(res);
       }
-    }
+    };
+
+    // Overall safety limit (16s) so check-in never hangs
+    const safetyTimer = setTimeout(() => {
+      if (!finished) {
+        console.warn('Geolocation overall safety timeout fired (16s limit)');
+        toast('⚠️ GPS taking longer than expected. Proceeding with punch...');
+        finish(null);
+      }
+    }, 16000);
+
+    const attemptPosition = (options) => {
+      return new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(
+          pos => res({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: Math.round(pos.coords.accuracy || 0)
+          }),
+          err => rej(err),
+          options
+        );
+      });
+    };
+
+    (async () => {
+      // Tier 1: Satellite GPS High Accuracy (up to 8.5 seconds)
+      if (typeof onStatusUpdate === 'function') {
+        onStatusUpdate('🛰️ Acquiring GPS satellite lock...');
+      }
+
+      try {
+        const satPos = await attemptPosition({
+          enableHighAccuracy: true,
+          timeout: 8500,
+          maximumAge: 60000
+        });
+        if (satPos) {
+          finish(satPos);
+          return;
+        }
+      } catch (err1) {
+        console.warn('Tier 1 satellite GPS capture:', err1);
+        if (err1 && err1.code === 1) {
+          // Permission denied
+          toast('⚠️ Location access was denied in browser. Punching without GPS.');
+          openLocationHelpModal();
+          finish(null);
+          return;
+        }
+      }
+
+      // Tier 2: Resilient Fallback to Standard Network Geolocation (Wi-Fi / Cell tower)
+      // Resolves in < 1-2s on Android indoors
+      if (typeof onStatusUpdate === 'function') {
+        onStatusUpdate('📶 Using network triangulation fallback...');
+      }
+
+      try {
+        const netPos = await attemptPosition({
+          enableHighAccuracy: false,
+          timeout: 6000,
+          maximumAge: 180000
+        });
+        if (netPos) {
+          finish(netPos);
+          return;
+        }
+      } catch (err2) {
+        console.warn('Tier 2 network location capture:', err2);
+        if (err2 && err2.code === 1) {
+          toast('⚠️ Location access was denied in browser.');
+          openLocationHelpModal();
+        } else if (err2 && err2.code === 2) {
+          toast('⚠️ Phone GPS/location unavailable. Check device settings.');
+        } else {
+          toast('⚠️ Location request timed out. Proceeding...');
+        }
+        finish(null);
+      }
+    })();
   });
 }
 
@@ -1171,7 +1296,9 @@ async function performAttendanceCheckIn() {
   const originalText = b.textContent;
   b.textContent = '📍 Verifying GPS...';
 
-  const geoData = await captureGeolocation();
+  const geoData = await captureGeolocation(msg => {
+    b.textContent = msg;
+  });
 
   try {
     const r = await fetch('/api/employee/attendance/check-in', {
@@ -1206,6 +1333,22 @@ function openEodModal() {
   const att = state.todayAttendance;
   $('eodCheckInDisplay').textContent = (att && att.check_in) ? att.check_in : '—';
   
+  if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'geolocation' }).then(st => {
+      const el = $('eodGeoStatus');
+      if (!el) return;
+      if (st.state === 'denied') {
+        el.innerHTML = '⚠️ <span style="color:#dc2626; font-weight:700;">Location blocked.</span> <a href="javascript:void(0)" onclick="openLocationHelpModal()" style="color:#0284c7; text-decoration:underline; font-weight:700;">Tap for Android/iOS Guide ↗</a>';
+        el.style.background = '#fef2f2';
+        el.style.borderColor = '#fecaca';
+      } else if (st.state === 'granted') {
+        el.innerHTML = '🟢 GPS Ready · Auto-verifies location upon submit.';
+        el.style.background = '#f0fdf4';
+        el.style.borderColor = '#bbf7d0';
+      }
+    }).catch(() => {});
+  }
+
   if (att && att.check_in) {
     try {
       const nowTime = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
@@ -1251,7 +1394,9 @@ async function quickCheckOutFallback() {
   }
   toast('📍 Verifying location & checking out...');
 
-  const geoData = await captureGeolocation();
+  const geoData = await captureGeolocation(msg => {
+    if (submitBtn) submitBtn.textContent = msg;
+  });
 
   try {
     const payload = {
@@ -1296,7 +1441,9 @@ $('eodForm').onsubmit = async e => {
     return;
   }
 
-  const geoData = await captureGeolocation();
+  const geoData = await captureGeolocation(msg => {
+    submitBtn.textContent = msg;
+  });
 
   try {
     const payload = {
