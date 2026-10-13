@@ -536,6 +536,15 @@ tr:hover td { background: #fdfdfe; }
           <input id="advisorSearchInput" type="text" placeholder="Search name, phone, project..." oninput="onAdvisorSearchInput(this.value)" style="padding:7px 12px 7px 30px; font-size:12px; border:1px solid var(--line-strong); border-radius:var(--radius-pill); outline:none; width:220px; color:var(--ink-heading); background:#fff;">
           <span style="position:absolute; left:10px; font-size:12px; color:var(--ink-muted); pointer-events:none;">🔍</span>
         </div>
+        <select id="advisorPriorityFilter" onchange="onAdvisorPriorityFilterChange(this.value)" style="padding:7px 12px; font-size:12px; font-weight:600; border:1px solid var(--line-strong); border-radius:var(--radius-pill); outline:none; color:var(--ink-heading); background:#fff; cursor:pointer; min-width:160px;">
+          <option value="">All Priorities</option>
+          <option value="hot">🔥 Hot Enquiries</option>
+          <option value="warm">⚡ Warm Enquiries</option>
+          <option value="cold">❄️ Cold Enquiries</option>
+          <option value="closed">📁 Closed Enquiries</option>
+          <option value="today">📅 Today's Follow-ups</option>
+          <option value="overdue">⚠️ Overdue Follow-ups</option>
+        </select>
         <button class="btn-sm" onclick="openCostSheetModal()" style="border-color:#0284c7; color:#0284c7; font-weight:700; padding:6px 14px; background:#f0f9ff; display:inline-flex; align-items:center; gap:5px;">📄 Quotation</button>
         <button class="btn-sm btn-edit" onclick="openWalkInModal()" style="padding:6px 14px; font-weight:700;">+ Record Walk-In</button>
       </div>
@@ -838,6 +847,7 @@ let state = {
   walkinsToday: 0,
   followupsDoneToday: 0,
   activeFilter: 'all',
+  priorityFilter: '',
   searchQuery: ''
 };
 
@@ -975,19 +985,40 @@ function getFilteredAdvisorLeads() {
   const todayIST = getTodayISTDate();
 
   if (state.activeFilter === 'active') {
-    list = list.filter(l => !['won', 'lost'].includes(l.status));
+    list = list.filter(l => !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase()));
   } else if (state.activeFilter === 'today') {
     list = list.filter(l => {
       const fDate = l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '';
-      return fDate === todayIST && !['won', 'lost'].includes(l.status);
+      return fDate === todayIST && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase());
     });
   } else if (state.activeFilter === 'overdue') {
     list = list.filter(l => {
       const fDate = l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '';
-      return fDate && fDate < todayIST && !['won', 'lost'].includes(l.status);
+      return fDate && fDate < todayIST && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase());
     });
   } else if (state.activeFilter === 'won') {
     list = list.filter(l => l.status === 'won');
+  }
+
+  // Priority / Sentiment / Status dropdown filter
+  const pri = state.priorityFilter || $('advisorPriorityFilter')?.value || '';
+  if (pri) {
+    if (pri === 'closed') {
+      list = list.filter(l => ['lost', 'closed'].includes(String(l.status || '').toLowerCase()));
+    } else if (pri === 'today') {
+      list = list.filter(l => {
+        const fDate = l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '';
+        return fDate === todayIST && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase());
+      });
+    } else if (pri === 'overdue') {
+      list = list.filter(l => {
+        const fDate = l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '';
+        return fDate && fDate < todayIST && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase());
+      });
+    } else {
+      // hot, warm, cold
+      list = list.filter(l => (l.sentiment || 'warm').toLowerCase() === pri.toLowerCase());
+    }
   }
 
   const q = (state.searchQuery || '').trim().toLowerCase();
@@ -999,6 +1030,7 @@ function getFilteredAdvisorLeads() {
       (l.notes && l.notes.toLowerCase().includes(q)) ||
       (l.project_name && l.project_name.toLowerCase().includes(q)) ||
       (l.status && l.status.toLowerCase().includes(q)) ||
+      (l.sentiment && l.sentiment.toLowerCase().includes(q)) ||
       String(l.id).includes(q)
     );
   }
@@ -1034,6 +1066,11 @@ function highlightAdvisorTable() {
 
 function filterAdvisorLeads(mode = 'all', options = { scroll: true }) {
   state.activeFilter = mode;
+  if (mode === 'all') {
+    state.priorityFilter = '';
+    const priSelect = $('advisorPriorityFilter');
+    if (priSelect) priSelect.value = '';
+  }
 
   const cardAssigned = $('cardStatAssigned');
   const cardActive = $('cardStatActive');
@@ -1067,11 +1104,42 @@ function filterAdvisorLeads(mode = 'all', options = { scroll: true }) {
   }
 }
 
+function onAdvisorPriorityFilterChange(val) {
+  state.priorityFilter = val || '';
+  if (val === 'closed' && state.activeFilter === 'active') {
+    state.activeFilter = 'all';
+    const cardActive = $('cardStatActive');
+    if (cardActive) cardActive.classList.remove('active');
+    const cardAssigned = $('cardStatAssigned');
+    if (cardAssigned) cardAssigned.classList.add('active');
+  } else if (val === 'today') {
+    state.activeFilter = 'today';
+    const cardFollowUps = $('cardStatFollowUps');
+    if (cardFollowUps) cardFollowUps.classList.add('active');
+    const cardAssigned = $('cardStatAssigned');
+    if (cardAssigned) cardAssigned.classList.remove('active');
+    const cardActive = $('cardStatActive');
+    if (cardActive) cardActive.classList.remove('active');
+  }
+  renderAdvisorLeads();
+  const count = getFilteredAdvisorLeads().length;
+  if (val === 'hot') toast(`🔥 Showing Hot Enquiries (${count})`);
+  else if (val === 'warm') toast(`⚡ Showing Warm Enquiries (${count})`);
+  else if (val === 'cold') toast(`❄️ Showing Cold Enquiries (${count})`);
+  else if (val === 'closed') toast(`📁 Showing Closed Enquiries (${count})`);
+  else if (val === 'today') toast(`📅 Showing Today's Follow-ups (${count})`);
+  else if (val === 'overdue') toast(`⚠️ Showing Overdue Follow-ups (${count})`);
+  else toast(`Showing All Enquiries (${count})`);
+}
+
 function resetAdvisorFilters() {
   state.activeFilter = 'all';
+  state.priorityFilter = '';
   state.searchQuery = '';
   const searchInput = $('advisorSearchInput');
   if (searchInput) searchInput.value = '';
+  const priSelect = $('advisorPriorityFilter');
+  if (priSelect) priSelect.value = '';
 
   const cardAssigned = $('cardStatAssigned');
   const cardActive = $('cardStatActive');
@@ -1097,11 +1165,18 @@ function renderAdvisorLeads() {
   const resetBtn = $('advisorFilterResetBtn');
   const activePill = $('advisorActiveFilterPill');
 
-  const hasFilter = state.activeFilter !== 'all' || Boolean(state.searchQuery.trim());
+  const hasFilter = state.activeFilter !== 'all' || Boolean(state.priorityFilter) || Boolean(state.searchQuery.trim());
   if (resetBtn) resetBtn.style.display = hasFilter ? 'inline-flex' : 'none';
 
   let filterLabel = '';
-  if (state.activeFilter === 'active') filterLabel = 'Active Deals';
+  if (state.priorityFilter) {
+    if (state.priorityFilter === 'hot') filterLabel = '🔥 Hot Enquiries';
+    else if (state.priorityFilter === 'warm') filterLabel = '⚡ Warm Enquiries';
+    else if (state.priorityFilter === 'cold') filterLabel = '❄️ Cold Enquiries';
+    else if (state.priorityFilter === 'closed') filterLabel = '📁 Closed Enquiries';
+    else if (state.priorityFilter === 'today') filterLabel = "📅 Today's Follow-ups";
+    else if (state.priorityFilter === 'overdue') filterLabel = '⚠️ Overdue Follow-ups';
+  } else if (state.activeFilter === 'active') filterLabel = 'Active Deals';
   else if (state.activeFilter === 'today') filterLabel = "Today's Follow-ups";
   else if (state.activeFilter === 'overdue') filterLabel = 'Overdue';
   else if (state.activeFilter === 'won') filterLabel = 'Booked / Won';
@@ -1150,8 +1225,8 @@ function renderAdvisorLeads() {
     const telLink = cleanPhone ? `tel:${cleanPhone}` : '#';
     const sentClass = x.sentiment === 'hot' ? 'pill-hot' : (x.sentiment === 'cold' ? 'pill-cold' : 'pill-warm');
     const fDate = x.follow_up_at ? String(x.follow_up_at).slice(0, 10) : '';
-    const isToday = fDate && fDate === todayIST && !['won', 'lost'].includes(x.status);
-    const isOverdue = fDate && fDate < todayIST && !['won', 'lost'].includes(x.status);
+    const isToday = fDate && fDate === todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
+    const isOverdue = fDate && fDate < todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
 
     return `
       <tr>
