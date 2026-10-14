@@ -3449,6 +3449,7 @@ const state = {
   projectFilterStatus: '',
   projectFilterCategory: ''
 };
+window.state = state;
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, m => ({

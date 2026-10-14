@@ -1,6 +1,6 @@
 /**
  * Laxminarayan Group - Executive Command Palette (Ctrl + K)
- * Universal Spotlight Search, Unit Locator & Quick Actions
+ * Universal Spotlight Search, Dynamic Project & Unit Locator, and Quick Actions
  */
 (function() {
   'use strict';
@@ -8,6 +8,8 @@
   let isOpen = false;
   let selectedIndex = 0;
   let currentResults = [];
+  let dynamicProjects = [];
+  let dynamicUnits = [];
 
   function isAdvisor() {
     return window.location.pathname.includes('advisor.html') || !!document.getElementById('advisorName');
@@ -15,6 +17,30 @@
 
   function isAdmin() {
     return window.location.pathname.includes('admin.html') || !!document.getElementById('heroOpenLeads');
+  }
+
+  // Preload and keep projects / inventory synced
+  async function syncDynamicData() {
+    try {
+      const pEndpoint = isAdmin() ? '/api/admin/projects' : '/api/projects';
+      const pRes = await fetch(pEndpoint, { credentials: 'include' });
+      const pJson = await pRes.json();
+      if (pJson && pJson.success && Array.isArray(pJson.data)) {
+        dynamicProjects = pJson.data;
+      } else if (Array.isArray(pJson)) {
+        dynamicProjects = pJson;
+      }
+
+      if (isAdmin()) {
+        const uRes = await fetch('/api/admin/units', { credentials: 'include' });
+        const uJson = await uRes.json();
+        if (uJson && uJson.success && Array.isArray(uJson.data)) {
+          dynamicUnits = uJson.data;
+        }
+      }
+    } catch (_e) {
+      // Non-blocking fallback to in-memory state
+    }
   }
 
   // Inject palette DOM structure if missing
@@ -32,7 +58,7 @@
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
           </div>
-          <input id="cmdPaletteInput" class="cmd-search-input" type="text" placeholder="Search clients, units, projects, or quick actions..." autocomplete="off" spellcheck="false">
+          <input id="cmdPaletteInput" class="cmd-search-input" type="text" placeholder="Search projects (e.g. The Neer, DS 208), clients, units, or actions..." autocomplete="off" spellcheck="false">
           <span class="cmd-esc-badge" id="cmdPaletteCloseBtn">ESC</span>
         </div>
         <div id="cmdPaletteResults" class="cmd-results-list"></div>
@@ -60,13 +86,15 @@
     input.addEventListener('input', () => {
       renderSearch(input.value.trim());
     });
+
+    syncDynamicData();
   }
 
   // Gather searchable items
   function getItems() {
     const items = [];
 
-    // ─── 1. ACTIONS ───
+    // ─── 1. QUICK ACTIONS ───
     if (isAdvisor()) {
       items.push({
         type: 'action',
@@ -207,10 +235,71 @@
       });
     }
 
-    // ─── 2. CLIENT LEADS & ENQUIRIES ───
-    const leadsSource = isAdvisor() ? (window.state?.leads || []) : (window.data?.leads || window.leads || []);
+    // ─── 2. ALL REAL PROJECTS (DYNAMIC - NEVER HARDCODED) ───
+    const projectsMap = new Map();
+
+    // Ingest from state.projects (Live in Admin & Advisor)
+    const stateProjects = (window.state && Array.isArray(window.state.projects)) ? window.state.projects : [];
+    stateProjects.forEach(p => {
+      if (p && (p.name || p.id)) projectsMap.set(String(p.id || p.name), p);
+    });
+
+    // Ingest from dynamic fetched cache
+    dynamicProjects.forEach(p => {
+      if (p && (p.name || p.id)) {
+        const key = String(p.id || p.name);
+        if (!projectsMap.has(key)) projectsMap.set(key, p);
+      }
+    });
+
+    // Render every real project into searchable items
+    projectsMap.forEach(p => {
+      const pName = String(p.name || '').trim();
+      if (!pName) return;
+
+      const cat = String(p.category || 'RESIDENTIAL & COMMERCIAL').trim();
+      const loc = p.location ? ` • ${p.location}` : '';
+      const desc = p.description ? (p.description.slice(0, 95) + '...') : `${cat}${loc}`;
+      const isVilla = cat.toLowerCase().includes('villa');
+
+      items.push({
+        type: 'project',
+        category: 'Projects',
+        icon: isVilla ? '🏡' : '🏢',
+        title: pName,
+        sub: desc,
+        badge: cat.toUpperCase(),
+        searchTerms: `${pName} ${cat} ${p.location || ''} ${p.description || ''} ${p.price || ''} ${p.id || ''}`,
+        run: () => {
+          if (isAdmin() && typeof window.showView === 'function') {
+            window.showView('projectsView');
+            setTimeout(() => {
+              const pSearch = document.getElementById('projectSearch');
+              if (pSearch) {
+                pSearch.value = pName;
+                pSearch.dispatchEvent(new Event('input'));
+              }
+            }, 80);
+          } else {
+            if (p.id === 1 || pName.toLowerCase().includes('ds 208')) {
+              window.open('/detail-ds208.html', '_blank');
+            } else if (p.id === 2 || pName.toLowerCase().includes('nilkanth')) {
+              window.open('/detail-nilkanth.html', '_blank');
+            } else {
+              window.open(`/project-detail.html?id=${p.id}`, '_blank');
+            }
+          }
+        }
+      });
+    });
+
+    // ─── 3. CLIENT LEADS & ENQUIRIES ───
+    const leadsSource = (window.state && Array.isArray(window.state.leads))
+      ? window.state.leads
+      : (window.data?.leads || window.leads || []);
+
     if (Array.isArray(leadsSource)) {
-      leadsSource.slice(0, 50).forEach(l => {
+      leadsSource.slice(0, 100).forEach(l => {
         items.push({
           type: 'lead',
           category: 'Clients & Enquiries',
@@ -234,42 +323,13 @@
       });
     }
 
-    // ─── 3. UNITS & PROJECTS ───
-    items.push({
-      type: 'project',
-      category: 'Projects',
-      icon: '🏢',
-      title: 'DS 208 (Developed by Akshar Group)',
-      sub: 'Luxury 3 BHK Residences & Commercial High Street • Ahmedabad',
-      badge: 'Project',
-      run: () => {
-        if (isAdmin() && typeof window.showView === 'function') {
-          window.showView('projectsView');
-        } else {
-          window.open('/detail-ds208.html', '_blank');
-        }
-      }
-    });
+    // ─── 4. PROJECT UNITS & INVENTORY ───
+    const unitsSource = (window.state && Array.isArray(window.state.units) && window.state.units.length)
+      ? window.state.units
+      : dynamicUnits;
 
-    items.push({
-      type: 'project',
-      category: 'Projects',
-      icon: '🏡',
-      title: 'Nilkanth Villa',
-      sub: 'Ultra-Luxury 4 & 5 BHK Private Bungalows & Garden Enclave',
-      badge: 'Project',
-      run: () => {
-        if (isAdmin() && typeof window.showView === 'function') {
-          window.showView('projectsView');
-        } else {
-          window.open('/detail-nilkanth.html', '_blank');
-        }
-      }
-    });
-
-    const unitsSource = window.data?.units || window.units || [];
     if (Array.isArray(unitsSource)) {
-      unitsSource.slice(0, 35).forEach(u => {
+      unitsSource.slice(0, 50).forEach(u => {
         const uNum = u.unit_number || u.unit || `Unit #${u.id}`;
         items.push({
           type: 'unit',
@@ -319,7 +379,7 @@
         <div class="cmd-empty">
           <span>🔍</span>
           No matches found for "<strong>${escapeHtml(query)}</strong>".<br>
-          Try searching for a client name, unit (e.g. 302), project, or action.
+          Try searching for a project name, client name, unit (e.g. 302), or action.
         </div>
       `;
       countEl.textContent = '0 results';
@@ -412,6 +472,7 @@
   // Global Open / Close
   window.openCommandPalette = function() {
     initDOM();
+    syncDynamicData();
     const backdrop = document.getElementById('cmdPaletteBackdrop');
     const input = document.getElementById('cmdPaletteInput');
     if (!backdrop || !input) return;
