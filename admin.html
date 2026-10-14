@@ -4283,6 +4283,9 @@ function applyRolePermissions(user) {
     if (isBuilder) document.body.classList.add('role-builder');
 
     const tabsToHide = ['attendanceView', 'auditView', 'teamView'];
+    if (isBuilder) {
+      tabsToHide.push('funnelView');
+    }
     tabsToHide.forEach(viewId => {
       const tabBtn = document.querySelector(`.tab[data-view="${viewId}"]`);
       if (tabBtn) tabBtn.style.display = 'none';
@@ -4353,7 +4356,8 @@ function showView(id, options = {}) {
       id = 'teamView';
     }
   } else if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
-    if (id === 'attendanceView' || id === 'auditView' || id === 'teamView') {
+    const isBuilderUser = state.currentUser.role === 'builder' || state.currentUser.role === 'partner';
+    if (id === 'attendanceView' || id === 'auditView' || id === 'teamView' || (isBuilderUser && id === 'funnelView')) {
       id = 'overview';
     }
   }
@@ -4381,7 +4385,8 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
     }
   }
   if (state.currentUser && (state.currentUser.role === 'coordinator' || state.currentUser.role === 'manager' || state.currentUser.role === 'builder' || state.currentUser.role === 'partner')) {
-    if (b.dataset.view === 'attendanceView' || b.dataset.view === 'auditView' || b.dataset.view === 'teamView') {
+    const isBuilderUser = state.currentUser.role === 'builder' || state.currentUser.role === 'partner';
+    if (b.dataset.view === 'attendanceView' || b.dataset.view === 'auditView' || b.dataset.view === 'teamView' || (isBuilderUser && b.dataset.view === 'funnelView')) {
       return;
     }
   }
