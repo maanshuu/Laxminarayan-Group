@@ -1931,7 +1931,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
         <div class="quick-stat"><span>New enquiries today</span><strong id="heroNewEnquiries">0</strong></div>
         <div class="actions">
           <button class="btn gold" onclick="openLeadModal()">+ Add Enquiry</button>
-          <button class="btn" onclick="showView('unitsView')">Units</button>
+          <button class="btn" onclick="showView('unitsView', { scroll: true })">Units</button>
         </div>
       </div>
     </div>
@@ -3710,7 +3710,11 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
       return;
     }
   }
-  showView(b.dataset.view);
+  const isOverview = b.dataset.view === 'overview';
+  showView(b.dataset.view, { scroll: !isOverview });
+  if (isOverview) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   if (b.dataset.view === 'reportsView') loadReports();
   if (b.dataset.view === 'auditView') loadAudit();
   if (b.dataset.view === 'customersView') loadCustomers();
@@ -4109,6 +4113,7 @@ function smoothScrollToWorkspace() {
     });
   }, 60);
 }
+window.smoothScrollToWorkspace = smoothScrollToWorkspace;
 
 function highlightLeadsToolbar() {
   const toolbar = document.querySelector('#leadsView .view-switcher-bar');
@@ -6347,13 +6352,12 @@ async function executePermanentDeleteProject() {
 
 // ─── CROSS-MODULE SHORTCUTS ───
 function viewProjectUnits(id) {
-  showView('unitsView');
+  showView('unitsView', { scroll: true });
   if ($('unitFilterProject')) {
     $('unitFilterProject').value = String(id);
     updateUnitTypeDropdown();
     renderUnits();
   }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function previewProjectLive(id) {
@@ -7651,7 +7655,8 @@ load().then(() => {
   const p = new URLSearchParams(window.location.search);
   const tab = p.get('tab');
   if (tab) {
-    showView(tab);
+    const isOverview = tab === 'overview';
+    showView(tab, { scroll: !isOverview });
     if (tab === 'projectsView' && typeof loadProjects === 'function') loadProjects();
     if (tab === 'leadsView' && typeof loadLeads === 'function') loadLeads();
     if (tab === 'unitsView' && typeof loadUnits === 'function') loadUnits();

@@ -230,7 +230,17 @@
           title: `Jump to ${v.title}`,
           sub: `Switch active view to ${v.id}`,
           badge: 'View',
-          run: () => { if (typeof window.showView === 'function') window.showView(v.id); }
+          run: () => {
+            if (typeof window.showView === 'function') {
+              const isOverview = v.id === 'overview';
+              window.showView(v.id, { scroll: !isOverview });
+              if (isOverview) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else if (typeof window.smoothScrollToWorkspace === 'function') {
+                window.smoothScrollToWorkspace();
+              }
+            }
+          }
         });
       });
     }
@@ -272,15 +282,25 @@
         searchTerms: `${pName} ${cat} ${p.location || ''} ${p.description || ''} ${p.price || ''} ${p.id || ''}`,
         run: () => {
           if (isAdmin() && typeof window.showView === 'function') {
-            window.showView('projectsView');
+            window.showView('projectsView', { scroll: true });
             setTimeout(() => {
+              if (typeof window.smoothScrollToWorkspace === 'function') {
+                window.smoothScrollToWorkspace();
+              }
               const pSearch = document.getElementById('projectSearch');
               if (pSearch) {
                 pSearch.value = pName;
                 pSearch.dispatchEvent(new Event('input'));
               }
-            }, 80);
-          } else {
+            }, 70);
+          } else if (isAdvisor()) {
+            if (typeof window.filterAdvisorLeads === 'function') {
+              const pSel = document.getElementById('advisorSearchInput');
+              if (pSel) {
+                pSel.value = pName;
+                pSel.dispatchEvent(new Event('input'));
+              }
+            }
             if (p.id === 1 || pName.toLowerCase().includes('ds 208')) {
               window.open('/detail-ds208.html', '_blank');
             } else if (p.id === 2 || pName.toLowerCase().includes('nilkanth')) {
@@ -315,7 +335,12 @@
               if (typeof window.openDrawer === 'function') {
                 window.openDrawer(l);
               } else if (typeof window.showView === 'function') {
-                window.showView('leadsView');
+                window.showView('leadsView', { scroll: true });
+                setTimeout(() => {
+                  if (typeof window.smoothScrollToWorkspace === 'function') {
+                    window.smoothScrollToWorkspace();
+                  }
+                }, 70);
               }
             }
           }
@@ -341,7 +366,12 @@
           searchTerms: `${uNum} ${u.project_name || ''} ${u.type || ''} ${u.status || ''}`,
           run: () => {
             if (isAdmin() && typeof window.showView === 'function') {
-              window.showView('unitsView');
+              window.showView('unitsView', { scroll: true });
+              setTimeout(() => {
+                if (typeof window.smoothScrollToWorkspace === 'function') {
+                  window.smoothScrollToWorkspace();
+                }
+              }, 70);
             }
           }
         });
