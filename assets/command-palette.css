@@ -1,0 +1,313 @@
+/* ─── LAXMINARAYAN GROUP • LUXURY COMMAND PALETTE (CTRL + K) ─── */
+
+/* Trigger Button in Header */
+.cmd-palette-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(11, 21, 40, 0.05);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  color: #1e293b;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.cmd-palette-btn:hover {
+  background: rgba(197, 160, 89, 0.12);
+  border-color: #C5A059;
+  color: #0B1528;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.2);
+}
+.cmd-palette-btn kbd {
+  background: rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  color: #64748b;
+}
+
+/* Dark mode / dark header adaptation */
+.top .cmd-palette-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 175, 55, 0.4);
+  color: #f8fafc;
+}
+.top .cmd-palette-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+  color: #ffffff;
+}
+.top .cmd-palette-btn kbd {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+}
+
+/* Modal Backdrop */
+#cmdPaletteBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 13, 26, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 999999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 80px 20px 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+#cmdPaletteBackdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Palette Window Box */
+#cmdPaletteModal {
+  width: 100%;
+  max-width: 640px;
+  background: linear-gradient(180deg, #101c33 0%, #0B1528 100%);
+  border: 1px solid rgba(197, 160, 89, 0.4);
+  border-radius: 18px;
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.75), 0 0 30px rgba(197, 160, 89, 0.15);
+  overflow: hidden;
+  transform: translateY(-16px) scale(0.98);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+#cmdPaletteBackdrop.active #cmdPaletteModal {
+  transform: translateY(0) scale(1);
+}
+
+/* Input Search Bar */
+.cmd-search-wrap {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+  background: rgba(16, 28, 51, 0.6);
+  gap: 12px;
+}
+.cmd-search-icon {
+  color: #C5A059;
+  flex-shrink: 0;
+  display: flex;
+}
+.cmd-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: inherit;
+}
+.cmd-search-input::placeholder {
+  color: #64748b;
+  font-weight: 400;
+}
+.cmd-esc-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+/* Results Container */
+.cmd-results-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  max-height: 480px;
+}
+.cmd-results-list::-webkit-scrollbar {
+  width: 6px;
+}
+.cmd-results-list::-webkit-scrollbar-thumb {
+  background: rgba(197, 160, 89, 0.3);
+  border-radius: 10px;
+}
+
+/* Section Header */
+.cmd-section-title {
+  padding: 10px 12px 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #C5A059;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Command Item */
+.cmd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  color: #e2e8f0;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+.cmd-item:hover, .cmd-item.selected {
+  background: rgba(197, 160, 89, 0.16);
+  color: #ffffff;
+}
+.cmd-item.selected {
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  box-shadow: 0 0 12px rgba(197, 160, 89, 0.1);
+}
+
+.cmd-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+.cmd-item-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.cmd-item.selected .cmd-item-icon {
+  background: rgba(197, 160, 89, 0.25);
+  border-color: rgba(197, 160, 89, 0.5);
+  color: #FFDF80;
+}
+.cmd-item-text {
+  min-width: 0;
+  flex: 1;
+}
+.cmd-item-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+.cmd-item-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.cmd-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.cmd-item-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+.cmd-item.selected .cmd-enter-hint {
+  opacity: 1;
+}
+.cmd-enter-hint {
+  font-size: 11px;
+  font-weight: 600;
+  color: #C5A059;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: opacity 0.12s ease;
+}
+
+/* Empty State */
+.cmd-empty {
+  padding: 36px 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+.cmd-empty span {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Palette Footer */
+.cmd-footer {
+  padding: 10px 18px;
+  background: rgba(7, 13, 26, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748b;
+}
+.cmd-footer-keys {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cmd-footer-key {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cmd-footer-key kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 9.5px;
+  font-family: inherit;
+  color: #94a3b8;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  #cmdPaletteBackdrop {
+    padding: 20px 10px;
+  }
+  .cmd-palette-btn span, .cmd-palette-btn kbd {
+    display: none;
+  }
+  .cmd-palette-btn {
+    padding: 6px 8px;
+  }
+  .cmd-footer-keys {
+    display: none;
+  }
+}

@@ -17,6 +17,7 @@
 <link rel="manifest" href="/manifest.json">
 <script src="assets/attribution.js?v=4"></script>
 <script src="assets/cost-sheet.js?v=4"></script>
+<link rel="stylesheet" href="assets/command-palette.css?v=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -1840,6 +1841,11 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
     <span class="top-status-badge" data-admin-only="true" onclick="openIntegrationModal()" style="cursor:pointer; background:rgba(16,185,129,0.1); color:#059669; border-color:rgba(16,185,129,0.3);" title="Click to view Live SMTP & WhatsApp Status"><span class="top-status-dot" style="background:#10b981;"></span> ⚡ SMTP & WA LIVE</span>
   </div>
   <div class="top-actions-flex">
+    <button type="button" class="cmd-palette-btn" onclick="openCommandPalette()" title="Press Ctrl + K to search anything">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <span>Quick Search</span>
+      <kbd>Ctrl K</kbd>
+    </button>
     <a href="index.html" class="top-link">← Website</a>
     <a href="properties.html" class="top-link">Portfolio</a>
     <button onclick="location.href='/api/auth/logout'">LOG OUT</button>
@@ -7680,5 +7686,6 @@ setInterval(() => {
 }, 15000);
 </script>
 <script src="/assets/pwa-install.js" defer></script>
+<script src="assets/command-palette.js?v=1" defer></script>
 </body>
 </html>
