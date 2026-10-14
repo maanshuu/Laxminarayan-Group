@@ -5062,6 +5062,9 @@ app.get("/offline.html", (req, res) => {
 app.get("/demo-advisor-theme.html", (req, res) => {
   res.sendFile(path.join(__dirname, "demo-advisor-theme.html"));
 });
+app.get("/demo-executive-funnel.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "demo-executive-funnel.html"));
+});
 
 // ─── PUBLIC ASSETS & UPLOADED MEDIA (7-DAY BROWSER CACHE + GZIP) ───
 app.use("/assets", express.static(path.join(__dirname, "assets"), { maxAge: "7d", etag: true, dotfiles: "ignore", index: false }));

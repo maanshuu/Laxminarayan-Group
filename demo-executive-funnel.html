@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo: Executive Sales Pipeline & Lead Conversion Funnel — Laxminarayan Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --font-sans: "Plus Jakarta Sans", -apple-system, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  
+  --sky-primary: #0284c7;
+  --sky-deep: #0369a1;
+  --sky-light: #e0f2fe;
+  --gold-accent: #C5A059;
+  --gold-gradient: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+  --gold-card-bg: linear-gradient(135deg, #fef3c7 0%, #fae8b4 100%);
+  --gold-text: #78350f;
+  
+  --ink-heading: #0f172a;
+  --ink-body: #475569;
+  --ink-muted: #94a3b8;
+  
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --table-hover: #fdfdfe;
+  
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="dark"] {
+  --ink-heading: #f8fafc;
+  --ink-body: #cbd5e1;
+  --ink-muted: #94a3b8;
+  
+  --bg-main: #070b14;
+  --bg-card: #0f172a;
+  --bg-header: #0b111e;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --table-hover: rgba(255, 255, 255, 0.03);
+  
+  --gold-card-bg: linear-gradient(135deg, #2a2211 0%, #1a160d 100%);
+  --gold-text: #fde68a;
+  --shadow-card: 0 4px 25px -2px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-main);
+  color: var(--ink-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Demo Notice Banner */
+.demo-banner {
+  background: linear-gradient(135deg, #0284c7 0%, #0f172a 100%);
+  color: #fff;
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+header {
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+.head-wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #d4af37, #aa7c11);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+}
+.brand-text h1 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink-heading);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.brand-text p {
+  font-size: 11px;
+  color: var(--ink-muted);
+  font-weight: 600;
+  letter-spacing: 0.8px;
+}
+.user-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-heading);
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.theme-toggle-btn:hover {
+  border-color: var(--sky-primary);
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .theme-toggle-btn {
+  background: #111a2e;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+}
+
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+}
+
+/* ─── 1. REVENUE HERO STRIP ─── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+@media (max-width: 1024px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .kpi-row { grid-template-columns: 1fr; }
+}
+
+.pipeline-hero-card {
+  background: var(--gold-card-bg);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: var(--radius-md);
+  padding: 22px 26px;
+  position: relative;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.pipeline-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gold-text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pipeline-value {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--ink-heading);
+  line-height: 1.1;
+  margin: 8px 0 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.pipeline-value span {
+  font-size: 20px;
+  color: #d97706;
+  font-weight: 700;
+}
+[data-theme="dark"] .pipeline-value span {
+  color: #fbbf24;
+}
+.pipeline-sub {
+  font-size: 12.5px;
+  color: var(--ink-body);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pipeline-badge {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+}
+
+.stat-box {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.stat-box .title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-muted);
+}
+.stat-box .val {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink-heading);
+  margin: 6px 0;
+}
+.stat-box .sub {
+  font-size: 12px;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── 2. INTERACTIVE 5-STAGE SALES CONVERSION FUNNEL ─── */
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.section-head h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink-heading);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.funnel-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+@media (max-width: 1024px) {
+  .funnel-container { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .funnel-container { grid-template-columns: 1fr; }
+}
+
+.funnel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+.funnel-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--sky-primary);
+  box-shadow: 0 10px 24px -4px rgba(2, 132, 199, 0.2);
+}
+.funnel-card.active {
+  border-color: var(--sky-primary);
+  background: linear-gradient(180deg, rgba(2, 132, 199, 0.12) 0%, var(--bg-card) 100%);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.4), var(--shadow-card);
+}
+.funnel-step {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ink-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.funnel-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-heading);
+  margin-bottom: 6px;
+}
+.funnel-counts {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.funnel-leads {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ink-heading);
+}
+.funnel-vol {
+  font-size: 12px;
+  font-weight: 700;
+  color: #d97706;
+}
+[data-theme="dark"] .funnel-vol {
+  color: #fbbf24;
+}
+
+.funnel-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+[data-theme="dark"] .funnel-bar-bg {
+  background: rgba(255, 255, 255, 0.1);
+}
+.funnel-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sky-primary), #38bdf8);
+  border-radius: 9999px;
+  transition: width 0.6s ease;
+}
+.funnel-conv {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  display: flex;
+  justify-content: space-between;
+}
+.funnel-card.step-won .funnel-bar-fill {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+/* ─── 3. SPLIT ROW: PROJECTS & ADVISOR LEADERBOARD ─── */
+.split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+@media (max-width: 900px) {
+  .split-grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+}
+.project-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.01);
+  transition: all 0.2s ease;
+}
+[data-theme="dark"] .project-card {
+  background: rgba(255, 255, 255, 0.02);
+}
+.project-card:hover {
+  border-color: var(--sky-primary);
+  transform: translateX(4px);
+}
+.proj-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-heading);
+}
+.proj-sub {
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+.proj-pipe {
+  text-align: right;
+}
+.proj-pipe-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink-heading);
+}
+.proj-pipe-sub {
+  font-size: 11px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.advisor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.advisor-row:last-child { border-bottom: none; }
+.advisor-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-heading);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tag-closer {
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+}
+.tag-warning {
+  font-size: 10px;
+  font-weight: 800;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+}
+
+/* ─── 4. INTERACTIVE LEADS TABLE ─── */
+.table-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.table-head {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.table-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink-heading);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+th {
+  padding: 12px 18px;
+  background: rgba(0, 0, 0, 0.02);
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--line);
+}
+[data-theme="dark"] th {
+  background: rgba(255, 255, 255, 0.02);
+}
+td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-heading);
+  vertical-align: middle;
+}
+tr:hover td {
+  background: var(--table-hover);
+}
+.pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.pill-hot { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.pill-warm { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.pill-cold { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+.btn-action {
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-heading);
+  cursor: pointer;
+}
+.btn-action:hover {
+  border-color: var(--sky-primary);
+  color: var(--sky-primary);
+}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  <span>⚡ <b>Interactive Preview:</b> Executive Sales Pipeline & Lead Conversion Funnel for Laxminarayan Group</span>
+  <span style="opacity:0.7">•</span>
+  <span>Click any Funnel Stage to filter leads live</span>
+</div>
+
+<header>
+  <div class="head-wrap">
+    <div class="logo-box">
+      <div class="brand-mark">LG</div>
+      <div class="brand-text">
+        <h1>Laxminarayan Group</h1>
+        <p>EXECUTIVE CRM · REVENUE COMMAND CENTER</p>
+      </div>
+    </div>
+    <div class="user-meta">
+      <button type="button" class="theme-toggle-btn" onclick="toggleDemoTheme()" title="Switch Light/Dark Mode">
+        <span id="themeToggleIcon">☀️</span>
+        <span id="themeToggleLabel">Light Mode</span>
+      </button>
+      <span style="font-size:12px; font-weight:700; background:rgba(212,175,55,0.15); color:#d97706; padding:4px 12px; border-radius:9999px;">
+        👑 DIRECTOR VIEW
+      </span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 1. EXECUTIVE REVENUE PULSE -->
+  <div class="kpi-row">
+    <div class="pipeline-hero-card">
+      <div class="pipeline-lbl">
+        <span>ACTIVE SALES PIPELINE VALUE</span>
+        <span class="pipeline-badge">▲ +12% MoM</span>
+      </div>
+      <div class="pipeline-value">
+        ₹ 18.40 <span>CRORE INR</span>
+      </div>
+      <div class="pipeline-sub">
+        <span>42 Active Qualified Buyers across DS 208 & Nilkanth Villa</span>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="title">Confirmed Booked Deals</div>
+      <div class="val" style="color:#10b981;">₹ 4.85 Cr</div>
+      <div class="sub">6 Units Allotted & Token Deposited</div>
+    </div>
+    <div class="stat-box">
+      <div class="title">Hot Intent Prospects</div>
+      <div class="val" style="color:#f59e0b;">14 Deals</div>
+      <div class="sub">₹ 9.20 Cr in final negotiation</div>
+    </div>
+    <div class="stat-box">
+      <div class="title">Site Visit Velocity</div>
+      <div class="val" style="color:var(--sky-primary);">30 Visits</div>
+      <div class="sub">Conducted this month on site</div>
+    </div>
+  </div>
+
+  <!-- 2. INTERACTIVE 5-STAGE CONVERSION FUNNEL -->
+  <div class="section-head">
+    <h2>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+      Live Lead Conversion Funnel
+    </h2>
+    <span style="font-size:12px; color:var(--ink-muted); font-weight:600;">(Tap any stage below to inspect deal cohort)</span>
+  </div>
+
+  <div class="funnel-container">
+    <div class="funnel-card active" onclick="filterFunnel('all', this)">
+      <div class="funnel-step"><span>STAGE 1</span> <span>100%</span></div>
+      <div class="funnel-name">All Inquiries</div>
+      <div class="funnel-counts">
+        <span class="funnel-leads">84</span>
+        <span class="funnel-vol">₹ 21.0 Cr</span>
+      </div>
+      <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width: 100%;"></div></div>
+      <div class="funnel-conv"><span>Starting Pool</span> <span>Website + Meta</span></div>
+    </div>
+
+    <div class="funnel-card" onclick="filterFunnel('contacted', this)">
+      <div class="funnel-step"><span>STAGE 2</span> <span>67.8%</span></div>
+      <div class="funnel-name">Contacted / Briefed</div>
+      <div class="funnel-counts">
+        <span class="funnel-leads">57</span>
+        <span class="funnel-vol">₹ 14.2 Cr</span>
+      </div>
+      <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width: 67.8%;"></div></div>
+      <div class="funnel-conv"><span>Advisor Briefing</span> <span style="color:#f59e0b;">27 Drop-offs</span></div>
+    </div>
+
+    <div class="funnel-card" onclick="filterFunnel('site_visit', this)">
+      <div class="funnel-step"><span>STAGE 3</span> <span>35.7%</span></div>
+      <div class="funnel-name">Site Visits Done</div>
+      <div class="funnel-counts">
+        <span class="funnel-leads">30</span>
+        <span class="funnel-vol">₹ 8.5 Cr</span>
+      </div>
+      <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width: 35.7%;"></div></div>
+      <div class="funnel-conv"><span>Sample Flat Tour</span> <span style="color:#f59e0b;">27 Drop-offs</span></div>
+    </div>
+
+    <div class="funnel-card" onclick="filterFunnel('negotiation', this)">
+      <div class="funnel-step"><span>STAGE 4</span> <span>14.3%</span></div>
+      <div class="funnel-name">Price Discussion</div>
+      <div class="funnel-counts">
+        <span class="funnel-leads">12</span>
+        <span class="funnel-vol">₹ 3.4 Cr</span>
+      </div>
+      <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width: 14.3%;"></div></div>
+      <div class="funnel-conv"><span>Cost Sheet Issued</span> <span style="color:#f59e0b;">18 Drop-offs</span></div>
+    </div>
+
+    <div class="funnel-card step-won" onclick="filterFunnel('won', this)">
+      <div class="funnel-step"><span style="color:#10b981;">STAGE 5</span> <span style="color:#10b981;">7.1%</span></div>
+      <div class="funnel-name">Booked Units</div>
+      <div class="funnel-counts">
+        <span class="funnel-leads" style="color:#10b981;">6</span>
+        <span class="funnel-vol" style="color:#10b981;">₹ 4.85 Cr</span>
+      </div>
+      <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width: 7.1%;"></div></div>
+      <div class="funnel-conv"><span style="color:#10b981;">Token Deposited</span> <span>6 Closures</span></div>
+    </div>
+  </div>
+
+  <!-- 3. PROJECT REVENUE VELOCITY & ADVISOR LEADERBOARD -->
+  <div class="split-grid">
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:16px; font-weight:800; color:var(--ink-heading);">🏗️ Project Pipeline Breakdown</h3>
+        <span style="font-size:11.5px; font-weight:700; color:var(--sky-primary);">Live Demand</span>
+      </div>
+
+      <div class="project-card">
+        <div>
+          <div class="proj-title">DS 208 (Developed by Akshar Group)</div>
+          <div class="proj-sub">48 Inquiries · 18 Site Visits Conducted · 4 Bookings</div>
+        </div>
+        <div class="proj-pipe">
+          <div class="proj-pipe-val">₹ 11.20 Cr</div>
+          <div class="proj-pipe-sub">65% Conversion Speed</div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div>
+          <div class="proj-title">Nilkanth Villa</div>
+          <div class="proj-sub">36 Inquiries · 12 Site Visits Conducted · 2 Bookings</div>
+        </div>
+        <div class="proj-pipe">
+          <div class="proj-pipe-val">₹ 7.20 Cr</div>
+          <div class="proj-pipe-sub">71% Conversion Speed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:16px; font-weight:800; color:var(--ink-heading);">🏆 Sales Advisor Leaderboard & Watchdog</h3>
+        <span style="font-size:11.5px; font-weight:700; color:#10b981;">Active Performance</span>
+      </div>
+
+      <div class="advisor-row">
+        <div>
+          <div class="advisor-name">
+            1. Rajesh Sharma
+            <span class="tag-closer">⚡ Top Closer</span>
+          </div>
+          <div style="font-size:11.5px; color:var(--ink-muted); margin-top:2px;">18 Walk-Ins Handled · 4 Bookings Closed</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:800; color:#10b981; font-size:14px;">₹ 3.10 Cr</div>
+          <div style="font-size:11px; color:#10b981;">0 Overdue 🟢</div>
+        </div>
+      </div>
+
+      <div class="advisor-row">
+        <div>
+          <div class="advisor-name">
+            2. Amit Trivedi
+            <span class="tag-warning">⚠️ 2 Overdue</span>
+          </div>
+          <div style="font-size:11.5px; color:var(--ink-muted); margin-top:2px;">12 Walk-Ins Handled · 2 Bookings Closed</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:800; color:var(--ink-heading); font-size:14px;">₹ 1.75 Cr</div>
+          <button style="font-size:10px; font-weight:700; background:#fee2e2; color:#be123c; border:1px solid #fecdd3; padding:2px 8px; border-radius:4px; cursor:pointer;" onclick="alert('Sent WhatsApp escalation to Advisor Amit regarding 2 overdue buyer follow-ups!')">Escalate 💬</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. SAMPLE FILTERABLE LEADS TABLE -->
+  <div class="table-panel">
+    <div class="table-head">
+      <div>
+        <div class="table-title" id="tableCohortTitle">Showing All Inquiries (84 Total)</div>
+        <div style="font-size:12px; color:var(--ink-muted); margin-top:2px;">Filtered automatically by funnel stage click</div>
+      </div>
+      <div>
+        <span style="font-size:12px; font-weight:700; color:var(--sky-primary); background:rgba(2,132,199,0.12); padding:4px 12px; border-radius:9999px;">
+          Showing Sample Deals
+        </span>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Client Name</th>
+          <th>Contact</th>
+          <th>Target Project</th>
+          <th>Ticket / Budget</th>
+          <th>Pipeline Stage</th>
+          <th>Sentiment</th>
+          <th>Assigned Advisor</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="demoTableBody">
+        <!-- Rendered by JS -->
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const SAMPLE_LEADS = [
+  { name: "Harsh Vardhan", phone: "98250 •••••", project: "DS 208", budget: "₹ 85 Lakh (3 BHK)", stage: "negotiation", sentiment: "hot", advisor: "Rajesh Sharma" },
+  { name: "Mehul Choksi", phone: "98791 •••••", project: "Nilkanth Villa", budget: "₹ 1.20 Cr (4 BHK)", stage: "won", sentiment: "hot", advisor: "Rajesh Sharma" },
+  { name: "Bhavin Patel", phone: "99092 •••••", project: "DS 208", budget: "₹ 55 Lakh (2 BHK)", stage: "site_visit", sentiment: "warm", advisor: "Amit Trivedi" },
+  { name: "Pooja Shah", phone: "98244 •••••", project: "DS 208", budget: "₹ 62 Lakh (2 BHK)", stage: "contacted", sentiment: "warm", advisor: "Rajesh Sharma" },
+  { name: "Chirag Modi", phone: "97129 •••••", project: "Nilkanth Villa", budget: "₹ 95 Lakh (3 BHK)", stage: "negotiation", sentiment: "hot", advisor: "Amit Trivedi" },
+  { name: "Dipen Solanki", phone: "94260 •••••", project: "DS 208", budget: "₹ 58 Lakh (2 BHK)", stage: "won", sentiment: "hot", advisor: "Rajesh Sharma" }
+];
+
+function renderTable(stageFilter = 'all') {
+  const tbody = document.getElementById('demoTableBody');
+  const title = document.getElementById('tableCohortTitle');
+  
+  const filtered = stageFilter === 'all' 
+    ? SAMPLE_LEADS 
+    : SAMPLE_LEADS.filter(l => l.stage === stageFilter);
+    
+  title.textContent = stageFilter === 'all'
+    ? `Showing All Inquiries (${SAMPLE_LEADS.length} Sample Deals Shown)`
+    : `Showing Pipeline Cohort: Stage "${stageFilter.toUpperCase()}" (${filtered.length} Deals)`;
+
+  tbody.innerHTML = filtered.map(l => `
+    <tr>
+      <td><b>${l.name}</b></td>
+      <td><span style="font-family:monospace; font-size:12px;">📞 ${l.phone}</span></td>
+      <td>${l.project}</td>
+      <td><b style="color:#d97706;">${l.budget}</b></td>
+      <td><span style="font-weight:700; text-transform:capitalize; color:var(--sky-primary);">${l.stage.replace('_', ' ')}</span></td>
+      <td><span class="pill pill-${l.sentiment}">${l.sentiment}</span></td>
+      <td>${l.advisor}</td>
+      <td>
+        <button class="btn-action" onclick="alert('Viewing executive brief for ' + '${l.name}')">View Deal</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterFunnel(stage, el) {
+  document.querySelectorAll('.funnel-card').forEach(c => c.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderTable(stage);
+}
+
+function toggleDemoTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  const icon = document.getElementById('themeToggleIcon');
+  const label = document.getElementById('themeToggleLabel');
+  if (icon) icon.textContent = next === 'dark' ? '🌙' : '☀️';
+  if (label) label.textContent = next === 'dark' ? 'Dark Mode' : 'Light Mode';
+}
+
+renderTable('all');
+</script>
+</body>
+</html>
