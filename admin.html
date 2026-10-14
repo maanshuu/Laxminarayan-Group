@@ -3077,9 +3077,22 @@ body.role-hr #funnelView {
         </div>
         <p style="font-size:13px; color:#94a3b8; margin-top:4px; margin-bottom:0;">Real-time revenue velocity, 5-stage conversion cohorts, project demand breakdown, and sales advisor watchdog.</p>
       </div>
-      <div style="display:flex; align-items:center; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:6px; background:#1e293b; border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:3px 10px;">
+          <span style="font-size:11.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">📅 Period:</span>
+          <select id="funnelDateRangeSelect" onchange="handleFunnelDateRangeChange()" style="background:transparent; border:none; color:#f8fafc; font-size:12.5px; font-weight:700; cursor:pointer; outline:none; padding:4px 0;">
+            <option value="all" style="background:#0f172a; color:#f8fafc;">All Time Pipeline</option>
+            <option value="this_month" style="background:#0f172a; color:#f8fafc;">This Month</option>
+            <option value="last_30" style="background:#0f172a; color:#f8fafc;">Last 30 Days</option>
+            <option value="this_quarter" style="background:#0f172a; color:#f8fafc;">This Quarter</option>
+            <option value="this_year" style="background:#0f172a; color:#f8fafc;">This Financial Year</option>
+          </select>
+        </div>
+        <button type="button" class="btn smallbtn" onclick="exportFunnelCohortCSV()" style="background:linear-gradient(135deg, #065f46 0%, #047857 100%); color:#ecfdf5; border:1px solid #10b981; font-weight:700; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(16,185,129,0.25);" title="Export current funnel cohort to CSV / Excel spreadsheet">
+          📥 Export CSV
+        </button>
         <button type="button" class="btn smallbtn" onclick="renderExecutivePipelineFunnel()" style="background:#1e293b; color:#f8fafc; border:1px solid rgba(255,255,255,0.15); font-weight:700; border-radius:8px; padding:7px 14px; cursor:pointer;" title="Refresh Sales Pipeline metrics">
-          🔄 Refresh Funnel
+          🔄 Refresh
         </button>
       </div>
     </div>
@@ -3201,6 +3214,9 @@ body.role-hr #funnelView {
           <span id="funnelCohortBadge" style="font-size:11.5px; font-weight:700; color:#38bdf8; background:rgba(2,132,199,0.18); border:1px solid rgba(2,132,199,0.3); padding:5px 12px; border-radius:9999px;">
             Stage 1: All Inquiries
           </span>
+          <button type="button" class="btn smallbtn" onclick="exportFunnelCohortCSV()" style="background:linear-gradient(135deg, #065f46 0%, #047857 100%); color:#ecfdf5; border:1px solid #10b981; font-weight:700; border-radius:8px; padding:6px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(16,185,129,0.25);" title="Export currently filtered deals to CSV / Excel spreadsheet">
+            📥 Export CSV
+          </button>
         </div>
       </div>
 
@@ -5093,6 +5109,137 @@ function parseLeadBudgetINR(bStr, projectName = '') {
 
 state.funnelCohortStage = 'all';
 state.funnelCohortProject = null;
+state.funnelDateRange = 'all';
+
+function isDateInFunnelRange(dateStr, rangeKey) {
+  if (!rangeKey || rangeKey === 'all') return true;
+  if (!dateStr) return false;
+
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return false;
+
+  // Compare using Asia/Kolkata timezone
+  const now = new Date();
+  const nowKolkata = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const dKolkata = new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+
+  if (rangeKey === 'this_month') {
+    return dKolkata.getFullYear() === nowKolkata.getFullYear() && dKolkata.getMonth() === nowKolkata.getMonth();
+  } else if (rangeKey === 'last_30') {
+    const diffMs = nowKolkata.getTime() - dKolkata.getTime();
+    return diffMs >= 0 && diffMs <= 30 * 24 * 60 * 60 * 1000;
+  } else if (rangeKey === 'this_quarter') {
+    const curQuarter = Math.floor(nowKolkata.getMonth() / 3);
+    const dQuarter = Math.floor(dKolkata.getMonth() / 3);
+    return dKolkata.getFullYear() === nowKolkata.getFullYear() && curQuarter === dQuarter;
+  } else if (rangeKey === 'this_year') {
+    return dKolkata.getFullYear() === nowKolkata.getFullYear();
+  }
+  return true;
+}
+
+function handleFunnelDateRangeChange() {
+  const val = $('funnelDateRangeSelect')?.value || 'all';
+  state.funnelDateRange = val;
+  renderExecutivePipelineFunnel();
+  const labels = {
+    all: 'All Time Pipeline',
+    this_month: 'This Month',
+    last_30: 'Last 30 Days',
+    this_quarter: 'This Quarter',
+    this_year: 'This Financial Year'
+  };
+  toast('📅 Funnel Period: ' + (labels[val] || val));
+}
+
+function exportFunnelCohortCSV() {
+  if (state.currentUser && state.currentUser.role === 'hr') return;
+
+  const leads = state.leads || [];
+  const stage = state.funnelCohortStage || 'all';
+  const pid = state.funnelCohortProject;
+  const q = ($('funnelTableSearchInput')?.value || '').trim().toLowerCase();
+  const dateRange = state.funnelDateRange || 'all';
+
+  let filtered = leads.filter(l => isDateInFunnelRange(l.created_at, dateRange));
+
+  // Filter by stage
+  if (stage === 'contacted') {
+    filtered = filtered.filter(l => ['contacted', 'qualified', 'site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'site_visit') {
+    filtered = filtered.filter(l => ['site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'negotiation') {
+    filtered = filtered.filter(l => ['negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'won') {
+    filtered = filtered.filter(l => String(l.status || '').toLowerCase() === 'won');
+  }
+
+  // Filter by project
+  if (pid) {
+    filtered = filtered.filter(l => Number(l.project_id) === Number(pid));
+  }
+
+  // Search filter
+  if (q) {
+    filtered = filtered.filter(l =>
+      (l.name && l.name.toLowerCase().includes(q)) ||
+      (l.phone && l.phone.toLowerCase().includes(q)) ||
+      (l.email && l.email.toLowerCase().includes(q)) ||
+      (l.project_name && l.project_name.toLowerCase().includes(q)) ||
+      (l.employee_name && l.employee_name.toLowerCase().includes(q))
+    );
+  }
+
+  if (!filtered.length) {
+    toast('⚠️ No deals found to export for current filters');
+    return;
+  }
+
+  const csvRows = [
+    ['Deal ID', 'Client Name', 'Phone', 'Email', 'Target Project', 'Unit Number', 'Budget / Ticket INR', 'Pipeline Stage', 'Sentiment', 'Assigned Advisor', 'Source', 'Follow-up Date', 'Notes', 'Created Date']
+  ];
+
+  filtered.forEach(l => {
+    const budgetVal = l.budget || ('₹ ' + (parseLeadBudgetINR(l.budget, l.project_name) / 10000000).toFixed(2) + ' Cr');
+    csvRows.push([
+      l.id,
+      l.name || '',
+      l.phone || '',
+      l.email || '',
+      l.project_name || 'General',
+      l.unit_number || '',
+      budgetVal,
+      (l.status || 'new').replace('_', ' ').toUpperCase(),
+      (l.sentiment || 'warm').toUpperCase(),
+      l.employee_name || 'Unassigned',
+      l.source || '',
+      l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '',
+      (l.notes || '').replace(/[\r\n]+/g, ' '),
+      l.created_at ? String(l.created_at).slice(0, 19) : ''
+    ]);
+  });
+
+  const csvContent = '\uFEFF' + csvRows.map(row =>
+    row.map(cell => {
+      const s = String(cell ?? '').replace(/"/g, '""');
+      return `"${s}"`;
+    }).join(',')
+  ).join('\r\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+  const cleanStage = (stage || 'all').replace(/[^a-zA-Z0-9]/g, '_');
+  a.href = url;
+  a.download = `Laxminarayan_Sales_Funnel_${cleanStage}_${dateStr}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  toast(`📥 Exported ${filtered.length} Funnel Deals to CSV!`);
+}
 
 function filterProjectPipeline(projectId, projectName) {
   if (state.currentUser && state.currentUser.role === 'hr') return;
@@ -5157,8 +5304,9 @@ function renderFunnelDealsTable() {
   const stage = state.funnelCohortStage || 'all';
   const pid = state.funnelCohortProject;
   const q = ($('funnelTableSearchInput')?.value || '').trim().toLowerCase();
+  const dateRange = state.funnelDateRange || 'all';
 
-  let filtered = leads;
+  let filtered = leads.filter(l => isDateInFunnelRange(l.created_at, dateRange));
 
   // Filter by stage
   if (stage === 'contacted') {
@@ -5210,13 +5358,22 @@ function renderFunnelDealsTable() {
     if (p) projName = ' · ' + p.name;
   }
 
+  const dateRangeLabels = {
+    all: 'All Time',
+    this_month: 'This Month',
+    last_30: 'Last 30 Days',
+    this_quarter: 'This Quarter',
+    this_year: 'This Year'
+  };
+  const periodLabel = dateRangeLabels[dateRange] || dateRange;
+
   if (titleEl) {
-    titleEl.textContent = `${stageDisplayNames[stage] || stage}${projName} (${filtered.length} Deals)`;
+    titleEl.textContent = `${stageDisplayNames[stage] || stage}${projName} (${filtered.length} Deals · ${periodLabel})`;
   }
   if (subEl) {
     const totalINR = filtered.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
     const crVal = (totalINR / 10000000).toFixed(2);
-    subEl.textContent = `Aggregated Cohort Value: ₹ ${crVal} Cr · Instant 360° Lead Drawer view available for each deal below`;
+    subEl.textContent = `Aggregated Cohort Value: ₹ ${crVal} Cr (${periodLabel}) · Instant 360° Lead Drawer view & 1-Click CSV Export available`;
   }
   if (badgeEl) {
     badgeEl.textContent = (stage === 'all' ? 'All Stages' : stage.replace('_', ' ').toUpperCase()) + (pid ? ' (Filtered)' : '');
@@ -5306,9 +5463,16 @@ function renderExecutivePipelineFunnel() {
     return;
   }
 
-  const leads = state.leads || [];
-  const visits = state.visits || [];
-  const bookings = state.bookings || [];
+  const dateRange = state.funnelDateRange || 'all';
+  const dateRangeSelect = $('funnelDateRangeSelect');
+  if (dateRangeSelect && dateRangeSelect.value !== dateRange) {
+    dateRangeSelect.value = dateRange;
+  }
+
+  const allLeads = state.leads || [];
+  const leads = allLeads.filter(l => isDateInFunnelRange(l.created_at, dateRange));
+  const visits = (state.visits || []).filter(v => isDateInFunnelRange(v.date || v.created_at, dateRange));
+  const bookings = (state.bookings || []).filter(b => isDateInFunnelRange(b.created_at || b.date, dateRange));
   const projects = state.projects || [];
   const employees = state.employees || [];
 
