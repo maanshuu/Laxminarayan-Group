@@ -24,6 +24,7 @@
 <link rel="manifest" href="/manifest.json">
 <script src="assets/attribution.js?v=4"></script>
 <script src="assets/cost-sheet.js?v=4"></script>
+<script src="assets/offline-walkin.js?v=1"></script>
 <link rel="stylesheet" href="assets/command-palette.css?v=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -763,6 +764,32 @@ tr:hover td { background: #fdfdfe; }
     display: none;
   }
 }
+
+/* Offline Queue Banner & Status Indicator */
+#offlineSyncBanner.pending {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+#offlineSyncBanner.synced {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+[data-theme="dark"] #offlineSyncBanner.pending {
+  background: rgba(245, 158, 11, 0.14) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  color: #fbbf24 !important;
+}
+[data-theme="dark"] #offlineSyncBanner.synced {
+  background: rgba(34, 197, 94, 0.14) !important;
+  border: 1px solid rgba(34, 197, 94, 0.35) !important;
+  color: #4ade80 !important;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.9); }
+}
 </style>
 </head>
 <body>
@@ -803,6 +830,19 @@ tr:hover td { background: #fdfdfe; }
       <button class="btn-checkin" onclick="openWalkInModal()" style="background:var(--sky-primary); color:#fff; display:inline-flex; align-items:center; gap:8px; font-weight:700; padding:10px 18px; font-size:13px; border:none; cursor:pointer; margin-top:0; box-shadow:0 4px 12px var(--sky-glow);">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Record Site Walk-In
+      </button>
+    </div>
+  </div>
+
+  <!-- OFFLINE WALK-IN QUEUE STATUS BANNER -->
+  <div id="offlineSyncBanner" style="display:none; margin-bottom:24px; padding:12px 20px; border-radius:var(--radius-md); font-size:13px; font-weight:600; align-items:center; justify-content:space-between; gap:12px; transition:all .3s ease; box-shadow:var(--shadow-sm);">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span id="offlineSyncIcon" style="font-size:16px;">🟡</span>
+      <span id="offlineSyncText">1 Site Walk-In saved locally on device · Auto-syncing when signal returns</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button type="button" id="offlineManualSyncBtn" onclick="window.LngOfflineWalkIn && window.LngOfflineWalkIn.flushQueue(true)" style="background:var(--sky-primary); color:#fff; border:none; padding:6px 14px; border-radius:var(--radius-pill); font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+        <span>Sync Now</span> 🔄
       </button>
     </div>
   </div>
@@ -942,9 +982,15 @@ tr:hover td { background: #fdfdfe; }
           <textarea id="walkInNotes" rows="3" placeholder="Sample flat visited, floor preference, pricing discussion, family requirement..."></textarea>
         </div>
       </div>
-      <div class="modal-foot">
-        <button type="button" class="btn-cancel" onclick="closeWalkInModal()">Cancel</button>
-        <button type="submit" class="btn-save" id="saveWalkInBtn">Save Walk-In Enquiry</button>
+      <div class="modal-foot" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <span id="walkInNetworkStatus" style="font-size:11.5px; font-weight:700; display:inline-flex; align-items:center; gap:6px; color:#16a34a;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#16a34a;"></span>
+          Online · Direct Cloud Save
+        </span>
+        <div style="display:flex; gap:8px; margin-left:auto;">
+          <button type="button" class="btn-cancel" onclick="closeWalkInModal()">Cancel</button>
+          <button type="submit" class="btn-save" id="saveWalkInBtn">Save Walk-In Enquiry</button>
+        </div>
       </div>
     </form>
   </div>
@@ -1187,20 +1233,37 @@ let state = {
 };
 window.state = state;
 
+function renderProjectSelect() {
+  const select = $('walkInProject');
+  if (select && Array.isArray(state.projects) && state.projects.length > 0) {
+    select.innerHTML = '<option value="">-- Select Construction Site --</option>' +
+      state.projects.map(p => `<option value="${p.id}">${esc(p.name)} (${esc(p.category || 'Residential')})</option>`).join('');
+  }
+}
+
 async function loadProjects() {
+  // Pre-load from local cache so dropdown is never blank in offline dead zones
+  try {
+    const cached = localStorage.getItem('lng_cached_projects');
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        state.projects = parsed;
+        renderProjectSelect();
+      }
+    }
+  } catch (_) {}
+
   try {
     const res = await fetch('/api/projects', { credentials: 'include', cache: 'no-store' });
     const data = await res.json();
     if (data.success && Array.isArray(data.data)) {
       state.projects = data.data;
-      const select = $('walkInProject');
-      if (select) {
-        select.innerHTML = '<option value="">-- Select Construction Site --</option>' +
-          state.projects.map(p => `<option value="${p.id}">${esc(p.name)} (${esc(p.category || 'Residential')})</option>`).join('');
-      }
+      try { localStorage.setItem('lng_cached_projects', JSON.stringify(data.data)); } catch(_) {}
+      renderProjectSelect();
     }
   } catch (e) {
-    console.error('Failed to load projects list', e);
+    console.warn('[Projects] Offline or network error, retained cached project list:', e);
   }
 }
 
@@ -2010,6 +2073,9 @@ function openWalkInModal() {
   $('walkInForm').reset();
   const warn = $('walkInDuplicateWarning');
   if (warn) { warn.style.display = 'none'; warn.innerHTML = ''; }
+  if (window.LngOfflineWalkIn) {
+    window.LngOfflineWalkIn.updateNetworkStatusUI();
+  }
   if (!state.projects || state.projects.length === 0) {
     loadProjects().then(autoSelectProject);
   } else {
@@ -2081,11 +2147,23 @@ window.addEventListener('keydown', e => {
   }
 });
 
+function resetWalkInForm() {
+  const f = $('walkInForm');
+  if (f) f.reset();
+  const warn = $('walkInDuplicateWarning');
+  if (warn) warn.style.display = 'none';
+}
+
 $('walkInForm').onsubmit = async e => {
   e.preventDefault();
   const btn = $('saveWalkInBtn');
   btn.disabled = true;
   btn.textContent = 'Saving...';
+
+  const projectSelect = $('walkInProject');
+  const projectName = projectSelect && projectSelect.selectedIndex >= 0 && projectSelect.options[projectSelect.selectedIndex] 
+    ? projectSelect.options[projectSelect.selectedIndex].text 
+    : 'Construction Site';
 
   const body = {
     project_id: $('walkInProject').value ? Number($('walkInProject').value) : null,
@@ -2098,21 +2176,52 @@ $('walkInForm').onsubmit = async e => {
     notes: $('walkInNotes').value.trim()
   };
 
+  // 1. If device is currently offline (detected immediately in dead zone)
+  if (!navigator.onLine || !window.fetch) {
+    if (window.LngOfflineWalkIn) {
+      await window.LngOfflineWalkIn.saveOffline(body, projectName);
+      closeWalkInModal();
+      resetWalkInForm();
+      toast('⚡ Saved Offline on Phone: You are in a dead zone. Will auto-sync when cellular signal returns!');
+    } else {
+      toast('⚠️ Offline: Please reconnect to save walk-in');
+    }
+    btn.disabled = false;
+    btn.textContent = 'Save Walk-In Enquiry';
+    return;
+  }
+
+  // 2. Device is online: Attempt direct cloud save with 7-second safety timeout for weak 2G signal
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
+
     const r = await fetch('/api/employee/walk-in', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
+
     const d = await r.json();
     if (!r.ok || !d.success) throw new Error(d.error || 'Failed to record site walk-in');
 
     toast(d.message || 'Site walk-in enquiry recorded successfully!');
     closeWalkInModal();
+    resetWalkInForm();
     await loadPortal();
   } catch (err) {
-    toast(err.message);
+    console.warn('[Walk-In] Cloud request failed, saving to offline queue:', err);
+    if (window.LngOfflineWalkIn) {
+      await window.LngOfflineWalkIn.saveOffline(body, projectName);
+      closeWalkInModal();
+      resetWalkInForm();
+      toast('📶 Signal Dropped: Walk-in saved safely on device. Auto-syncing when signal returns!');
+    } else {
+      toast(err.message || 'Network error');
+    }
   } finally {
     btn.disabled = false;
     btn.textContent = 'Save Walk-In Enquiry';

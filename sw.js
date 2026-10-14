@@ -1,9 +1,10 @@
-const CACHE_NAME = 'lng-pwa-v1.0';
+const CACHE_NAME = 'lng-pwa-v1.1';
 
 const PRECACHE_ASSETS = [
   '/',
   '/offline.html',
   '/manifest.json',
+  '/assets/offline-walkin.js',
   '/assets/logo.png',
   '/assets/logo-mark.png',
   '/assets/icons/icon-72x72.png',
@@ -100,3 +101,17 @@ self.addEventListener('fetch', event => {
     fetch(req).catch(() => caches.match(req))
   );
 });
+
+// 5. Background Sync: Triggers offline queue flushing when network is restored
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-walkins' || event.tag === 'lng-offline-sync') {
+    event.waitUntil(
+      self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ type: 'TRIGGER_OFFLINE_SYNC' });
+        });
+      })
+    );
+  }
+});
+
