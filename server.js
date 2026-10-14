@@ -5068,6 +5068,9 @@ app.get("/demo-executive-funnel.html", (req, res) => {
 app.get("/demo-admin-dashboard-redesign.html", (req, res) => {
   res.sendFile(path.join(__dirname, "demo-admin-dashboard-redesign.html"));
 });
+app.get("/demo-layout-switcher.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "demo-layout-switcher.html"));
+});
 
 // ─── PUBLIC ASSETS & UPLOADED MEDIA (7-DAY BROWSER CACHE + GZIP) ───
 app.use("/assets", express.static(path.join(__dirname, "assets"), { maxAge: "7d", etag: true, dotfiles: "ignore", index: false }));

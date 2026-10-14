@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactive Layout Switcher Demo — Laxminarayan Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─── GLOBAL DESIGN SYSTEM TOKENS ─── */
+:root {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Classic Theme Variables */
+  --c-bg: #f8fafc;
+  --c-surface: #ffffff;
+  --c-ink: #080b0f;
+  --c-ink-muted: #64748b;
+  --c-line: rgba(8, 11, 15, 0.08);
+  --c-primary: #0284c7;
+
+  /* Modern Executive Dark Theme Variables */
+  --m-bg: #070a0e;
+  --m-surface: #0d1219;
+  --m-surface-card: #121822;
+  --m-surface-hover: #18202d;
+  --m-line: rgba(255, 255, 255, 0.08);
+  --m-line-gold: rgba(212, 175, 55, 0.25);
+  --m-gold: #d4af37;
+  --m-gold-bright: #f5d77f;
+  --m-gold-glow: rgba(212, 175, 55, 0.18);
+  --m-ink: #ffffff;
+  --m-ink-muted: #94a3b8;
+  --m-ink-dim: #64748b;
+  --m-green: #10b981;
+  --m-blue: #38bdf8;
+  --m-amber: #f59e0b;
+
+  --sidebar-w: 74px;
+  --header-h: 68px;
+  --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOP DEMO COMPARISON CONTROLLER BAR (Sticky at very top)
+   ══════════════════════════════════════════════════════════════ */
+.demo-controller-bar {
+  background: #000000;
+  color: #fff;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.demo-controller-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.demo-badge {
+  background: linear-gradient(135deg, #d4af37 0%, #aa8010 100%);
+  color: #000;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.demo-controller-text {
+  font-size: 12.5px;
+  color: #cbd5e1;
+}
+.demo-controller-text b {
+  color: #fff;
+}
+.demo-switcher-segmented {
+  display: flex;
+  align-items: center;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  padding: 4px;
+  gap: 4px;
+}
+.switch-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  transition: var(--transition);
+  user-select: none;
+}
+.switch-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+.switch-btn.active {
+  background: #ffffff;
+  color: #080b0f;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.switch-btn.active.modern-active {
+  background: linear-gradient(135deg, #d4af37 0%, #f5d77f 100%);
+  color: #000000;
+  box-shadow: 0 2px 14px rgba(212, 175, 55, 0.4);
+}
+.demo-controller-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hotkey-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE 1: CLASSIC TOP-TABS LAYOUT (Active when body.mode-classic)
+   ══════════════════════════════════════════════════════════════ */
+body.mode-classic {
+  background-color: var(--c-bg);
+  color: var(--c-ink);
+}
+body.mode-classic .modern-shell {
+  display: none !important;
+}
+body.mode-classic .classic-shell {
+  display: block;
+}
+
+/* Classic Top Navigation Bar */
+.classic-top {
+  background: var(--c-ink);
+  color: #fff;
+  padding: 14px 4%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.classic-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.classic-logo-box {
+  background: #ffffff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-weight: 800;
+  font-size: 13px;
+  color: #000;
+  letter-spacing: 0.5px;
+}
+.classic-title-wrap b {
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #fff;
+}
+.classic-title-wrap span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: #94a3b8;
+  display: block;
+  text-transform: uppercase;
+}
+.classic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #38bdf8;
+}
+.classic-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+.classic-header-switch-btn {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(212, 175, 55, 0.08));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #f5d77f;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+.classic-header-switch-btn:hover {
+  background: rgba(212, 175, 55, 0.3);
+  color: #fff;
+}
+.classic-wrap {
+  width: min(1520px, 94%);
+  margin: 24px auto 60px;
+}
+.classic-headrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.classic-headrow h1 {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--c-ink);
+}
+.classic-headrow .muted {
+  font-size: 13.5px;
+  color: var(--c-ink-muted);
+}
+
+/* Speed Alert Banner */
+.classic-speed-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+.speed-pill {
+  background: #16a34a;
+  color: #fff;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-right: 8px;
+}
+
+/* Classic 12 Top Tabs */
+.classic-tabs-wrap {
+  display: flex;
+  gap: 6px;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(8, 11, 15, 0.08);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.classic-tab-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--c-ink-muted);
+  cursor: pointer;
+  border-radius: 10px;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.classic-tab-btn:hover {
+  color: var(--c-ink);
+  background: #f1f5f9;
+}
+.classic-tab-btn.active {
+  background: #080b0f;
+  color: #ffffff;
+  font-weight: 700;
+}
+.classic-tab-btn.gold-tab.active {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #fff;
+}
+
+/* Classic 12 KPI Stat Grid */
+.classic-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.classic-stat-card {
+  background: #fff;
+  border: 1px solid rgba(8, 11, 15, 0.08);
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.classic-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+.classic-stat-card::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+}
+.classic-stat-card strong {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  color: #080b0f;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.classic-stat-card span {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Classic Panel & Table */
+.classic-panel {
+  background: #fff;
+  border: 1px solid rgba(8, 11, 15, 0.08);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+.classic-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.classic-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.classic-table th {
+  background: #f8fafc;
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+}
+.classic-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODE 2: MODERN EXECUTIVE STUDIO (Active when body.mode-modern)
+   ══════════════════════════════════════════════════════════════ */
+body.mode-modern {
+  background-color: var(--m-bg);
+  color: var(--m-ink);
+}
+body.mode-modern .classic-shell {
+  display: none !important;
+}
+body.mode-modern .modern-shell {
+  display: flex;
+  min-height: calc(100vh - 54px);
+}
+
+/* Modern Left Icon Rail (74px) */
+.modern-sidebar {
+  width: var(--sidebar-w);
+  background: var(--m-surface);
+  border-right: 1px solid var(--m-line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0;
+  flex-shrink: 0;
+  position: sticky;
+  top: 54px;
+  height: calc(100vh - 54px);
+  z-index: 100;
+}
+.modern-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+}
+.modern-divider {
+  width: 32px;
+  height: 1px;
+  background: var(--m-line);
+  margin: 12px 0;
+}
+.modern-nav-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--m-ink-muted);
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+}
+.modern-nav-item:hover {
+  background: var(--m-surface-card);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.modern-nav-item.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  color: var(--m-gold);
+  border-color: var(--m-line-gold);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.2);
+}
+.modern-nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: -13px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--m-gold);
+}
+.modern-nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+.modern-tooltip {
+  position: absolute;
+  left: 64px;
+  background: #000;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+.modern-nav-item:hover .modern-tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+.modern-sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+/* Modern Main Content Area */
+.modern-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--m-bg);
+}
+.modern-header {
+  height: var(--header-h);
+  background: var(--m-surface);
+  border-bottom: 1px solid var(--m-line);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 54px;
+  z-index: 90;
+}
+.modern-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.modern-breadcrumbs .brand {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--m-gold-bright);
+  letter-spacing: 0.5px;
+}
+.modern-breadcrumbs .sep {
+  color: var(--m-ink-dim);
+}
+.modern-breadcrumbs .current {
+  font-weight: 600;
+  color: #fff;
+}
+.modern-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.modern-ist-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--m-gold-bright);
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid var(--m-line-gold);
+  padding: 6px 14px;
+  border-radius: 9999px;
+}
+.modern-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--m-green);
+  box-shadow: 0 0 10px var(--m-green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+.modern-header-switch-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+.modern-header-switch-btn:hover {
+  background: #ffffff;
+  color: #000;
+  border-color: #fff;
+}
+
+/* Modern View Wrapper */
+.modern-content-wrap {
+  padding: 28px 32px 60px;
+  max-width: 1680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Modern Hero Gold Revenue Card + 3 Dark KPIs */
+.modern-kpi-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.modern-gold-hero {
+  background: linear-gradient(135deg, #221808 0%, #151006 60%, #0d0a04 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(212, 175, 55, 0.3);
+}
+.modern-gold-hero::before {
+  content: "";
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--m-gold-bright);
+}
+.hero-val {
+  font-size: 34px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 8px 0 4px;
+  letter-spacing: -0.8px;
+}
+.hero-sparkline {
+  margin-top: 12px;
+  width: 100%;
+  height: 40px;
+}
+.modern-kpi-card {
+  background: var(--m-surface-card);
+  border: 1px solid var(--m-line);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  transition: var(--transition);
+}
+.modern-kpi-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: var(--m-surface-hover);
+  transform: translateY(-2px);
+}
+.kpi-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--m-ink-muted);
+  letter-spacing: 0.8px;
+}
+.kpi-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  margin: 6px 0 4px;
+}
+.kpi-sub {
+  font-size: 12px;
+  color: var(--m-green);
+  font-weight: 600;
+}
+
+/* Modern Chevron Funnel */
+.modern-funnel-strip {
+  background: var(--m-surface-card);
+  border: 1px solid var(--m-line);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.funnel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.funnel-stages {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.funnel-stage-card {
+  background: var(--m-surface);
+  border: 1px solid var(--m-line);
+  border-radius: 12px;
+  padding: 14px;
+  position: relative;
+  transition: var(--transition);
+  cursor: pointer;
+}
+.funnel-stage-card:hover {
+  border-color: var(--m-gold);
+  background: rgba(212, 175, 55, 0.05);
+}
+.funnel-stage-card.active-stage {
+  border-color: var(--m-gold);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.02));
+}
+.stage-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--m-ink-muted);
+}
+.stage-count {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin: 4px 0 2px;
+}
+.stage-drop {
+  font-size: 10.5px;
+  color: var(--m-gold);
+  font-weight: 600;
+}
+
+/* Modern Project Architecture Cards + Leaderboard */
+.modern-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr;
+  gap: 16px;
+}
+.modern-card-panel {
+  background: var(--m-surface-card);
+  border: 1px solid var(--m-line);
+  border-radius: 16px;
+  padding: 20px;
+}
+.project-render-card {
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 12px;
+}
+.project-render-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.9) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+}
+.project-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+.project-meta {
+  font-size: 12px;
+  color: var(--m-gold-bright);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST NOTIFICATION FOR SWITCH CONFIRMATION
+   ══════════════════════════════════════════════════════════════ */
+.toast-notice {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #111827;
+  color: #fff;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.toast-notice.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FLOATING ACTION QUICK-SWITCH PILL (ALWAYS ON SCREEN)
+   ══════════════════════════════════════════════════════════════ */
+.floating-quick-switch {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 999;
+  background: #000;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 18px;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 12.5px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  transition: var(--transition);
+}
+.floating-quick-switch:hover {
+  transform: translateY(-2px);
+  border-color: var(--m-gold);
+  color: var(--m-gold-bright);
+}
+</style>
+</head>
+
+<body class="mode-modern">
+
+<!-- ══════════════════════════════════════════════════════════════
+     STICKY TOP COMPARISON DEMO CONTROLLER
+     ══════════════════════════════════════════════════════════════ -->
+<header class="demo-controller-bar">
+  <div class="demo-controller-left">
+    <span class="demo-badge">LIVE DEMO</span>
+    <span class="demo-controller-text">
+      <b>Interactive Layout Switcher:</b> Switch between <b>Classic Top-Tabs</b> and <b>Modern Executive Studio</b> with 1 click.
+    </span>
+  </div>
+
+  <div class="demo-switcher-segmented">
+    <button class="switch-btn" id="btnClassic" onclick="setLayoutMode('classic')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      Classic Top-Tabs
+    </button>
+    <button class="switch-btn active modern-active" id="btnModern" onclick="setLayoutMode('modern')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="14" y1="8" x2="19" y2="8"/></svg>
+      Modern Executive Studio
+    </button>
+  </div>
+
+  <div class="demo-controller-right">
+    <span class="hotkey-tag" title="Press Alt + L on your keyboard to switch layouts anytime">Shortcut: Alt + L</span>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SHELL 1: CLASSIC TOP-TABS LAYOUT (CURRENT admin.html STYLE)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="classic-shell">
+  <!-- Classic Executive Top Bar -->
+  <div class="classic-top">
+    <div class="classic-brand">
+      <div class="classic-logo-box">LNG</div>
+      <div class="classic-title-wrap">
+        <b>LAXMINARAYAN GROUP</b>
+        <span>EXECUTIVE CRM · COMMAND CENTER</span>
+      </div>
+      <span class="classic-badge"><span class="classic-dot"></span> LIVE DB</span>
+      <span class="classic-badge" style="background:rgba(2,132,199,0.1); color:#0284c7; border-color:rgba(2,132,199,0.3);">📥 BACKUP DB</span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <!-- Dedicated Switch Button in Classic Top Bar -->
+      <button class="classic-header-switch-btn" onclick="setLayoutMode('modern')" title="Click to test modern executive studio view">
+        <span>✦</span> Switch to Modern Executive Studio
+      </button>
+      <span style="font-size:12px; color:#94a3b8;">Welcome, Director</span>
+    </div>
+  </div>
+
+  <main class="classic-wrap">
+    <!-- Classic Head Row -->
+    <div class="classic-headrow">
+      <div>
+        <h1 id="classicPageTitle">Executive Command Center</h1>
+        <p class="muted">High-level pulse of projects, sales pipeline, and site operations.</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button style="padding:8px 16px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; cursor:pointer; font-weight:600;">⚡ Diagnostics</button>
+        <button style="padding:8px 16px; border-radius:8px; border:none; background:#0284c7; color:#fff; cursor:pointer; font-weight:700;">+ Quick Action</button>
+      </div>
+    </div>
+
+    <!-- Classic Speed Alert Banner -->
+    <div class="classic-speed-banner">
+      <div>
+        <span class="speed-pill">Quick Update</span>
+        <span style="font-weight:600; font-size:13.5px; color:#14532d;">All 142 enquiry follow-ups and unit allocations are up to date.</span>
+      </div>
+      <button style="padding:6px 14px; background:#16a34a; color:#fff; border:none; border-radius:6px; font-weight:700; cursor:pointer;">View Enquiries →</button>
+    </div>
+
+    <!-- Classic 12 Top Segmented Tabs -->
+    <div class="classic-tabs-wrap">
+      <button class="classic-tab-btn active" onclick="syncView('overview')">Overview</button>
+      <button class="classic-tab-btn" onclick="syncView('leads')">Enquiries (142)</button>
+      <button class="classic-tab-btn" onclick="syncView('units')">Units (148)</button>
+      <button class="classic-tab-btn" onclick="syncView('bookings')">Bookings & Deals</button>
+      <button class="classic-tab-btn" onclick="syncView('visits')">Site visits (48)</button>
+      <button class="classic-tab-btn" onclick="syncView('projects')">Projects (3)</button>
+      <button class="classic-tab-btn" onclick="syncView('team')">Team</button>
+      <button class="classic-tab-btn" onclick="syncView('attendance')">Attendance</button>
+      <button class="classic-tab-btn" onclick="syncView('customers')">Customers</button>
+      <button class="classic-tab-btn" onclick="syncView('reports')">Reports</button>
+      <button class="classic-tab-btn gold-tab" onclick="syncView('funnel')">🎯 Sales Funnel</button>
+      <button class="classic-tab-btn" onclick="syncView('audit')">Activity History</button>
+    </div>
+
+    <!-- Classic 12 KPI Stat Grid -->
+    <div class="classic-stats-grid">
+      <div class="classic-stat-card"><strong>412</strong><span>Customers</span></div>
+      <div class="classic-stat-card"><strong>142</strong><span>Enquiries</span></div>
+      <div class="classic-stat-card"><strong>28</strong><span>New Inquiries</span></div>
+      <div class="classic-stat-card"><strong>64</strong><span>Open Active</span></div>
+      <div class="classic-stat-card"><strong>48</strong><span>Site Visits</span></div>
+      <div class="classic-stat-card"><strong>148</strong><span>Total Units</span></div>
+      <div class="classic-stat-card"><strong>94</strong><span>Available</span></div>
+      <div class="classic-stat-card"><strong>54</strong><span>Sold/Booked</span></div>
+      <div class="classic-stat-card"><strong>19</strong><span>Bookings</span></div>
+      <div class="classic-stat-card"><strong>14</strong><span>Team Active</span></div>
+      <div class="classic-stat-card"><strong>3</strong><span>Projects</span></div>
+      <div class="classic-stat-card"><strong>12</strong><span>Today's Visits</span></div>
+    </div>
+
+    <!-- Classic Panel & Table Sample -->
+    <div class="classic-panel">
+      <div class="classic-panel-header">
+        <div>
+          <h2 style="font-size:18px; font-weight:800; margin-bottom:2px;">Live High-Priority Enquiries</h2>
+          <p style="font-size:12.5px; color:#64748b; margin:0;">Active buyer inquiries synchronized in real time.</p>
+        </div>
+        <input type="text" placeholder="Search customer, phone..." style="padding:8px 14px; border:1px solid #cbd5e1; border-radius:8px; font-size:12.5px; width:260px;">
+      </div>
+
+      <table class="classic-table">
+        <thead>
+          <tr>
+            <th>Ref</th>
+            <th>Customer</th>
+            <th>Phone / Email</th>
+            <th>Project</th>
+            <th>Stage</th>
+            <th>Assigned Advisor</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>#ENQ-902</b></td>
+            <td><b>Rajesh Shah</b><br><span style="font-size:11px; color:#64748b;">Direct Walk-in</span></td>
+            <td>+91 98250 14890<br><span style="font-size:11px; color:#64748b;">rajesh.s@gmail.com</span></td>
+            <td><span style="font-weight:700; color:#0284c7;">Akshar DS 208</span> (4BHK)</td>
+            <td><span style="background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">Site Visit Done</span></td>
+            <td>Amitabh Verma</td>
+            <td><button style="padding:4px 10px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; font-weight:600;">360° Drawer</button></td>
+          </tr>
+          <tr>
+            <td><b>#ENQ-901</b></td>
+            <td><b>Dr. Neha Patel</b><br><span style="font-size:11px; color:#64748b;">99acres Portal</span></td>
+            <td>+91 94260 77120<br><span style="font-size:11px; color:#64748b;">drneha@patelclinic.in</span></td>
+            <td><span style="font-weight:700; color:#059669;">Nilkanth Villa</span> (Luxury Row)</td>
+            <td><span style="background:#ecfdf5; color:#047857; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">Token In Discussion</span></td>
+            <td>Pooja Desai</td>
+            <td><button style="padding:4px 10px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; font-weight:600;">360° Drawer</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     SHELL 2: MODERN EXECUTIVE STUDIO (REDESIGNED LEFT-RAIL STYLE)
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modern-shell">
+  <!-- Fixed 74px Left Icon Rail Sidebar -->
+  <aside class="modern-sidebar">
+    <div class="modern-nav-group">
+      <!-- 1. Overview -->
+      <button class="modern-nav-item active" onclick="syncView('overview')" data-view="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="modern-tooltip">Overview Command</span>
+      </button>
+
+      <!-- 2. Leads -->
+      <button class="modern-nav-item" onclick="syncView('leads')" data-view="leads">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="modern-tooltip">Enquiries CRM (142)</span>
+      </button>
+
+      <!-- 3. Units -->
+      <button class="modern-nav-item" onclick="syncView('units')" data-view="units">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        <span class="modern-tooltip">Inventory Matrix (148)</span>
+      </button>
+
+      <!-- 4. Bookings -->
+      <button class="modern-nav-item" onclick="syncView('bookings')" data-view="bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        <span class="modern-tooltip">Deals & Bookings</span>
+      </button>
+
+      <!-- 5. Visits -->
+      <button class="modern-nav-item" onclick="syncView('visits')" data-view="visits">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="modern-tooltip">Site Visits (48)</span>
+      </button>
+
+      <!-- 6. Projects -->
+      <button class="modern-nav-item" onclick="syncView('projects')" data-view="projects">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="modern-tooltip">Projects Portfolio</span>
+      </button>
+
+      <div class="modern-divider"></div>
+
+      <!-- 7. Funnel -->
+      <button class="modern-nav-item" onclick="syncView('funnel')" data-view="funnel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <span class="modern-tooltip">🎯 Sales Funnel BI</span>
+      </button>
+
+      <!-- 8. Reports -->
+      <button class="modern-nav-item" onclick="syncView('reports')" data-view="reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span class="modern-tooltip">Channel Analytics</span>
+      </button>
+
+      <!-- 9. Team -->
+      <button class="modern-nav-item" onclick="syncView('team')" data-view="team">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        <span class="modern-tooltip">Sales Team</span>
+      </button>
+    </div>
+
+    <!-- Pinned Bottom Controls -->
+    <div class="modern-sidebar-bottom">
+      <button class="modern-nav-item" onclick="showToast('Settings: CRM Configuration & Backup Options')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="modern-tooltip">CRM Settings</span>
+      </button>
+
+      <button class="modern-nav-item" onclick="showToast('Secure Session Active')" style="color:#ef4444;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span class="modern-tooltip">Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Modern Main Executive Area -->
+  <div class="modern-main">
+    <!-- Modern Header -->
+    <header class="modern-header">
+      <div class="modern-breadcrumbs">
+        <span class="brand">Laxminarayan Group</span>
+        <span class="sep">/</span>
+        <span class="current" id="modernBreadcrumb">Executive Command Center</span>
+      </div>
+
+      <div class="modern-header-actions">
+        <div class="modern-ist-badge">
+          <span class="modern-pulse-dot"></span>
+          <span id="liveIstClock">16:45:00 IST</span>
+        </div>
+
+        <!-- Dedicated Switch Button in Modern Header -->
+        <button class="modern-header-switch-btn" onclick="setLayoutMode('classic')" title="Switch back to Classic Top-Tabs Layout">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Switch to Classic Top-Tabs
+        </button>
+
+        <button style="background:linear-gradient(135deg, #d4af37, #f5d77f); color:#000; font-weight:800; font-size:12px; padding:7px 16px; border-radius:9999px; border:none; cursor:pointer;">
+          + Quick Action
+        </button>
+      </div>
+    </header>
+
+    <!-- Modern Content View -->
+    <div class="modern-content-wrap">
+      <!-- 1. Gold Hero Revenue Card + 3 Dark KPIs -->
+      <div class="modern-kpi-grid">
+        <div class="modern-gold-hero">
+          <span class="hero-tag">ACTIVE PIPELINE VALUE</span>
+          <div class="hero-val">₹ 38.64 Cr</div>
+          <span style="font-size:12.5px; color:#f5d77f; font-weight:600;">↑ +14.2% month-over-month deal velocity</span>
+          <svg class="hero-sparkline" viewBox="0 0 300 40">
+            <path d="M0,35 Q40,30 80,24 T160,18 T240,8 T300,4" fill="none" stroke="#f5d77f" stroke-width="3"/>
+            <circle cx="300" cy="4" r="4" fill="#fff"/>
+          </svg>
+        </div>
+
+        <div class="modern-kpi-card">
+          <span class="kpi-kicker">Total Enquiries</span>
+          <div class="kpi-number">142</div>
+          <span class="kpi-sub">+18 this week</span>
+        </div>
+
+        <div class="modern-kpi-card">
+          <span class="kpi-kicker">Site Velocity</span>
+          <div class="kpi-number">48</div>
+          <span class="kpi-sub">82% on-site completion</span>
+        </div>
+
+        <div class="modern-kpi-card">
+          <span class="kpi-kicker">Confirmed Closures</span>
+          <div class="kpi-number">19</div>
+          <span class="kpi-sub">₹ 14.80 Cr booked</span>
+        </div>
+      </div>
+
+      <!-- 2. Chevron Conversion Funnel -->
+      <div class="modern-funnel-strip">
+        <div class="funnel-header">
+          <div>
+            <h3 style="font-size:15px; font-weight:700; color:#fff;">5-Stage Executive Conversion Funnel</h3>
+            <p style="font-size:12px; color:var(--m-ink-muted);">Click any stage to filter deal cohorts.</p>
+          </div>
+          <button style="background:rgba(212,175,55,0.15); border:1px solid var(--m-line-gold); color:var(--m-gold-bright); padding:6px 14px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer;" onclick="syncView('funnel')">
+            Deep BI Funnel View →
+          </button>
+        </div>
+
+        <div class="funnel-stages">
+          <div class="funnel-stage-card active-stage">
+            <span class="stage-title">1. Enquiries</span>
+            <div class="stage-count">142</div>
+            <span class="stage-drop">100% baseline</span>
+          </div>
+          <div class="funnel-stage-card">
+            <span class="stage-title">2. Contacted</span>
+            <div class="stage-count">108</div>
+            <span class="stage-drop">76.0% reach rate</span>
+          </div>
+          <div class="funnel-stage-card">
+            <span class="stage-title">3. Site Visits</span>
+            <div class="stage-count">48</div>
+            <span class="stage-drop">33.8% walk-in rate</span>
+          </div>
+          <div class="funnel-stage-card">
+            <span class="stage-title">4. Negotiation</span>
+            <div class="stage-count">24</div>
+            <span class="stage-drop">16.9% hot stage</span>
+          </div>
+          <div class="funnel-stage-card" style="border-color:rgba(16,185,129,0.4);">
+            <span class="stage-title" style="color:#10b981;">5. Booked</span>
+            <div class="stage-count" style="color:#34d399;">19</div>
+            <span class="stage-drop" style="color:#34d399;">13.4% win rate</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Project Architectural Cards & Team Velocity -->
+      <div class="modern-split-grid">
+        <div class="modern-card-panel">
+          <div class="project-render-card" style="background-image:url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&auto=format&fit=crop&q=80');">
+            <div class="project-render-overlay">
+              <span class="project-title">Akshar DS 208</span>
+              <span class="project-meta">Vasna-Bhayli, Vadodara · 4 BHK Penthouse</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--m-ink-muted);">
+            <span>48 Units Total</span>
+            <span style="color:var(--m-gold-bright); font-weight:700;">68% Sold Out</span>
+          </div>
+        </div>
+
+        <div class="modern-card-panel">
+          <div class="project-render-card" style="background-image:url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&auto=format&fit=crop&q=80');">
+            <div class="project-render-overlay">
+              <span class="project-title">Nilkanth Villa</span>
+              <span class="project-meta">Sevasi Canal Road · Ultra-Luxury Bungalows</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--m-ink-muted);">
+            <span>24 Bungalows Total</span>
+            <span style="color:var(--m-green); font-weight:700;">₹ 3.2 Cr Base</span>
+          </div>
+        </div>
+
+        <div class="modern-card-panel">
+          <h3 style="font-size:14px; font-weight:700; color:#fff; margin-bottom:14px;">Sales Advisor Velocity</h3>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px;">
+              <div><b>Amitabh Verma</b><br><span style="font-size:11px; color:var(--m-ink-dim);">Senior Luxury Advisor</span></div>
+              <span style="font-weight:700; color:var(--m-gold);">8 Deals (₹ 18.2 Cr)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px;">
+              <div><b>Pooja Desai</b><br><span style="font-size:11px; color:var(--m-ink-dim);">Relationship Manager</span></div>
+              <span style="font-weight:700; color:var(--m-gold);">6 Deals (₹ 12.4 Cr)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px;">
+              <div><b>Rohit Patel</b><br><span style="font-size:11px; color:var(--m-ink-dim);">Site Specialist</span></div>
+              <span style="font-weight:700; color:var(--m-gold);">5 Deals (₹ 8.0 Cr)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     FLOATING QUICK-SWITCH PILL (ALWAYS VISIBLE BOTTOM-LEFT)
+     ══════════════════════════════════════════════════════════════ -->
+<button class="floating-quick-switch" onclick="toggleLayoutMode()" title="Click or press Alt+L to toggle between Classic and Modern">
+  <span style="color:#f5d77f;">⇄</span>
+  <span id="floatingLabel">Switch to Classic Top-Tabs</span>
+</button>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TOAST NOTIFICATION COMPONENT
+     ══════════════════════════════════════════════════════════════ -->
+<div id="toast" class="toast-notice">
+  <span style="color:#f5d77f; font-size:16px;">✦</span>
+  <span id="toastMsg">Preference saved.</span>
+</div>
+
+<script>
+// ─── STATE MANAGEMENT ───
+let currentLayout = localStorage.getItem('demo_dashboard_layout') || 'modern';
+let activeView = 'overview';
+
+const VIEW_TITLES = {
+  overview: 'Executive Command Center',
+  leads: 'Enquiries & CRM Pipeline',
+  units: 'Inventory Units Matrix',
+  bookings: 'Deals & Financial Closures',
+  visits: 'Site Visits & Walk-in Velocity',
+  projects: 'Luxury Projects Portfolio',
+  team: 'Executive Sales Directory',
+  attendance: 'Staff Attendance & Punch Logs',
+  customers: 'Verified Customer Directory',
+  reports: 'Channel Attribution & Velocity BI',
+  funnel: '5-Stage Sales Conversion Funnel',
+  audit: 'System Activity & Security Logs'
+};
+
+function setLayoutMode(mode) {
+  currentLayout = mode;
+  localStorage.setItem('demo_dashboard_layout', mode);
+
+  if (mode === 'classic') {
+    document.body.className = 'mode-classic';
+    document.getElementById('btnClassic').classList.add('active');
+    document.getElementById('btnModern').classList.remove('active', 'modern-active');
+    document.getElementById('floatingLabel').textContent = 'Switch to Modern Executive Studio';
+    showToast('Switched to Classic Top-Tab Workspace (Current admin style)');
+  } else {
+    document.body.className = 'mode-modern';
+    document.getElementById('btnModern').classList.add('active', 'modern-active');
+    document.getElementById('btnClassic').classList.remove('active');
+    document.getElementById('floatingLabel').textContent = 'Switch to Classic Top-Tabs';
+    showToast('Switched to Modern Executive Studio (Redesigned Sidebar style)');
+  }
+}
+
+function toggleLayoutMode() {
+  setLayoutMode(currentLayout === 'modern' ? 'classic' : 'modern');
+}
+
+// ─── VIEW SYNCHRONIZATION ───
+function syncView(viewId) {
+  activeView = viewId;
+  const title = VIEW_TITLES[viewId] || VIEW_TITLES.overview;
+
+  // Update Classic Tabs
+  document.querySelectorAll('.classic-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick').includes(viewId));
+  });
+  const cTitle = document.getElementById('classicPageTitle');
+  if (cTitle) cTitle.textContent = title;
+
+  // Update Modern Sidebar Icons
+  document.querySelectorAll('.modern-nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.view === viewId);
+  });
+  const mBreadcrumb = document.getElementById('modernBreadcrumb');
+  if (mBreadcrumb) mBreadcrumb.textContent = title;
+
+  showToast(`View updated: ${title}`);
+}
+
+// ─── LIVE IST CLOCK ───
+function updateClock() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false });
+  const el = document.getElementById('liveIstClock');
+  if (el) el.textContent = `${timeStr} IST`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── TOAST NOTIFICATION ───
+let toastTimer = null;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  const msgEl = document.getElementById('toastMsg');
+  if (!toast || !msgEl) return;
+  msgEl.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2400);
+}
+
+// ─── KEYBOARD SHORTCUT (Alt + L) ───
+window.addEventListener('keydown', (e) => {
+  if (e.altKey && (e.key === 'l' || e.key === 'L')) {
+    e.preventDefault();
+    toggleLayoutMode();
+  }
+});
+
+// Initialize on page load
+setLayoutMode(currentLayout);
+</script>
+</body>
+</html>
