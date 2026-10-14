@@ -1848,198 +1848,305 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
   flex-direction: column;
   justify-content: space-between;
 }
-.exec-hero-lbl {
+/* ─── DEDICATED SALES FUNNEL BI DASHBOARD (EXECUTIVE LUXURY THEME) ─── */
+#funnelView {
+  background: #070b14 !important;
+  color: #cbd5e1 !important;
+  border-radius: 20px;
+  padding: 28px 26px 40px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  margin-bottom: 30px;
+}
+#funnelView .exec-kpi-row {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 1024px) {
+  #funnelView .exec-kpi-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  #funnelView .exec-kpi-row { grid-template-columns: 1fr; }
+}
+#funnelView .exec-hero-card {
+  background: linear-gradient(135deg, #2a2211 0%, #1a160d 100%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 16px;
+  padding: 22px 26px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.55);
+}
+#funnelView .exec-hero-lbl {
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #78350f;
+  color: #fde68a;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.exec-hero-val {
-  font-size: 34px;
+#funnelView .exec-hero-val {
+  font-size: 38px;
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   line-height: 1.1;
-  margin: 8px 0 6px;
+  margin: 10px 0 6px;
   display: flex;
   align-items: baseline;
   gap: 8px;
 }
-.exec-hero-val span {
-  font-size: 18px;
-  color: #d97706;
+#funnelView .exec-hero-val span {
+  font-size: 20px;
+  color: #fbbf24;
   font-weight: 700;
 }
-.exec-hero-sub {
+#funnelView .exec-hero-sub {
   font-size: 12.5px;
-  color: #475569;
+  color: #cbd5e1;
 }
 
-.exec-stat-box {
-  background: var(--bg-surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+#funnelView .exec-stat-box {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   padding: 22px 24px;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-.exec-stat-box .title {
+#funnelView .exec-stat-box .title {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: var(--ink-subtle);
+  color: #94a3b8;
 }
-.exec-stat-box .val {
+#funnelView .exec-stat-box .val {
   font-size: 28px;
   font-weight: 800;
-  color: var(--ink);
+  color: #f8fafc;
   margin: 6px 0;
 }
-.exec-stat-box .sub {
+#funnelView .exec-stat-box .sub {
   font-size: 12px;
-  color: var(--ink-subtle);
+  color: #94a3b8;
 }
 
-.exec-funnel-grid {
+#funnelView .exec-funnel-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 14px;
   margin-bottom: 24px;
 }
 @media (max-width: 1024px) {
-  .exec-funnel-grid { grid-template-columns: repeat(3, 1fr); }
+  #funnelView .exec-funnel-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 640px) {
-  .exec-funnel-grid { grid-template-columns: 1fr; }
+  #funnelView .exec-funnel-grid { grid-template-columns: 1fr; }
 }
 
-.exec-funnel-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+#funnelView .exec-funnel-card {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   padding: 16px 18px;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   position: relative;
   transition: all 0.25s ease;
   user-select: none;
 }
-.exec-funnel-card:hover {
+#funnelView .exec-funnel-card:hover {
   transform: translateY(-3px);
-  border-color: var(--sky);
-  box-shadow: 0 10px 24px -4px rgba(2, 132, 199, 0.18);
+  border-color: #0284c7;
+  box-shadow: 0 10px 24px -4px rgba(2, 132, 199, 0.3);
 }
-.exec-funnel-card.active {
-  border-color: var(--sky);
-  background: linear-gradient(180deg, rgba(2, 132, 199, 0.08) 0%, var(--bg-surface) 100%);
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.35), var(--shadow-card);
+#funnelView .exec-funnel-card.active {
+  border-color: #38bdf8;
+  background: linear-gradient(180deg, rgba(2, 132, 199, 0.22) 0%, #0f172a 100%);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
 }
-.exec-funnel-step {
+#funnelView .exec-funnel-step {
   font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: var(--ink-subtle);
+  color: #94a3b8;
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
 }
-.exec-funnel-name {
+#funnelView .exec-funnel-name {
   font-size: 14px;
   font-weight: 700;
-  color: var(--ink);
+  color: #f8fafc;
   margin-bottom: 6px;
 }
-.exec-funnel-counts {
+#funnelView .exec-funnel-counts {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: 10px;
 }
-.exec-funnel-leads {
-  font-size: 22px;
+#funnelView .exec-funnel-leads {
+  font-size: 24px;
   font-weight: 800;
-  color: var(--ink);
+  color: #f8fafc;
 }
-.exec-funnel-vol {
+#funnelView .exec-funnel-vol {
   font-size: 12px;
   font-weight: 700;
-  color: #d97706;
+  color: #fbbf24;
 }
-.exec-funnel-bar-bg {
+#funnelView .exec-funnel-bar-bg {
   width: 100%;
   height: 5px;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
   overflow: hidden;
   margin-bottom: 8px;
 }
-.exec-funnel-bar-fill {
+#funnelView .exec-funnel-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--sky), #38bdf8);
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
   border-radius: 9999px;
   transition: width 0.5s ease;
 }
-.exec-funnel-card.step-won .exec-funnel-bar-fill {
+#funnelView .exec-funnel-card.step-won .exec-funnel-bar-fill {
   background: linear-gradient(90deg, #10b981, #34d399);
 }
-.exec-funnel-conv {
+#funnelView .exec-funnel-conv {
   font-size: 11px;
   font-weight: 700;
-  color: var(--ink-subtle);
+  color: #94a3b8;
   display: flex;
   justify-content: space-between;
 }
 
-.exec-split-grid {
+#funnelView .exec-split-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
   margin-bottom: 24px;
 }
 @media (max-width: 900px) {
-  .exec-split-grid { grid-template-columns: 1fr; }
+  #funnelView .exec-split-grid { grid-template-columns: 1fr; }
 }
 
-.exec-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  box-shadow: var(--shadow-card);
+#funnelView .exec-panel {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
-.exec-project-item {
+#funnelView .exec-project-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
   margin-top: 10px;
-  background: rgba(8, 11, 15, 0.01);
+  background: rgba(255, 255, 255, 0.02);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
-.exec-project-item:hover {
-  border-color: var(--sky);
-  transform: translateX(3px);
+#funnelView .exec-project-item:hover {
+  border-color: #38bdf8;
+  background: rgba(2, 132, 199, 0.08);
+  transform: translateX(4px);
 }
-.exec-advisor-item {
+#funnelView .exec-project-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+#funnelView .exec-project-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+#funnelView .exec-project-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+#funnelView .exec-project-rate {
+  font-size: 11px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+#funnelView .exec-advisor-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-.exec-advisor-item:last-child {
+#funnelView .exec-advisor-item:last-child {
   border-bottom: none;
 }
-body.role-hr #execPipelineSection {
+#funnelView .exec-advisor-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#funnelView .exec-advisor-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+#funnelView .exec-advisor-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+#funnelView .exec-table-wrap {
+  background: #0b1329;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+  margin-top: 14px;
+  overflow: hidden;
+}
+#funnelView table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12.5px;
+}
+#funnelView th {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+#funnelView td {
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  vertical-align: middle;
+}
+#funnelView tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+body.role-hr .tab[data-view="funnelView"],
+body.role-hr #funnelView {
   display: none !important;
 }
 </style>
@@ -2125,139 +2232,12 @@ body.role-hr #execPipelineSection {
     <button class="tab" data-view="attendanceView">Attendance</button>
     <button class="tab" data-view="customersView">Customers</button>
     <button class="tab" data-view="reportsView">Reports</button>
+    <button class="tab" data-view="funnelView">🎯 Sales Funnel</button>
     <button class="tab" data-view="auditView">Activity History</button>
   </div>
 
   <!-- OVERVIEW VIEW -->
   <section id="overview" class="view active">
-    <!-- ─── EXECUTIVE SALES PIPELINE & LEAD CONVERSION FUNNEL ─── -->
-    <div id="execPipelineSection" style="margin-bottom: 24px;">
-      <!-- REVENUE HERO STRIP -->
-      <div class="exec-kpi-row">
-        <div class="exec-hero-card">
-          <div class="exec-hero-lbl">
-            <span>ACTIVE SALES PIPELINE VALUE</span>
-            <span style="background:rgba(16,185,129,0.18); color:#059669; font-weight:800; padding:2px 8px; border-radius:9999px; font-size:11px;">▲ LIVE CRM</span>
-          </div>
-          <div class="exec-hero-val" id="execPipelineValDisplay">
-            ₹ 0.00 <span>CRORE INR</span>
-          </div>
-          <div class="exec-hero-sub" id="execPipelineSubDisplay">
-            Calculating active qualified buyers across projects...
-          </div>
-        </div>
-        <div class="exec-stat-box">
-          <div class="title">Confirmed Booked Deals</div>
-          <div class="val" style="color:#10b981;" id="execBookedValDisplay">₹ 0.00 Cr</div>
-          <div class="sub" id="execBookedSubDisplay">0 Units Confirmed & Token Deposited</div>
-        </div>
-        <div class="exec-stat-box">
-          <div class="title">Hot Intent Prospects</div>
-          <div class="val" style="color:#f59e0b;" id="execHotDealsDisplay">0 Deals</div>
-          <div class="sub" id="execHotSubDisplay">In active price & token discussion</div>
-        </div>
-        <div class="exec-stat-box">
-          <div class="title">Site Visit Velocity</div>
-          <div class="val" style="color:var(--sky);" id="execVisitVelocityDisplay">0 Visits</div>
-          <div class="sub">Conducted sample flat tours on site</div>
-        </div>
-      </div>
-
-      <!-- INTERACTIVE 5-STAGE CONVERSION FUNNEL -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-        <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:8px;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-          Live Lead Conversion Funnel
-        </h3>
-        <span style="font-size:12px; color:var(--ink-subtle); font-weight:600;">(Click any stage to filter enquiries table below)</span>
-      </div>
-
-      <div class="exec-funnel-grid" id="execFunnelContainer">
-        <!-- Stage 1 -->
-        <div class="exec-funnel-card active" onclick="drillDownLeads('all')" title="Click to view all enquiries in pipeline">
-          <div class="exec-funnel-step"><span>STAGE 1</span> <span id="funnelPct-all">100%</span></div>
-          <div class="exec-funnel-name">All Inquiries</div>
-          <div class="exec-funnel-counts">
-            <span class="exec-funnel-leads" id="funnelCount-all">0</span>
-            <span class="exec-funnel-vol" id="funnelVol-all">₹ 0.0 Cr</span>
-          </div>
-          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" style="width: 100%;"></div></div>
-          <div class="exec-funnel-conv"><span>Starting Pool</span> <span>Web + Walk-Ins</span></div>
-        </div>
-
-        <!-- Stage 2 -->
-        <div class="exec-funnel-card" onclick="drillDownLeads('contacted')" title="Click to view contacted / briefed buyers">
-          <div class="exec-funnel-step"><span>STAGE 2</span> <span id="funnelPct-contacted">0%</span></div>
-          <div class="exec-funnel-name">Contacted / Briefed</div>
-          <div class="exec-funnel-counts">
-            <span class="exec-funnel-leads" id="funnelCount-contacted">0</span>
-            <span class="exec-funnel-vol" id="funnelVol-contacted">₹ 0.0 Cr</span>
-          </div>
-          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-contacted" style="width: 0%;"></div></div>
-          <div class="exec-funnel-conv"><span>Advisor Briefing</span> <span id="funnelDrop-contacted" style="color:#f59e0b;">0 Drop-offs</span></div>
-        </div>
-
-        <!-- Stage 3 -->
-        <div class="exec-funnel-card" onclick="drillDownLeads('site_visit')" title="Click to view site visits cohort">
-          <div class="exec-funnel-step"><span>STAGE 3</span> <span id="funnelPct-site_visit">0%</span></div>
-          <div class="exec-funnel-name">Site Visits Done</div>
-          <div class="exec-funnel-counts">
-            <span class="exec-funnel-leads" id="funnelCount-site_visit">0</span>
-            <span class="exec-funnel-vol" id="funnelVol-site_visit">₹ 0.0 Cr</span>
-          </div>
-          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-site_visit" style="width: 0%;"></div></div>
-          <div class="exec-funnel-conv"><span>Sample Flat Tour</span> <span id="funnelDrop-site_visit" style="color:#f59e0b;">0 Drop-offs</span></div>
-        </div>
-
-        <!-- Stage 4 -->
-        <div class="exec-funnel-card" onclick="drillDownLeads('negotiation')" title="Click to view negotiation & price discussion cohort">
-          <div class="exec-funnel-step"><span>STAGE 4</span> <span id="funnelPct-negotiation">0%</span></div>
-          <div class="exec-funnel-name">Price Discussion</div>
-          <div class="exec-funnel-counts">
-            <span class="exec-funnel-leads" id="funnelCount-negotiation">0</span>
-            <span class="exec-funnel-vol" id="funnelVol-negotiation">₹ 0.0 Cr</span>
-          </div>
-          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-negotiation" style="width: 0%;"></div></div>
-          <div class="exec-funnel-conv"><span>Cost Sheet Issued</span> <span id="funnelDrop-negotiation" style="color:#f59e0b;">0 Drop-offs</span></div>
-        </div>
-
-        <!-- Stage 5 -->
-        <div class="exec-funnel-card step-won" onclick="drillDownLeads('won')" title="Click to view confirmed booked deals">
-          <div class="exec-funnel-step"><span style="color:#10b981;">STAGE 5</span> <span id="funnelPct-won" style="color:#10b981;">0%</span></div>
-          <div class="exec-funnel-name">Booked Units</div>
-          <div class="exec-funnel-counts">
-            <span class="exec-funnel-leads" id="funnelCount-won" style="color:#10b981;">0</span>
-            <span class="exec-funnel-vol" id="funnelVol-won" style="color:#10b981;">₹ 0.0 Cr</span>
-          </div>
-          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-won" style="width: 0%;"></div></div>
-          <div class="exec-funnel-conv"><span style="color:#10b981;">Token Deposited</span> <span id="funnelDrop-won">0 Closures</span></div>
-        </div>
-      </div>
-
-      <!-- SPLIT ROW: PROJECT BREAKDOWN & ADVISOR LEADERBOARD -->
-      <div class="exec-split-grid">
-        <div class="exec-panel">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h4 style="margin:0; font-size:15px; font-weight:800; color:var(--ink);">🏗️ Project Pipeline Breakdown</h4>
-            <span style="font-size:11.5px; font-weight:700; color:var(--sky);">Live Demand</span>
-          </div>
-          <div id="execProjectBreakdownContainer">
-            <div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">Loading project pipeline...</div>
-          </div>
-        </div>
-
-        <div class="exec-panel">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h4 style="margin:0; font-size:15px; font-weight:800; color:var(--ink);">🏆 Sales Advisor Leaderboard & Watchdog</h4>
-            <span style="font-size:11.5px; font-weight:700; color:#10b981;">Active Performance</span>
-          </div>
-          <div id="execAdvisorLeaderboardContainer">
-            <div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">Loading advisor metrics...</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- COMMAND CENTER HERO -->
     <div class="dashboard-hero">
       <div class="hero-card">
@@ -3044,6 +3024,190 @@ body.role-hr #execPipelineSection {
       <div class="panel" style="margin-top:16px;">
         <h3>Site visits</h3>
         <div id="visitChart"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DEDICATED SALES FUNNEL BI DASHBOARD ─── -->
+  <section id="funnelView" class="view">
+    <!-- EXECUTIVE HEADER -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+      <div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <h2 style="font-size:22px; font-weight:800; color:#f8fafc; margin:0; letter-spacing:-0.3px;">🎯 Executive Sales Pipeline & Conversion Funnel</h2>
+          <span style="font-size:11.5px; font-weight:800; background:rgba(212,175,55,0.18); color:#fbbf24; border:1px solid rgba(212,175,55,0.35); padding:4px 12px; border-radius:9999px;">
+            👑 DIRECTOR VIEW · LIVE BI
+          </span>
+        </div>
+        <p style="font-size:13px; color:#94a3b8; margin-top:4px; margin-bottom:0;">Real-time revenue velocity, 5-stage conversion cohorts, project demand breakdown, and sales advisor watchdog.</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button type="button" class="btn smallbtn" onclick="renderExecutivePipelineFunnel()" style="background:#1e293b; color:#f8fafc; border:1px solid rgba(255,255,255,0.15); font-weight:700; border-radius:8px; padding:7px 14px; cursor:pointer;" title="Refresh Sales Pipeline metrics">
+          🔄 Refresh Funnel
+        </button>
+      </div>
+    </div>
+
+    <!-- REVENUE HERO STRIP -->
+    <div class="exec-kpi-row">
+      <div class="exec-hero-card">
+        <div class="exec-hero-lbl">
+          <span>ACTIVE SALES PIPELINE VALUE</span>
+          <span style="background:rgba(16,185,129,0.18); color:#34d399; font-weight:800; padding:2px 8px; border-radius:9999px; font-size:11px;">▲ LIVE CRM</span>
+        </div>
+        <div class="exec-hero-val" id="execPipelineValDisplay">
+          ₹ 0.00 <span>CRORE INR</span>
+        </div>
+        <div class="exec-hero-sub" id="execPipelineSubDisplay">
+          Calculating active qualified buyers across projects...
+        </div>
+      </div>
+      <div class="exec-stat-box">
+        <div class="title">Confirmed Booked Deals</div>
+        <div class="val" style="color:#10b981;" id="execBookedValDisplay">₹ 0.00 Cr</div>
+        <div class="sub" id="execBookedSubDisplay">0 Units Confirmed & Token Deposited</div>
+      </div>
+      <div class="exec-stat-box">
+        <div class="title">Hot Intent Prospects</div>
+        <div class="val" style="color:#f59e0b;" id="execHotDealsDisplay">0 Deals</div>
+        <div class="sub" id="execHotSubDisplay">In active price & token discussion</div>
+      </div>
+      <div class="exec-stat-box">
+        <div class="title">Site Visit Velocity</div>
+        <div class="val" style="color:#38bdf8;" id="execVisitVelocityDisplay">0 Visits</div>
+        <div class="sub">Conducted sample flat tours on site</div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE 5-STAGE CONVERSION FUNNEL -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+      <h3 style="margin:0; font-size:17px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+        Live Lead Conversion Funnel
+      </h3>
+      <span style="font-size:12px; color:#94a3b8; font-weight:600;">(Click any stage to isolate matching deals in table below)</span>
+    </div>
+
+    <div class="exec-funnel-grid" id="execFunnelContainer">
+      <!-- Stage 1 -->
+      <div class="exec-funnel-card active" onclick="selectFunnelCohort('all')" title="Click to view all enquiries in pipeline">
+        <div class="exec-funnel-step"><span>STAGE 1</span> <span id="funnelPct-all">100%</span></div>
+        <div class="exec-funnel-name">All Inquiries</div>
+        <div class="exec-funnel-counts">
+          <span class="exec-funnel-leads" id="funnelCount-all">0</span>
+          <span class="exec-funnel-vol" id="funnelVol-all">₹ 0.0 Cr</span>
+        </div>
+        <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" style="width: 100%;"></div></div>
+        <div class="exec-funnel-conv"><span>Starting Pool</span> <span>Web + Walk-Ins</span></div>
+      </div>
+
+      <!-- Stage 2 -->
+      <div class="exec-funnel-card" onclick="selectFunnelCohort('contacted')" title="Click to view contacted / briefed buyers">
+        <div class="exec-funnel-step"><span>STAGE 2</span> <span id="funnelPct-contacted">0%</span></div>
+        <div class="exec-funnel-name">Contacted / Briefed</div>
+        <div class="exec-funnel-counts">
+          <span class="exec-funnel-leads" id="funnelCount-contacted">0</span>
+          <span class="exec-funnel-vol" id="funnelVol-contacted">₹ 0.0 Cr</span>
+        </div>
+        <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-contacted" style="width: 0%;"></div></div>
+        <div class="exec-funnel-conv"><span>Advisor Briefing</span> <span id="funnelDrop-contacted" style="color:#fbbf24;">0 Drop-offs</span></div>
+      </div>
+
+      <!-- Stage 3 -->
+      <div class="exec-funnel-card" onclick="selectFunnelCohort('site_visit')" title="Click to view site visits cohort">
+        <div class="exec-funnel-step"><span>STAGE 3</span> <span id="funnelPct-site_visit">0%</span></div>
+        <div class="exec-funnel-name">Site Visits Done</div>
+        <div class="exec-funnel-counts">
+          <span class="exec-funnel-leads" id="funnelCount-site_visit">0</span>
+          <span class="exec-funnel-vol" id="funnelVol-site_visit">₹ 0.0 Cr</span>
+        </div>
+        <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-site_visit" style="width: 0%;"></div></div>
+        <div class="exec-funnel-conv"><span>Sample Flat Tour</span> <span id="funnelDrop-site_visit" style="color:#fbbf24;">0 Drop-offs</span></div>
+      </div>
+
+      <!-- Stage 4 -->
+      <div class="exec-funnel-card" onclick="selectFunnelCohort('negotiation')" title="Click to view negotiation & price discussion cohort">
+        <div class="exec-funnel-step"><span>STAGE 4</span> <span id="funnelPct-negotiation">0%</span></div>
+        <div class="exec-funnel-name">Price Discussion</div>
+        <div class="exec-funnel-counts">
+          <span class="exec-funnel-leads" id="funnelCount-negotiation">0</span>
+          <span class="exec-funnel-vol" id="funnelVol-negotiation">₹ 0.0 Cr</span>
+        </div>
+        <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-negotiation" style="width: 0%;"></div></div>
+        <div class="exec-funnel-conv"><span>Cost Sheet Issued</span> <span id="funnelDrop-negotiation" style="color:#fbbf24;">0 Drop-offs</span></div>
+      </div>
+
+      <!-- Stage 5 -->
+      <div class="exec-funnel-card step-won" onclick="selectFunnelCohort('won')" title="Click to view confirmed booked deals">
+        <div class="exec-funnel-step"><span style="color:#34d399;">STAGE 5</span> <span id="funnelPct-won" style="color:#34d399;">0%</span></div>
+        <div class="exec-funnel-name">Booked Units</div>
+        <div class="exec-funnel-counts">
+          <span class="exec-funnel-leads" id="funnelCount-won" style="color:#34d399;">0</span>
+          <span class="exec-funnel-vol" id="funnelVol-won" style="color:#34d399;">₹ 0.0 Cr</span>
+        </div>
+        <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-won" style="width: 0%;"></div></div>
+        <div class="exec-funnel-conv"><span style="color:#34d399;">Token Deposited</span> <span id="funnelDrop-won">0 Closures</span></div>
+      </div>
+    </div>
+
+    <!-- SPLIT ROW: PROJECT BREAKDOWN & ADVISOR LEADERBOARD -->
+    <div class="exec-split-grid">
+      <div class="exec-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="margin:0; font-size:15px; font-weight:800; color:#f8fafc;">🏗️ Project Pipeline Breakdown</h4>
+          <span style="font-size:11.5px; font-weight:700; color:#38bdf8;">Live Demand</span>
+        </div>
+        <div id="execProjectBreakdownContainer">
+          <div style="text-align:center; padding:18px; color:#94a3b8; font-size:12px;">Loading project pipeline...</div>
+        </div>
+      </div>
+
+      <div class="exec-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="margin:0; font-size:15px; font-weight:800; color:#f8fafc;">🏆 Sales Advisor Leaderboard & Watchdog</h4>
+          <span style="font-size:11.5px; font-weight:700; color:#34d399;">Active Performance</span>
+        </div>
+        <div id="execAdvisorLeaderboardContainer">
+          <div style="text-align:center; padding:18px; color:#94a3b8; font-size:12px;">Loading advisor metrics...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMBEDDED INTERACTIVE DEALS COHORT TABLE -->
+    <div class="exec-table-wrap">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 22px; border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:12px;">
+        <div>
+          <h3 id="funnelCohortTableTitle" style="font-size:16px; font-weight:800; color:#f8fafc; margin:0;">Live Pipeline Deal Cohort</h3>
+          <span id="funnelCohortTableSub" style="font-size:12px; color:#94a3b8;">Click any stage in the funnel above or project to isolate matching deals</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button type="button" id="funnelClearFilterBtn" onclick="selectFunnelCohort('all')" style="display:none; font-size:11.5px; font-weight:700; background:rgba(239,68,68,0.18); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:5px 12px; border-radius:8px; cursor:pointer;">
+            ✕ Reset Filter
+          </button>
+          <input type="text" id="funnelTableSearchInput" placeholder="🔍 Search deals..." oninput="renderFunnelDealsTable()" style="background:#1e293b; border:1px solid rgba(255,255,255,0.15); color:#f8fafc; padding:6px 14px; border-radius:8px; font-size:12.5px; width:190px;">
+          <span id="funnelCohortBadge" style="font-size:11.5px; font-weight:700; color:#38bdf8; background:rgba(2,132,199,0.18); border:1px solid rgba(2,132,199,0.3); padding:5px 12px; border-radius:9999px;">
+            Stage 1: All Inquiries
+          </span>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Client Name</th>
+              <th>Contact Details</th>
+              <th>Target Project</th>
+              <th>Ticket / Budget</th>
+              <th>Pipeline Stage</th>
+              <th>Sentiment</th>
+              <th>Assigned Advisor</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="funnelCohortTableBody">
+            <tr><td colspan="8" style="text-align:center; padding:28px; color:#94a3b8;">Loading deals...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
@@ -3911,6 +4075,10 @@ const VIEW_METADATA = {
     title: 'Executive Analytics & Reports',
     subtitle: 'Conversion rates, enquiry sources, project velocity, and sales metrics.'
   },
+  funnelView: {
+    title: 'Executive Sales Pipeline & Lead Conversion Funnel',
+    subtitle: 'Live revenue velocity, 5-stage conversion cohorts, project demand breakdown, and sales advisor watchdog.'
+  },
   auditView: {
     title: 'Activity History & Audit Trail',
     subtitle: 'Comprehensive immutable log of administrative actions and status updates.'
@@ -3926,7 +4094,7 @@ function applyRolePermissions(user) {
   if (isHR) {
     document.body.classList.add('role-hr');
 
-    const tabsToHide = ['overview', 'leadsView', 'unitsView', 'bookingsView', 'visitsView', 'projectsView', 'customersView', 'reportsView', 'auditView'];
+    const tabsToHide = ['overview', 'leadsView', 'unitsView', 'bookingsView', 'visitsView', 'projectsView', 'customersView', 'reportsView', 'funnelView', 'auditView'];
     tabsToHide.forEach(viewId => {
       const tabBtn = document.querySelector(`.tab[data-view="${viewId}"]`);
       if (tabBtn) tabBtn.style.display = 'none';
@@ -4064,6 +4232,10 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   if (b.dataset.view === 'reportsView') loadReports();
+  if (b.dataset.view === 'funnelView') {
+    renderExecutivePipelineFunnel();
+    renderFunnelDealsTable();
+  }
   if (b.dataset.view === 'auditView') loadAudit();
   if (b.dataset.view === 'customersView') loadCustomers();
   if (b.dataset.view === 'leadsView') loadLeads();
@@ -4872,25 +5044,190 @@ function parseLeadBudgetINR(bStr, projectName = '') {
   return 7500000;
 }
 
+state.funnelCohortStage = 'all';
+state.funnelCohortProject = null;
+
 function filterProjectPipeline(projectId, projectName) {
   if (state.currentUser && state.currentUser.role === 'hr') return;
-  showView('leadsView', { scroll: true });
-  const pSelect = $('leadFilterProject');
-  if (pSelect) pSelect.value = projectId;
-  state.leadFilterStage = null;
-  applyLeadFilters();
-  toast('📍 Filtered to ' + (projectName || 'Project') + ' Enquiries Pipeline');
-  highlightLeadsToolbar();
+  selectFunnelCohort('all', projectId);
+  toast('📍 Filtered Funnel Deals to ' + (projectName || 'Project'));
+}
+
+function selectFunnelCohort(stage = 'all', projectId = null) {
+  state.funnelCohortStage = stage;
+  if (projectId !== null && projectId !== undefined) {
+    state.funnelCohortProject = projectId;
+  }
+
+  // Highlight active funnel card
+  document.querySelectorAll('#funnelView .exec-funnel-card').forEach(c => c.classList.remove('active'));
+  const targetCard = document.querySelector(`#funnelView .exec-funnel-card[onclick*="'${stage}'"]`);
+  if (targetCard) targetCard.classList.add('active');
+
+  const clearBtn = $('funnelClearFilterBtn');
+  if (clearBtn) {
+    clearBtn.style.display = (state.funnelCohortStage !== 'all' || state.funnelCohortProject) ? 'inline-flex' : 'none';
+  }
+
+  renderFunnelDealsTable();
+
+  const stageLabels = {
+    all: 'All Inquiries Pipeline',
+    contacted: 'Stage 2: Contacted / Briefed',
+    site_visit: 'Stage 3: Site Visits Conducted',
+    negotiation: 'Stage 4: Price Discussion',
+    won: 'Stage 5: Confirmed Booked Units'
+  };
+  toast('📍 Isolating ' + (stageLabels[stage] || stage) + ' Cohort');
+}
+
+function renderFunnelDealsTable() {
+  const tbody = $('funnelCohortTableBody');
+  if (!tbody) return;
+
+  const leads = state.leads || [];
+  const stage = state.funnelCohortStage || 'all';
+  const pid = state.funnelCohortProject;
+  const q = ($('funnelTableSearchInput')?.value || '').trim().toLowerCase();
+
+  let filtered = leads;
+
+  // Filter by stage
+  if (stage === 'contacted') {
+    filtered = filtered.filter(l => ['contacted', 'qualified', 'site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'site_visit') {
+    filtered = filtered.filter(l => ['site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'negotiation') {
+    filtered = filtered.filter(l => ['negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'won') {
+    filtered = filtered.filter(l => String(l.status || '').toLowerCase() === 'won');
+  }
+
+  // Filter by project
+  if (pid) {
+    filtered = filtered.filter(l => Number(l.project_id) === Number(pid));
+  }
+
+  // Search filter
+  if (q) {
+    filtered = filtered.filter(l =>
+      (l.name && l.name.toLowerCase().includes(q)) ||
+      (l.phone && l.phone.toLowerCase().includes(q)) ||
+      (l.email && l.email.toLowerCase().includes(q)) ||
+      (l.project_name && l.project_name.toLowerCase().includes(q)) ||
+      (l.employee_name && l.employee_name.toLowerCase().includes(q))
+    );
+  }
+
+  const titleEl = $('funnelCohortTableTitle');
+  const subEl = $('funnelCohortTableSub');
+  const badgeEl = $('funnelCohortBadge');
+  const clearBtn = $('funnelClearFilterBtn');
+
+  if (clearBtn) {
+    clearBtn.style.display = (stage !== 'all' || pid) ? 'inline-flex' : 'none';
+  }
+
+  const stageDisplayNames = {
+    all: 'All Enquiries Pipeline',
+    contacted: 'Stage 2: Contacted / Briefed Cohort',
+    site_visit: 'Stage 3: Site Visits Conducted Cohort',
+    negotiation: 'Stage 4: Active Price Discussion Cohort',
+    won: 'Stage 5: Confirmed Booked Units'
+  };
+
+  let projName = '';
+  if (pid) {
+    const p = (state.projects || []).find(x => Number(x.id) === Number(pid));
+    if (p) projName = ' · ' + p.name;
+  }
+
+  if (titleEl) {
+    titleEl.textContent = `${stageDisplayNames[stage] || stage}${projName} (${filtered.length} Deals)`;
+  }
+  if (subEl) {
+    const totalINR = filtered.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+    const crVal = (totalINR / 10000000).toFixed(2);
+    subEl.textContent = `Aggregated Cohort Value: ₹ ${crVal} Cr · Instant 360° Lead Drawer view available for each deal below`;
+  }
+  if (badgeEl) {
+    badgeEl.textContent = (stage === 'all' ? 'All Stages' : stage.replace('_', ' ').toUpperCase()) + (pid ? ' (Filtered)' : '');
+  }
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:36px; color:#94a3b8; font-size:13px;">No deals found matching the current funnel cohort filter.</td></tr>`;
+    return;
+  }
+
+  const displaySlice = filtered.slice(0, 50);
+
+  tbody.innerHTML = displaySlice.map(l => {
+    const cleanPhone = (l.phone || '').replace(/[^0-9]/g, '');
+    const budgetVal = l.budget || ('₹ ' + (parseLeadBudgetINR(l.budget, l.project_name) / 10000000).toFixed(2) + ' Cr');
+    const sentiment = l.sentiment || 'warm';
+
+    const sentimentBadge = sentiment === 'hot'
+      ? '<span style="background:rgba(239,68,68,0.18); color:#f87171; font-weight:800; font-size:11px; padding:3px 8px; border-radius:9999px;">🔥 HOT</span>'
+      : (sentiment === 'cold'
+        ? '<span style="background:rgba(148,163,184,0.18); color:#cbd5e1; font-weight:800; font-size:11px; padding:3px 8px; border-radius:9999px;">❄️ COLD</span>'
+        : '<span style="background:rgba(245,158,11,0.18); color:#fbbf24; font-weight:800; font-size:11px; padding:3px 8px; border-radius:9999px;">⚡ WARM</span>');
+
+    return `
+      <tr>
+        <td>
+          <b style="color:#ffffff; font-size:13.5px;">${esc(l.name)}</b><br>
+          <span style="font-size:11px; color:#94a3b8; font-family:monospace;">#${l.id}</span>
+        </td>
+        <td>
+          <span style="font-family:monospace; color:#cbd5e1; font-size:12px;">📞 ${esc(l.phone || '—')}</span><br>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+            <span style="font-size:11px; color:#94a3b8;">${esc(l.email || 'No email')}</span>
+            ${cleanPhone ? `<a href="https://wa.me/91${cleanPhone.slice(-10)}" target="_blank" style="text-decoration:none;" title="Open WhatsApp Chat">💬</a>` : ''}
+          </div>
+        </td>
+        <td>
+          <b style="color:#f8fafc;">${esc(l.project_name || 'General')}</b>
+          ${l.unit_number ? `<br><span style="font-size:11px; color:#38bdf8;">Unit ${esc(l.unit_number)}</span>` : ''}
+        </td>
+        <td>
+          <b style="color:#fbbf24; font-size:13px;">${esc(budgetVal)}</b>
+        </td>
+        <td>
+          <span style="background:rgba(2,132,199,0.2); color:#38bdf8; font-weight:700; font-size:11px; padding:3px 8px; border-radius:9999px; text-transform:uppercase;">
+            ${esc((l.status || 'new').replace('_', ' '))}
+          </span>
+        </td>
+        <td>${sentimentBadge}</td>
+        <td>
+          <span style="color:#e2e8f0; font-weight:600;">${esc(l.employee_name || 'Unassigned')}</span>
+        </td>
+        <td style="text-align:right; white-space:nowrap;">
+          <button type="button" class="btn smallbtn" onclick="openLeadDrawer(${l.id})" style="background:#1e293b; color:#f8fafc; border:1px solid rgba(255,255,255,0.2); font-weight:700; border-radius:6px; padding:4px 10px; cursor:pointer;" title="Open 360° Lead Dossier">
+            View Deal ↗
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  if (filtered.length > 50) {
+    tbody.innerHTML += `
+      <tr>
+        <td colspan="8" style="text-align:center; padding:12px; background:rgba(255,255,255,0.02); color:#94a3b8; font-size:12px;">
+          Showing top 50 deals of ${filtered.length}. Use Search box above or click Enquiries tab for full bulk pagination.
+        </td>
+      </tr>
+    `;
+  }
 }
 
 function renderExecutivePipelineFunnel() {
-  const section = $('execPipelineSection');
+  const section = $('funnelView');
   if (!section) return;
   if (state.currentUser && state.currentUser.role === 'hr') {
     section.style.display = 'none';
     return;
   }
-  section.style.display = 'block';
 
   const leads = state.leads || [];
   const visits = state.visits || [];
@@ -5012,7 +5349,7 @@ function renderExecutivePipelineFunnel() {
   if (projContainer) {
     const activeProjects = projects.filter(p => p.status === 'active');
     if (!activeProjects.length) {
-      projContainer.innerHTML = '<div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">No active projects recorded.</div>';
+      projContainer.innerHTML = '<div style="text-align:center; padding:18px; color:#94a3b8; font-size:12px;">No active projects recorded.</div>';
     } else {
       projContainer.innerHTML = activeProjects.map(p => {
         const pLeads = leads.filter(l => Number(l.project_id) === Number(p.id) || (l.project_name && l.project_name.toLowerCase().includes(p.name.toLowerCase())));
@@ -5023,7 +5360,7 @@ function renderExecutivePipelineFunnel() {
         const pVelocity = pLeads.length ? Math.min(100, Math.round(((pVisits + pWon) / pLeads.length) * 100)) : 0;
 
         return `
-          <div class="exec-project-item" onclick="filterProjectPipeline(${p.id}, '${escAttr(p.name)}')" title="Click to view ${escAttr(p.name)} enquiries">
+          <div class="exec-project-item" onclick="selectFunnelCohort('all', ${p.id})" title="Click to isolate ${escAttr(p.name)} deals in table below">
             <div>
               <div class="exec-project-name">${esc(p.name)}</div>
               <div class="exec-project-sub">${pLeads.length} Inquiries · ${pVisits} Visits Conducted · ${pWon} Bookings</div>
@@ -5079,16 +5416,16 @@ function renderExecutivePipelineFunnel() {
           <div>
             <div class="exec-advisor-name">
               ${rank}. ${esc(adv.name)}
-              ${isTop ? `<span class="exec-badge-top">⚡ Top Closer</span>` : ''}
-              ${adv.overdueCount > 0 ? `<span class="exec-badge-alert">⚠️ ${adv.overdueCount} Overdue</span>` : ''}
+              ${isTop ? `<span class="exec-badge-top" style="font-size:10.5px; font-weight:800; background:rgba(16,185,129,0.18); color:#34d399; padding:2px 8px; border-radius:9999px;">⚡ Top Closer</span>` : ''}
+              ${adv.overdueCount > 0 ? `<span class="exec-badge-alert" style="font-size:10.5px; font-weight:800; background:rgba(239,68,68,0.18); color:#f87171; padding:2px 8px; border-radius:9999px;">⚠️ ${adv.overdueCount} Overdue</span>` : ''}
             </div>
             <div class="exec-advisor-sub">${esc(adv.designation)} · ${adv.leadsCount} Enquiries · ${adv.wonCount} Bookings</div>
           </div>
           <div style="text-align:right;">
             <div class="exec-advisor-val">₹ ${advCr} Cr</div>
             ${adv.overdueCount > 0 && cleanPhone ? `
-              <a href="https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent('Hi ' + adv.name + ', you have ' + adv.overdueCount + ' overdue buyer enquiry follow-ups in the Laxminarayan CRM. Please update them today.')}" target="_blank" class="exec-btn-escalate" title="Send WhatsApp Escalation">Escalate 💬</a>
-            ` : `<span style="font-size:11px; color:#10b981; font-weight:700;">${adv.leadsCount > 0 ? '0 Overdue 🟢' : 'Active 🟢'}</span>`}
+              <a href="https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent('Hi ' + adv.name + ', you have ' + adv.overdueCount + ' overdue buyer enquiry follow-ups in the Laxminarayan CRM. Please update them today.')}" target="_blank" class="exec-btn-escalate" style="font-size:11px; font-weight:700; background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:3px 8px; border-radius:6px; text-decoration:none; display:inline-block; margin-top:2px;" title="Send WhatsApp Escalation">Escalate 💬</a>
+            ` : `<span style="font-size:11px; color:#34d399; font-weight:700;">${adv.leadsCount > 0 ? '0 Overdue 🟢' : 'Active 🟢'}</span>`}
           </div>
         </div>
       `;
@@ -5099,24 +5436,27 @@ function renderExecutivePipelineFunnel() {
       const unassignedINR = unassignedLeads.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
       const uCr = (unassignedINR / 10000000).toFixed(2);
       html += `
-        <div class="exec-advisor-item" style="background:rgba(245,158,11,0.04); border-color:rgba(245,158,11,0.25);">
+        <div class="exec-advisor-item" style="background:rgba(245,158,11,0.06); border-radius:8px; border:1px solid rgba(245,158,11,0.25); margin-top:6px;">
           <div>
             <div class="exec-advisor-name">
               📌 Central Intake Desk
-              <span class="exec-badge-alert" style="background:rgba(245,158,11,0.15); color:#d97706;">⚡ ${unassignedLeads.length} Unallocated</span>
+              <span class="exec-badge-alert" style="font-size:10.5px; font-weight:800; background:rgba(245,158,11,0.2); color:#fbbf24; padding:2px 8px; border-radius:9999px;">⚡ ${unassignedLeads.length} Unallocated</span>
             </div>
-            <div class="exec-advisor-sub">Enquiries awaiting sales executive assignment</div>
+            <div class="exec-advisor-sub" style="color:#cbd5e1;">Enquiries awaiting sales executive assignment</div>
           </div>
           <div style="text-align:right;">
-            <div class="exec-advisor-val" style="color:#d97706;">₹ ${uCr} Cr</div>
-            <button type="button" class="exec-btn-escalate" style="background:#fef3c7; color:#92400e; border-color:#fde68a;" onclick="drillDownLeads('new')" title="Assign Enquiries">Assign Now →</button>
+            <div class="exec-advisor-val" style="color:#fbbf24;">₹ ${uCr} Cr</div>
+            <button type="button" class="exec-btn-escalate" style="font-size:11px; font-weight:700; background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:3px 8px; border-radius:6px; cursor:pointer;" onclick="drillDownLeads('new')" title="Assign Enquiries">Assign Now →</button>
           </div>
         </div>
       `;
     }
 
-    advisorContainer.innerHTML = html || '<div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">No advisor data available.</div>';
+    advisorContainer.innerHTML = html || '<div style="text-align:center; padding:18px; color:#94a3b8; font-size:12px;">No advisor data available.</div>';
   }
+
+  // Render the deals cohort table below the funnel
+  renderFunnelDealsTable();
 }
 
 // ─── LEAD 360° DRAWER ───
