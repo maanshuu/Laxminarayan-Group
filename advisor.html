@@ -693,6 +693,7 @@ tr:hover td { background: #fdfdfe; }
         </div>
       </div>
       <div class="modal-foot">
+        <button type="button" class="btn-sm" style="background:linear-gradient(135deg, #0284c7, #d4af37); color:#fff; border:none; font-weight:700; padding:8px 14px; border-radius:8px; margin-right:auto; cursor:pointer;" onclick="openAiPitchFromAdvisorEdit()">✨ AI Pitch</button>
         <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
         <button type="submit" class="btn-save">Save Changes</button>
       </div>
@@ -1315,6 +1316,7 @@ function renderAdvisorLeads() {
         <td>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn-sm btn-edit" onclick="openEditModal(${x.id})">Update</button>
+            <button class="btn-sm" style="background:linear-gradient(135deg, #0284c7, #d4af37); color:#fff; border:none; font-weight:700; box-shadow:0 2px 8px rgba(2,132,199,0.25);" onclick="openAiPitchModal(${x.id})" title="AI WhatsApp Pitch">✨ Pitch</button>
             <button class="btn-sm" style="border-color:#0284c7; color:#0284c7; font-weight:700;" onclick="openCostSheetModal({ clientName: '${escAttr(x.name)}', clientPhone: '${escAttr(x.phone)}', projectName: '${escAttr(x.project_name || '')}' })" title="Generate Buyer Cost Sheet">📄 Quote</button>
           </div>
         </td>
@@ -1625,6 +1627,15 @@ function closeEditModal() {
   $('editModal').classList.remove('open');
 }
 
+function openAiPitchFromAdvisorEdit() {
+  const id = Number($('editLeadId')?.value);
+  if (!id) return;
+  const lead = (state.leads || []).find(l => Number(l.id) === id) || { id };
+  if (typeof window.openAiPitchModal === 'function') {
+    window.openAiPitchModal(lead);
+  }
+}
+
 if ($('editModal')) {
   $('editModal').addEventListener('click', e => {
     if (e.target === $('editModal')) closeEditModal();
@@ -1812,5 +1823,6 @@ loadPortal().then(() => {
 <script src="/assets/pwa-install.js" defer></script>
 <script src="assets/command-palette.js?v=1" defer></script>
 <script src="assets/realtime.js?v=1" defer></script>
+<script src="assets/ai-copilot.js?v=1" defer></script>
 </body>
 </html>

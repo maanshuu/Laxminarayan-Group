@@ -157,9 +157,33 @@
           if (sel) { sel.value = 'hot'; if (typeof window.onAdvisorPriorityChange === 'function') window.onAdvisorPriorityChange(); }
         }
       });
+      items.push({
+        type: 'action',
+        category: 'Quick Actions',
+        icon: '✨',
+        title: '✨ AI WhatsApp Pitch Drafter',
+        sub: 'Draft high-converting follow-up pitch in English, Gujarati, or Hindi',
+        badge: 'AI Copilot',
+        run: () => {
+          const firstLead = (window.state?.leads && window.state.leads[0]) || { id: 1, name: 'Valued Client' };
+          if (typeof window.openAiPitchModal === 'function') window.openAiPitchModal(firstLead);
+        }
+      });
     }
 
     if (isAdmin()) {
+      items.push({
+        type: 'action',
+        category: 'Quick Actions',
+        icon: '✨',
+        title: '✨ AI WhatsApp Pitch Drafter',
+        sub: 'Draft high-converting follow-up pitch in English, Gujarati, or Hindi',
+        badge: 'AI Copilot',
+        run: () => {
+          const firstLead = (window.state?.leads && window.state.leads[0]) || { id: 1, name: 'Valued Client' };
+          if (typeof window.openAiPitchModal === 'function') window.openAiPitchModal(firstLead);
+        }
+      });
       items.push({
         type: 'action',
         category: 'Quick Actions',

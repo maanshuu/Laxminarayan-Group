@@ -37,6 +37,7 @@ const crypto=require("crypto");
 const Database=require("./scripts/sqlite-compat");
 const { buildPdf }=require("./scripts/pdf-brochure");
 const { buildAllotmentPdf }=require("./scripts/pdf-allotment");
+const { generateRealEstatePitch }=require("./scripts/ai-copilot-engine");
 
 const app=express();
 const PORT=Number(process.env.PORT||5000);
@@ -3106,6 +3107,91 @@ app.post("/api/employee/leads/audit-reveal",employeeOrAdmin,(req,res)=>{
   const advisorName=emp ? emp.name : (req.user?.name||`User #${req.user?.id}`);
   audit(req,"reveal_phone","lead",leadId,`Advisor ${advisorName} revealed phone for client ${lead.name}`);
   res.json({success:true});
+});
+
+// ---------------- Enterprise PropTech: AI Real Estate Copilot ----------------
+app.post("/api/ai/draft-pitch", employeeOrAdmin, async (req, res) => {
+  try {
+    const leadId = Number(req.body.lead_id);
+    const tone = clean(req.body.tone, 40) || "site_visit";
+    const language = clean(req.body.language, 20) || "english";
+    const customPrompt = clean(req.body.custom_prompt, 500) || "";
+
+    if (!leadId) {
+      return res.status(400).json({ success: false, error: "Valid Lead ID is required" });
+    }
+
+    const lead = db.prepare(`
+      SELECT l.*, p.name AS project_name, p.location AS project_location, 
+             p.category AS project_category, p.description AS project_desc,
+             p.price AS project_price, p.amenities AS project_amenities
+      FROM leads l
+      LEFT JOIN projects p ON p.id = l.project_id
+      WHERE l.id = ?
+    `).get(leadId);
+
+    if (!lead) {
+      return res.status(404).json({ success: false, error: "Lead record not found" });
+    }
+
+    const emp = currentEmployee(req.user.id);
+    const advisorName = emp?.name || (req.user?.name || "Sales Advisor");
+    const advisorPhone = emp?.phone || "";
+
+    const pitch = await generateRealEstatePitch({
+      clientName: lead.name,
+      projName: lead.project_name,
+      projLoc: lead.project_location,
+      projDesc: lead.project_desc,
+      projCategory: lead.project_category,
+      tone,
+      language,
+      advisorName,
+      advisorPhone,
+      notes: lead.notes,
+      budget: lead.budget,
+      customPrompt
+    });
+
+    const cleanPhone = (lead.phone || "").replace(/[^0-9]/g, "");
+    const waLink = cleanPhone ? `https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent(pitch)}` : null;
+
+    audit(req, "ai_generate", "lead", lead.id, `Generated ${language} ${tone} pitch for ${lead.name}`);
+
+    return res.json({
+      success: true,
+      pitch,
+      whatsappUrl: waLink,
+      phone: cleanPhone,
+      clientName: lead.name,
+      projectName: lead.project_name || "General Portfolio",
+      language,
+      tone
+    });
+  } catch (err) {
+    console.error("[AI PITCH ERROR]", err);
+    return res.status(500).json({ success: false, error: err.message || "Failed to generate pitch" });
+  }
+});
+
+app.post("/api/ai/save-pitch-note", employeeOrAdmin, (req, res) => {
+  try {
+    const leadId = Number(req.body.lead_id);
+    const summary = clean(req.body.summary, 2000) || "";
+    if (!leadId || !summary) {
+      return res.status(400).json({ success: false, error: "Lead ID and pitch summary required" });
+    }
+    const lead = db.prepare("SELECT id, notes FROM leads WHERE id=?").get(leadId);
+    if (!lead) return res.status(404).json({ success: false, error: "Lead not found" });
+
+    const timeStamp = nowIST();
+    const newNotes = (lead.notes ? (lead.notes + "\n\n") : "") + `[✨ AI WhatsApp Follow-up • ${timeStamp}]:\n${summary}`;
+    db.prepare("UPDATE leads SET notes=?, updated_at=CURRENT_TIMESTAMP WHERE id=?").run(newNotes, leadId);
+    notifyRealtimeLeadUpdate(leadId, 'updated');
+    return res.json({ success: true, message: "AI pitch logged to CRM activity notes" });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.post("/api/employee/walk-in",employeeOrAdmin,(req,res)=>{

@@ -3376,6 +3376,7 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
       <a id="drawerCallBtn" href="#" class="btn btn-call">📞 Call Directly</a>
       <button class="btn smallbtn" onclick="openVisitFromDrawer()">📅 Schedule Visit</button>
       <button class="btn smallbtn" style="border-color:#0284c7; color:#0284c7; font-weight:700;" onclick="openCostSheetFromDrawer()">📄 Generate Cost Sheet</button>
+      <button type="button" class="btn smallbtn" style="background:linear-gradient(135deg, #0284c7, #d4af37); color:#fff; border:none; font-weight:700; box-shadow:0 2px 8px rgba(2,132,199,0.3);" onclick="openAiPitchFromDrawer()">✨ AI WhatsApp Pitch</button>
     </div>
 
     <form id="drawerForm" class="formgrid" style="margin-top:16px;">
@@ -4559,6 +4560,23 @@ function openCostSheetFromDrawer() {
   const projSel = $('drawerProject');
   const projName = projSel?.options[projSel.selectedIndex]?.text || '';
   openCostSheetModal({ clientName: name, clientPhone: phone, projectName: projName });
+}
+
+function openAiPitchFromDrawer() {
+  const leadId = $('drawerLeadId')?.value;
+  const lead = state.currentDrawerLead || (leadId ? {
+    id: Number(leadId),
+    name: $('drawerName')?.value,
+    phone: $('drawerPhone')?.value,
+    project_name: $('drawerProject')?.options[$('drawerProject')?.selectedIndex]?.text,
+    sentiment: $('drawerSentiment')?.value,
+    notes: $('drawerNotes')?.value
+  } : null);
+  if (lead && typeof window.openAiPitchModal === 'function') {
+    window.openAiPitchModal(lead);
+  } else if (!lead) {
+    toast('Please select an enquiry first');
+  }
 }
 
 function closeLeadDrawer() {
@@ -7694,5 +7712,6 @@ setInterval(() => {
 <script src="/assets/pwa-install.js" defer></script>
 <script src="assets/command-palette.js?v=1" defer></script>
 <script src="assets/realtime.js?v=1" defer></script>
+<script src="assets/ai-copilot.js?v=1" defer></script>
 </body>
 </html>
