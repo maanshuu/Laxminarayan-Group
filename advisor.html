@@ -982,6 +982,50 @@ async function loadPortal() {
   }
 }
 
+// ─── CLIENT PHONE PRIVACY MASKING & AUDIT REVEAL ───
+const revealedPhones = new Set();
+
+function maskPhoneNumber(phone) {
+  if (!phone) return '—';
+  const clean = String(phone).trim();
+  const digits = clean.replace(/[^0-9]/g, '');
+  if (digits.length < 7) return clean;
+  if (digits.length === 10) {
+    return digits.slice(0, 5) + ' •••••';
+  }
+  if (digits.length > 10) {
+    const main10 = digits.slice(-10);
+    const prefix = digits.slice(0, -10);
+    return `+${prefix} ${main10.slice(0, 5)} •••••`;
+  }
+  return digits.slice(0, 3) + ' •••• ' + digits.slice(-2);
+}
+
+async function toggleRevealPhone(leadId) {
+  const id = Number(leadId);
+  const lead = (state.leads || []).find(l => Number(l.id) === id);
+  if (!lead) return;
+
+  if (revealedPhones.has(id)) {
+    revealedPhones.delete(id);
+    renderAdvisorLeads();
+    return;
+  }
+
+  revealedPhones.add(id);
+  renderAdvisorLeads();
+
+  // Audit log reveal event on server (non-blocking)
+  try {
+    fetch('/api/employee/leads/audit-reveal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ lead_id: id })
+    }).catch(() => {});
+  } catch (_e) {}
+}
+
 function getTodayISTDate() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
 }
@@ -1233,6 +1277,8 @@ function renderAdvisorLeads() {
     const fDate = x.follow_up_at ? String(x.follow_up_at).slice(0, 10) : '';
     const isToday = fDate && fDate === todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
     const isOverdue = fDate && fDate < todayIST && !['won', 'lost', 'closed'].includes(String(x.status || '').toLowerCase());
+    const isRevealed = revealedPhones.has(Number(x.id));
+    const displayPhone = isRevealed ? (x.phone || cleanPhone) : maskPhoneNumber(x.phone || cleanPhone);
 
     return `
       <tr>
@@ -1242,9 +1288,12 @@ function renderAdvisorLeads() {
           <div style="margin-top:3px;">${window.renderSourceBadge ? window.renderSourceBadge(x.source) : `<span style="font-size:11px; color:var(--ink-muted);">${esc(x.source || 'website')}</span>`}</div>
         </td>
         <td>
-          <div class="action-btns">
-            ${cleanPhone ? `<a href="${telLink}" class="btn-sm" title="Call">📞 ${cleanPhone}</a>` : '—'}
-            ${cleanPhone ? `<a href="${waLink}" target="_blank" rel="noopener" class="btn-sm btn-wa" title="WhatsApp">💬 Chat</a>` : ''}
+          <div class="action-btns" style="display:inline-flex; align-items:center; gap:5px; flex-wrap:nowrap;">
+            ${cleanPhone ? `
+              <a href="${telLink}" class="btn-sm" style="display:inline-flex; align-items:center; gap:4px; font-family:monospace,sans-serif; font-size:12px; font-variant-numeric:tabular-nums;" title="Click to Call Client">📞 ${displayPhone}</a>
+              <button type="button" class="btn-sm" onclick="toggleRevealPhone(${x.id})" title="${isRevealed ? 'Hide Number' : 'Reveal Full Number (Logged for Security)'}" style="padding:4px 7px; font-size:12px; border:1px solid #cbd5e1; background:${isRevealed ? '#e0f2fe' : '#ffffff'}; color:${isRevealed ? '#0369a1' : '#64748b'}; cursor:pointer; border-radius:6px; line-height:1;">${isRevealed ? '🔒' : '👁️'}</button>
+              <a href="${waLink}" target="_blank" rel="noopener" class="btn-sm btn-wa" title="WhatsApp Chat">💬 Chat</a>
+            ` : '—'}
           </div>
         </td>
         <td>${esc(x.project_name || 'General')}</td>
@@ -1655,7 +1704,7 @@ function checkWalkInDuplicate() {
             <span style="font-size:16px;">⚠️</span>
             <div style="font-size:12px; color:#92400e; flex:1; line-height:1.4;">
               <strong>Existing Customer Found in CRM:</strong><br>
-              Customer <b>${esc(d.name)}</b> (${esc(d.phone)}) is already registered in CRM under <b>${esc(d.project_name || 'General')}</b> (Lead #${d.id}, Stage: <b>${esc(d.status)}</b>) by advisor <b>${esc(d.employee_name || 'Admin')}</b>.
+              Customer <b>${esc(d.name)}</b> (${esc(maskPhoneNumber(d.phone))}) is already registered in CRM under <b>${esc(d.project_name || 'General')}</b> (Lead #${d.id}, Stage: <b>${esc(d.status)}</b>) by advisor <b>${esc(d.employee_name || 'Admin')}</b>.
               <div style="margin-top:5px; font-size:11px; color:#78350f;">
                 💡 <em>If this visitor is following up, you can still save this walk-in to log their visit, but please note their existing record.</em>
               </div>

@@ -2957,6 +2957,18 @@ app.patch("/api/employee/leads/:id",employeeOrAdmin,(req,res)=>{
   res.json({success:true,message:"Lead updated"});
 });
 
+app.post("/api/employee/leads/audit-reveal",employeeOrAdmin,(req,res)=>{
+  const leadId=Number(req.body.lead_id);
+  if(!leadId)return res.status(400).json({success:false,error:"Invalid lead ID"});
+  const lead=db.prepare("SELECT id, name, phone FROM leads WHERE id=?").get(leadId);
+  if(!lead)return res.status(404).json({success:false,error:"Lead not found"});
+
+  const emp=currentEmployee(req.user.id);
+  const advisorName=emp ? emp.name : (req.user?.name||`User #${req.user?.id}`);
+  audit(req,"reveal_phone","lead",leadId,`Advisor ${advisorName} revealed phone for client ${lead.name}`);
+  res.json({success:true});
+});
+
 app.post("/api/employee/walk-in",employeeOrAdmin,(req,res)=>{
   const emp=currentEmployee(req.user.id);
   const empId=emp?emp.id:null;
