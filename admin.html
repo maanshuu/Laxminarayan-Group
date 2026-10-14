@@ -2155,6 +2155,42 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
   border-color: #38bdf8 !important;
   box-shadow: 0 0 12px rgba(2, 132, 199, 0.45);
 }
+#funnelView .exec-export-wrap {
+  position: relative;
+  display: inline-block;
+}
+#funnelView .exec-export-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
+  min-width: 220px;
+  z-index: 100;
+  overflow: hidden;
+}
+#funnelView .exec-export-menu button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #f8fafc;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s ease;
+  font-family: inherit;
+}
+#funnelView .exec-export-menu button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
 #funnelView table {
   width: 100%;
   border-collapse: collapse;
@@ -3088,9 +3124,39 @@ body.role-hr #funnelView {
             <option value="this_year" style="background:#0f172a; color:#f8fafc;">This Financial Year</option>
           </select>
         </div>
-        <button type="button" class="btn smallbtn" onclick="exportFunnelCohortCSV()" style="background:linear-gradient(135deg, #065f46 0%, #047857 100%); color:#ecfdf5; border:1px solid #10b981; font-weight:700; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(16,185,129,0.25);" title="Export current funnel cohort to CSV / Excel spreadsheet">
-          📥 Export CSV
-        </button>
+        <!-- EXECUTIVE EXPORT MENU -->
+        <div class="exec-export-wrap">
+          <button type="button" class="btn smallbtn" onclick="toggleExportMenu(this, event)" style="background:linear-gradient(135deg, #065f46 0%, #047857 100%); color:#ecfdf5; border:1px solid #10b981; font-weight:700; border-radius:8px; padding:7px 14px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(16,185,129,0.25);" title="Export options: Excel, PDF Dossier, CSV">
+            <span>📥 Export Report</span>
+            <span style="font-size:10px; opacity:0.85;">▼</span>
+          </button>
+          <div class="exec-export-menu">
+            <div style="padding:7px 12px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">
+              Executive Formats
+            </div>
+            <button type="button" onclick="exportFunnelCohortExcel(); closeAllExportMenus();">
+              <span style="font-size:16px;">📊</span>
+              <div>
+                <div style="color:#ffffff;">Excel Spreadsheet</div>
+                <div style="font-size:10.5px; color:#34d399; font-weight:500;">Formatted (.xls / XLSX)</div>
+              </div>
+            </button>
+            <button type="button" onclick="exportFunnelCohortPDF(); closeAllExportMenus();" style="border-top:1px solid rgba(255,255,255,0.06);">
+              <span style="font-size:16px;">📄</span>
+              <div>
+                <div style="color:#ffffff;">Executive PDF Dossier</div>
+                <div style="font-size:10.5px; color:#38bdf8; font-weight:500;">Director Branded & Print</div>
+              </div>
+            </button>
+            <button type="button" onclick="exportFunnelCohortCSV(); closeAllExportMenus();" style="border-top:1px solid rgba(255,255,255,0.06);">
+              <span style="font-size:16px;">📥</span>
+              <div>
+                <div style="color:#ffffff;">Raw Data CSV</div>
+                <div style="font-size:10.5px; color:#fbbf24; font-weight:500;">Universal CSV (.csv)</div>
+              </div>
+            </button>
+          </div>
+        </div>
         <button type="button" class="btn smallbtn" onclick="renderExecutivePipelineFunnel()" style="background:#1e293b; color:#f8fafc; border:1px solid rgba(255,255,255,0.15); font-weight:700; border-radius:8px; padding:7px 14px; cursor:pointer;" title="Refresh Sales Pipeline metrics">
           🔄 Refresh
         </button>
@@ -3214,9 +3280,39 @@ body.role-hr #funnelView {
           <span id="funnelCohortBadge" style="font-size:11.5px; font-weight:700; color:#38bdf8; background:rgba(2,132,199,0.18); border:1px solid rgba(2,132,199,0.3); padding:5px 12px; border-radius:9999px;">
             Stage 1: All Inquiries
           </span>
-          <button type="button" class="btn smallbtn" onclick="exportFunnelCohortCSV()" style="background:linear-gradient(135deg, #065f46 0%, #047857 100%); color:#ecfdf5; border:1px solid #10b981; font-weight:700; border-radius:8px; padding:6px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(16,185,129,0.25);" title="Export currently filtered deals to CSV / Excel spreadsheet">
-            📥 Export CSV
-          </button>
+          <!-- EXECUTIVE EXPORT MENU -->
+          <div class="exec-export-wrap">
+            <button type="button" class="btn smallbtn" onclick="toggleExportMenu(this, event)" style="background:linear-gradient(135deg, #065f46 0%, #047857 100%); color:#ecfdf5; border:1px solid #10b981; font-weight:700; border-radius:8px; padding:6px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(16,185,129,0.25);" title="Export options: Excel, PDF Dossier, CSV">
+              <span>📥 Export Report</span>
+              <span style="font-size:10px; opacity:0.85;">▼</span>
+            </button>
+            <div class="exec-export-menu">
+              <div style="padding:7px 12px; font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">
+                Executive Formats
+              </div>
+              <button type="button" onclick="exportFunnelCohortExcel(); closeAllExportMenus();">
+                <span style="font-size:16px;">📊</span>
+                <div>
+                  <div style="color:#ffffff;">Excel Spreadsheet</div>
+                  <div style="font-size:10.5px; color:#34d399; font-weight:500;">Formatted (.xls / XLSX)</div>
+                </div>
+              </button>
+              <button type="button" onclick="exportFunnelCohortPDF(); closeAllExportMenus();" style="border-top:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:16px;">📄</span>
+                <div>
+                  <div style="color:#ffffff;">Executive PDF Dossier</div>
+                  <div style="font-size:10.5px; color:#38bdf8; font-weight:500;">Director Branded & Print</div>
+                </div>
+              </button>
+              <button type="button" onclick="exportFunnelCohortCSV(); closeAllExportMenus();" style="border-top:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:16px;">📥</span>
+                <div>
+                  <div style="color:#ffffff;">Raw Data CSV</div>
+                  <div style="font-size:10.5px; color:#fbbf24; font-weight:500;">Universal CSV (.csv)</div>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -5239,6 +5335,384 @@ function exportFunnelCohortCSV() {
   URL.revokeObjectURL(url);
 
   toast(`📥 Exported ${filtered.length} Funnel Deals to CSV!`);
+}
+
+function toggleExportMenu(btn, e) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const wrap = btn.closest('.exec-export-wrap');
+  if (!wrap) return;
+  const menu = wrap.querySelector('.exec-export-menu');
+  if (!menu) return;
+  const isShown = menu.style.display === 'block';
+  closeAllExportMenus();
+  if (!isShown) {
+    menu.style.display = 'block';
+  }
+}
+
+function closeAllExportMenus() {
+  document.querySelectorAll('.exec-export-menu').forEach(m => m.style.display = 'none');
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.exec-export-wrap')) {
+    closeAllExportMenus();
+  }
+});
+
+function exportFunnelCohortExcel() {
+  if (state.currentUser && state.currentUser.role === 'hr') return;
+
+  const leads = state.leads || [];
+  const stage = state.funnelCohortStage || 'all';
+  const pid = state.funnelCohortProject;
+  const q = ($('funnelTableSearchInput')?.value || '').trim().toLowerCase();
+  const dateRange = state.funnelDateRange || 'all';
+
+  let filtered = leads.filter(l => isDateInFunnelRange(l.created_at, dateRange));
+
+  if (stage === 'contacted') {
+    filtered = filtered.filter(l => ['contacted', 'qualified', 'site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'site_visit') {
+    filtered = filtered.filter(l => ['site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'negotiation') {
+    filtered = filtered.filter(l => ['negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'won') {
+    filtered = filtered.filter(l => String(l.status || '').toLowerCase() === 'won');
+  }
+
+  if (pid) {
+    filtered = filtered.filter(l => Number(l.project_id) === Number(pid));
+  }
+
+  if (q) {
+    filtered = filtered.filter(l =>
+      (l.name && l.name.toLowerCase().includes(q)) ||
+      (l.phone && l.phone.toLowerCase().includes(q)) ||
+      (l.email && l.email.toLowerCase().includes(q)) ||
+      (l.project_name && l.project_name.toLowerCase().includes(q)) ||
+      (l.employee_name && l.employee_name.toLowerCase().includes(q))
+    );
+  }
+
+  if (!filtered.length) {
+    toast('⚠️ No deals found to export for current filters');
+    return;
+  }
+
+  const dateRangeLabels = {
+    all: 'All Time Pipeline',
+    this_month: 'This Month',
+    last_30: 'Last 30 Days',
+    this_quarter: 'This Quarter',
+    this_year: 'This Financial Year'
+  };
+  const stageLabels = {
+    all: 'All Inquiries Pipeline',
+    contacted: 'Stage 2: Contacted / Briefed',
+    site_visit: 'Stage 3: Site Visits Conducted',
+    negotiation: 'Stage 4: Price Discussion',
+    won: 'Stage 5: Confirmed Booked Units'
+  };
+
+  const totalINR = filtered.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const totalCr = (totalINR / 10000000).toFixed(2);
+  const todayIST = new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }).format(new Date());
+
+  const tableRows = filtered.map((l, idx) => {
+    const budgetVal = l.budget || ('₹ ' + (parseLeadBudgetINR(l.budget, l.project_name) / 10000000).toFixed(2) + ' Cr');
+    const bg = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+    return `
+      <tr style="background:${bg};">
+        <td style="padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold;">#${l.id}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; color:#0f172a;">${esc(l.name || '—')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.phone || '—')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.email || '—')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1; font-weight:600;">${esc(l.project_name || 'General')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.unit_number || '—')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1; font-weight:bold; color:#0369a1;">${esc(budgetVal)}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1; text-transform:uppercase; font-weight:bold;">${esc((l.status || 'new').replace('_', ' '))}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1; text-transform:uppercase; font-weight:bold;">${esc(l.sentiment || 'warm')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.employee_name || 'Unassigned')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.source || '—')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '—')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.created_at ? String(l.created_at).slice(0, 19) : '—')}</td>
+        <td style="padding:8px 12px; border:1px solid #cbd5e1;">${esc(l.notes || '')}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const excelTemplate = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <!--[if gte mso 9]>
+      <xml>
+        <x:ExcelWorkbook>
+          <x:ExcelWorksheets>
+            <x:ExcelWorksheet>
+              <x:Name>Sales Funnel Deals</x:Name>
+              <x:WorksheetOptions>
+                <x:DisplayGridlines/>
+              </x:WorksheetOptions>
+            </x:ExcelWorksheet>
+          </x:ExcelWorksheets>
+        </x:ExcelWorkbook>
+      </xml>
+      <![endif]-->
+      <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
+      <style>
+        body { font-family: Calibri, 'Segoe UI', Arial, sans-serif; }
+        table { border-collapse: collapse; width: 100%; }
+        th { background: #0f172a; color: #ffffff; padding: 10px 12px; border: 1px solid #334155; font-size: 11pt; text-align: left; }
+        td { font-size: 10pt; vertical-align: middle; }
+      </style>
+    </head>
+    <body>
+      <div style="font-size: 16pt; font-weight: bold; color: #0f172a; margin-bottom: 4px;">LAXMINARAYAN GROUP — EXECUTIVE SALES FUNNEL & DEAL DOSSIER</div>
+      <div style="font-size: 11pt; color: #475569; margin-bottom: 12px;">Cohort: <b>${stageLabels[stage] || stage}</b> | Period: <b>${dateRangeLabels[dateRange] || dateRange}</b> | Deals: <b>${filtered.length}</b> | Pipeline Value: <b>₹ ${totalCr} Cr</b> | Exported: ${todayIST}</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Deal ID</th>
+            <th>Client Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Target Project</th>
+            <th>Unit</th>
+            <th>Ticket / Budget</th>
+            <th>Pipeline Stage</th>
+            <th>Sentiment</th>
+            <th>Assigned Advisor</th>
+            <th>Source</th>
+            <th>Follow-up Date</th>
+            <th>Created Date</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+  const cleanStage = (stage || 'all').replace(/[^a-zA-Z0-9]/g, '_');
+  a.href = url;
+  a.download = `Laxminarayan_Sales_Funnel_${cleanStage}_${dateStr}.xls`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  toast(`📊 Exported ${filtered.length} Deals to Formatted Excel (.xls)!`);
+}
+
+function exportFunnelCohortPDF() {
+  if (state.currentUser && state.currentUser.role === 'hr') return;
+
+  const leads = state.leads || [];
+  const stage = state.funnelCohortStage || 'all';
+  const pid = state.funnelCohortProject;
+  const q = ($('funnelTableSearchInput')?.value || '').trim().toLowerCase();
+  const dateRange = state.funnelDateRange || 'all';
+
+  let filtered = leads.filter(l => isDateInFunnelRange(l.created_at, dateRange));
+
+  if (stage === 'contacted') {
+    filtered = filtered.filter(l => ['contacted', 'qualified', 'site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'site_visit') {
+    filtered = filtered.filter(l => ['site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'negotiation') {
+    filtered = filtered.filter(l => ['negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  } else if (stage === 'won') {
+    filtered = filtered.filter(l => String(l.status || '').toLowerCase() === 'won');
+  }
+
+  if (pid) {
+    filtered = filtered.filter(l => Number(l.project_id) === Number(pid));
+  }
+
+  if (q) {
+    filtered = filtered.filter(l =>
+      (l.name && l.name.toLowerCase().includes(q)) ||
+      (l.phone && l.phone.toLowerCase().includes(q)) ||
+      (l.email && l.email.toLowerCase().includes(q)) ||
+      (l.project_name && l.project_name.toLowerCase().includes(q)) ||
+      (l.employee_name && l.employee_name.toLowerCase().includes(q))
+    );
+  }
+
+  if (!filtered.length) {
+    toast('⚠️ No deals found to print for current filters');
+    return;
+  }
+
+  const dateRangeLabels = {
+    all: 'All Time Pipeline',
+    this_month: 'This Month',
+    last_30: 'Last 30 Days',
+    this_quarter: 'This Quarter',
+    this_year: 'This Financial Year'
+  };
+  const stageLabels = {
+    all: 'All Inquiries Pipeline',
+    contacted: 'Stage 2: Contacted / Briefed',
+    site_visit: 'Stage 3: Site Visits Conducted',
+    negotiation: 'Stage 4: Price Discussion',
+    won: 'Stage 5: Confirmed Booked Units'
+  };
+
+  const totalINR = filtered.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const totalCr = (totalINR / 10000000).toFixed(2);
+  const todayIST = new Intl.DateTimeFormat('en-IN', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Kolkata' }).format(new Date());
+
+  let projName = 'All Projects';
+  if (pid) {
+    const p = (state.projects || []).find(x => Number(x.id) === Number(pid));
+    if (p) projName = p.name;
+  }
+
+  const printRows = filtered.map((l) => {
+    const budgetVal = l.budget || ('₹ ' + (parseLeadBudgetINR(l.budget, l.project_name) / 10000000).toFixed(2) + ' Cr');
+    const sentiment = (l.sentiment || 'warm').toUpperCase();
+    const sentimentColor = sentiment === 'HOT' ? '#b91c1c' : (sentiment === 'COLD' ? '#475569' : '#b45309');
+    const sentimentBg = sentiment === 'HOT' ? '#fee2e2' : (sentiment === 'COLD' ? '#f1f5f9' : '#fef3c7');
+
+    return `
+      <tr>
+        <td style="font-family:monospace; font-weight:700;">#${l.id}</td>
+        <td><b>${esc(l.name)}</b></td>
+        <td>📞 ${esc(l.phone || '—')}<br><small style="color:#64748b;">${esc(l.email || '')}</small></td>
+        <td><b>${esc(l.project_name || 'General')}</b>${l.unit_number ? `<br><small style="color:#0284c7;">Unit ${esc(l.unit_number)}</small>` : ''}</td>
+        <td style="font-weight:700; color:#0369a1;">${esc(budgetVal)}</td>
+        <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:9999px; font-weight:700; font-size:10.5px; text-transform:uppercase;">${esc((l.status || 'new').replace('_', ' '))}</span></td>
+        <td><span style="background:${sentimentBg}; color:${sentimentColor}; padding:2px 8px; border-radius:9999px; font-weight:800; font-size:10.5px;">${sentiment}</span></td>
+        <td><b>${esc(l.employee_name || 'Unassigned')}</b></td>
+        <td><small>${esc(l.created_at ? String(l.created_at).slice(0, 10) : '—')}</small></td>
+      </tr>
+    `;
+  }).join('');
+
+  const printHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Laxminarayan Group - Executive Sales Funnel Dossier</title>
+      <style>
+        @page { size: A4 landscape; margin: 10mm; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0f172a; margin: 0; padding: 15px; background: #fff; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 14px; }
+        .brand-title { font-size: 20px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; }
+        .brand-sub { font-size: 11px; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .meta-box { text-align: right; font-size: 11px; color: #475569; }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+        .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; }
+        .kpi-title { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-val { font-size: 18px; font-weight: 800; color: #0f172a; margin-top: 2px; }
+        .kpi-sub { font-size: 10.5px; color: #64748b; margin-top: 2px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { background: #0f172a; color: #ffffff; font-weight: 700; text-align: left; padding: 7px 9px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 7px 9px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        tr:nth-child(even) td { background: #f8fafc; }
+        .footer { margin-top: 18px; padding-top: 8px; border-top: 1px solid #cbd5e1; font-size: 9.5px; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; }
+        .print-btn-bar { margin-bottom: 15px; display: flex; justify-content: flex-end; gap: 10px; }
+        @media print {
+          .print-btn-bar { display: none !important; }
+          body { padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="print-btn-bar">
+        <button onclick="window.print()" style="background:#0284c7; color:#fff; border:none; padding:8px 16px; font-weight:700; border-radius:6px; cursor:pointer; font-size:13px;">🖨️ Print / Save as PDF</button>
+        <button onclick="window.close()" style="background:#64748b; color:#fff; border:none; padding:8px 16px; font-weight:700; border-radius:6px; cursor:pointer; font-size:13px;">✕ Close Window</button>
+      </div>
+      <div class="header">
+        <div>
+          <div class="brand-title">👑 Laxminarayan Group — Executive Sales Funnel & Deal Dossier</div>
+          <div class="brand-sub">DIRECTOR BI & AUDIT REPORT · CONFIDENTIAL</div>
+        </div>
+        <div class="meta-box">
+          <div><b>Generated:</b> ${todayIST}</div>
+          <div><b>Scope:</b> ${esc(projName)}</div>
+          <div><b>Period:</b> ${esc(dateRangeLabels[dateRange] || dateRange)}</div>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card" style="border-left: 3px solid #d97706;">
+          <div class="kpi-title">Selected Cohort</div>
+          <div class="kpi-val" style="color:#d97706;">${esc(stageLabels[stage] || stage)}</div>
+          <div class="kpi-sub">${filtered.length} Active Deals</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #0284c7;">
+          <div class="kpi-title">Cohort Deal Value</div>
+          <div class="kpi-val" style="color:#0284c7;">₹ ${totalCr} Cr</div>
+          <div class="kpi-sub">Aggregated Pipeline Value</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #10b981;">
+          <div class="kpi-title">Scope & Project</div>
+          <div class="kpi-val" style="color:#10b981;">${esc(projName)}</div>
+          <div class="kpi-sub">${dateRangeLabels[dateRange] || dateRange}</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #8b5cf6;">
+          <div class="kpi-title">Audit Status</div>
+          <div class="kpi-val" style="color:#8b5cf6;">VERIFIED</div>
+          <div class="kpi-sub">Official CRM Live Snapshot</div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Client Name</th>
+            <th>Contact Details</th>
+            <th>Project & Unit</th>
+            <th>Budget / Ticket</th>
+            <th>Stage</th>
+            <th>Sentiment</th>
+            <th>Assigned Advisor</th>
+            <th>Date Added</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${printRows}
+        </tbody>
+      </table>
+
+      <div class="footer">
+        <div>🔒 Confidential — For Laxminarayan Group Executive Board & Management Use Only. Generated via Executive CRM Command Center.</div>
+        <div>Page 1 of 1 · Executive BI Snapshot</div>
+      </div>
+
+      <script>
+        window.addEventListener('DOMContentLoaded', () => {
+          setTimeout(() => { window.print(); }, 400);
+        });
+      <\/script>
+    </body>
+    </html>
+  `;
+
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    printWindow.document.open();
+    printWindow.document.write(printHtml);
+    printWindow.document.close();
+    toast(`📄 Opened Executive PDF Dossier with ${filtered.length} deals!`);
+  } else {
+    toast('⚠️ Pop-up blocked. Please allow pop-ups for laxminarayangroup.in to open PDF dossier.');
+  }
 }
 
 function filterProjectPipeline(projectId, projectName) {
