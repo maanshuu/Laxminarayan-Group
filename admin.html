@@ -2116,8 +2116,44 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
-  margin-top: 14px;
+  margin-top: 18px;
   overflow: hidden;
+  scroll-margin-top: 80px;
+}
+#funnelView .funnel-pills-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 22px;
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+#funnelView .funnel-pill {
+  background: rgba(30, 41, 59, 0.8);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+#funnelView .funnel-pill:hover {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-1px);
+}
+#funnelView .funnel-pill.active {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.45);
 }
 #funnelView table {
   width: 100%;
@@ -3150,6 +3186,55 @@ body.role-hr #funnelView {
       </div>
     </div>
 
+    <!-- EMBEDDED INTERACTIVE DEALS COHORT TABLE (DIRECTLY BENEATH FUNNEL CARDS) -->
+    <div class="exec-table-wrap" id="funnelCohortTableWrap">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 22px; border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:12px;">
+        <div>
+          <h3 id="funnelCohortTableTitle" style="font-size:16px; font-weight:800; color:#f8fafc; margin:0;">Live Pipeline Deal Cohort</h3>
+          <span id="funnelCohortTableSub" style="font-size:12px; color:#94a3b8;">Click any stage in the funnel above or project to isolate matching deals</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <button type="button" id="funnelClearFilterBtn" onclick="selectFunnelCohort('all')" style="display:none; font-size:11.5px; font-weight:700; background:rgba(239,68,68,0.18); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:5px 12px; border-radius:8px; cursor:pointer;">
+            ✕ Reset Filter
+          </button>
+          <input type="text" id="funnelTableSearchInput" placeholder="🔍 Search deals..." oninput="renderFunnelDealsTable()" style="background:#1e293b; border:1px solid rgba(255,255,255,0.15); color:#f8fafc; padding:6px 14px; border-radius:8px; font-size:12.5px; width:190px;">
+          <span id="funnelCohortBadge" style="font-size:11.5px; font-weight:700; color:#38bdf8; background:rgba(2,132,199,0.18); border:1px solid rgba(2,132,199,0.3); padding:5px 12px; border-radius:9999px;">
+            Stage 1: All Inquiries
+          </span>
+        </div>
+      </div>
+
+      <!-- QUICK 1-CLICK STAGE TOGGLE PILLS -->
+      <div class="funnel-pills-bar">
+        <span style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; margin-right:4px;">Filter Cohort:</span>
+        <button type="button" class="funnel-pill active" data-stage="all" onclick="selectFunnelCohort('all')">All Inquiries</button>
+        <button type="button" class="funnel-pill" data-stage="contacted" onclick="selectFunnelCohort('contacted')">Stage 2: Contacted</button>
+        <button type="button" class="funnel-pill" data-stage="site_visit" onclick="selectFunnelCohort('site_visit')">Stage 3: Visits</button>
+        <button type="button" class="funnel-pill" data-stage="negotiation" onclick="selectFunnelCohort('negotiation')">Stage 4: Price Discussion</button>
+        <button type="button" class="funnel-pill" data-stage="won" onclick="selectFunnelCohort('won')">Stage 5: Booked</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Client Name</th>
+              <th>Contact Details</th>
+              <th>Target Project</th>
+              <th>Ticket / Budget</th>
+              <th>Pipeline Stage</th>
+              <th>Sentiment</th>
+              <th>Assigned Advisor</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="funnelCohortTableBody">
+            <tr><td colspan="8" style="text-align:center; padding:28px; color:#94a3b8;">Loading deals...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- SPLIT ROW: PROJECT BREAKDOWN & ADVISOR LEADERBOARD -->
     <div class="exec-split-grid">
       <div class="exec-panel">
@@ -3170,44 +3255,6 @@ body.role-hr #funnelView {
         <div id="execAdvisorLeaderboardContainer">
           <div style="text-align:center; padding:18px; color:#94a3b8; font-size:12px;">Loading advisor metrics...</div>
         </div>
-      </div>
-    </div>
-
-    <!-- EMBEDDED INTERACTIVE DEALS COHORT TABLE -->
-    <div class="exec-table-wrap">
-      <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 22px; border-bottom:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 id="funnelCohortTableTitle" style="font-size:16px; font-weight:800; color:#f8fafc; margin:0;">Live Pipeline Deal Cohort</h3>
-          <span id="funnelCohortTableSub" style="font-size:12px; color:#94a3b8;">Click any stage in the funnel above or project to isolate matching deals</span>
-        </div>
-        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-          <button type="button" id="funnelClearFilterBtn" onclick="selectFunnelCohort('all')" style="display:none; font-size:11.5px; font-weight:700; background:rgba(239,68,68,0.18); color:#f87171; border:1px solid rgba(239,68,68,0.3); padding:5px 12px; border-radius:8px; cursor:pointer;">
-            ✕ Reset Filter
-          </button>
-          <input type="text" id="funnelTableSearchInput" placeholder="🔍 Search deals..." oninput="renderFunnelDealsTable()" style="background:#1e293b; border:1px solid rgba(255,255,255,0.15); color:#f8fafc; padding:6px 14px; border-radius:8px; font-size:12.5px; width:190px;">
-          <span id="funnelCohortBadge" style="font-size:11.5px; font-weight:700; color:#38bdf8; background:rgba(2,132,199,0.18); border:1px solid rgba(2,132,199,0.3); padding:5px 12px; border-radius:9999px;">
-            Stage 1: All Inquiries
-          </span>
-        </div>
-      </div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>Client Name</th>
-              <th>Contact Details</th>
-              <th>Target Project</th>
-              <th>Ticket / Budget</th>
-              <th>Pipeline Stage</th>
-              <th>Sentiment</th>
-              <th>Assigned Advisor</th>
-              <th style="text-align:right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="funnelCohortTableBody">
-            <tr><td colspan="8" style="text-align:center; padding:28px; color:#94a3b8;">Loading deals...</td></tr>
-          </tbody>
-        </table>
       </div>
     </div>
   </section>
@@ -5053,7 +5100,7 @@ function filterProjectPipeline(projectId, projectName) {
   toast('📍 Filtered Funnel Deals to ' + (projectName || 'Project'));
 }
 
-function selectFunnelCohort(stage = 'all', projectId = null) {
+function selectFunnelCohort(stage = 'all', projectId = null, opts = { scroll: true }) {
   state.funnelCohortStage = stage;
   if (projectId !== null && projectId !== undefined) {
     state.funnelCohortProject = projectId;
@@ -5064,12 +5111,33 @@ function selectFunnelCohort(stage = 'all', projectId = null) {
   const targetCard = document.querySelector(`#funnelView .exec-funnel-card[onclick*="'${stage}'"]`);
   if (targetCard) targetCard.classList.add('active');
 
+  // Highlight active stage pill
+  document.querySelectorAll('#funnelView .funnel-pill').forEach(pill => {
+    if (pill.getAttribute('data-stage') === stage) {
+      pill.classList.add('active');
+    } else {
+      pill.classList.remove('active');
+    }
+  });
+
   const clearBtn = $('funnelClearFilterBtn');
   if (clearBtn) {
     clearBtn.style.display = (state.funnelCohortStage !== 'all' || state.funnelCohortProject) ? 'inline-flex' : 'none';
   }
 
   renderFunnelDealsTable();
+
+  // Smooth auto-scroll directly to the Deals Cohort Table
+  if (opts && opts.scroll !== false) {
+    const tableWrap = $('funnelCohortTableWrap');
+    if (tableWrap) {
+      const rect = tableWrap.getBoundingClientRect();
+      if (rect.top < 70 || rect.top > 220) {
+        const targetY = rect.top + window.pageYOffset - 85;
+        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+      }
+    }
+  }
 
   const stageLabels = {
     all: 'All Inquiries Pipeline',
@@ -5153,6 +5221,15 @@ function renderFunnelDealsTable() {
   if (badgeEl) {
     badgeEl.textContent = (stage === 'all' ? 'All Stages' : stage.replace('_', ' ').toUpperCase()) + (pid ? ' (Filtered)' : '');
   }
+
+  // Synchronize quick filter pills
+  document.querySelectorAll('#funnelView .funnel-pill').forEach(pill => {
+    if (pill.getAttribute('data-stage') === stage) {
+      pill.classList.add('active');
+    } else {
+      pill.classList.remove('active');
+    }
+  });
 
   if (!filtered.length) {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:36px; color:#94a3b8; font-size:13px;">No deals found matching the current funnel cohort filter.</td></tr>`;
