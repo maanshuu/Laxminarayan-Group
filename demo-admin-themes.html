@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Executive Theme Studio — Laxminarayan Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL BASE & RESET
+   ══════════════════════════════════════════════════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEME PALETTE DEFINITIONS (CSS VARIABLES)
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─── THEME 1: CHAMPAGNE GOLD & ALABASTER (WARM SILK LUXURY) ─── */
+body.theme-champagne {
+  --bg-page: #f9f7f2;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #fcfbfa;
+  --bg-sidebar: #171512;
+  --bg-header: #ffffff;
+  --border-line: rgba(180, 138, 40, 0.22);
+  --border-subtle: rgba(28, 25, 23, 0.08);
+  --border-active: #b48a28;
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #8c827a;
+  --accent-gold: #b48a28;
+  --accent-gold-glow: rgba(180, 138, 40, 0.15);
+  --hero-bg: linear-gradient(135deg, #2a2214 0%, #17140e 100%);
+  --hero-text: #ffffff;
+  --hero-gold: #f5d77f;
+  --card-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.06), 0 1px 3px rgba(180, 138, 40, 0.08);
+  --card-hover-shadow: 0 16px 36px -6px rgba(180, 138, 40, 0.18);
+  --sidebar-text: #a8a29e;
+  --sidebar-active: #f5d77f;
+  --sidebar-active-bg: rgba(245, 215, 127, 0.12);
+}
+
+/* ─── THEME 2: ROYAL SAPPHIRE & DEEP NAVY (PRIVATE BANKING) ─── */
+body.theme-sapphire {
+  --bg-page: #0b132b;
+  --bg-surface: #1c2541;
+  --bg-card: #151d38;
+  --bg-card-subtle: #192342;
+  --bg-sidebar: #070c1e;
+  --bg-header: #101935;
+  --border-line: rgba(56, 189, 248, 0.18);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: #38bdf8;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent-gold: #38bdf8;
+  --accent-gold-glow: rgba(56, 189, 248, 0.2);
+  --hero-bg: linear-gradient(135deg, #1e3a8a 0%, #0c1a3e 100%);
+  --hero-text: #ffffff;
+  --hero-gold: #60a5fa;
+  --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --card-hover-shadow: 0 16px 40px rgba(56, 189, 248, 0.2);
+  --sidebar-text: #94a3b8;
+  --sidebar-active: #38bdf8;
+  --sidebar-active-bg: rgba(56, 189, 248, 0.12);
+}
+
+/* ─── THEME 3: CLEAN TITANIUM & SLATE (SWISS MINIMALIST SAAS) ─── */
+body.theme-titanium {
+  --bg-page: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f8fafc;
+  --bg-sidebar: #0f172a;
+  --bg-header: #ffffff;
+  --border-line: #e2e8f0;
+  --border-subtle: #edf2f7;
+  --border-active: #0284c7;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --accent-gold: #0284c7;
+  --accent-gold-glow: rgba(2, 132, 199, 0.15);
+  --hero-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  --hero-text: #ffffff;
+  --hero-gold: #38bdf8;
+  --card-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  --card-hover-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.08);
+  --sidebar-text: #94a3b8;
+  --sidebar-active: #38bdf8;
+  --sidebar-active-bg: rgba(56, 189, 248, 0.12);
+}
+
+/* ─── THEME 4: EMERALD PRESTIGE (HERITAGE ESTATE LUXURY) ─── */
+body.theme-emerald {
+  --bg-page: #f4f7f4;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f9fbf9;
+  --bg-sidebar: #052014;
+  --bg-header: #ffffff;
+  --border-line: rgba(5, 150, 105, 0.22);
+  --border-subtle: rgba(6, 78, 59, 0.08);
+  --border-active: #059669;
+  --text-primary: #064e3b;
+  --text-secondary: #047857;
+  --text-muted: #64748b;
+  --accent-gold: #b48a28;
+  --accent-gold-glow: rgba(180, 138, 40, 0.15);
+  --hero-bg: linear-gradient(135deg, #064e3b 0%, #02261b 100%);
+  --hero-text: #ffffff;
+  --hero-gold: #f5d77f;
+  --card-shadow: 0 4px 20px -2px rgba(6, 78, 59, 0.06), 0 1px 3px rgba(5, 150, 105, 0.08);
+  --card-hover-shadow: 0 16px 36px -6px rgba(5, 150, 105, 0.18);
+  --sidebar-text: #a7f3d0;
+  --sidebar-active: #34d399;
+  --sidebar-active-bg: rgba(52, 211, 153, 0.14);
+}
+
+/* ─── THEME 5: MIDNIGHT OBSIDIAN & GOLD (DARK LUXURY) ─── */
+body.theme-obsidian {
+  --bg-page: #070a0e;
+  --bg-surface: #0d1219;
+  --bg-card: #121822;
+  --bg-card-subtle: #171f2c;
+  --bg-sidebar: #06080b;
+  --bg-header: #0d1219;
+  --border-line: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-active: #d4af37;
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent-gold: #d4af37;
+  --accent-gold-glow: rgba(212, 175, 55, 0.2);
+  --hero-bg: linear-gradient(135deg, #221808 0%, #0d0a04 100%);
+  --hero-text: #ffffff;
+  --hero-gold: #f5d77f;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --card-hover-shadow: 0 16px 36px rgba(212, 175, 55, 0.15);
+  --sidebar-text: #94a3b8;
+  --sidebar-active: #d4af37;
+  --sidebar-active-bg: rgba(212, 175, 55, 0.15);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOP THEME STUDIO CONTROL BAR (Sticky at Top)
+   ══════════════════════════════════════════════════════════════ */
+.theme-studio-bar {
+  background: #000000;
+  color: #fff;
+  border-bottom: 2px solid #d4af37;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.theme-studio-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.studio-badge {
+  background: linear-gradient(135deg, #d4af37 0%, #aa8010 100%);
+  color: #000;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.theme-pills-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+.theme-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #111827;
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.theme-pill-btn:hover {
+  background: #1f2937;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.theme-pill-btn.active {
+  background: linear-gradient(135deg, #d4af37 0%, #f5d77f 100%);
+  color: #000;
+  border-color: #d4af37;
+  box-shadow: 0 2px 14px rgba(212, 175, 55, 0.4);
+}
+.theme-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   APP SHELL LAYOUT
+   ══════════════════════════════════════════════════════════════ */
+.app-container {
+  display: flex;
+  min-height: calc(100vh - 54px);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+}
+
+/* Fixed 74px Left Icon Rail Sidebar */
+.app-sidebar {
+  width: 74px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 0;
+  flex-shrink: 0;
+  position: sticky;
+  top: 54px;
+  height: calc(100vh - 54px);
+  z-index: 100;
+}
+.sidebar-logo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--sidebar-active);
+  border: 1px solid var(--border-line);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+}
+.nav-item {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.nav-item.active {
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-active);
+  border-color: var(--border-active);
+}
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--sidebar-active);
+}
+.nav-item svg { width: 20px; height: 20px; }
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+/* Main Content Workspace */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.app-header {
+  height: 68px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-line);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 54px;
+  z-index: 90;
+}
+.header-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+}
+.header-breadcrumbs .brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent-gold);
+}
+.header-breadcrumbs .sep { color: var(--text-muted); }
+.header-breadcrumbs .title { font-weight: 700; color: var(--text-primary); }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ist-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--accent-gold);
+  background: var(--accent-gold-glow);
+  border: 1px solid var(--border-line);
+  padding: 5px 12px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* Content Area */
+.app-content {
+  padding: 28px 32px 60px;
+  max-width: 1680px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD COMPONENTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* 1. Theme Info Banner */
+.theme-info-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 14px;
+  padding: 16px 22px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--card-shadow);
+}
+.theme-info-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.theme-emoji-icon {
+  font-size: 26px;
+}
+.theme-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.theme-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+/* 2. Top KPI Cards Grid */
+.kpi-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.hero-revenue-card {
+  background: var(--hero-bg);
+  color: var(--hero-text);
+  border: 1px solid var(--border-line);
+  border-radius: 16px;
+  padding: 22px 26px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+.hero-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--hero-gold);
+}
+.hero-amount {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  margin: 6px 0 2px;
+  color: #ffffff;
+}
+.hero-sub {
+  font-size: 12.5px;
+  color: var(--hero-gold);
+  font-weight: 600;
+}
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s ease;
+}
+.kpi-card:hover {
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--border-active);
+  transform: translateY(-2px);
+}
+.kpi-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+}
+.kpi-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 6px 0 2px;
+}
+.kpi-delta {
+  font-size: 12px;
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* 3. 5-Stage Conversion Funnel */
+.funnel-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--card-shadow);
+}
+.funnel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.funnel-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.funnel-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.funnel-step {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-line);
+  border-radius: 12px;
+  padding: 14px;
+  transition: all 0.2s ease;
+}
+.funnel-step:hover, .funnel-step.active {
+  border-color: var(--border-active);
+  background: var(--accent-gold-glow);
+}
+.step-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.step-cnt {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 4px 0 2px;
+}
+.step-rate {
+  font-size: 11px;
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+
+/* 4. Split Grid: Architectural Cards & Advisor Leaderboard */
+.split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.15fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.content-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+}
+.project-image-box {
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 14px;
+}
+.project-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+}
+.project-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+.project-card-loc {
+  font-size: 12px;
+  color: #f5d77f;
+}
+.table-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: var(--card-shadow);
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.data-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-line);
+}
+.data-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+/* Toast */
+.theme-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #d4af37;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+.theme-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+</style>
+</head>
+
+<body class="theme-champagne">
+
+<!-- ══════════════════════════════════════════════════════════════
+     TOP THEME STUDIO CONTROL BAR (CLICK ANY PILL TO CHANGE THEME)
+     ══════════════════════════════════════════════════════════════ -->
+<header class="theme-studio-bar">
+  <div class="theme-studio-left">
+    <span class="studio-badge">THEME STUDIO</span>
+    <span style="font-size:12.5px; color:#cbd5e1;"><b>Test Different Themes:</b> Click any button below to see the whole dashboard instantly change.</span>
+  </div>
+
+  <div class="theme-pills-wrap">
+    <!-- Theme 1: Champagne Gold -->
+    <button class="theme-pill-btn active" onclick="applyTheme('champagne', this)">
+      <span class="theme-color-dot" style="background:#b48a28;"></span>
+      1. Champagne Silk & Gold (Warm Luxury)
+    </button>
+
+    <!-- Theme 2: Royal Sapphire -->
+    <button class="theme-pill-btn" onclick="applyTheme('sapphire', this)">
+      <span class="theme-color-dot" style="background:#38bdf8;"></span>
+      2. Royal Sapphire & Deep Navy
+    </button>
+
+    <!-- Theme 3: Titanium Slate -->
+    <button class="theme-pill-btn" onclick="applyTheme('titanium', this)">
+      <span class="theme-color-dot" style="background:#0284c7;"></span>
+      3. Clean Titanium & Slate (Swiss SaaS)
+    </button>
+
+    <!-- Theme 4: Emerald Prestige -->
+    <button class="theme-pill-btn" onclick="applyTheme('emerald', this)">
+      <span class="theme-color-dot" style="background:#10b981;"></span>
+      4. Emerald Prestige (Estate Luxury)
+    </button>
+
+    <!-- Theme 5: Midnight Obsidian -->
+    <button class="theme-pill-btn" onclick="applyTheme('obsidian', this)">
+      <span class="theme-color-dot" style="background:#111827;"></span>
+      5. Midnight Obsidian (Dark Mode)
+    </button>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     FULL ADMIN DASHBOARD APPLICATION WITH ACTIVE THEME APPLIED
+     ══════════════════════════════════════════════════════════════ -->
+<div class="app-container">
+  <!-- Left Icon Rail Sidebar -->
+  <aside class="app-sidebar">
+    <div class="sidebar-logo">LNG</div>
+
+    <div class="nav-group">
+      <button class="nav-item active" title="Overview Command Center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </button>
+
+      <button class="nav-item" title="Enquiries CRM (142)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+
+      <button class="nav-item" title="Units Matrix (148)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      </button>
+
+      <button class="nav-item" title="Deals & Bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </button>
+
+      <button class="nav-item" title="Site Visits (48)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </button>
+
+      <button class="nav-item" title="Projects Portfolio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+
+      <button class="nav-item" title="🎯 Sales Funnel BI (Restricted from HR & Builder)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-bottom">
+      <button class="nav-item" title="CRM Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="nav-item" title="Log Out" style="color:#ef4444;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Space -->
+  <main class="app-main">
+    <header class="app-header">
+      <div class="header-breadcrumbs">
+        <span class="brand">Laxminarayan Group</span>
+        <span class="sep">/</span>
+        <span class="title">Executive Command Center</span>
+      </div>
+
+      <div class="header-actions">
+        <div class="ist-badge">
+          <span class="pulse-dot"></span>
+          <span id="clockIst">17:00:00 IST</span>
+        </div>
+        <button style="background:var(--accent-gold); color:#fff; font-weight:700; font-size:12px; padding:7px 16px; border-radius:9999px; border:none; cursor:pointer;">
+          + Quick Action
+        </button>
+      </div>
+    </header>
+
+    <div class="app-content">
+      <!-- Active Theme Description Banner -->
+      <div class="theme-info-banner">
+        <div class="theme-info-left">
+          <span class="theme-emoji-icon" id="bannerEmoji">👑</span>
+          <div>
+            <div class="theme-name" id="bannerTitle">Theme 1: Champagne Silk & Warm Alabaster (Heritage Luxury)</div>
+            <div class="theme-desc" id="bannerDesc">Warm ivory canvas, pure white cards, polished bronze gold hairlines, and Playfair serif typography. Used by Sotheby's & luxury hospitality.</div>
+          </div>
+        </div>
+        <div style="font-size:11.5px; font-weight:700; color:var(--accent-gold); background:var(--accent-gold-glow); padding:6px 14px; border-radius:9999px; border:1px solid var(--border-line);">
+          ACTIVE SELECTION
+        </div>
+      </div>
+
+      <!-- 1. KPI Cards Row -->
+      <div class="kpi-row">
+        <div class="hero-revenue-card">
+          <span class="hero-kicker">Active Pipeline Value</span>
+          <div class="hero-amount">₹ 38.64 Cr</div>
+          <span class="hero-sub">↑ +14.2% month-over-month deal velocity</span>
+          <svg viewBox="0 0 300 40" style="width:100%; height:36px; margin-top:10px;">
+            <path d="M0,35 Q40,30 80,24 T160,18 T240,8 T300,4" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="300" cy="4" r="4" fill="#fff"/>
+          </svg>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-kicker">Total Enquiries</span>
+          <div class="kpi-num">142</div>
+          <span class="kpi-delta">+18 this week</span>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-kicker">Site Velocity</span>
+          <div class="kpi-num">48</div>
+          <span class="kpi-delta">82% completed</span>
+        </div>
+
+        <div class="kpi-card">
+          <span class="kpi-kicker">Confirmed Closures</span>
+          <div class="kpi-num">19</div>
+          <span class="kpi-delta">₹ 14.80 Cr booked</span>
+        </div>
+      </div>
+
+      <!-- 2. Conversion Funnel -->
+      <div class="funnel-panel">
+        <div class="funnel-top">
+          <div>
+            <div class="funnel-title">5-Stage Executive Conversion Funnel</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Conversion velocity across buyer lifecycle (Restricted to Management).</div>
+          </div>
+          <button style="background:var(--accent-gold-glow); border:1px solid var(--border-line); color:var(--accent-gold); padding:6px 14px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer;">
+            Export BI Dossier ↓
+          </button>
+        </div>
+
+        <div class="funnel-grid">
+          <div class="funnel-step active">
+            <span class="step-lbl">1. Enquiries</span>
+            <div class="step-cnt">142</div>
+            <span class="step-rate">100% baseline</span>
+          </div>
+          <div class="funnel-step">
+            <span class="step-lbl">2. Contacted</span>
+            <div class="step-cnt">108</div>
+            <span class="step-rate">76.0% reached</span>
+          </div>
+          <div class="funnel-step">
+            <span class="step-lbl">3. Site Visits</span>
+            <div class="step-cnt">48</div>
+            <span class="step-rate">33.8% walk-in</span>
+          </div>
+          <div class="funnel-step">
+            <span class="step-lbl">4. Negotiation</span>
+            <div class="step-cnt">24</div>
+            <span class="step-rate">16.9% hot stage</span>
+          </div>
+          <div class="funnel-step">
+            <span class="step-lbl">5. Booked</span>
+            <div class="step-cnt">19</div>
+            <span class="step-rate">13.4% closed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Projects Showcase & Sales Leaderboard -->
+      <div class="split-grid">
+        <div class="content-card">
+          <div class="project-image-box" style="background-image:url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&auto=format&fit=crop&q=80');">
+            <div class="project-image-overlay">
+              <span class="project-card-title">Akshar DS 208</span>
+              <span class="project-card-loc">Vasna-Bhayli · 4 BHK Penthouse</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary);">
+            <span>48 Units Total</span>
+            <strong style="color:var(--accent-gold);">68% Sold Out</strong>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="project-image-box" style="background-image:url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&auto=format&fit=crop&q=80');">
+            <div class="project-image-overlay">
+              <span class="project-card-title">Nilkanth Villa</span>
+              <span class="project-card-loc">Sevasi Canal Road · Ultra-Luxury Bungalows</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary);">
+            <span>24 Bungalows Total</span>
+            <strong style="color:#10b981;">₹ 3.2 Cr Base</strong>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <h3 style="font-size:14px; font-weight:800; margin-bottom:14px; color:var(--text-primary);">Sales Advisor Leaderboard</h3>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+              <div><b>Amitabh Verma</b><br><span style="font-size:11px; color:var(--text-muted);">Senior Luxury Advisor</span></div>
+              <strong style="color:var(--accent-gold);">8 Deals (₹ 18.2 Cr)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+              <div><b>Pooja Desai</b><br><span style="font-size:11px; color:var(--text-muted);">Relationship Manager</span></div>
+              <strong style="color:var(--accent-gold);">6 Deals (₹ 12.4 Cr)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; padding-bottom:4px;">
+              <div><b>Rohit Patel</b><br><span style="font-size:11px; color:var(--text-muted);">Site Specialist</span></div>
+              <strong style="color:var(--accent-gold);">5 Deals (₹ 8.0 Cr)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Sample Enquiries Table -->
+      <div class="table-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <h3 style="font-size:15px; font-weight:800; color:var(--text-primary);">High-Priority Enquiries Pipeline</h3>
+            <span style="font-size:12px; color:var(--text-secondary);">Real-time synchronized CRM records.</span>
+          </div>
+          <input type="text" placeholder="Search customer, phone..." style="padding:7px 14px; border:1px solid var(--border-line); border-radius:8px; font-size:12px; background:var(--bg-card); color:var(--text-primary); width:240px;">
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Ref</th>
+              <th>Customer</th>
+              <th>Contact Details</th>
+              <th>Interested Project</th>
+              <th>Stage</th>
+              <th>Assigned Advisor</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>#ENQ-902</b></td>
+              <td><b>Rajesh Shah</b><br><span style="font-size:11px; color:var(--text-muted);">Direct Walk-in</span></td>
+              <td>+91 98250 14890<br><span style="font-size:11px; color:var(--text-muted);">rajesh.s@gmail.com</span></td>
+              <td><strong style="color:var(--accent-gold);">Akshar DS 208</strong> (4BHK)</td>
+              <td><span style="background:var(--accent-gold-glow); color:var(--accent-gold); padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">Site Visit Done</span></td>
+              <td>Amitabh Verma</td>
+              <td><button style="padding:4px 10px; border-radius:6px; border:1px solid var(--border-line); background:var(--bg-card-subtle); color:var(--text-primary); cursor:pointer; font-weight:600; font-size:11.5px;">360° Drawer</button></td>
+            </tr>
+            <tr>
+              <td><b>#ENQ-901</b></td>
+              <td><b>Dr. Neha Patel</b><br><span style="font-size:11px; color:var(--text-muted);">99acres Portal</span></td>
+              <td>+91 94260 77120<br><span style="font-size:11px; color:var(--text-muted);">drneha@patelclinic.in</span></td>
+              <td><strong style="color:#10b981;">Nilkanth Villa</strong> (Bungalow)</td>
+              <td><span style="background:rgba(16,185,129,0.12); color:#10b981; padding:3px 8px; border-radius:6px; font-weight:700; font-size:11px;">Token In Discussion</span></td>
+              <td>Pooja Desai</td>
+              <td><button style="padding:4px 10px; border-radius:6px; border:1px solid var(--border-line); background:var(--bg-card-subtle); color:var(--text-primary); cursor:pointer; font-weight:600; font-size:11.5px;">360° Drawer</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="theme-toast">
+  <span style="color:#f5d77f;">✦</span>
+  <span id="toastText">Theme updated</span>
+</div>
+
+<script>
+const THEME_METADATA = {
+  champagne: {
+    emoji: '👑',
+    title: 'Theme 1: Champagne Silk & Warm Alabaster (Heritage Luxury)',
+    desc: 'Warm ivory canvas, pure white cards, polished bronze gold hairlines, and Playfair serif typography. The gold standard for ultra-luxury real estate & private wealth.'
+  },
+  sapphire: {
+    emoji: '🏛️',
+    title: 'Theme 2: Royal Sapphire & Deep Navy (Private Banking)',
+    desc: 'Deep navy-slate canvas (not pitch-black!), elevated midnight glass cards, and crisp ice-blue/cyan accents. Clean, authoritative, and boardroom-ready.'
+  },
+  titanium: {
+    emoji: '💎',
+    title: 'Theme 3: Clean Titanium & Slate (Swiss Minimalist SaaS)',
+    desc: 'Crisp light titanium canvas, pure white cards with soft neutral borders, high-density typography, and electric sky-blue accents. Effortless readability.'
+  },
+  emerald: {
+    emoji: '🌿',
+    title: 'Theme 4: Emerald Prestige (Heritage Estate Luxury)',
+    desc: 'Regal British racing green, soft ivory pearl canvas, and champagne gold trims. Tailor-made for luxury villas, bungalows, and exclusive estates.'
+  },
+  obsidian: {
+    emoji: '🌙',
+    title: 'Theme 5: Midnight Obsidian & Gilded Gold (Ultra-Dark Mode)',
+    desc: 'Pitch-black obsidian canvas, deep charcoal cards with 24K gold glowing accents and dark mode sparkline curves.'
+  }
+};
+
+function applyTheme(themeKey, btn) {
+  document.body.className = `theme-${themeKey}`;
+  
+  document.querySelectorAll('.theme-pill-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const meta = THEME_METADATA[themeKey];
+  if (meta) {
+    document.getElementById('bannerEmoji').textContent = meta.emoji;
+    document.getElementById('bannerTitle').textContent = meta.title;
+    document.getElementById('bannerDesc').textContent = meta.desc;
+  }
+
+  showToast(`Applied ${meta ? meta.title : themeKey}`);
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  const txt = document.getElementById('toastText');
+  txt.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function updateClock() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false });
+  const el = document.getElementById('clockIst');
+  if (el) el.textContent = `${timeStr} IST`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>

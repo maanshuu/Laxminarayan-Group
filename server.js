@@ -5071,6 +5071,9 @@ app.get("/demo-admin-dashboard-redesign.html", (req, res) => {
 app.get("/demo-layout-switcher.html", (req, res) => {
   res.sendFile(path.join(__dirname, "demo-layout-switcher.html"));
 });
+app.get("/demo-admin-themes.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "demo-admin-themes.html"));
+});
 
 // ─── PUBLIC ASSETS & UPLOADED MEDIA (7-DAY BROWSER CACHE + GZIP) ───
 app.use("/assets", express.static(path.join(__dirname, "assets"), { maxAge: "7d", etag: true, dotfiles: "ignore", index: false }));
