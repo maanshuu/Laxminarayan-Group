@@ -1823,6 +1823,225 @@ body.role-hr button[onclick*="openSiteVisitModal"],
 body.role-hr button[onclick*="openNewEnquiryModal"] {
   display: none !important;
 }
+
+/* ─── EXECUTIVE SALES PIPELINE & LEAD CONVERSION FUNNEL ─── */
+.exec-kpi-row {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 1024px) {
+  .exec-kpi-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .exec-kpi-row { grid-template-columns: 1fr; }
+}
+
+.exec-hero-card {
+  background: linear-gradient(135deg, #fef3c7 0%, #fae8b4 100%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: var(--radius-lg);
+  padding: 22px 26px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.exec-hero-lbl {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #78350f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.exec-hero-val {
+  font-size: 34px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+  margin: 8px 0 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.exec-hero-val span {
+  font-size: 18px;
+  color: #d97706;
+  font-weight: 700;
+}
+.exec-hero-sub {
+  font-size: 12.5px;
+  color: #475569;
+}
+
+.exec-stat-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.exec-stat-box .title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-subtle);
+}
+.exec-stat-box .val {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 6px 0;
+}
+.exec-stat-box .sub {
+  font-size: 12px;
+  color: var(--ink-subtle);
+}
+
+.exec-funnel-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 1024px) {
+  .exec-funnel-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .exec-funnel-grid { grid-template-columns: 1fr; }
+}
+
+.exec-funnel-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+.exec-funnel-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--sky);
+  box-shadow: 0 10px 24px -4px rgba(2, 132, 199, 0.18);
+}
+.exec-funnel-card.active {
+  border-color: var(--sky);
+  background: linear-gradient(180deg, rgba(2, 132, 199, 0.08) 0%, var(--bg-surface) 100%);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.35), var(--shadow-card);
+}
+.exec-funnel-step {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--ink-subtle);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.exec-funnel-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.exec-funnel-counts {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.exec-funnel-leads {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.exec-funnel-vol {
+  font-size: 12px;
+  font-weight: 700;
+  color: #d97706;
+}
+.exec-funnel-bar-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.exec-funnel-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sky), #38bdf8);
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+.exec-funnel-card.step-won .exec-funnel-bar-fill {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.exec-funnel-conv {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-subtle);
+  display: flex;
+  justify-content: space-between;
+}
+
+.exec-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .exec-split-grid { grid-template-columns: 1fr; }
+}
+
+.exec-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-card);
+}
+.exec-project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  margin-top: 10px;
+  background: rgba(8, 11, 15, 0.01);
+  transition: all 0.2s ease;
+}
+.exec-project-item:hover {
+  border-color: var(--sky);
+  transform: translateX(3px);
+}
+.exec-advisor-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.exec-advisor-item:last-child {
+  border-bottom: none;
+}
+body.role-hr #execPipelineSection {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -1911,6 +2130,134 @@ body.role-hr button[onclick*="openNewEnquiryModal"] {
 
   <!-- OVERVIEW VIEW -->
   <section id="overview" class="view active">
+    <!-- ─── EXECUTIVE SALES PIPELINE & LEAD CONVERSION FUNNEL ─── -->
+    <div id="execPipelineSection" style="margin-bottom: 24px;">
+      <!-- REVENUE HERO STRIP -->
+      <div class="exec-kpi-row">
+        <div class="exec-hero-card">
+          <div class="exec-hero-lbl">
+            <span>ACTIVE SALES PIPELINE VALUE</span>
+            <span style="background:rgba(16,185,129,0.18); color:#059669; font-weight:800; padding:2px 8px; border-radius:9999px; font-size:11px;">▲ LIVE CRM</span>
+          </div>
+          <div class="exec-hero-val" id="execPipelineValDisplay">
+            ₹ 0.00 <span>CRORE INR</span>
+          </div>
+          <div class="exec-hero-sub" id="execPipelineSubDisplay">
+            Calculating active qualified buyers across projects...
+          </div>
+        </div>
+        <div class="exec-stat-box">
+          <div class="title">Confirmed Booked Deals</div>
+          <div class="val" style="color:#10b981;" id="execBookedValDisplay">₹ 0.00 Cr</div>
+          <div class="sub" id="execBookedSubDisplay">0 Units Confirmed & Token Deposited</div>
+        </div>
+        <div class="exec-stat-box">
+          <div class="title">Hot Intent Prospects</div>
+          <div class="val" style="color:#f59e0b;" id="execHotDealsDisplay">0 Deals</div>
+          <div class="sub" id="execHotSubDisplay">In active price & token discussion</div>
+        </div>
+        <div class="exec-stat-box">
+          <div class="title">Site Visit Velocity</div>
+          <div class="val" style="color:var(--sky);" id="execVisitVelocityDisplay">0 Visits</div>
+          <div class="sub">Conducted sample flat tours on site</div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 5-STAGE CONVERSION FUNNEL -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+        <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+          Live Lead Conversion Funnel
+        </h3>
+        <span style="font-size:12px; color:var(--ink-subtle); font-weight:600;">(Click any stage to filter enquiries table below)</span>
+      </div>
+
+      <div class="exec-funnel-grid" id="execFunnelContainer">
+        <!-- Stage 1 -->
+        <div class="exec-funnel-card active" onclick="drillDownLeads('all')" title="Click to view all enquiries in pipeline">
+          <div class="exec-funnel-step"><span>STAGE 1</span> <span id="funnelPct-all">100%</span></div>
+          <div class="exec-funnel-name">All Inquiries</div>
+          <div class="exec-funnel-counts">
+            <span class="exec-funnel-leads" id="funnelCount-all">0</span>
+            <span class="exec-funnel-vol" id="funnelVol-all">₹ 0.0 Cr</span>
+          </div>
+          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" style="width: 100%;"></div></div>
+          <div class="exec-funnel-conv"><span>Starting Pool</span> <span>Web + Walk-Ins</span></div>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="exec-funnel-card" onclick="drillDownLeads('contacted')" title="Click to view contacted / briefed buyers">
+          <div class="exec-funnel-step"><span>STAGE 2</span> <span id="funnelPct-contacted">0%</span></div>
+          <div class="exec-funnel-name">Contacted / Briefed</div>
+          <div class="exec-funnel-counts">
+            <span class="exec-funnel-leads" id="funnelCount-contacted">0</span>
+            <span class="exec-funnel-vol" id="funnelVol-contacted">₹ 0.0 Cr</span>
+          </div>
+          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-contacted" style="width: 0%;"></div></div>
+          <div class="exec-funnel-conv"><span>Advisor Briefing</span> <span id="funnelDrop-contacted" style="color:#f59e0b;">0 Drop-offs</span></div>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="exec-funnel-card" onclick="drillDownLeads('site_visit')" title="Click to view site visits cohort">
+          <div class="exec-funnel-step"><span>STAGE 3</span> <span id="funnelPct-site_visit">0%</span></div>
+          <div class="exec-funnel-name">Site Visits Done</div>
+          <div class="exec-funnel-counts">
+            <span class="exec-funnel-leads" id="funnelCount-site_visit">0</span>
+            <span class="exec-funnel-vol" id="funnelVol-site_visit">₹ 0.0 Cr</span>
+          </div>
+          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-site_visit" style="width: 0%;"></div></div>
+          <div class="exec-funnel-conv"><span>Sample Flat Tour</span> <span id="funnelDrop-site_visit" style="color:#f59e0b;">0 Drop-offs</span></div>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="exec-funnel-card" onclick="drillDownLeads('negotiation')" title="Click to view negotiation & price discussion cohort">
+          <div class="exec-funnel-step"><span>STAGE 4</span> <span id="funnelPct-negotiation">0%</span></div>
+          <div class="exec-funnel-name">Price Discussion</div>
+          <div class="exec-funnel-counts">
+            <span class="exec-funnel-leads" id="funnelCount-negotiation">0</span>
+            <span class="exec-funnel-vol" id="funnelVol-negotiation">₹ 0.0 Cr</span>
+          </div>
+          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-negotiation" style="width: 0%;"></div></div>
+          <div class="exec-funnel-conv"><span>Cost Sheet Issued</span> <span id="funnelDrop-negotiation" style="color:#f59e0b;">0 Drop-offs</span></div>
+        </div>
+
+        <!-- Stage 5 -->
+        <div class="exec-funnel-card step-won" onclick="drillDownLeads('won')" title="Click to view confirmed booked deals">
+          <div class="exec-funnel-step"><span style="color:#10b981;">STAGE 5</span> <span id="funnelPct-won" style="color:#10b981;">0%</span></div>
+          <div class="exec-funnel-name">Booked Units</div>
+          <div class="exec-funnel-counts">
+            <span class="exec-funnel-leads" id="funnelCount-won" style="color:#10b981;">0</span>
+            <span class="exec-funnel-vol" id="funnelVol-won" style="color:#10b981;">₹ 0.0 Cr</span>
+          </div>
+          <div class="exec-funnel-bar-bg"><div class="exec-funnel-bar-fill" id="funnelBar-won" style="width: 0%;"></div></div>
+          <div class="exec-funnel-conv"><span style="color:#10b981;">Token Deposited</span> <span id="funnelDrop-won">0 Closures</span></div>
+        </div>
+      </div>
+
+      <!-- SPLIT ROW: PROJECT BREAKDOWN & ADVISOR LEADERBOARD -->
+      <div class="exec-split-grid">
+        <div class="exec-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h4 style="margin:0; font-size:15px; font-weight:800; color:var(--ink);">🏗️ Project Pipeline Breakdown</h4>
+            <span style="font-size:11.5px; font-weight:700; color:var(--sky);">Live Demand</span>
+          </div>
+          <div id="execProjectBreakdownContainer">
+            <div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">Loading project pipeline...</div>
+          </div>
+        </div>
+
+        <div class="exec-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h4 style="margin:0; font-size:15px; font-weight:800; color:var(--ink);">🏆 Sales Advisor Leaderboard & Watchdog</h4>
+            <span style="font-size:11.5px; font-weight:700; color:#10b981;">Active Performance</span>
+          </div>
+          <div id="execAdvisorLeaderboardContainer">
+            <div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">Loading advisor metrics...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- COMMAND CENTER HERO -->
     <div class="dashboard-hero">
       <div class="hero-card">
@@ -3836,6 +4183,9 @@ async function load() {
     await Promise.all([loadEnquiries(), loadTeam(), loadCustomers(), loadProjects()]);
   }
   await Promise.all([loadLeads(), loadVisits(), loadUnits(), loadBookings(), loadMyAttendance()]);
+  if (typeof renderExecutivePipelineFunnel === 'function') {
+    renderExecutivePipelineFunnel();
+  }
 }
 
 function fillProjectSelect(id, includeGeneral = true) {
@@ -4154,6 +4504,11 @@ async function drillDownLeads(mode = 'all') {
   showView('leadsView', { scroll: true });
   await loadLeads();
 
+  // Highlight active funnel card
+  document.querySelectorAll('.exec-funnel-card').forEach(c => c.classList.remove('active'));
+  const targetCard = document.querySelector(`.exec-funnel-card[onclick*="'${mode}'"]`);
+  if (targetCard) targetCard.classList.add('active');
+
   if (mode === 'new') {
     state.leadFilterStage = 'new';
     if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
@@ -4164,11 +4519,36 @@ async function drillDownLeads(mode = 'all') {
     if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
     applyLeadFilters();
     toast('📍 Filtered to Active / Open Pipeline');
+  } else if (mode === 'contacted') {
+    state.leadFilterStage = 'contacted';
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('📍 Filtered to Contacted / Briefed Cohort');
+  } else if (mode === 'qualified') {
+    state.leadFilterStage = 'qualified';
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('📍 Filtered to Interested / Qualified Buyers');
+  } else if (mode === 'site_visit') {
+    state.leadFilterStage = 'site_visit';
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('📍 Filtered to Site Visits Done Cohort');
+  } else if (mode === 'negotiation') {
+    state.leadFilterStage = 'negotiation';
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('📍 Filtered to Price Discussion / Negotiation Cohort');
+  } else if (mode === 'won') {
+    state.leadFilterStage = 'won';
+    if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
+    applyLeadFilters();
+    toast('🏆 Filtered to Confirmed Booked Units');
   } else {
     state.leadFilterStage = null;
     if ($('leadFilterPriority')) $('leadFilterPriority').value = '';
     applyLeadFilters();
-    toast('Showing All Enquiries');
+    toast('Showing All Enquiries Pipeline');
   }
   highlightLeadsToolbar();
 }
@@ -4457,8 +4837,285 @@ async function loadLeads() {
     }
 
     applyLeadFilters();
+    if (typeof renderExecutivePipelineFunnel === 'function') {
+      renderExecutivePipelineFunnel();
+    }
   } catch (e) {
     toast(e.message);
+  }
+}
+
+// ─── EXECUTIVE SALES PIPELINE & LEAD CONVERSION FUNNEL ENGINE ───
+function parseLeadBudgetINR(bStr, projectName = '') {
+  if (typeof bStr === 'number' && !isNaN(bStr) && bStr > 0) {
+    if (bStr > 10000) return bStr;
+    return bStr * 10000000;
+  }
+  if (typeof bStr === 'string' && bStr.trim()) {
+    const s = bStr.toLowerCase().replace(/,/g, '');
+    const crMatch = s.match(/([0-9]+(?:\.[0-9]+)?)\s*(?:cr|crore)/i);
+    if (crMatch) return parseFloat(crMatch[1]) * 10000000;
+
+    const lakhMatch = s.match(/([0-9]+(?:\.[0-9]+)?)\s*(?:l|lac|lakh)/i);
+    if (lakhMatch) return parseFloat(lakhMatch[1]) * 100000;
+
+    const numMatch = s.match(/([0-9]{4,12})/);
+    if (numMatch) return parseFloat(numMatch[1]);
+  }
+
+  // Inventory defaults based on Laxminarayan Group project tickets
+  const pLower = String(projectName || '').toLowerCase();
+  if (pLower.includes('nilkanth')) return 8500000;
+  if (pLower.includes('208') || pLower.includes('akshar')) return 6500000;
+  if (pLower.includes('rivera')) return 11000000;
+  if (pLower.includes('vintage')) return 14000000;
+  return 7500000;
+}
+
+function filterProjectPipeline(projectId, projectName) {
+  if (state.currentUser && state.currentUser.role === 'hr') return;
+  showView('leadsView', { scroll: true });
+  const pSelect = $('leadFilterProject');
+  if (pSelect) pSelect.value = projectId;
+  state.leadFilterStage = null;
+  applyLeadFilters();
+  toast('📍 Filtered to ' + (projectName || 'Project') + ' Enquiries Pipeline');
+  highlightLeadsToolbar();
+}
+
+function renderExecutivePipelineFunnel() {
+  const section = $('execPipelineSection');
+  if (!section) return;
+  if (state.currentUser && state.currentUser.role === 'hr') {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+
+  const leads = state.leads || [];
+  const visits = state.visits || [];
+  const bookings = state.bookings || [];
+  const projects = state.projects || [];
+  const employees = state.employees || [];
+
+  const todayIST = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+
+  // 1. Executive Top Hero Metrics
+  const openLeads = leads.filter(l => !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase()));
+  const activePipelineINR = openLeads.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const activePipeCr = (activePipelineINR / 10000000).toFixed(2);
+  const activeProjectsCount = projects.filter(p => p.status === 'active').length || 2;
+
+  if ($('execPipelineValDisplay')) {
+    $('execPipelineValDisplay').innerHTML = `₹ ${activePipeCr} <span>CRORE INR</span>`;
+  }
+  if ($('execPipelineSubDisplay')) {
+    $('execPipelineSubDisplay').textContent = `${openLeads.length} Active Qualified Buyers across ${activeProjectsCount} projects`;
+  }
+
+  // Confirmed Booked
+  const wonLeads = leads.filter(l => String(l.status || '').toLowerCase() === 'won');
+  const bookedCount = Math.max(wonLeads.length, bookings.length);
+  const bookedINR = wonLeads.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const bookedCr = (bookedINR / 10000000).toFixed(2);
+  if ($('execBookedValDisplay')) {
+    $('execBookedValDisplay').textContent = `₹ ${bookedCr} Cr`;
+  }
+  if ($('execBookedSubDisplay')) {
+    $('execBookedSubDisplay').textContent = `${bookedCount} Units Confirmed & Token Deposited`;
+  }
+
+  // Hot Intent Deals
+  const hotLeads = leads.filter(l => (l.sentiment || '').toLowerCase() === 'hot' && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase()));
+  const hotCount = hotLeads.length;
+  const hotINR = hotLeads.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const hotCr = (hotINR / 10000000).toFixed(2);
+  if ($('execHotDealsDisplay')) {
+    $('execHotDealsDisplay').textContent = `${hotCount} Deals`;
+  }
+  if ($('execHotSubDisplay')) {
+    $('execHotSubDisplay').textContent = hotCount > 0 ? `₹ ${hotCr} Cr high-intent pipeline` : 'In active price & token discussion';
+  }
+
+  // Site Visits Velocity
+  const visitVelocity = visits.length;
+  if ($('execVisitVelocityDisplay')) {
+    $('execVisitVelocityDisplay').textContent = `${visitVelocity} Visits`;
+  }
+
+  // 2. 5-Stage Conversion Funnel Cohorts
+  const totalLeadsCount = leads.length;
+  const totalVolumeINR = leads.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const totalCr = (totalVolumeINR / 10000000).toFixed(1);
+
+  // Stage 1: All Inquiries
+  if ($('funnelCount-all')) $('funnelCount-all').textContent = totalLeadsCount;
+  if ($('funnelVol-all')) $('funnelVol-all').textContent = `₹ ${totalCr} Cr`;
+  if ($('funnelPct-all')) $('funnelPct-all').textContent = '100%';
+
+  // Stage 2: Contacted / Briefed
+  const contactedList = leads.filter(l => ['contacted', 'qualified', 'site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  const contactedCount = contactedList.length;
+  const contactedINR = contactedList.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const contactedCr = (contactedINR / 10000000).toFixed(1);
+  const contactedPct = totalLeadsCount ? Math.round((contactedCount / totalLeadsCount) * 100) : 0;
+  const dropContacted = Math.max(0, totalLeadsCount - contactedCount);
+
+  if ($('funnelCount-contacted')) $('funnelCount-contacted').textContent = contactedCount;
+  if ($('funnelVol-contacted')) $('funnelVol-contacted').textContent = `₹ ${contactedCr} Cr`;
+  if ($('funnelPct-contacted')) $('funnelPct-contacted').textContent = `${contactedPct}%`;
+  if ($('funnelBar-contacted')) $('funnelBar-contacted').style.width = `${contactedPct}%`;
+  if ($('funnelDrop-contacted')) $('funnelDrop-contacted').textContent = `${dropContacted} Drop-offs`;
+
+  // Stage 3: Site Visits Done
+  const visitList = leads.filter(l => ['site_visit', 'negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  const visitCount = Math.max(visitList.length, visits.length > 0 ? Math.min(totalLeadsCount, visits.length) : 0);
+  const visitINR = visitList.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const visitCr = (visitINR / 10000000).toFixed(1);
+  const visitPct = totalLeadsCount ? Math.round((visitCount / totalLeadsCount) * 100) : 0;
+  const dropVisit = Math.max(0, contactedCount - visitCount);
+
+  if ($('funnelCount-site_visit')) $('funnelCount-site_visit').textContent = visitCount;
+  if ($('funnelVol-site_visit')) $('funnelVol-site_visit').textContent = `₹ ${visitCr} Cr`;
+  if ($('funnelPct-site_visit')) $('funnelPct-site_visit').textContent = `${visitPct}%`;
+  if ($('funnelBar-site_visit')) $('funnelBar-site_visit').style.width = `${visitPct}%`;
+  if ($('funnelDrop-site_visit')) $('funnelDrop-site_visit').textContent = `${dropVisit} Drop-offs`;
+
+  // Stage 4: Price Discussion / Negotiation
+  const negList = leads.filter(l => ['negotiation', 'won'].includes(String(l.status || '').toLowerCase()));
+  const negCount = negList.length;
+  const negINR = negList.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const negCr = (negINR / 10000000).toFixed(1);
+  const negPct = totalLeadsCount ? Math.round((negCount / totalLeadsCount) * 100) : 0;
+  const dropNeg = Math.max(0, visitCount - negCount);
+
+  if ($('funnelCount-negotiation')) $('funnelCount-negotiation').textContent = negCount;
+  if ($('funnelVol-negotiation')) $('funnelVol-negotiation').textContent = `₹ ${negCr} Cr`;
+  if ($('funnelPct-negotiation')) $('funnelPct-negotiation').textContent = `${negPct}%`;
+  if ($('funnelBar-negotiation')) $('funnelBar-negotiation').style.width = `${negPct}%`;
+  if ($('funnelDrop-negotiation')) $('funnelDrop-negotiation').textContent = `${dropNeg} Drop-offs`;
+
+  // Stage 5: Won / Booked Units
+  const wonCountStage = wonLeads.length;
+  const wonINR = wonLeads.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+  const wonCr = (wonINR / 10000000).toFixed(1);
+  const wonPct = totalLeadsCount ? ((wonCountStage / totalLeadsCount) * 100).toFixed(1) : '0';
+
+  if ($('funnelCount-won')) $('funnelCount-won').textContent = wonCountStage;
+  if ($('funnelVol-won')) $('funnelVol-won').textContent = `₹ ${wonCr} Cr`;
+  if ($('funnelPct-won')) $('funnelPct-won').textContent = `${wonPct}%`;
+  if ($('funnelBar-won')) $('funnelBar-won').style.width = `${Math.min(100, Math.max(wonCountStage ? 5 : 0, parseFloat(wonPct)))}%`;
+  if ($('funnelDrop-won')) $('funnelDrop-won').textContent = `${wonCountStage} Closures`;
+
+  // 3. Project Pipeline Breakdown
+  const projContainer = $('execProjectBreakdownContainer');
+  if (projContainer) {
+    const activeProjects = projects.filter(p => p.status === 'active');
+    if (!activeProjects.length) {
+      projContainer.innerHTML = '<div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">No active projects recorded.</div>';
+    } else {
+      projContainer.innerHTML = activeProjects.map(p => {
+        const pLeads = leads.filter(l => Number(l.project_id) === Number(p.id) || (l.project_name && l.project_name.toLowerCase().includes(p.name.toLowerCase())));
+        const pVisits = visits.filter(v => Number(v.project_id) === Number(p.id) || (v.project_name && v.project_name.toLowerCase().includes(p.name.toLowerCase()))).length;
+        const pWon = pLeads.filter(l => String(l.status || '').toLowerCase() === 'won').length;
+        const pPipeINR = pLeads.filter(l => !['lost', 'closed'].includes(String(l.status || '').toLowerCase())).reduce((s, l) => s + parseLeadBudgetINR(l.budget, p.name), 0);
+        const pPipeCr = (pPipeINR / 10000000).toFixed(2);
+        const pVelocity = pLeads.length ? Math.min(100, Math.round(((pVisits + pWon) / pLeads.length) * 100)) : 0;
+
+        return `
+          <div class="exec-project-item" onclick="filterProjectPipeline(${p.id}, '${escAttr(p.name)}')" title="Click to view ${escAttr(p.name)} enquiries">
+            <div>
+              <div class="exec-project-name">${esc(p.name)}</div>
+              <div class="exec-project-sub">${pLeads.length} Inquiries · ${pVisits} Visits Conducted · ${pWon} Bookings</div>
+            </div>
+            <div class="exec-project-stats">
+              <div class="exec-project-val">₹ ${pPipeCr} Cr</div>
+              <div class="exec-project-rate">${pVelocity}% Conversion Speed</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // 4. Sales Advisor Leaderboard & Watchdog
+  const advisorContainer = $('execAdvisorLeaderboardContainer');
+  if (advisorContainer) {
+    const activeEmployees = employees.filter(e => e.status === 'active');
+    const advisorStats = activeEmployees.map(e => {
+      const eLeads = leads.filter(l => Number(l.assigned_employee_id) === Number(e.id) || (l.employee_code && l.employee_code === e.employee_code));
+      const wonCount = eLeads.filter(l => String(l.status || '').toLowerCase() === 'won').length;
+      const overdueCount = eLeads.filter(l => {
+        const fDate = l.follow_up_at ? String(l.follow_up_at).slice(0, 10) : '';
+        return fDate && fDate < todayIST && !['won', 'lost', 'closed'].includes(String(l.status || '').toLowerCase());
+      }).length;
+      const volumeINR = eLeads.filter(l => !['lost', 'closed'].includes(String(l.status || '').toLowerCase())).reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+      return {
+        id: e.id,
+        name: e.name,
+        phone: e.phone,
+        designation: e.designation || 'Sales Advisor',
+        department: e.department,
+        leadsCount: eLeads.length,
+        wonCount,
+        overdueCount,
+        volumeINR
+      };
+    });
+
+    advisorStats.sort((a, b) => (b.wonCount - a.wonCount) || (b.volumeINR - a.volumeINR) || (b.leadsCount - a.leadsCount));
+
+    const unassignedLeads = leads.filter(l => !l.assigned_employee_id);
+    let html = '';
+    let rank = 1;
+
+    advisorStats.forEach(adv => {
+      const cleanPhone = (adv.phone || '').replace(/[^0-9]/g, '');
+      const advCr = (adv.volumeINR / 10000000).toFixed(2);
+      const isTop = rank === 1 && (adv.wonCount > 0 || adv.leadsCount > 0);
+
+      html += `
+        <div class="exec-advisor-item">
+          <div>
+            <div class="exec-advisor-name">
+              ${rank}. ${esc(adv.name)}
+              ${isTop ? `<span class="exec-badge-top">⚡ Top Closer</span>` : ''}
+              ${adv.overdueCount > 0 ? `<span class="exec-badge-alert">⚠️ ${adv.overdueCount} Overdue</span>` : ''}
+            </div>
+            <div class="exec-advisor-sub">${esc(adv.designation)} · ${adv.leadsCount} Enquiries · ${adv.wonCount} Bookings</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="exec-advisor-val">₹ ${advCr} Cr</div>
+            ${adv.overdueCount > 0 && cleanPhone ? `
+              <a href="https://wa.me/91${cleanPhone.slice(-10)}?text=${encodeURIComponent('Hi ' + adv.name + ', you have ' + adv.overdueCount + ' overdue buyer enquiry follow-ups in the Laxminarayan CRM. Please update them today.')}" target="_blank" class="exec-btn-escalate" title="Send WhatsApp Escalation">Escalate 💬</a>
+            ` : `<span style="font-size:11px; color:#10b981; font-weight:700;">${adv.leadsCount > 0 ? '0 Overdue 🟢' : 'Active 🟢'}</span>`}
+          </div>
+        </div>
+      `;
+      rank++;
+    });
+
+    if (unassignedLeads.length > 0) {
+      const unassignedINR = unassignedLeads.reduce((s, l) => s + parseLeadBudgetINR(l.budget, l.project_name), 0);
+      const uCr = (unassignedINR / 10000000).toFixed(2);
+      html += `
+        <div class="exec-advisor-item" style="background:rgba(245,158,11,0.04); border-color:rgba(245,158,11,0.25);">
+          <div>
+            <div class="exec-advisor-name">
+              📌 Central Intake Desk
+              <span class="exec-badge-alert" style="background:rgba(245,158,11,0.15); color:#d97706;">⚡ ${unassignedLeads.length} Unallocated</span>
+            </div>
+            <div class="exec-advisor-sub">Enquiries awaiting sales executive assignment</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="exec-advisor-val" style="color:#d97706;">₹ ${uCr} Cr</div>
+            <button type="button" class="exec-btn-escalate" style="background:#fef3c7; color:#92400e; border-color:#fde68a;" onclick="drillDownLeads('new')" title="Assign Enquiries">Assign Now →</button>
+          </div>
+        </div>
+      `;
+    }
+
+    advisorContainer.innerHTML = html || '<div style="text-align:center; padding:18px; color:var(--ink-subtle); font-size:12px;">No advisor data available.</div>';
   }
 }
 
@@ -5375,6 +6032,9 @@ async function loadBookings() {
   } catch (e) {
     toast(e.message);
   }
+  if (typeof renderExecutivePipelineFunnel === 'function') {
+    renderExecutivePipelineFunnel();
+  }
 }
 
 function openBookingModal(prefill = null) {
@@ -5628,6 +6288,7 @@ if ($('visitFormInline')) {
 async function loadVisits() {
   try {
     const d = await get('/api/admin/site-visits');
+    state.visits = d.data || [];
     const isBuilder = state.currentUser && (state.currentUser.role === 'builder' || state.currentUser.role === 'partner');
     $('visitRows').innerHTML = d.data.length ? d.data.map(x => {
       const vp = (x.phone || '').replace(/[^0-9]/g, '');
@@ -5657,6 +6318,9 @@ async function loadVisits() {
     `;}).join('') : '<tr><td colspan="8" class="empty">No saved site visits yet.</td></tr>';
   } catch (e) {
     toast(e.message);
+  }
+  if (typeof renderExecutivePipelineFunnel === 'function') {
+    renderExecutivePipelineFunnel();
   }
 }
 
