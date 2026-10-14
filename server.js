@@ -903,6 +903,139 @@ function currentEmployee(userId){
   }
   return emp;
 }
+
+// ---------------- Real-Time Server-Sent Events (SSE) Engine ----------------
+const sseClients = new Set();
+
+app.get("/api/stream/events", (req, res) => {
+  const bearer = (req.headers.authorization || "").startsWith("Bearer ") ? req.headers.authorization.slice(7) : null;
+  const token = req.cookies?.lg_session || bearer || req.query.token;
+  if (!token) {
+    return res.status(401).json({ success: false, error: "Authentication required" });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ success: false, error: "Invalid session" });
+  }
+
+  const u = db.prepare("SELECT id, status, role, name, email FROM users WHERE id=?").get(decoded.id);
+  if (!u || u.status !== "active") {
+    return res.status(403).json({ success: false, error: "Account inactive" });
+  }
+
+  const emp = db.prepare("SELECT id, project_id FROM employees WHERE user_id=?").get(u.id);
+
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache, no-transform",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no"
+  });
+
+  const client = {
+    id: Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+    res,
+    userId: u.id,
+    userName: u.name,
+    role: u.role,
+    employeeId: emp ? emp.id : null,
+    projectId: emp ? emp.project_id : null
+  };
+
+  sseClients.add(client);
+  res.write(`data: ${JSON.stringify({ type: "connected", role: u.role, timestamp: new Date().toISOString() })}\n\n`);
+
+  req.on("close", () => {
+    sseClients.delete(client);
+  });
+});
+
+setInterval(() => {
+  if (!sseClients.size) return;
+  for (const client of sseClients) {
+    try {
+      client.res.write(":keepalive\n\n");
+    } catch (_) {
+      sseClients.delete(client);
+    }
+  }
+}, 25000);
+
+function broadcastRealtimeEvent(eventType, payload, targetFilter = null) {
+  if (!sseClients.size) return;
+  const messageStr = `data: ${JSON.stringify({ type: eventType, data: payload, timestamp: new Date().toISOString() })}\n\n`;
+  for (const client of sseClients) {
+    try {
+      if (typeof targetFilter === 'function' && !targetFilter(client)) continue;
+      client.res.write(messageStr);
+    } catch (_) {
+      try { client.res.end(); } catch (__) {}
+      sseClients.delete(client);
+    }
+  }
+}
+
+function notifyRealtimeNewLead(leadId) {
+  try {
+    if (!leadId) return;
+    const lead = db.prepare(`
+      SELECT l.id, l.name, l.source, l.status, l.sentiment, l.project_id, l.assigned_employee_id, l.created_at,
+             p.name AS project_name
+      FROM leads l
+      LEFT JOIN projects p ON p.id=l.project_id
+      WHERE l.id=?
+    `).get(Number(leadId));
+    if (!lead) return;
+
+    broadcastRealtimeEvent('new_lead', {
+      id: lead.id,
+      name: lead.name || 'New Client',
+      project_name: lead.project_name || 'General Portfolio',
+      source: lead.source || 'website',
+      sentiment: lead.sentiment || 'warm',
+      status: lead.status || 'new',
+      created_at: lead.created_at || new Date().toISOString()
+    }, client => {
+      if (['admin', 'manager', 'coordinator', 'hr'].includes(client.role)) return true;
+      if (['builder', 'partner'].includes(client.role)) {
+        return lead.project_id && Number(client.projectId) === Number(lead.project_id);
+      }
+      if (client.role === 'employee') {
+        if (!lead.assigned_employee_id) return true;
+        return Number(client.employeeId) === Number(lead.assigned_employee_id);
+      }
+      return false;
+    });
+  } catch (err) {
+    console.error('[REALTIME LEAD ERROR]', err.message);
+  }
+}
+
+function notifyRealtimeLeadUpdate(leadId, status) {
+  try {
+    if (!leadId) return;
+    broadcastRealtimeEvent('lead_updated', {
+      id: Number(leadId),
+      status: status || 'updated'
+    });
+  } catch (err) {
+    console.error('[REALTIME UPDATE ERROR]', err.message);
+  }
+}
+
+function notifyRealtimeAttendance(punchData) {
+  try {
+    broadcastRealtimeEvent('attendance_punch', punchData, client => {
+      return ['admin', 'hr', 'manager', 'coordinator'].includes(client.role);
+    });
+  } catch (err) {
+    console.error('[REALTIME ATTENDANCE ERROR]', err.message);
+  }
+}
+
 function dispatchNotification({ type, name, phone, email, project, details }){
   const cleanPhone = (phone || "").replace(/[^0-9]/g, "");
   const adminPhone = (process.env.ADMIN_WHATSAPP_PHONE || "916352000017").replace(/[^0-9]/g, "");
@@ -1722,6 +1855,7 @@ app.post("/api/admin/leads",coordinatorOrAdmin,(req,res)=>{
     syncLeadToSiteVisit(newLeadId);
   }
   audit(req,"create","lead",newLeadId,`${name} · ${source}`);
+  notifyRealtimeNewLead(newLeadId);
   res.status(201).json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(newLeadId)});
 });
 // Duplicate lead checking helper
@@ -1897,6 +2031,7 @@ app.patch("/api/admin/leads/:id",coordinatorOrAdmin,(req,res)=>{
     db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=? OR lead_id=?").run(id, id);
   }
   audit(req,"update","lead",id,`Status ${status} · Sentiment: ${sentiment}`);
+  notifyRealtimeLeadUpdate(id, status);
   res.json({success:true,data:db.prepare("SELECT * FROM leads WHERE id=?").get(id)});
 });
 
@@ -1911,9 +2046,11 @@ app.post("/api/admin/enquiries/:id/convert",coordinatorOrAdmin,(req,res)=>{
     const r=db.prepare(`INSERT INTO leads(user_id,name,phone,email,source,status,notes,project_id,enquiry_id,created_at,updated_at)
       VALUES(?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`).run(enq.user_id,enq.name,enq.phone||'',enq.email||'','website enquiry','qualified',enq.message||'',enq.project_id||null,id);
     lead=db.prepare("SELECT * FROM leads WHERE id=?").get(r.lastInsertRowid);
+    notifyRealtimeNewLead(lead.id);
   }else{
     db.prepare("UPDATE leads SET status='qualified',updated_at=CURRENT_TIMESTAMP WHERE id=?").run(lead.id);
     lead.status='qualified';
+    notifyRealtimeLeadUpdate(lead.id, 'qualified');
   }
   db.prepare("UPDATE enquiries SET status='contacted' WHERE id=?").run(id);
   audit(req,"convert","enquiry",id,`Converted to qualified lead #${lead.id}`);
@@ -2321,6 +2458,7 @@ app.post("/api/webhooks/meta-leads", (req, res) => {
 
       audit({ user: null, ip: req.ip }, "create", "lead", insertRes.lastInsertRowid, `Live ad lead captured: ${lead.name} via ${effectiveSource}`);
       console.log(`[META LEAD INGESTED] Lead ID: ${insertRes.lastInsertRowid}, Name: ${lead.name}, Source: ${effectiveSource}`);
+      notifyRealtimeNewLead(insertRes.lastInsertRowid);
     }
 
     return res.status(200).json({ success: true, count: leadsToProcess.length });
@@ -2954,6 +3092,7 @@ app.patch("/api/employee/leads/:id",employeeOrAdmin,(req,res)=>{
     db.prepare("UPDATE site_visits SET status='completed',updated_at=CURRENT_TIMESTAMP WHERE enquiry_id=? OR lead_id=?").run(id, id);
   }
   audit(req,"update","lead",id,`Updated by advisor: ${status} · ${sentiment}`);
+  notifyRealtimeLeadUpdate(id, status);
   res.json({success:true,message:"Lead updated"});
 });
 
@@ -2995,6 +3134,7 @@ app.post("/api/employee/walk-in",employeeOrAdmin,(req,res)=>{
 
   const newId=Number(r.lastInsertRowid);
   audit(req,"create","lead",newId,`Site Walk-In at ${projectName} recorded by ${emp?emp.name:'Admin'}`);
+  notifyRealtimeNewLead(newId);
 
   const notify = dispatchNotification({
     type: "Site Walk-In",
@@ -3074,6 +3214,7 @@ app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
       existing.id
     );
     audit(req,"update","attendance",existing.id,`Check-out: ${timeNow} · ${loc.site_name} · Shift: ${duration}`);
+    notifyRealtimeAttendance({ employee_id: emp.id, employee_name: emp.name, action: 'check_out', site: loc.site_name, time: timeNow, duration });
     const updated = db.prepare("SELECT * FROM employee_attendance WHERE id=?").get(existing.id);
     return res.json({
       success:true,
@@ -3090,6 +3231,7 @@ app.post("/api/employee/attendance/check-in",employeeOrAdmin,(req,res)=>{
       loc.site_name || '', loc.distance_m ?? null, loc.status || ''
     );
     audit(req,"create","attendance",r.lastInsertRowid,`Check-in: ${timeNow} · ${loc.site_name}`);
+    notifyRealtimeAttendance({ employee_id: emp.id, employee_name: emp.name, action: 'check_in', site: loc.site_name, time: timeNow });
     const created = db.prepare("SELECT * FROM employee_attendance WHERE id=?").get(r.lastInsertRowid);
     return res.json({
       success:true,
@@ -3991,7 +4133,9 @@ function createEnquiry({userId,projectId=null,name,phone,email,message,source='w
     .run(userId,name,phone,email,safeSource,'new',message,projectId,r.lastInsertRowid);
   return {id:Number(r.lastInsertRowid),reference:ref,lead_id:Number(lead.lastInsertRowid)};
  });
- return tx();
+ const res = tx();
+ setTimeout(() => notifyRealtimeNewLead(res.lead_id), 10);
+ return res;
 }
 app.post("/api/enquiries",rateLimit(10,10*60*1000),(req,res)=>{
  if(req.body.hp_confirm_field) return res.status(200).json({success:true,message:"Enquiry submitted successfully"});
