@@ -9,6 +9,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LNG Advisor">
+<script>
+  (function() {
+    try {
+      var saved = localStorage.getItem('lng_advisor_theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var theme = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch(e) {}
+  })();
+</script>
 <link rel="icon" type="image/png" href="/assets/icons/icon-96x96.png">
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
@@ -31,6 +41,7 @@
   --ink-muted: #94a3b8;
   --bg-main: #f8fafc;
   --bg-card: #ffffff;
+  --bg-header: #ffffff;
   --line: #e2e8f0;
   --line-strong: #cbd5e1;
   --success: #16a34a;
@@ -42,7 +53,25 @@
   --radius-pill: 9999px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
   --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  --table-hover: #fdfdfe;
+  --input-bg: #ffffff;
 }
+
+[data-theme="dark"] {
+  --ink-heading: #f8fafc;
+  --ink-body: #cbd5e1;
+  --ink-muted: #94a3b8;
+  --bg-main: #070b14;
+  --bg-card: #0f172a;
+  --bg-header: #0b111e;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --sky-light: rgba(2, 132, 199, 0.18);
+  --shadow-card: 0 4px 25px -2px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.08);
+  --table-hover: rgba(255, 255, 255, 0.03);
+  --input-bg: #111a2e;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: var(--font-sans);
@@ -50,13 +79,15 @@ body {
   color: var(--ink-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 header {
-  background: #fff;
+  background: var(--bg-header);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 40;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 .head-wrap {
   max-width: 1280px;
@@ -470,6 +501,268 @@ tr:hover td { background: #fdfdfe; }
   display: none;
   z-index: 200;
 }
+
+/* ─── DUAL THEME TOGGLE & DARK MODE OVERRIDES (MIDNIGHT OBSIDIAN) ─── */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  color: var(--ink-heading);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+.theme-toggle-btn:hover {
+  border-color: var(--sky-primary);
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .theme-toggle-btn {
+  background: #111a2e;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+}
+[data-theme="dark"] .theme-toggle-btn:hover {
+  border-color: #38bdf8;
+  background: #16223b;
+}
+
+[data-theme="dark"] header {
+  background: #0b111e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .kpi-card {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .kpi-card.clickable:hover {
+  box-shadow: 0 10px 24px -4px rgba(2, 132, 199, 0.25);
+  border-color: rgba(2, 132, 199, 0.6);
+}
+[data-theme="dark"] .kpi-card.clickable.active {
+  background: linear-gradient(180deg, rgba(2, 132, 199, 0.18) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-color: var(--sky-primary);
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.3), var(--shadow-card);
+}
+[data-theme="dark"] #attendanceStatusText {
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] .content-box {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .box-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] th {
+  background: rgba(255, 255, 255, 0.02);
+  color: #94a3b8;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+}
+[data-theme="dark"] tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .btn-sm {
+  background: #162035;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+[data-theme="dark"] .btn-sm:hover {
+  background: #1e2c47;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+[data-theme="dark"] .btn-wa {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.3);
+}
+[data-theme="dark"] .btn-wa:hover {
+  background: rgba(34, 197, 94, 0.22);
+}
+
+[data-theme="dark"] .btn-logout {
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+[data-theme="dark"] .btn-logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .advisor-tag {
+  background: rgba(2, 132, 199, 0.2);
+  color: #38bdf8;
+}
+
+[data-theme="dark"] #advisorSearchInput,
+[data-theme="dark"] #advisorPriorityFilter {
+  background: #111a2e !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+[data-theme="dark"] #advisorActiveFilterPill {
+  background: rgba(2, 132, 199, 0.2) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(2, 132, 199, 0.35) !important;
+}
+
+[data-theme="dark"] #advisorFilterResetBtn {
+  background: rgba(244, 63, 94, 0.15) !important;
+  color: #fb7185 !important;
+  border-color: rgba(244, 63, 94, 0.3) !important;
+}
+
+[data-theme="dark"] .modal-box {
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+[data-theme="dark"] .modal-head {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .modal-foot {
+  background: #0b111e;
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .btn-cancel {
+  background: #162035;
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+[data-theme="dark"] .btn-cancel:hover {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .field-group input,
+[data-theme="dark"] .field-group select,
+[data-theme="dark"] .field-group textarea {
+  background: #111a2e;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+[data-theme="dark"] .field-group input:focus,
+[data-theme="dark"] .field-group select:focus,
+[data-theme="dark"] .field-group textarea:focus {
+  border-color: var(--sky-primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.35);
+}
+
+[data-theme="dark"] .pill-hot {
+  background: rgba(239, 68, 68, 0.16);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+[data-theme="dark"] .pill-warm {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+[data-theme="dark"] .pill-cold {
+  background: rgba(148, 163, 184, 0.16);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+[data-theme="dark"] .status-tag {
+  color: #38bdf8;
+}
+
+[data-theme="dark"] .pill[style*="background:#e0f2fe"] {
+  background: rgba(2, 132, 199, 0.2) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(2, 132, 199, 0.35);
+}
+[data-theme="dark"] .pill[style*="background:#fee2e2"] {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+[data-theme="dark"] .btn-sm[style*="border-color:#0284c7"] {
+  background: rgba(2, 132, 199, 0.15) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(2, 132, 199, 0.45) !important;
+}
+
+[data-theme="dark"] #eodModal .modal-body > div[style*="background:#f8fafc"],
+[data-theme="dark"] #eodModal .modal-body > div[style*="background: #f8fafc"] {
+  background: #162035 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+[data-theme="dark"] #eodCheckInDisplay {
+  color: #f8fafc !important;
+}
+[data-theme="dark"] #eodGeoStatus {
+  background: rgba(2, 132, 199, 0.15) !important;
+  border-color: rgba(2, 132, 199, 0.3) !important;
+  color: #38bdf8 !important;
+}
+
+[data-theme="dark"] #locationHelpModal .modal-body {
+  color: #e2e8f0;
+}
+[data-theme="dark"] #locationHelpModal .modal-body > div[style*="background:#eff6ff"] {
+  background: rgba(2, 132, 199, 0.15) !important;
+  border-color: rgba(2, 132, 199, 0.3) !important;
+  color: #bae6fd !important;
+}
+[data-theme="dark"] #locationHelpModal ol li {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .cmd-palette-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 175, 55, 0.4);
+  color: #f8fafc;
+}
+[data-theme="dark"] .cmd-palette-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+  color: #ffffff;
+}
+[data-theme="dark"] .cmd-palette-btn kbd {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #cbd5e1;
+}
+
+@media (max-width: 640px) {
+  .head-wrap {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  .brand-sub {
+    display: none;
+  }
+  .user-badge {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  #themeToggleLabel {
+    display: none;
+  }
+  .cmd-palette-btn kbd {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
@@ -484,6 +777,10 @@ tr:hover td { background: #fdfdfe; }
       </div>
     </a>
     <div class="user-badge" style="display:flex; align-items:center; gap:10px;">
+      <button type="button" class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Switch Light/Dark Mode (Saves Phone Battery)">
+        <span id="themeToggleIcon">☀️</span>
+        <span id="themeToggleLabel">Light</span>
+      </button>
       <button type="button" class="cmd-palette-btn" onclick="openCommandPalette()" title="Press Ctrl + K to search anything">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         <span>Search</span>
@@ -812,6 +1109,31 @@ if (location.protocol === 'http:' && location.hostname !== 'localhost' && locati
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
 const escAttr = s => String(s ?? '').replace(/'/g, '&#039;').replace(/"/g, '&quot;');
+
+// ─── THEME CONTROLLER (Dual-Mode: Midnight Obsidian & Light) ───
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('lng_advisor_theme', theme); } catch(e) {}
+  const icon = $('themeToggleIcon');
+  const label = $('themeToggleLabel');
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (icon) icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+  if (label) label.textContent = theme === 'dark' ? 'Dark' : 'Light';
+  if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#070B14' : '#0B1528');
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  toast(next === 'dark' ? '🌙 Dark Mode activated (Battery-saving)' : '☀️ Light Mode activated');
+}
+
+function syncThemeUI() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(current);
+}
+syncThemeUI();
 
 function openLocationHelpModal() {
   const modal = $('locationHelpModal');
